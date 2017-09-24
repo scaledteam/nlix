@@ -1,0 +1,16 @@
+#
+# This E2 made by scaled
+#
+
+@name reboot
+
+if (!APPS_INFO:exists("reboot")) {
+    local Info = table()
+    
+    APPS_INFO["reboot", table] = Info
+}
+
+if (app("reboot")) {
+    halt()
+    reset()
+}

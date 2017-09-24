@@ -1,0 +1,57 @@
+#
+# This E2 made by scaled
+#
+
+@name egp-wm-shell
+
+if (!APPS_INFO:exists("egp-wm-shell")) {
+    local Info = table()
+    
+    APPS_INFO["egp-wm-shell", table] = Info
+}
+
+if (app("egp-wm-shell")) {
+    switch (ThisAppState) {
+        # Wait console driver
+        case 0,
+            if (initTerminal()) {
+                appNextState()
+            }
+            break
+        # Wait keyboard driver
+        case 1,
+            if (initSimpleKeyboard()) {
+                appNextState()
+            }
+            break
+        
+        # Get callback device
+        case 2,
+            appT("callback-device", ThisWorkspace["devices", table]["other", table][1, table])
+            appNextState()
+            break
+        
+        # Main state
+        case 3,
+            consolePrint("wm-sh: $ ")
+            requestKeyboardInput()
+            
+            appNextState()
+            break
+        
+        # Get input
+        case 4,
+            if (waitKeyboardInput()) {
+                local Input = getKeyboardInput()
+                local Commands = Input:trim():explode(" ")
+                
+                local CallbackDevice = appT("callback-device")
+                foreach (I, Command:string = Commands) {
+                    CallbackDevice["queue", array]:pushString(Command)
+                }
+                appSetState(2)
+            }
+            
+            break
+    }
+}

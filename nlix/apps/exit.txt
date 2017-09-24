@@ -1,0 +1,19 @@
+#
+# This E2 made by scaled
+#
+
+@name exit
+
+if (!APPS_INFO:exists("exit")) {
+    local Info = table()
+    
+    APPS_INFO["exit", table] = Info
+}
+
+if (app("exit")) {
+    switch (ThisAppState) {
+        case 0,
+            break
+    }
+    ThisWorkspace:clear()
+}

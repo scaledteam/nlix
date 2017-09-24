@@ -1,0 +1,64 @@
+#
+# This E2 made by scaled
+#
+
+@name driver-keyboard
+
+if (!APPS_INFO:exists("driver-keyboard")) {
+    local Info = table()
+    
+    APPS_INFO["driver-keyboard", table] = Info
+}
+
+if (app("driver-keyboard")) {
+    switch (ThisAppState) {
+        # Initialize
+        case 0,
+            appR("keys", array())
+            
+            # Init first keyboard
+            local KeyboardId = 0
+            for (I = 1, ThisWorkspace["devices", table]["keyboards", table]:count()) {
+                if (!ThisWorkspace["devices", table]["keyboards", table][I, table]["busy", number]) {
+                    KeyboardId = I
+                    break
+                }
+            }
+            
+            if (KeyboardId != 0) {
+                local Device = ThisWorkspace["devices", table]["keyboards", table][KeyboardId, table]
+                Device["busy", number] = 1
+                
+                appT("device", Device)
+            }
+            else {
+                Dmesg += "Failed to find free keyboard on workspace " + ThisWorkspace["name", string] + "."
+                appCloseSelf()
+            }
+            
+            appNextState()
+            break
+        
+        # Track keys
+        case 1,
+            local Device = appT("device")
+            DeviceType = Device["type", string]
+            
+            local Keys = appR("keys")
+            
+            switch (DeviceType) {
+                case "keyboard",
+                    for (I = 1, 5) {
+                        Keys[I, number] = Device["port", wirelink][I - 1]
+                    }
+                    break
+                
+                case "virtual",
+                    for (I = 1, 5) {
+                        Keys[I, number] = Device["keys", array][I, number]
+                    }
+                    break
+            }
+            break
+    }
+}

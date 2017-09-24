@@ -1,0 +1,266 @@
+#
+# This E2 made by scaled
+#
+
+@name egp-wm
+
+if (!APPS_INFO:exists("egp-wm")) {
+    local Info = table()
+    
+    APPS_INFO["egp-wm", table] = Info
+}
+
+if (app("egp-wm")) {
+    switch (ThisAppState) {
+        case 0,
+            if (initEgp()) {
+                appNextState()
+            }
+            break
+        
+        case 1,
+            if (initCursor()) {
+                appNextState()
+            }
+            break
+        
+        case 2,
+            if (initKeyboard()) {
+                appNextState()
+            }
+            break
+        
+        case 3,
+            local EgpMemory = table()
+            appT("egp-memory", EgpMemory)
+            
+            #[local ParentId = 4
+            EgpMemory[AppName, vector2] = vec2(ParentId, 20 + ParentId)
+            ParentId = EgpMemory[AppName, vector2][1]]#
+            
+            egpBox(1, vec2(), egpResolution())
+            egpColor(1, vec(127))
+            egpParentToBase(1)
+            
+            local Size = vec2(400, 400)
+            local Pos = vec2(30, 40)
+            local BorderWidth = 2
+            local ParentId = 4
+            local LabelHeight = 25
+            local AppName = "egp-eyes"
+            #local AppName = "egp-wm-launcher"
+            
+            egpParentPoint(ParentId, Pos)
+            egpParentToBase(ParentId)
+            
+            egpBox(2, vec2(-BorderWidth, -BorderWidth - LabelHeight), Size + vec2(2 * BorderWidth, 2 * BorderWidth + LabelHeight))
+            egpParent(2, ParentId)
+            egpColor(2, vec(127, 127, 255))
+            
+            egpTextLayout(3, AppName, vec2(0, -LabelHeight), vec2(Size[1], LabelHeight))
+            egpParent(3, ParentId)
+            egpAlign2(3, 1, 1)
+            
+            local Workspace = createVirtualWorkspace(array("driver-egp", "driver-cursor", "driver-keyboard", AppName))
+            appT("workspace", Workspace)
+            
+            # Create egp screen virtual device
+            appT("egp-screen", createVirtualEgpScreen(Size, 20))
+            Workspace["devices", table]["egp-screens", table]:pushTable(appT("egp-screen"))
+            
+            # Create Virtual keyboard device
+            appT("keyboard", createVirtualKeyboard())
+            local VirtualKeyboardDevice = appT("keyboard")
+            
+            # Send all keys to virtual driver
+            VirtualKeyboardDevice["keys", array] = keyboardGetKeys()
+            Workspace["devices", table]["keyboards", table]:pushTable(VirtualKeyboardDevice)
+            
+            # Cursor device
+            local VirtualCursorDevice = createVirtualCursor()
+            appT("cursor", VirtualCursorDevice)
+            Workspace["devices", table]["cursors", table]:pushTable(VirtualCursorDevice)
+            
+            # Callback device
+            local CallbackDevice = table()
+            CallbackDevice["type", string] = "callback"
+            CallbackDevice["queue", array] = array()
+            appT("callback-device", CallbackDevice)
+            Workspace["devices", table]["other", table]:pushTable(CallbackDevice)
+            
+            autostartVirtualWorkspace(Workspace)
+            
+            appNextState()
+            break
+        
+        case 4,
+            if (egpIsIdle()) {
+                appNextState()
+            }
+            break
+        
+        case 5,
+            # Virtual screen driver
+            VirtualScreenDevice = appT("egp-screen")
+            local EgpQueue = VirtualScreenDevice["output-queue", array]
+            if (EgpQueue:count() > 0) {
+                VirtualScreenDevice["idle", number] = 0
+                
+                local Command = EgpQueue:shiftString()
+                local ParentId = 4
+                
+                switch (Command) {
+                    case "egpBox",
+                        egpBox(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector2(), EgpQueue:shiftVector2())
+                        break
+                    
+                    case "egpSetText",
+                        egpSetText(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftString())
+                        break
+                    
+                    case "egpText",
+                        egpText(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftString(), EgpQueue:shiftVector2())
+                        break
+                    
+                    case "egpTextLayout",
+                        egpTextLayout(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftString(), EgpQueue:shiftVector2(), EgpQueue:shiftVector2())
+                        break
+                    
+                    case "egpColor",
+                        egpColor(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector())
+                        break
+                    
+                    case "egpSize",
+                        egpSize(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftNumber())
+                        break
+                    
+                    case "egpParent",
+                        egpParent(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftNumber() + ParentId)
+                        break
+                    
+                    case "egpParentToBase",
+                        egpParent(EgpQueue:shiftNumber() + ParentId, ParentId)
+                        break
+                    
+                    case "egpParentPoint",
+                        egpParentPoint(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector2())
+                        break
+                    
+                    case "egpAlign",
+                        egpAlign(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftNumber())
+                        break
+                    
+                    case "egpAlign2",
+                        egpAlign2(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftNumber(), EgpQueue:shiftNumber())
+                        break
+                    
+                    case "egpCircle",
+                        egpCircle(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector2(), EgpQueue:shiftVector2())
+                        break
+                    
+                    case "egpCircleOutline",
+                        egpCircleOutline(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector2(), EgpQueue:shiftVector2())
+                        break
+                    
+                    case "egpPos",
+                        egpPos(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector2())
+                        break
+                }
+            }
+            else {
+                VirtualScreenDevice["idle", number] = 1
+            }
+            
+            # Virtual cursor device driver
+            local VirtualCursorDevice = appT("cursor")
+            local CursorPos = cursorGetPos()
+            VirtualCursorDevice["pos", vector2] = CursorPos - vec2(30, 40)
+            
+            # Callback device
+            local CommandQueue = appT("callback-device")["queue", array]
+            if (CommandQueue:count() > 0) {
+                local Command = CommandQueue:shiftString()
+                
+                switch (Command) {
+                    case "create",
+                        local WorkspaceName = CommandQueue:shiftString()
+                        local NewEgpId = 30
+                        
+                        local Size = vec2(300, 150)
+                        local Pos = vec2(30, 300)
+                        local BorderWidth = 2
+                        local ParentId = 4
+                        local LabelHeight = 25
+                        
+                        egpBox(1 + NewEgpId, vec2(), egpResolution())
+                        egpColor(1 + NewEgpId, vec(127))
+                        egpParentToBase(1 + NewEgpId)
+                        
+                        egpParentPoint(ParentId, Pos)
+                        egpParentToBase(ParentId)
+                        
+                        egpBox(2 + NewEgpId, vec2(-BorderWidth, -BorderWidth - LabelHeight), Size + vec2(2 * BorderWidth, 2 * BorderWidth + LabelHeight))
+                        egpParent(2 + NewEgpId, ParentId)
+                        egpColor(2 + NewEgpId, vec(127, 127, 255))
+                        
+                        egpTextLayout(3 + NewEgpId, AppName, vec2(0, -LabelHeight), vec2(Size[1], LabelHeight))
+                        egpParent(3 + NewEgpId, ParentId)
+                        egpAlign2(3 + NewEgpId, 1, 1)
+                        
+                        autostartVirtualWorkspace(Workspace)
+                        break
+                    
+                    case "add-device",
+                        local WorkspaceName = CommandQueue:shiftString()
+                        local DeviceType = CommandQueue:shiftString()
+                        local Workspace = Workspaces[WorkspaceName, table]
+                        switch (DeviceType) {
+                            case "egp-screen",
+                                appT("egp-screen", createVirtualEgpScreen(Size, 20))
+                                Workspace["devices", table]["egp-screens", table]:pushTable(appT("egp-screen"))
+                                
+                                break
+                            
+                            case "keyboard",
+                                appT("keyboard", createVirtualKeyboard())
+                                local VirtualKeyboardDevice = appT("keyboard")
+                                Workspace["devices", table]["keyboards", table]:pushTable(VirtualKeyboardDevice)
+                                break
+                            
+                            case "cursor",
+                                local VirtualCursorDevice = createVirtualCursor()
+                                appT("cursor", VirtualCursorDevice)
+                                Workspace["devices", table]["cursors", table]:pushTable(VirtualCursorDevice)
+                                break
+                            
+                            case "callback",
+                                local CallbackDevice = table()
+                                CallbackDevice["type", string] = "callback"
+                                CallbackDevice["queue", array] = array()
+                                appT("callback-device", CallbackDevice)
+                                Workspace["devices", table]["other", table]:pushTable(CallbackDevice)
+                                break
+                        }
+                        break
+                    
+                    case "start",
+                        local WorkspaceName = CommandQueue:shiftString()
+                        autostartVirtualWorkspace(Workspaces[WorkspaceName, table])
+                        break
+                    
+                    case "test",
+                        egpColor(1, randvec(0, 255))
+                        break
+                    
+                    case "cursor",
+                        egpSetText(3, cursorGetPos()[1] + ", " + cursorGetPos()[2])
+                        break
+                    
+                    case "move",
+                        egpPos(4, cursorGetPos())
+                        break
+                }
+            }
+            break
+    }
+}

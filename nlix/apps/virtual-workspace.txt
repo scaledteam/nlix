@@ -1,0 +1,63 @@
+#
+# This E2 made by scaled
+#
+
+@name virtual-workspace
+
+if (!APPS_INFO:exists("virtual-workspace")) {
+    local Info = table()
+    
+    APPS_INFO["virtual-workspace", table] = Info
+}
+
+if (app("virtual-workspace")) {
+    switch (ThisAppState) {
+        case 0,
+            if (initTerminal()) {
+                appNextState()
+            }
+            break
+        
+        case 1,
+            if (initKeyboard()) {
+                appNextState()
+            }
+            break
+        
+        case 2,
+            appT("workspace", createVirtualWorkspace(AUTOSTART_TERMINAL))
+            
+            appT("console-screen", createVirtualConsoleScreen())
+            appT("keyboard", createVirtualKeyboard())
+            
+            local Workspace = appT("workspace")
+            Workspace["devices", table]["console-screens", table]:pushTable(appT("console-screen"))
+            Workspace["devices", table]["keyboards", table]:pushTable(appT("keyboard"))
+            
+            autostartVirtualWorkspace(appT("workspace"))
+            
+            appNextState()
+            break
+        
+        case 3,
+            # Virtual screen driver
+            local ConsoleScreenDevice = appT("console-screen")
+            if (ConsoleScreenDevice["new-output", string] != "") {
+                consolePrint(ConsoleScreenDevice["new-output", string])
+                ConsoleScreenDevice["new-output", string] = ""
+            }
+            
+            if (ConsoleScreenDevice["new-erase", number] != 0) {
+                consoleErase(ConsoleScreenDevice["new-erase", number])
+                ConsoleScreenDevice["new-erase", number] = 0
+            }
+            
+            # Virtual keyboard driver
+            local Keys = keyboardGetKeys()
+            local VirtualKeyboardDevice = appT("keyboard")
+            for (I = 1, 5) {
+                VirtualKeyboardDevice["keys", array][I, number] = Keys[I, number]
+            }
+            break
+    }
+}

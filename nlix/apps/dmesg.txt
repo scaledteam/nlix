@@ -1,0 +1,17 @@
+#
+# This E2 made by scaled
+#
+
+@name dmesg
+
+if (!APPS_INFO:exists("dmesg")) {
+    local Info = table()
+    
+    APPS_INFO["dmesg", table] = Info
+}
+
+if (app("dmesg")) {
+    consolePrintFast(Dmesg)
+    appCloseSelf()
+}
+

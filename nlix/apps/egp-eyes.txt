@@ -1,0 +1,85 @@
+#
+# This E2 made by scaled
+#
+
+@name egp-eyes
+
+if (!APPS_INFO:exists("egp-eyes")) {
+    local Info = table()
+    
+    APPS_INFO["egp-eyes", table] = Info
+}
+
+if (app("egp-eyes")) {
+    switch (ThisAppState) {
+        case 0,
+            if (initEgp()) {
+                appNextState()
+            }
+            break
+        
+        case 1,
+            if (initCursor()) {
+                appNextState()
+            }
+            break
+        
+        case 2,
+            egpBox(1, vec2(), egpResolution())
+            egpParentToBase(1)
+            
+            egpCircleOutline(2, egpResolution() * vec2(0.25, 0.5), egpResolution() * vec2(0.5, 1) / 2)
+            egpParentToBase(2)
+            egpColor(2, vec())
+            
+            egpCircleOutline(3, egpResolution() * vec2(0.75, 0.5), egpResolution() * vec2(0.5, 1) / 2)
+            egpParentToBase(3)
+            egpColor(3, vec())
+            
+            egpCircle(4, egpResolution() * vec2(0.25, 0.5), egpResolution() * vec2(0.5, 1) / 20)
+            egpParentToBase(4)
+            egpColor(4, vec())
+            
+            egpCircle(5, egpResolution() * vec2(0.75, 0.5), egpResolution() * vec2(0.5, 1) / 20)
+            egpParentToBase(5)
+            egpColor(5, vec())
+            
+            appNextState()
+            break
+        
+        case 3,
+            if (egpIsIdle()) {
+                local CursorPos = cursorGetPos()
+                if (appV2("cursorPosOld") != CursorPos) {
+                    #local Eye1Pos = clamp(CursorPos, vec2(), egpResolution() * vec2(0.5, 1))
+                    #local Eye2Pos = clamp(CursorPos, egpResolution() * vec2(0.5, 0), egpResolution())
+                    
+                    local RadiusX = egpResolution()[1] / 2
+                    local RadiusY = egpResolution()[2]
+                    local Aspect = RadiusY / RadiusX
+                    
+                    local Offset1 = egpResolution() * vec2(0.25, 0.5)
+                    local Offset2 = egpResolution() * vec2(0.75, 0.5)
+                    
+                    local Direction1 = CursorPos - Offset1
+                    local Direction2 = CursorPos - Offset2
+                    
+                    local Eye1Pos = Direction1 / sqrt(Direction1[1] ^ 2 + (Direction1[2] / Aspect) ^ 2) * RadiusX / 2
+                    local Eye2Pos = Direction2 / sqrt(Direction2[1] ^ 2 + (Direction2[2] / Aspect) ^ 2) * RadiusX / 2
+                    
+                    if (Eye1Pos:length() > Direction1:length()) {
+                        Eye1Pos = Direction1
+                    }
+                    if (Eye2Pos:length() > Direction2:length()) {
+                        Eye2Pos = Direction2
+                    }
+                    
+                    egpPos(4, Eye1Pos + Offset1)
+                    egpPos(5, Eye2Pos + Offset2)
+                    
+                    appV2("cursorPosOld", CursorPos)
+                }
+            }
+            break
+    }
+}

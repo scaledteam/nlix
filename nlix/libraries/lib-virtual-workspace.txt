@@ -1,0 +1,100 @@
+#
+# This E2 made by scaled
+#
+
+@name lib-virtual-workspace
+
+
+function table createVirtualWorkspace(Name:string, Autostart:array) {
+    Workspace = table()
+    
+    Workspace["name", string] = Name
+    Workspace["autostart", array] = Autostart
+    #Workspace["parent", table] = ThisWorkspace
+    #Workspace["parent-app", table] = ThisApp
+    #Workspace["parent-app-id", number] = ThisAppId
+    
+    Workspace["devices", table] = table()
+    Workspace["devices", table]["egp-screens", table] = table()
+    Workspace["devices", table]["console-screens", table] = table()
+    Workspace["devices", table]["keyboards", table] = table()
+    Workspace["devices", table]["cursors", table] = table()
+    Workspace["devices", table]["other", table] = table()
+    
+    Workspaces[Name, table] = Workspace
+    return Workspace
+}
+
+function table createVirtualWorkspace(Autostart:array) {
+    local Name = "vws" + Workspaces:count()
+    
+    # If name is exists
+    if (Workspaces:exists(Name)) {
+        local I = 1
+        while (Workspaces:exists("vws" + (Workspaces:count() + I))) {
+            I++
+        }
+        Name = "vws" + (Workspaces:count() + I)
+    }
+    
+    return createVirtualWorkspace(Name, Autostart)
+}
+
+function table createVirtualKeyboard() {
+    local Device = table()
+    Device["type", string] = "virtual"
+    Device["busy", number] = 0
+    Device["keys", array] = array()
+    
+    return Device
+}
+
+function table createVirtualConsoleScreen() {
+    local Device = table()
+    Device["type", string] = "virtual"
+    Device["busy", number] = 0
+    Device["new-output", string] = ""
+    Device["new-erase", number] = 0
+    Device["clear", number] = 0
+    
+    return Device
+}
+
+function number autostartVirtualWorkspace(Workspace:table) {
+    local ThisWorkspaceParent = ThisWorkspace
+    ThisWorkspace = Workspace
+    
+    local AutoStarted = 0
+    foreach (I, AppName:string = Workspace["autostart", array]) {
+        command(AppName)
+    }
+    
+    ThisWorkspace = ThisWorkspaceParent
+    
+    Workspace:remove("autostart")
+}
+
+function table createVirtualEgpScreen(Resolution:vector2, MaxObjects) {
+    local Device = table()
+    Device["type", string] = "virtual"
+    Device["busy", number] = 0
+    Device["idle", number] = 1
+    
+    Device["resolution", vector2] = Resolution
+    Device["max-objects", number] = MaxObjects
+    
+    Device["output-queue", array] = array()
+    Device["input-queue", array] = array()
+    
+    return Device
+}
+
+function table createVirtualCursor() {
+    local Device = table()
+    Device["type", string] = "virtual"
+    Device["busy", number] = 0
+    
+    Device["pos", vector2] = vec2()
+    
+    return Device
+}

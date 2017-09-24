@@ -1,0 +1,17 @@
+#
+# This E2 made by scaled
+#
+
+@name echo
+
+if (!APPS_INFO:exists("echo")) {
+    local Info = table()
+    
+    APPS_INFO["echo", table] = Info
+}
+
+if (app("echo")) {
+    consolePrintFast(appS("args") + "\n")
+    appCloseSelf()
+}
+

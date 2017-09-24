@@ -1,0 +1,78 @@
+#
+# This E2 made by scaled
+#
+
+@name nlix
+@inputs [Port0 Port1 Port2 Port3 Port4 Port5 Port6 Port7]:wirelink
+
+if (first()) {
+    #include "nlix/system/system"
+    
+    #include "nlix/libraries/lib-vars"
+    ##include "nlix/libraries/lib-vars-2"
+    #include "nlix/libraries/lib-app"
+    #include "nlix/libraries/lib-event"
+    
+    #include "nlix/libraries/drivers/lib-driver-terminal"
+    #include "nlix/libraries/drivers/lib-driver-keyboard"
+    #include "nlix/libraries/drivers/lib-driver-egp"
+    #include "nlix/libraries/drivers/lib-driver-cursor"
+    
+    #include "nlix/libraries/lib-simple-keyboard"
+    #include "nlix/libraries/lib-virtual-workspace"
+}
+
+if (first()) {
+    init()
+    autostart()
+}
+
+if (tickClk()) {
+    while (perf(SysPerf)) {
+        appManager()
+        
+        # Drivers.
+        #include "nlix/drivers/driver-terminal"
+        #include "nlix/drivers/driver-keyboard"
+        #include "nlix/drivers/driver-egp"
+        #include "nlix/drivers/driver-cursor"
+        
+        # Simplifier tools.
+        #include "nlix/apps/simple-keyboard"
+        
+        # Shells.
+        #include "nlix/apps/sh"
+        
+        # Quit tools.
+        #include "nlix/apps/halt"
+        #include "nlix/apps/reboot"
+        #include "nlix/apps/exit"
+        
+        # Classic console utilites.
+        #include "nlix/apps/clear"
+        #include "nlix/apps/echo"
+        #include "nlix/apps/test"
+        #include "nlix/apps/dmesg"
+        
+        # Apps control.
+        #include "nlix/apps/pkill"
+        #include "nlix/apps/kill"
+        #include "nlix/apps/plist"
+        
+        # Performande control and tests.
+        #include "nlix/apps/perf"
+        #include "nlix/apps/ops"
+        #include "nlix/apps/print-pi"
+        
+        # Egp tests.
+        #include "nlix/apps/egp-clocks"
+        #include "nlix/apps/egp-eyes"
+        
+        # Virtual workspace managers
+        #include "nlix/apps/egp-terminal"
+        #include "nlix/apps/egp-wm"
+        #include "nlix/apps/egp-wm-launcher"
+        #include "nlix/apps/egp-wm-shell"
+        #include "nlix/apps/virtual-workspace"
+    }
+}

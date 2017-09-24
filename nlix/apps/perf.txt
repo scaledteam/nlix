@@ -1,0 +1,23 @@
+#
+# This E2 made by scaled
+#
+
+@name perf
+
+if (!APPS_INFO:exists("perf")) {
+    local Info = table()
+    
+    APPS_INFO["perf", table] = Info
+}
+
+if (app("perf")) {
+    local ArgNumber = appS("args"):toNumber()
+    if (ArgNumber != 0) {
+        SysPerf = ArgNumber
+    }
+    else {
+        consolePrintFast("Entered value is not a number or 0.\n")
+    }
+    appCloseSelf()
+}
+

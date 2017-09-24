@@ -1,0 +1,79 @@
+#
+# This E2 made by scaled
+#
+
+@name driver-cursor
+
+if (!APPS_INFO:exists("driver-cursor")) {
+    local Info = table()
+    
+    APPS_INFO["driver-cursor", table] = Info
+}
+
+if (app("driver-cursor")) {
+    switch (ThisAppState) {
+        # Initialize
+        case 0,
+            # Init first screen
+            appT("device", ThisWorkspace["devices", table]["cursors", table][1, table])
+            
+            if (appT("device")["type", string] == "egp-screen") {
+                appN("need-to-find-user", 1)
+            }
+            
+            #ifdef findInSphere(vector,number)
+                if (appN("need-to-find-user")) {
+                    findIncludeClass("player")
+                }
+            #endif
+            
+            if (appN("need-to-find-user")) {
+                appNextState()
+            }
+            else {
+                appSetState(2)
+            }
+            break
+        
+        case 1,
+            if (appN("need-to-find-user")) {
+                #ifdef findInSphere(vector,number)
+                    local ScanPos = appT("device")["port", wirelink]:entity():pos()
+                    findInSphere(ScanPos, 100)
+                    findSortByDistance(ScanPos)
+                    appE("user", find())
+                #else
+                    local ScanPos = appT("device")["port", wirelink]:entity():pos()
+                    local Player_Distance = 100
+                    foreach(I, Player:entity = players()){
+                        local Distance = ScanPos:distance(Player:pos())
+                        if (Distance < Player_Distance){
+                            Player_Distance = Distance
+                            appE("user", Player)
+                        }
+                    }
+                #endif
+            }
+            
+            appNextState()
+            break
+        
+        case 2,
+            local Device = appT("device")
+            
+            local DeviceType = Device["type", string]
+            switch (DeviceType) {
+                case "egp-screen",
+                    appV2("pos", Device["port", wirelink]:egpCursor(appE("user")))
+                    break
+                
+                case "virtual",
+                    appV2("pos", Device["pos", vector2])
+                    break
+            }
+            if (appN("need-to-find-user")) {
+                appSetState(1)
+            }
+            break
+    }
+}

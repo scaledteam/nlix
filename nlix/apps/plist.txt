@@ -1,0 +1,21 @@
+#
+# This E2 made by scaled
+#
+
+@name plist
+
+if (!APPS_INFO:exists("plist")) {
+    local Info = table()
+    
+    APPS_INFO["plist", table] = Info
+}
+
+if (app("plist")) {
+    local List = ""
+    for (I = 1, Apps:count()) {
+        List += I + ", " + Apps[I, table]["workspace", table]["name", string] + ", " + Apps[I, table]["name", string] + "\n"
+    }
+    consolePrintFast(List)
+    appCloseSelf()
+}
+

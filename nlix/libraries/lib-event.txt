@@ -1,0 +1,68 @@
+#
+# This E2 made by scaled
+#
+
+@name lib-event
+
+function number waitEvent(EventName:string) {
+    if (ThisApp["events", array][1, string] == EventName) {
+        ThisApp["events", array]:shiftString()
+        return 1
+    }
+    else {
+        return 0
+    }
+}
+
+function number waitAnyEvent() {
+    return ThisApp["events", array]:count() > 0
+}
+
+function number waitAnyEventOfApp(AppId) {
+    return Apps[AppId, table]["events", array]:count() > 0
+}
+
+function sendEvent(AppId, EventName:string) {
+    Apps[AppId, table]["events", array]:pushString(EventName)
+}
+
+function sendEventData(AppId, Data:number) {
+    Apps[AppId, table]["events", array]:pushNumber(Data)
+}
+
+function sendEventData(AppId, Data:string) {
+    Apps[AppId, table]["events", array]:pushString(Data)
+}
+
+function sendEventData(AppId, Data:vector) {
+    Apps[AppId, table]["events", array]:pushVector(Data)
+}
+
+function sendEventData(AppId, Data:vector2) {
+    Apps[AppId, table]["events", array]:pushVector2(Data)
+}
+
+function sendEventData(AppId, Data:vector4) {
+    Apps[AppId, table]["events", array]:pushVector4(Data)
+}
+
+function number getEventDataN() {
+    return ThisApp["events", array]:shiftNumber()
+}
+
+function string getEventDataS() {
+    return ThisApp["events", array]:shiftString()
+}
+
+function vector getEventDataV() {
+    return ThisApp["events", array]:shiftVector()
+}
+
+function vector2 getEventDataV2() {
+    return ThisApp["events", array]:shiftVector2()
+}
+
+function vector4 getEventDataV4() {
+    return ThisApp["events", array]:shiftVector4()
+}
+

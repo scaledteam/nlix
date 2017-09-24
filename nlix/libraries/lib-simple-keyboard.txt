@@ -1,0 +1,31 @@
+#
+# This E2 made by scaled
+#
+
+@name lib-simple-keyboard
+
+function number initSimpleKeyboard() {
+    local SimpleKeyboardAppId = findAppByName("simple-keyboard")
+    if (SimpleKeyboardAppId != -1) {
+        appN("simple-keyboard-appid", SimpleKeyboardAppId)
+        return 1
+    }
+    else {
+        return 0
+    }
+}
+
+function requestKeyboardInput() {
+    local AppId = appN("simple-keyboard-appid")
+    
+    sendEvent(AppId, "get-input")
+    sendEventData(AppId, ThisAppId)
+}
+
+function number waitKeyboardInput() {
+    return waitEvent("get-input")
+}
+
+function string getKeyboardInput() {
+    return getEventDataS()
+}

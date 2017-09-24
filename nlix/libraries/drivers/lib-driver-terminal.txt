@@ -1,0 +1,46 @@
+#
+# This E2 made by scaled
+#
+
+@name lib-driver-terminal
+
+function number initTerminal() {
+    local AppId = findAppByName("driver-terminal")
+    if (AppId != -1) {
+        appN("driver-terminal-appid", AppId)
+        return 1
+    }
+    else {
+        return 0
+    }
+}
+
+function consolePrint(Text:string) {
+    local AppId = appN("driver-terminal-appid")
+    
+    sendEvent(AppId, "print")
+    sendEventData(AppId, Text)
+}
+
+function consolePrintFast(Text:string) {
+    local AppId = findAppByName("driver-terminal")
+    
+    sendEvent(AppId, "print")
+    sendEventData(AppId, Text)
+}
+
+function consoleErase(Count) {
+    local AppId = findAppByName("driver-terminal")
+    
+    sendEvent(AppId, "erase")
+    sendEventData(AppId, Count)
+}
+
+function consoleClear() {
+    sendEvent(appN("driver-terminal-appid"), "clear")
+}
+
+function consoleClearFast() {
+    sendEvent(findAppByName("driver-terminal"), "clear")
+}
+

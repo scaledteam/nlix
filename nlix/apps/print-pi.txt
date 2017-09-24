@@ -1,0 +1,55 @@
+#
+# This E2 made by scaled
+#
+
+@name print-pi
+
+if (!APPS_INFO:exists("print-pi")) {
+    local Info = table()
+    
+    APPS_INFO["print-pi", table] = Info
+}
+
+if (app("print-pi")) {
+    switch (ThisAppState) {
+        case 0,
+            if (initTerminal()) {
+                appNextState()
+            }
+            break
+        
+        case 1,
+            appN("iterations", 300)
+            appN("print-step", 10)
+            appN("last-print-step", 0)
+            
+            appN("start-time", systime())
+            consolePrint("Computing started...\n")
+            consolePrint("--------------|50%-----------|100%\n")
+            appNextState()
+            break
+        
+        case 2,
+            appN("counter", appN("counter") + 1)
+            local N = appN("counter")
+            
+            appN("result", appN("result") + 4 * ((-1) ^ (N - 1)) / (2 * N - 1))
+            
+            if (N > appN("last-print-step")) {
+                consolePrint(".")
+                appN("last-print-step", appN("last-print-step") + appN("print-step")) 
+            }
+            
+            if (N > appN("iterations")) {
+                consolePrint("\n")
+                appNextState()
+            }
+            break
+        
+        case 3,
+            consolePrint("Number pi = " + appN("result") + ". Time remaining: " + (int((systime() - appN("start-time")) * 1000) / 1000) + "\n")
+            appCloseSelf()
+            break
+    }
+}
+

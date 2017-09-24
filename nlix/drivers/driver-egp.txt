@@ -1,0 +1,300 @@
+#
+# This E2 made by scaled
+#
+
+@name driver-egp
+
+if (!APPS_INFO:exists("driver-egp")) {
+    local Info = table()
+    
+    APPS_INFO["driver-egp", table] = Info
+}
+
+if (app("driver-egp")) {
+    switch (ThisAppState) {
+        # Initialize
+        case 0,
+            # Init first screen
+            local ScreenId = 0
+            for (I = 1, ThisWorkspace["devices", table]["egp-screens", table]:count()) {
+                if (!ThisWorkspace["devices", table]["egp-screens", table][I, table]["busy", number]) {
+                    ScreenId = I
+                    break
+                }
+            }
+            
+            if (ScreenId != 0) {
+                local Device = ThisWorkspace["devices", table]["egp-screens", table][ScreenId, table]
+                switch (Device["type", string]) {
+                    case "egp-screen",
+                        Device["busy", number] = 1
+                        
+                        local Screen = Device["port", wirelink]
+                        Screen:egpClear()
+                        Screen:egpDrawTopLeft(1)
+                        
+                        Screen:egpBox(1, vec2(), vec2())
+                        
+                        appT("device", Device)
+                        break
+                    
+                    case "virtual",
+                        Device["busy", number] = 1
+                        
+                        appT("device", Device)
+                        break
+                }
+                appV2("resolution", Device["resolution", vector2])
+                appN("idle", 1)
+            }
+            else {
+                Dmesg += "Failed to find free egp screen on workspace " + ThisWorkspace["name", string] + "."
+                appCloseSelf()
+            }
+            
+            appNextState()
+            break
+        
+        # Wait events
+        case 1,
+            if (waitAnyEvent()) {
+                appN("idle", 0)
+                local Command = getEventDataS()
+                local Device = appT("device")
+                local Id = getEventDataN()
+                
+                switch (Command) {
+                    case "egpBox",
+                        switch (Device["type", string]) {
+                            case "egp-screen",
+                                Device["port", wirelink]:egpBox(Id + 1, getEventDataV2(), getEventDataV2())
+                                break
+                            
+                            case "virtual",
+                                local OutputQueue = Device["output-queue", array]
+                                OutputQueue:pushString("egpBox")
+                                OutputQueue:pushNumber(Id)
+                                OutputQueue:pushVector2(getEventDataV2())
+                                OutputQueue:pushVector2(getEventDataV2())
+                                break
+                        }
+                        break
+                    
+                    case "egpSetText",
+                        switch (Device["type", string]) {
+                            case "egp-screen",
+                                Device["port", wirelink]:egpSetText(Id + 1, getEventDataS())
+                                break
+                            
+                            case "virtual",
+                                local OutputQueue = Device["output-queue", array]
+                                OutputQueue:pushString("egpSetText")
+                                OutputQueue:pushNumber(Id)
+                                OutputQueue:pushString(getEventDataS())
+                                break
+                        }
+                        break
+                    
+                    case "egpText",
+                        switch (Device["type", string]) {
+                            case "egp-screen",
+                                Device["port", wirelink]:egpText(Id + 1, getEventDataS(), getEventDataV2())
+                                Device["port", wirelink]:egpFont(Id + 1, FONT_MONOSPACED)
+                                break
+                            
+                            case "virtual",
+                                local OutputQueue = Device["output-queue", array]
+                                OutputQueue:pushString("egpText")
+                                OutputQueue:pushNumber(Id)
+                                OutputQueue:pushString(getEventDataS())
+                                OutputQueue:pushVector2(getEventDataV2())
+                                break
+                        }
+                        break
+                    
+                    case "egpTextLayout",
+                        switch (Device["type", string]) {
+                            case "egp-screen",
+                                Device["port", wirelink]:egpTextLayout(Id + 1, getEventDataS(), getEventDataV2(), getEventDataV2())
+                                Device["port", wirelink]:egpFont(Id + 1, FONT_MONOSPACED)
+                                break
+                            
+                            case "virtual",
+                                local OutputQueue = Device["output-queue", array]
+                                OutputQueue:pushString("egpTextLayout")
+                                OutputQueue:pushNumber(Id)
+                                OutputQueue:pushString(getEventDataS())
+                                OutputQueue:pushVector2(getEventDataV2())
+                                OutputQueue:pushVector2(getEventDataV2())
+                                break
+                        }
+                        break
+                    
+                    case "egpColor",
+                        switch (Device["type", string]) {
+                            case "egp-screen",
+                                Device["port", wirelink]:egpColor(Id + 1, getEventDataV())
+                                break
+                            
+                            case "virtual",
+                                local OutputQueue = Device["output-queue", array]
+                                OutputQueue:pushString("egpColor")
+                                OutputQueue:pushNumber(Id)
+                                OutputQueue:pushVector(getEventDataV())
+                                break
+                        }
+                        break
+                    
+                    case "egpSize",
+                        switch (Device["type", string]) {
+                            case "egp-screen",
+                                Device["port", wirelink]:egpSize(Id + 1, getEventDataN())
+                                break
+                            
+                            case "virtual",
+                                local OutputQueue = Device["output-queue", array]
+                                OutputQueue:pushString("egpSize")
+                                OutputQueue:pushNumber(Id)
+                                OutputQueue:pushNumber(getEventDataN())
+                                break
+                        }
+                        break
+                    
+                    case "egpParent",
+                        switch (Device["type", string]) {
+                            case "egp-screen",
+                                Device["port", wirelink]:egpParent(Id + 1, getEventDataN() + 1)
+                                break
+                            
+                            case "virtual",
+                                local OutputQueue = Device["output-queue", array]
+                                OutputQueue:pushString("egpParent")
+                                OutputQueue:pushNumber(Id)
+                                OutputQueue:pushNumber(getEventDataN())
+                                break
+                        }
+                        break
+                    
+                    case "egpParentToBase",
+                        switch (Device["type", string]) {
+                            case "egp-screen",
+                                Device["port", wirelink]:egpParent(Id + 1, 1)
+                                break
+                            
+                            case "virtual",
+                                local OutputQueue = Device["output-queue", array]
+                                OutputQueue:pushString("egpParentToBase")
+                                OutputQueue:pushNumber(Id)
+                                break
+                        }
+                        break
+                    
+                    case "egpParentPoint",
+                        switch (Device["type", string]) {
+                            case "egp-screen",
+                                Device["port", wirelink]:egpBox(Id + 1, getEventDataV2(), vec2())
+                                break
+                            
+                            case "virtual",
+                                local OutputQueue = Device["output-queue", array]
+                                OutputQueue:pushString("egpParentPoint")
+                                OutputQueue:pushNumber(Id)
+                                OutputQueue:pushVector2(getEventDataV2())
+                                break
+                        }
+                        break
+                    
+                    case "egpAlign",
+                        switch (Device["type", string]) {
+                            case "egp-screen",
+                                Device["port", wirelink]:egpAlign(Id + 1, getEventDataN())
+                                break
+                            
+                            case "virtual",
+                                local OutputQueue = Device["output-queue", array]
+                                OutputQueue:pushString("egpAlign")
+                                OutputQueue:pushNumber(Id)
+                                OutputQueue:pushNumber(getEventDataN())
+                                break
+                        }
+                        break
+                    
+                    case "egpAlign2",
+                        switch (Device["type", string]) {
+                            case "egp-screen",
+                                Device["port", wirelink]:egpAlign(Id + 1, getEventDataN(), getEventDataN())
+                                break
+                            
+                            case "virtual",
+                                local OutputQueue = Device["output-queue", array]
+                                OutputQueue:pushString("egpAlign")
+                                OutputQueue:pushNumber(Id)
+                                OutputQueue:pushNumber(getEventDataN())
+                                OutputQueue:pushNumber(getEventDataN())
+                                break
+                        }
+                        break
+                    
+                    case "egpCircle",
+                        switch (Device["type", string]) {
+                            case "egp-screen",
+                                Device["port", wirelink]:egpCircle(Id + 1, getEventDataV2(), getEventDataV2())
+                                break
+                            
+                            case "virtual",
+                                local OutputQueue = Device["output-queue", array]
+                                OutputQueue:pushString("egpCircle")
+                                OutputQueue:pushNumber(Id)
+                                OutputQueue:pushVector2(getEventDataV2())
+                                OutputQueue:pushVector2(getEventDataV2())
+                                break
+                        }
+                        break
+                    
+                    case "egpCircleOutline",
+                        switch (Device["type", string]) {
+                            case "egp-screen",
+                                Device["port", wirelink]:egpCircleOutline(Id + 1, getEventDataV2(), getEventDataV2())
+                                break
+                            
+                            case "virtual",
+                                local OutputQueue = Device["output-queue", array]
+                                OutputQueue:pushString("egpCircleOutline")
+                                OutputQueue:pushNumber(Id)
+                                OutputQueue:pushVector2(getEventDataV2())
+                                OutputQueue:pushVector2(getEventDataV2())
+                                break
+                        }
+                        break
+                    
+                    case "egpPos",
+                        switch (Device["type", string]) {
+                            case "egp-screen",
+                                Device["port", wirelink]:egpPos(Id + 1, getEventDataV2())
+                                break
+                            
+                            case "virtual",
+                                local OutputQueue = Device["output-queue", array]
+                                OutputQueue:pushString("egpPos")
+                                OutputQueue:pushNumber(Id)
+                                OutputQueue:pushVector2(getEventDataV2())
+                                break
+                        }
+                        break
+                }
+            }
+            else {
+                local Device = appT("device")
+                switch (Device["type", string]) {
+                    case "egp-screen",
+                        appN("idle", 1)
+                        break
+                    
+                    case "virtual",
+                        appN("idle", Device["idle", number])
+                        break
+                }
+            }
+            break
+        }
+}

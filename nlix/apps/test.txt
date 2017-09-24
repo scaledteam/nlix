@@ -1,0 +1,16 @@
+#
+# This E2 made by scaled
+#
+
+@name test
+
+if (!APPS_INFO:exists("test")) {
+    local Info = table()
+    
+    APPS_INFO["test", table] = Info
+}
+
+if (app("test")) {
+    appCloseSelf()
+}
+

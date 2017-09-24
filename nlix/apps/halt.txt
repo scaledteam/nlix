@@ -1,0 +1,15 @@
+#
+# This E2 made by scaled
+#
+
+@name halt
+
+if (!APPS_INFO:exists("halt")) {
+    local Info = table()
+    
+    APPS_INFO["halt", table] = Info
+}
+
+if (app("halt")) {
+    halt()
+}

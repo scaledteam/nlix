@@ -1,0 +1,20 @@
+#
+# This E2 made by scaled
+#
+
+@name lib-driver-cursor
+
+function number initCursor() {
+    local AppId = findAppByName("driver-cursor")
+    if (AppId != -1) {
+        appN("driver-cursor-appid", AppId)
+        return 1
+    }
+    else {
+        return 0
+    }
+}
+
+function vector2 cursorGetPos() {
+    return glbV2(appN("driver-cursor-appid"), "pos")
+}

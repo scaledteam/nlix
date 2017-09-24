@@ -1,0 +1,30 @@
+#
+# This E2 made by scaled
+#
+
+@name pkill
+
+if (!APPS_INFO:exists("pkill")) {
+    local Info = table()
+    
+    APPS_INFO["pkill", table] = Info
+}
+
+if (app("pkill")) {
+    local AppName = appS("args")
+    if (appExists(AppName)) {
+        local AppId = findAppByName(AppName)
+        if (AppId != -1) {
+            appClose(AppId)
+            consolePrintFast("App with id " + AppId + " killed.\n")
+        }
+        else {
+            consolePrintFast("App don't launched!.\n")
+        }
+    }
+    else {
+        consolePrintFast("Error! Wrong app name!\n")
+    }
+    appCloseSelf()
+}
+

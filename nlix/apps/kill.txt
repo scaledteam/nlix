@@ -1,0 +1,24 @@
+#
+# This E2 made by scaled
+#
+
+@name kill
+
+if (!APPS_INFO:exists("kill")) {
+    local Info = table()
+    
+    APPS_INFO["kill", table] = Info
+}
+
+if (app("kill")) {
+    local AppId = appS("args"):toNumber()
+    if (AppId != -1) {
+        appClose(AppId)
+        consolePrintFast("App with id " + AppId + " killed.\n")
+    }
+    else {
+        consolePrintFast("App don't launched!.\n")
+    }
+    appCloseSelf()
+}
+

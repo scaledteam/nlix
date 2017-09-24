@@ -1,0 +1,62 @@
+#
+# This E2 made by scaled
+#
+
+@name sh
+
+if (!APPS_INFO:exists("sh")) {
+    local Info = table()
+    
+    APPS_INFO["sh", table] = Info
+}
+
+if (app("sh")) {
+    switch (ThisAppState) {
+        # Wait console driver
+        case 0,
+            if (initTerminal()) {
+                appNextState()
+            }
+            break
+        # Wait keyboard driver
+        case 1,
+            if (initSimpleKeyboard()) {
+                appNextState()
+            }
+            break
+        # Main state
+        case 2,
+            consolePrint(ThisWorkspace["name", string] + ": $ ")
+            requestKeyboardInput()
+            
+            appNextState()
+            break
+        # Get input
+        case 3,
+            if (waitKeyboardInput()) {
+                local Command = getKeyboardInput()
+                if (Command == "") {
+                    appSetState(2)
+                }
+                else {
+                    appN("LaunchedAppId", command(Command))
+                    
+                    if (appN("LaunchedAppId") == -1) {
+                        consolePrint("Error! App \"" + Command + "\" not found.\n")
+                        appSetState(2)
+                    }
+                    else {
+                        appNextState()
+                    }
+                }
+            }
+            
+            break
+        # Track launcher app
+        case 4,
+            if (!appLaunched(appN("LaunchedAppId"))) {
+                appSetState(2)
+            }
+            break
+    }
+}

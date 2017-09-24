@@ -1,0 +1,20 @@
+#
+# This E2 made by scaled
+#
+
+@name lib-driver-keyboard
+
+function number initKeyboard() {
+    local KeyboardDriverAppId = findAppByName("driver-keyboard")
+    if (KeyboardDriverAppId != -1) {
+        appN("driver-keyboard-appid", KeyboardDriverAppId)
+        return 1
+    }
+    else {
+        return 0
+    }
+}
+
+function array keyboardGetKeys() {
+    return glbR(appN("driver-keyboard-appid"), "keys")
+}

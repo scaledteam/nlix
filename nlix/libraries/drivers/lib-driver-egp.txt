@@ -1,0 +1,144 @@
+#
+# This E2 made by scaled
+#
+
+@name lib-driver-egp
+
+function number initEgp() {
+    local AppId = findAppByName("driver-egp")
+    if (AppId != -1) {
+        appN("driver-egp-appid", AppId)
+        appV2("driver-egp-resolution", glbV2(AppId, "resolution"))
+        return 1
+    }
+    else {
+        return 0
+    }
+}
+
+function egpBox(Id, Pos:vector2, Size:vector2) {
+    local DriverAppId = appN("driver-egp-appid")
+    
+    sendEvent(DriverAppId, "egpBox")
+    sendEventData(DriverAppId, Id)
+    sendEventData(DriverAppId, Pos)
+    sendEventData(DriverAppId, Size)
+}
+
+function egpText(Id, Text:string, Pos:vector2) {
+    local DriverAppId = appN("driver-egp-appid")
+    
+    sendEvent(DriverAppId, "egpText")
+    sendEventData(DriverAppId, Id)
+    sendEventData(DriverAppId, Text)
+    sendEventData(DriverAppId, Pos)
+}
+
+function egpTextLayout(Id, Text:string, Pos:vector2, Size:vector2) {
+    local DriverAppId = appN("driver-egp-appid")
+    
+    sendEvent(DriverAppId, "egpTextLayout")
+    sendEventData(DriverAppId, Id)
+    sendEventData(DriverAppId, Text)
+    sendEventData(DriverAppId, Pos)
+    sendEventData(DriverAppId, Size)
+}
+
+function egpSetText(Id, Text:string) {
+    local DriverAppId = appN("driver-egp-appid")
+    
+    sendEvent(DriverAppId, "egpSetText")
+    sendEventData(DriverAppId, Id)
+    sendEventData(DriverAppId, Text)
+}
+
+function egpColor(Id, Color:vector) {
+    local DriverAppId = appN("driver-egp-appid")
+    
+    sendEvent(DriverAppId, "egpColor")
+    sendEventData(DriverAppId, Id)
+    sendEventData(DriverAppId, Color)
+}
+
+function egpSize(Id, Size) {
+    local DriverAppId = appN("driver-egp-appid")
+    
+    sendEvent(DriverAppId, "egpSize")
+    sendEventData(DriverAppId, Id)
+    sendEventData(DriverAppId, Size)
+}
+
+function egpParent(Id, Id2) {
+    local DriverAppId = appN("driver-egp-appid")
+    
+    sendEvent(DriverAppId, "egpParent")
+    sendEventData(DriverAppId, Id)
+    sendEventData(DriverAppId, Id2)
+}
+
+function egpParentPoint(Id, Pos:vector2) {
+    local DriverAppId = appN("driver-egp-appid")
+    
+    sendEvent(DriverAppId, "egpParentPoint")
+    sendEventData(DriverAppId, Id)
+    sendEventData(DriverAppId, Pos)
+}
+
+function egpParentToBase(Id) {
+    local DriverAppId = appN("driver-egp-appid")
+    
+    sendEvent(DriverAppId, "egpParentToBase")
+    sendEventData(DriverAppId, Id)
+}
+
+function egpAlign(Id, Align) {
+    local DriverAppId = appN("driver-egp-appid")
+    
+    sendEvent(DriverAppId, "egpAlign")
+    sendEventData(DriverAppId, Id)
+    sendEventData(DriverAppId, Align)
+}
+
+function egpAlign2(Id, Align, Align2) {
+    local DriverAppId = appN("driver-egp-appid")
+    
+    sendEvent(DriverAppId, "egpAlign2")
+    sendEventData(DriverAppId, Id)
+    sendEventData(DriverAppId, Align)
+    sendEventData(DriverAppId, Align2)
+}
+
+function egpCircle(Id, Pos:vector2, Size:vector2) {
+    local DriverAppId = appN("driver-egp-appid")
+    
+    sendEvent(DriverAppId, "egpCircle")
+    sendEventData(DriverAppId, Id)
+    sendEventData(DriverAppId, Pos)
+    sendEventData(DriverAppId, Size)
+}
+
+function egpCircleOutline(Id, Pos:vector2, Size:vector2) {
+    local DriverAppId = appN("driver-egp-appid")
+    
+    sendEvent(DriverAppId, "egpCircleOutline")
+    sendEventData(DriverAppId, Id)
+    sendEventData(DriverAppId, Pos)
+    sendEventData(DriverAppId, Size)
+}
+
+function egpPos(Id, Pos:vector2) {
+    local DriverAppId = appN("driver-egp-appid")
+    
+    sendEvent(DriverAppId, "egpPos")
+    sendEventData(DriverAppId, Id)
+    sendEventData(DriverAppId, Pos)
+}
+
+function vector2 egpResolution() {
+    return glbV2(appN("driver-egp-appid"), "resolution")
+}
+
+function number egpIsIdle() {
+    return glbN(appN("driver-egp-appid"), "idle")
+}
+
