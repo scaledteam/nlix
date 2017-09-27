@@ -6,7 +6,7 @@
 
 
 function table createVirtualWorkspace(Name:string, Autostart:array) {
-    Workspace = table()
+    local Workspace = table()
     
     Workspace["name", string] = Name
     Workspace["autostart", array] = Autostart
@@ -38,6 +38,11 @@ function table createVirtualWorkspace(Autostart:array) {
     }
     
     return createVirtualWorkspace(Name, Autostart)
+}
+
+
+function table createVirtualWorkspace() {
+    return createVirtualWorkspace(array())
 }
 
 function table createVirtualKeyboard() {

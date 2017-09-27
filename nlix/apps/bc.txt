@@ -1,0 +1,111 @@
+#
+# This E2 made by scaled
+#
+
+@name bc
+
+if (!APPS_INFO:exists("bc")) {
+    local Info = table()
+    
+    APPS_INFO["bc", table] = Info
+}
+
+if (app("bc")) {
+    switch (ThisAppState) {
+        # Wait console driver
+        case 0,
+            if (initTerminal()) {
+                consolePrint("Calculator bc by scaled.\n")
+                appNextState()
+            }
+            break
+        
+        # Wait keyboard driver
+        case 1,
+            if (initSimpleKeyboard()) {
+                appNextState()
+            }
+            break
+        
+        # Main state
+        case 2,
+            consolePrint("bc: ")
+            requestKeyboardInput()
+            
+            appNextState()
+            break
+        
+        # Get input
+        case 3,
+            if (waitKeyboardInput()) {
+                local Input = getKeyboardInput()
+                varWrite("input", Input)
+                switch (Input) {
+                    case "",
+                        appSetState(2)
+                        break
+                    
+                    case "exit",
+                        appCloseSelf()
+                        break
+                    
+                    default,
+                        appSetState(4)
+                        break
+                }
+            }
+            break
+        
+        # Compute
+        case 4,
+            local Input = varString("input")
+            
+            local InputExplode = array()
+            local LastDivider = 0
+            
+            local InputActions = array()
+            
+            local Result = 0
+            
+            for (I = 1, Input:length()) {
+                local Char = Input[I]
+                if (Char == "+" | Char == "-" | Char == "*" | Char == "/") {
+                    InputExplode:pushNumber(Input:sub(LastDivider + 1, I - 1):toNumber())
+                    LastDivider = I
+                    
+                    InputActions:pushString(Char)
+                }
+            }
+            InputExplode:pushNumber(Input:sub(LastDivider + 1):toNumber())
+            
+            for (I = 1, InputActions:count()) {
+                if (InputActions[I, string] == "*") {
+                    InputExplode[I, number] = InputExplode[I, number] * InputExplode[I + 1, number]
+                    InputActions:remove(I)
+                    InputExplode:remove(I + 1)
+                }
+                elseif (InputActions[I, string] == "/") {
+                    InputExplode[I, number] = InputExplode[I, number] / InputExplode[I + 1, number]
+                    InputActions:remove(I)
+                    InputExplode:remove(I + 1)
+                }
+            }
+            
+            for (I = 1, InputActions:count()) {
+                if (InputActions[I, string] == "+") {
+                    InputExplode[I, number] = InputExplode[I, number] + InputExplode[I + 1, number]
+                    InputActions:remove(I)
+                    InputExplode:remove(I + 1)
+                }
+                elseif (InputActions[I, string] == "-") {
+                    InputExplode[I, number] = InputExplode[I, number] - InputExplode[I + 1, number]
+                    InputActions:remove(I)
+                    InputExplode:remove(I + 1)
+                }
+            }
+            
+            consolePrint(InputExplode:concat(" ") + "\n")
+            appSetState(2)
+            break
+    }
+}

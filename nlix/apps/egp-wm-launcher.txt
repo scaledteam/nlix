@@ -6,6 +6,7 @@
 
 if (!APPS_INFO:exists("egp-wm-launcher")) {
     local Info = table()
+    Info["min-egpid-count", number] = 2
     
     APPS_INFO["egp-wm-launcher", table] = Info
 }
@@ -20,29 +21,30 @@ if (app("egp-wm-launcher")) {
             break
         
         case 1,
-            if (initKeyboard()) {
-                appNextState()
-            }
-            break
-        
-        case 2,
-            appT("workspace", createVirtualWorkspace(array("driver-terminal", "driver-keyboard", "simple-keyboard", "clear", "egp-wm-shell")))
+            local Workspace = createVirtualWorkspace(array("driver-terminal", "driver-keyboard", "simple-keyboard", "clear", "egp-wm-shell"))
+            appT("workspace", Workspace)
             
             appT("console-screen", createVirtualConsoleScreen())
-            appT("keyboard", createVirtualKeyboard())
             
-            # Send all keys to virtual driver
-            local VirtualKeyboardDevice = appT("keyboard")
-            VirtualKeyboardDevice["keys", array] = keyboardGetKeys()
-            
-            local Workspace = appT("workspace")
             Workspace["devices", table]["console-screens", table]:pushTable(appT("console-screen"))
-            Workspace["devices", table]["keyboards", table]:pushTable(VirtualKeyboardDevice)
-            Workspace["devices", table]["other", table]:pushTable(ThisWorkspace["devices", table]["other", table][1, table])
+            # Send all keys to virtual driver
+            local KeyboardDevice = ThisWorkspace["devices", table]["keyboards", table][1, table]
+            appT("keyboard", KeyboardDevice)
+            Workspace["devices", table]["keyboards", table]:pushTable(KeyboardDevice)
             
             autostartVirtualWorkspace(Workspace)
             
             appNextState()
+            break
+        
+        # Wait callback device
+        case 2,
+            if (ThisWorkspace["devices", table]["other", table]:exists(1)) {
+                appT("callback-device", ThisWorkspace["devices", table]["other", table][1, table])
+                
+                appT("workspace")["devices", table]["other", table]:pushTable(ThisWorkspace["devices", table]["other", table][1, table])
+                appNextState()
+            }
             break
         
         case 3,

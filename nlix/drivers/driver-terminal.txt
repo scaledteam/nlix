@@ -74,71 +74,76 @@ if (app("driver-terminal")) {
         
         # Wait events
         case 1,
-            if (waitAnyEvent()) {
-                local ScreenDevice = appT("screen-device")
-                local ScreenType = ScreenDevice["type", string]
-                
-                local Command = getEventDataS()
-                switch (Command) {
-                    case "clear",
-                        switch (ScreenType) {
-                            case "egp-screen",
-                                ScreenDevice["port", wirelink]:egpSetText(1, "")
-                                break
-                            
-                            case "console-screen",
-                                ScreenDevice["port", wirelink][2041] = 1
-                                break
-                            
-                            case "virtual",
-                                ScreenDevice["new-erase", number] = appS("console-text"):length()
-                                break
-                        }
-                        
-                        appS("console-text", "")
-                        break
+            #for (I = 1, TICKS_INSIDE) {
+                if (waitAnyEvent()) {
+                    local ScreenDevice = appT("screen-device")
+                    local ScreenType = ScreenDevice["type", string]
                     
-                    case "print",
-                        local NewPrint = getEventDataS()
-                        appS("console-text", appS("console-text") + NewPrint)
+                    local Command = getEventDataS()
+                    switch (Command) {
+                        case "clear",
+                            switch (ScreenType) {
+                                case "egp-screen",
+                                    ScreenDevice["port", wirelink]:egpSetText(1, "")
+                                    break
+                                
+                                case "console-screen",
+                                    ScreenDevice["port", wirelink][2041] = 1
+                                    break
+                                
+                                case "virtual",
+                                    ScreenDevice["new-erase", number] = appS("console-text"):length()
+                                    break
+                            }
+                            
+                            appS("console-text", "")
+                            break
                         
-                        switch (ScreenType) {
-                            case "egp-screen",
-                                ScreenDevice["port", wirelink]:egpSetText(1, appS("console-text"))
-                                break
+                        case "print",
+                            local NewPrint = getEventDataS()
+                            appS("console-text", appS("console-text") + NewPrint)
                             
-                            case "console-screen",
-                                ScreenDevice["port", wirelink]:writeString(appS("console-text"), 0, 0)
-                                break
-                            
-                            case "virtual",
-                                ScreenDevice["new-output", string] = NewPrint
-                                break
-                        }
-                        break
-                    
-                    case "erase",
-                        local EraseCount = getEventDataN()
-                        appS("console-text", appS("console-text"):left(appS("console-text"):length() - EraseCount))
+                            switch (ScreenType) {
+                                case "egp-screen",
+                                    ScreenDevice["port", wirelink]:egpSetText(1, appS("console-text"))
+                                    break
+                                
+                                case "console-screen",
+                                    ScreenDevice["port", wirelink]:writeString(appS("console-text"), 0, 0)
+                                    break
+                                
+                                case "virtual",
+                                    ScreenDevice["new-output", string] = NewPrint
+                                    break
+                            }
+                            break
                         
-                        switch (ScreenType) {
-                            case "egp-screen",
-                                ScreenDevice["port", wirelink]:egpSetText(1, appS("console-text"))
-                                break
+                        case "erase",
+                            local EraseCount = getEventDataN()
+                            appS("console-text", appS("console-text"):left(appS("console-text"):length() - EraseCount))
                             
-                            case "console-screen",
-                                ScreenDevice["port", wirelink][2041] = 1
-                                ScreenDevice["port", wirelink]:writeString(appS("console-text"), 0, 0)
-                                break
+                            switch (ScreenType) {
+                                case "egp-screen",
+                                    ScreenDevice["port", wirelink]:egpSetText(1, appS("console-text"))
+                                    break
+                                
+                                case "console-screen",
+                                    ScreenDevice["port", wirelink][2041] = 1
+                                    ScreenDevice["port", wirelink]:writeString(appS("console-text"), 0, 0)
+                                    break
+                                
+                                case "virtual",
+                                    ScreenDevice["new-erase", number] = EraseCount
+                                    break
+                            }
+                            break
                             
-                            case "virtual",
-                                ScreenDevice["new-erase", number] = EraseCount
-                                break
-                        }
-                        break
-                        
+                    }
                 }
-            }
+            #    else {
+            #        break
+            #    }
+            #}
             break
     }
 }

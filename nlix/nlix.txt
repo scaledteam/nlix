@@ -9,7 +9,7 @@ if (first()) {
     #include "nlix/system/system"
     
     #include "nlix/libraries/lib-vars"
-    ##include "nlix/libraries/lib-vars-2"
+    #include "nlix/libraries/lib-vars-2"
     #include "nlix/libraries/lib-app"
     #include "nlix/libraries/lib-event"
     
@@ -53,6 +53,7 @@ if (tickClk()) {
         #include "nlix/apps/echo"
         #include "nlix/apps/test"
         #include "nlix/apps/dmesg"
+        #include "nlix/apps/bc"
         
         # Apps control.
         #include "nlix/apps/pkill"

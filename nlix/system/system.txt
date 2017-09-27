@@ -7,7 +7,7 @@
 # Persists
 @persist SysStartTime
 @persist Workspaces:table
-@persist SysPerf
+@persist SysPerf TICKS_INSIDE
 @persist [Dmesg]:string
 @persist AllData:gtable
 @persist [AUTOSTART_TERMINAL AUTOSTART_EGP]:array
@@ -42,7 +42,7 @@ function initDrivers() {
                     Device["type", string] = "egp-screen"
                     
                     Device["resolution", vector2] = vec2(512)
-                    Device["max-objects", number] = 300
+                    Device["max-objects", number] = egpMaxObjects() - 1
                     
                     Device["port", wirelink] = Port
                     Device["busy", number] = 0
@@ -93,9 +93,11 @@ function halt() {
 
 function init() {
     # Settings
-    SysPerf = 50
+    SysPerf = 90
     
     FONT_MONOSPACED = "Courier New"
+    
+    TICKS_INSIDE = 5
     
     AUTOSTART_TERMINAL = array(
         "driver-terminal",

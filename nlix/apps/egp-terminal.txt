@@ -6,6 +6,7 @@
 
 if (!APPS_INFO:exists("egp-terminal")) {
     local Info = table()
+    Info["min-egpid-count", number] = 2
     
     APPS_INFO["egp-terminal", table] = Info
 }

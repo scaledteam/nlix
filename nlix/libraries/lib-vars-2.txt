@@ -8,13 +8,12 @@ function angle      varAngle(AppId, VarName:string)     { return Apps[AppId, tab
 function array      varArray(AppId, VarName:string)     { return Apps[AppId, table]["data", table][VarName, array] }
 function bone       varBone(AppId, VarName:string)      { return Apps[AppId, table]["data", table][VarName, bone] }
 function complex    varComplex(AppId, VarName:string)   { return Apps[AppId, table]["data", table][VarName, complex] }
-function effect     varEffect(AppId, VarName:string)    { return Apps[AppId, table]["data", table][VarName, effect] }
 function entity     varEntity(AppId, VarName:string)    { return Apps[AppId, table]["data", table][VarName, entity] }
 function matrix     varMatrix(AppId, VarName:string)    { return Apps[AppId, table]["data", table][VarName, matrix] }
 function matrix2    varMatrix2(AppId, VarName:string)   { return Apps[AppId, table]["data", table][VarName, matrix2] }
 function matrix4    varMatrix4(AppId, VarName:string)   { return Apps[AppId, table]["data", table][VarName, matrix4] }
 function number     varNumber(AppId, VarName:string)    { return Apps[AppId, table]["data", table][VarName, number] }
-function quaternion varNumber(AppId, VarName:string)    { return Apps[AppId, table]["data", table][VarName, quaternion] }
+function quaternion varQuaternion(AppId, VarName:string){ return Apps[AppId, table]["data", table][VarName, quaternion] }
 function ranger     varRanger(AppId, VarName:string)    { return Apps[AppId, table]["data", table][VarName, ranger] }
 function string     varString(AppId, VarName:string)    { return Apps[AppId, table]["data", table][VarName, string] }
 function table      varTable(AppId, VarName:string)     { return Apps[AppId, table]["data", table][VarName, table] }
@@ -22,12 +21,14 @@ function vector     varVector(AppId, VarName:string)    { return Apps[AppId, tab
 function vector2    varVector2(AppId, VarName:string)   { return Apps[AppId, table]["data", table][VarName, vector2] }
 function vector4    varVector4(AppId, VarName:string)   { return Apps[AppId, table]["data", table][VarName, vector4] }
 function wirelink   varWirelink(AppId, VarName:string)  { return Apps[AppId, table]["data", table][VarName, wirelink] }
+#ifdef effect()
+function effect     varEffect(AppId, VarName:string)    { return Apps[AppId, table]["data", table][VarName, effect] }
+#endif
 
 function angle      varAngle(VarName:string)     { return ThisAppData[VarName, angle] }
 function array      varArray(VarName:string)     { return ThisAppData[VarName, array] }
 function bone       varBone(VarName:string)      { return ThisAppData[VarName, bone] }
 function complex    varComplex(VarName:string)   { return ThisAppData[VarName, complex] }
-function effect     varEffect(VarName:string)    { return ThisAppData[VarName, effect] }
 function entity     varEntity(VarName:string)    { return ThisAppData[VarName, entity] }
 function matrix     varMatrix(VarName:string)    { return ThisAppData[VarName, matrix] }
 function matrix2    varMatrix2(VarName:string)   { return ThisAppData[VarName, matrix2] }
@@ -41,12 +42,14 @@ function vector     varVector(VarName:string)    { return ThisAppData[VarName, v
 function vector2    varVector2(VarName:string)   { return ThisAppData[VarName, vector2] }
 function vector4    varVector4(VarName:string)   { return ThisAppData[VarName, vector4] }
 function wirelink   varWirelink(VarName:string)  { return ThisAppData[VarName, wirelink] }
+#ifdef effect()
+function effect     varEffect(VarName:string)    { return ThisAppData[VarName, effect] }
+#endif
 
 function varWrite(AppId, VarName:string, Write:angle)       { Apps[AppId, table]["data", table][VarName, angle] = Write }
 function varWrite(AppId, VarName:string, Write:array)       { Apps[AppId, table]["data", table][VarName, array] = Write }
 function varWrite(AppId, VarName:string, Write:bone)        { Apps[AppId, table]["data", table][VarName, bone] = Write }
 function varWrite(AppId, VarName:string, Write:complex)     { Apps[AppId, table]["data", table][VarName, complex] = Write }
-function varWrite(AppId, VarName:string, Write:effect)      { Apps[AppId, table]["data", table][VarName, effect] = Write }
 function varWrite(AppId, VarName:string, Write:entity)      { Apps[AppId, table]["data", table][VarName, entity] = Write }
 function varWrite(AppId, VarName:string, Write:matrix)      { Apps[AppId, table]["data", table][VarName, matrix] = Write }
 function varWrite(AppId, VarName:string, Write:matrix2)     { Apps[AppId, table]["data", table][VarName, matrix2] = Write }
@@ -60,12 +63,14 @@ function varWrite(AppId, VarName:string, Write:vector)      { Apps[AppId, table]
 function varWrite(AppId, VarName:string, Write:vector2)     { Apps[AppId, table]["data", table][VarName, vector2] = Write }
 function varWrite(AppId, VarName:string, Write:vector4)     { Apps[AppId, table]["data", table][VarName, vector4] = Write }
 function varWrite(AppId, VarName:string, Write:wirelink)    { Apps[AppId, table]["data", table][VarName, wirelink] = Write }
+#ifdef effect()
+function varWrite(AppId, VarName:string, Write:effect)      { Apps[AppId, table]["data", table][VarName, effect] = Write }
+#endif
 
 function varWrite(VarName:string, Write:angle)       { ThisAppData[VarName, angle] = Write }
 function varWrite(VarName:string, Write:array)       { ThisAppData[VarName, array] = Write }
 function varWrite(VarName:string, Write:bone)        { ThisAppData[VarName, bone] = Write }
 function varWrite(VarName:string, Write:complex)     { ThisAppData[VarName, complex] = Write }
-function varWrite(VarName:string, Write:effect)      { ThisAppData[VarName, effect] = Write }
 function varWrite(VarName:string, Write:entity)      { ThisAppData[VarName, entity] = Write }
 function varWrite(VarName:string, Write:matrix)      { ThisAppData[VarName, matrix] = Write }
 function varWrite(VarName:string, Write:matrix2)     { ThisAppData[VarName, matrix2] = Write }
@@ -79,4 +84,9 @@ function varWrite(VarName:string, Write:vector)      { ThisAppData[VarName, vect
 function varWrite(VarName:string, Write:vector2)     { ThisAppData[VarName, vector2] = Write }
 function varWrite(VarName:string, Write:vector4)     { ThisAppData[VarName, vector4] = Write }
 function varWrite(VarName:string, Write:wirelink)    { ThisAppData[VarName, wirelink] = Write }
+#ifdef effect()
+function varWrite(VarName:string, Write:effect)      { ThisAppData[VarName, effect] = Write }
+#endif
 
+function varRemove(VarName:string) { ThisAppData:remove(VarName) }
+function varRemove(AppId, VarName:string) { Apps[AppId, table]["data", table]:remove(VarName) }

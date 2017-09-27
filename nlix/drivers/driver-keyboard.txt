@@ -14,7 +14,7 @@ if (app("driver-keyboard")) {
     switch (ThisAppState) {
         # Initialize
         case 0,
-            appR("keys", array())
+            varWrite("keys", array())
             
             # Init first keyboard
             local KeyboardId = 0
@@ -29,7 +29,7 @@ if (app("driver-keyboard")) {
                 local Device = ThisWorkspace["devices", table]["keyboards", table][KeyboardId, table]
                 Device["busy", number] = 1
                 
-                appT("device", Device)
+                varWrite("device", Device)
             }
             else {
                 Dmesg += "Failed to find free keyboard on workspace " + ThisWorkspace["name", string] + "."
@@ -41,22 +41,19 @@ if (app("driver-keyboard")) {
         
         # Track keys
         case 1,
-            local Device = appT("device")
+            local Device = varTable("device")
             DeviceType = Device["type", string]
-            
-            local Keys = appR("keys")
             
             switch (DeviceType) {
                 case "keyboard",
+                    local Keys = varArray("keys")
                     for (I = 1, 5) {
                         Keys[I, number] = Device["port", wirelink][I - 1]
                     }
                     break
                 
                 case "virtual",
-                    for (I = 1, 5) {
-                        Keys[I, number] = Device["keys", array][I, number]
-                    }
+                    varWrite("keys", Device["keys", array])
                     break
             }
             break

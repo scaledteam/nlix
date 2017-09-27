@@ -30,19 +30,22 @@ if (app("print-pi")) {
             break
         
         case 2,
-            appN("counter", appN("counter") + 1)
-            local N = appN("counter")
-            
-            appN("result", appN("result") + 4 * ((-1) ^ (N - 1)) / (2 * N - 1))
-            
-            if (N > appN("last-print-step")) {
-                consolePrint(".")
-                appN("last-print-step", appN("last-print-step") + appN("print-step")) 
-            }
-            
-            if (N > appN("iterations")) {
-                consolePrint("\n")
-                appNextState()
+            for (I = 1, TICKS_INSIDE) {
+                appN("counter", appN("counter") + 1)
+                local N = appN("counter")
+                
+                appN("result", appN("result") + 4 * ((-1) ^ (N - 1)) / (2 * N - 1))
+                
+                if (N > appN("last-print-step")) {
+                    consolePrint(".")
+                    appN("last-print-step", appN("last-print-step") + appN("print-step")) 
+                }
+                
+                if (N > appN("iterations")) {
+                    consolePrint("\n")
+                    appNextState()
+                    break
+                }
             }
             break
         

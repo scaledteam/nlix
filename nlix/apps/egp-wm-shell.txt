@@ -18,6 +18,7 @@ if (app("egp-wm-shell")) {
                 appNextState()
             }
             break
+        
         # Wait keyboard driver
         case 1,
             if (initSimpleKeyboard()) {
@@ -25,10 +26,12 @@ if (app("egp-wm-shell")) {
             }
             break
         
-        # Get callback device
+        # Wait callback device
         case 2,
-            appT("callback-device", ThisWorkspace["devices", table]["other", table][1, table])
-            appNextState()
+            if (ThisWorkspace["devices", table]["other", table]:exists(1)) {
+                appT("callback-device", ThisWorkspace["devices", table]["other", table][1, table])
+                appNextState()
+            }
             break
         
         # Main state
@@ -49,7 +52,7 @@ if (app("egp-wm-shell")) {
                 foreach (I, Command:string = Commands) {
                     CallbackDevice["queue", array]:pushString(Command)
                 }
-                appSetState(2)
+                appSetState(3)
             }
             
             break

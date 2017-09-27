@@ -32,10 +32,6 @@ if (app("simple-keyboard")) {
                 local Sender = getEventDataN()
                 appN("input-sender", Sender)
                 
-                if (ThisWorkspace["devices", table]["keyboards", table][1, table]["type", string] == "virtual") {
-                    sendEvent(Workspace["parent-app-id", number], "keyboard")
-                }
-                
                 appNextState()
             }
             break

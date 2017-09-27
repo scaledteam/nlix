@@ -134,6 +134,21 @@ function egpPos(Id, Pos:vector2) {
     sendEventData(DriverAppId, Pos)
 }
 
+function egpRemove(Id) {
+    local DriverAppId = appN("driver-egp-appid")
+    
+    sendEvent(DriverAppId, "egpRemove")
+    sendEventData(DriverAppId, Id)
+}
+
+function egpCopy(Id, Id2) {
+    local DriverAppId = appN("driver-egp-appid")
+    
+    sendEvent(DriverAppId, "egpCopy")
+    sendEventData(DriverAppId, Id)
+    sendEventData(DriverAppId, Id2)
+}
+
 function vector2 egpResolution() {
     return glbV2(appN("driver-egp-appid"), "resolution")
 }
@@ -142,3 +157,10 @@ function number egpIsIdle() {
     return glbN(appN("driver-egp-appid"), "idle")
 }
 
+function number egpMaxObjects2() {
+    return glbN(appN("driver-egp-appid"), "egpMaxObjects")
+}
+
+function number egpParent(Id) {
+    return glbR(appN("driver-egp-appid"), "egpParents")[Id, number]
+}

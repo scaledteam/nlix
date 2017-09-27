@@ -6,6 +6,8 @@
 
 if (!APPS_INFO:exists("egp-clocks")) {
     local Info = table()
+    Info["min-egpid-count", number] = 2
+    Info["min-egp-size", vector2] = vec2(160, 20)
     
     APPS_INFO["egp-clocks", table] = Info
 }
