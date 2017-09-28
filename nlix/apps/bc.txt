@@ -15,7 +15,7 @@ if (app("bc")) {
         # Wait console driver
         case 0,
             if (initTerminal()) {
-                consolePrint("Calculator bc by scaled.\n")
+                consolePrint("Calculator shell. Write \"quit\" for exit.\n")
                 appNextState()
             }
             break
@@ -30,6 +30,7 @@ if (app("bc")) {
         # Main state
         case 2,
             consolePrint("bc: ")
+            varWrite("outputCount", varNumber("outputCount") + 4)
             requestKeyboardInput()
             
             appNextState()
@@ -40,13 +41,24 @@ if (app("bc")) {
             if (waitKeyboardInput()) {
                 local Input = getKeyboardInput()
                 varWrite("input", Input)
+                varWrite("outputCount", varNumber("outputCount") + Input:length() + 1)
                 switch (Input) {
                     case "",
                         appSetState(2)
                         break
                     
+                    case "quit",
+                        appCloseSelf()
+                        break
+                    
                     case "exit",
                         appCloseSelf()
+                        break
+                    
+                    case "clear",
+                        consoleErase(varNumber("outputCount"))
+                        varWrite("outputCount", 0)
+                        appSetState(2)
                         break
                     
                     default,
@@ -67,6 +79,7 @@ if (app("bc")) {
             
             local Result = 0
             
+            # Separate numbers
             for (I = 1, Input:length()) {
                 local Char = Input[I]
                 if (Char == "+" | Char == "-" | Char == "*" | Char == "/") {
@@ -78,7 +91,10 @@ if (app("bc")) {
             }
             InputExplode:pushNumber(Input:sub(LastDivider + 1):toNumber())
             
-            for (I = 1, InputActions:count()) {
+            # Replace actions on numbers
+            ## *, /
+            local I = 1
+            while (I <= InputActions:count()) {
                 if (InputActions[I, string] == "*") {
                     InputExplode[I, number] = InputExplode[I, number] * InputExplode[I + 1, number]
                     InputActions:remove(I)
@@ -89,9 +105,14 @@ if (app("bc")) {
                     InputActions:remove(I)
                     InputExplode:remove(I + 1)
                 }
+                else {
+                    I++
+                }
             }
             
-            for (I = 1, InputActions:count()) {
+            ## +, -
+            I = 1
+            while (I <= InputActions:count()) {
                 if (InputActions[I, string] == "+") {
                     InputExplode[I, number] = InputExplode[I, number] + InputExplode[I + 1, number]
                     InputActions:remove(I)
@@ -102,9 +123,14 @@ if (app("bc")) {
                     InputActions:remove(I)
                     InputExplode:remove(I + 1)
                 }
+                else {
+                    I++
+                }
             }
             
-            consolePrint(InputExplode:concat(" ") + "\n")
+            local Output = InputExplode:concat(" ") + "\n"
+            consolePrint(Output)
+            varWrite("outputCount", varNumber("outputCount") + Output:length())
             appSetState(2)
             break
     }

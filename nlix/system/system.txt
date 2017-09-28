@@ -20,7 +20,7 @@ function log(Text:string) {
 function createWorkspace(Name:string, Ports:array) {
     Workspaces[Name, table] = table()
     Workspaces[Name, table]["name", string] = Name
-    Workspaces[Name, table]["autostart", array] = AUTOSTART_EGP
+    Workspaces[Name, table]["autostart", array] = AUTOSTART_TERMINAL
     
     
     Workspaces[Name, table]["ports", array] = Ports
@@ -93,7 +93,7 @@ function halt() {
 
 function init() {
     # Settings
-    SysPerf = 90
+    SysPerf = 20
     
     FONT_MONOSPACED = "Courier New"
     
@@ -111,17 +111,15 @@ function init() {
         "driver-cursor",
         "driver-keyboard",
         "egp-wm"
-        #"egp-terminal"
     )
-    
-    SysStartTime = systime()
     
     # Save data to gtable
     AllData = gTable("nlix")
-    if (AllData["version", number] == 0.12) {
+    if (AllData["version", number] == 0.1) {
         Workspaces = AllData["workspaces", table]
         Apps = AllData["apps", table]
         APPS_INFO = AllData["APPS_INFO", table]
+        SysStartTime = AllData["SysStartTime", number]
         runOnTick(1)
     }
     elseif (Port0 | Port1 | Port2 | Port3 | Port4 | Port5 | Port6 | Port7) {
@@ -132,6 +130,7 @@ function init() {
         AllData["this-app-id", number] = 0
         AllData["app-closed", array] = array()
         AllData["app-count", number] = 0
+        AllData["SysStartTime", number] = SysStartTime = systime()
     
         if (Port0 | Port1 | Port2 | Port3) {
             createWorkspace("ws1", array(Port0, Port1, Port2, Port3))

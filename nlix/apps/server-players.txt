@@ -1,0 +1,21 @@
+#
+# This E2 made by scaled
+#
+
+@name server-players
+
+if (!APPS_INFO:exists("server-players")) {
+    local Info = table()
+    
+    APPS_INFO["server-players", table] = Info
+}
+
+if (app("server-players")) {
+    local Output = ""
+    foreach (I, Player:entity = players()) {
+        Output += Player:id() + " " + Player:name() + "\n"
+    }
+    consolePrintFast(Output)
+    appCloseSelf()
+}
+

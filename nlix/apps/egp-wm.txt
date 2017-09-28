@@ -199,11 +199,11 @@ if (app("egp-wm")) {
                             varWrite("counter", varNumber("counterStart"))
                             
                             # Change keyboard target
+                            WindowFocusOld = varNumber("window-focus")
                             varWrite("window-focus", WorkspaceId)
                             local WorkspacesById = varTable("workspacesById")
-                            WorkspacesById[varNumber("window-focus"), table]["devices", table]["keyboards", table][1, table]["keys", array] = keyboardGetKeys()
-                            WorkspacesById[varNumber("window-focus-old"), table]["devices", table]["keyboards", table][1, table]["keys", array] = varArray("KEYS_NULL")
-                            varWrite("window-focus-old", varNumber("window-focus"))
+                            WorkspacesById[WorkspaceId, table]["devices", table]["keyboards", table][1, table]["keys", array] = keyboardGetKeys()
+                            WorkspacesById[WindowFocusOld, table]["devices", table]["keyboards", table][1, table]["keys", array] = varArray("KEYS_NULL")
                             
                             # Move to redraw state
                             appSetState(6)
@@ -238,7 +238,7 @@ if (app("egp-wm")) {
                             local BorderWidth = 2
                             local LabelHeight = 25
                             
-                            local NewEgpId = varNumber("egp-last") + 4
+                            local NewEgpId = varNumber("egp-last") + 5
                             varWrite("egp-last", NewEgpId)
                             varArray("egp-ids"):pushNumber(NewEgpId)
                             
@@ -252,25 +252,25 @@ if (app("egp-wm")) {
                             egpParentPoint(NewEgpId, Pos)
                             egpParentToBase(NewEgpId)
                             
-                            egpBox(NewEgpId - 1, vec2(-BorderWidth, -BorderWidth - LabelHeight), Size + vec2(2 * BorderWidth, 2 * BorderWidth + LabelHeight))
-                            egpParent(NewEgpId - 1, NewEgpId)
-                            egpColor(NewEgpId - 1, vec(127, 127, 255))
-                            
-                            egpTextLayout(NewEgpId - 2, WorkspaceName, vec2(0, -LabelHeight), vec2(Size[1], LabelHeight))
+                            egpBox(NewEgpId - 2, vec2(-BorderWidth, -BorderWidth - LabelHeight), Size + vec2(2 * BorderWidth, 2 * BorderWidth + LabelHeight))
                             egpParent(NewEgpId - 2, NewEgpId)
-                            egpAlign2(NewEgpId - 2, 1, 1)
+                            egpColor(NewEgpId - 2, vec(127, 127, 255))
+                            
+                            egpTextLayout(NewEgpId - 1, WorkspaceName, vec2(0, -LabelHeight), vec2(Size[1], LabelHeight))
+                            egpParent(NewEgpId - 1, NewEgpId)
+                            egpAlign2(NewEgpId - 1, 1, 1)
                             
                             # Initialize place for app
                             local EgpIdsCount = CommandQueue:shiftNumber()
-                            varArray("egp-id-counts"):pushNumber(EgpIdsCount)
-                            varWrite("egp-last", varNumber("egp-last") + EgpIdsCount)
+                            varArray("egp-id-counts"):pushNumber(EgpIdsCount + 1)
+                            varWrite("egp-last", varNumber("egp-last") + EgpIdsCount + 1)
                             
+                            WindowFocusOld = varNumber("window-focus")
                             varWrite("window-focus", WorkspaceId)
                             local WorkspacesById = varTable("workspacesById")
                             if (varNumber("window-focus-old") != 0) {
-                                WorkspacesById[varNumber("window-focus-old"), table]["devices", table]["keyboards", table][1, table]["keys", array] = varArray("KEYS_NULL")
+                                WorkspacesById[WindowFocusOld, table]["devices", table]["keyboards", table][1, table]["keys", array] = varArray("KEYS_NULL")
                             }
-                            varWrite("window-focus-old", varNumber("window-focus"))
                             break
                         
                         case "add-device",
@@ -366,21 +366,26 @@ if (app("egp-wm")) {
             for (I = 1, TICKS_INSIDE) {
                 local Counter = varNumber("counter")
                 
+                local ThisEgpParent = egpParent(Counter)
+                if (ThisEgpParent) {
+                    EgpParents[Counter, number] = ThisEgpParent
+                }
+                
                 egpCopy(egpMaxObjects2() - Counter, Counter)
                 
-                EgpParents[Counter, number] = egpParent(Counter)
-                
                 if (Counter >= varNumber("counterLimit")) {
-                    varWrite("counter", varNumber("counterStart"))
                     appNextState()
                     break
                 }
-                varWrite("counter", Counter + 1)
+                else {
+                    varWrite("counter", Counter + 1)
+                }
             }
             break
         
         case 8,
             if (egpIsIdle()) {
+                varWrite("counter", varNumber("counterStart"))
                 appNextState()
             }
             break
@@ -392,16 +397,18 @@ if (app("egp-wm")) {
                 egpRemove(Counter)
                 
                 if (Counter >= varNumber("counterLimit")) {
-                    varWrite("counter", varNumber("counterStart"))
                     appNextState()
                     break
                 }
-                varWrite("counter", Counter + 1)
+                else {
+                    varWrite("counter", Counter + 1)
+                }
             }
             break
         
         case 10,
             if (egpIsIdle()) {
+                varWrite("counter", varNumber("counterStart"))
                 appNextState()
             }
             break
@@ -411,19 +418,20 @@ if (app("egp-wm")) {
                 local Counter = varNumber("counter")
                 
                 egpCopy(Counter, egpMaxObjects2() - Counter)
-                egpParent(Counter, varArray("egpParents")[Counter, number])
                 
                 if (Counter >= varNumber("counterLimit")) {
-                    varWrite("counter", varNumber("counterStart"))
                     appNextState()
                     break
                 }
-                varWrite("counter", Counter + 1)
+                else {
+                    varWrite("counter", Counter + 1)
+                }
             }
             break
         
         case 12,
             if (egpIsIdle()) {
+                varWrite("counter", varNumber("counterStart"))
                 appNextState()
             }
             break
@@ -434,14 +442,23 @@ if (app("egp-wm")) {
                 
                 egpRemove(egpMaxObjects2() - Counter)
                 
+                local ThisEgpParent = varArray("egpParents")[Counter, number]
+                if (ThisEgpParent) {
+                    egpParent(Counter, ThisEgpParent)
+                }
+                
                 if (Counter >= varNumber("counterLimit")) {
                     varRemove("counter")
                     varRemove("counterLimit")
                     varRemove("counterStart")
+                    varArray("egpParents"):clear()
+                    varRemove("egpParents")
                     appNextState()
                     break
                 }
-                varWrite("counter", Counter + 1)
+                else {
+                    varWrite("counter", Counter + 1)
+                }
             }
             break
         

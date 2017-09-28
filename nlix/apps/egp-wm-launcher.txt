@@ -21,20 +21,22 @@ if (app("egp-wm-launcher")) {
             break
         
         case 1,
-            local Workspace = createVirtualWorkspace(array("driver-terminal", "driver-keyboard", "simple-keyboard", "clear", "egp-wm-shell"))
-            appT("workspace", Workspace)
-            
-            appT("console-screen", createVirtualConsoleScreen())
-            
-            Workspace["devices", table]["console-screens", table]:pushTable(appT("console-screen"))
-            # Send all keys to virtual driver
-            local KeyboardDevice = ThisWorkspace["devices", table]["keyboards", table][1, table]
-            appT("keyboard", KeyboardDevice)
-            Workspace["devices", table]["keyboards", table]:pushTable(KeyboardDevice)
-            
-            autostartVirtualWorkspace(Workspace)
-            
-            appNextState()
+            if (ThisWorkspace["devices", table]["keyboards", table]:exists(1)) {
+                local Workspace = createVirtualWorkspace(array("driver-terminal", "driver-keyboard", "simple-keyboard", "clear", "egp-wm-shell"))
+                appT("workspace", Workspace)
+                
+                appT("console-screen", createVirtualConsoleScreen())
+                
+                Workspace["devices", table]["console-screens", table]:pushTable(appT("console-screen"))
+                # Send all keys to virtual driver
+                local KeyboardDevice = ThisWorkspace["devices", table]["keyboards", table][1, table]
+                appT("keyboard", KeyboardDevice)
+                Workspace["devices", table]["keyboards", table]:pushTable(KeyboardDevice)
+                
+                autostartVirtualWorkspace(Workspace)
+                
+                appNextState()
+            }
             break
         
         # Wait callback device

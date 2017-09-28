@@ -1,0 +1,17 @@
+#
+# This E2 made by scaled
+#
+
+@name server-hostname
+
+if (!APPS_INFO:exists("server-hostname")) {
+    local Info = table()
+    
+    APPS_INFO["server-hostname", table] = Info
+}
+
+if (app("server-hostname")) {
+    consolePrintFast(hostname() + "\n")
+    appCloseSelf()
+}
+

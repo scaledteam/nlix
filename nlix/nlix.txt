@@ -53,7 +53,14 @@ if (tickClk()) {
         #include "nlix/apps/echo"
         #include "nlix/apps/test"
         #include "nlix/apps/dmesg"
+        
+        # Math
         #include "nlix/apps/bc"
+        
+        # Server utils
+        #include "nlix/apps/server-uptime"
+        #include "nlix/apps/server-players"
+        #include "nlix/apps/server-hostname"
         
         # Apps control.
         #include "nlix/apps/pkill"
@@ -64,6 +71,7 @@ if (tickClk()) {
         #include "nlix/apps/perf"
         #include "nlix/apps/ops"
         #include "nlix/apps/print-pi"
+        #include "nlix/apps/uptime"
         
         # Egp tests.
         #include "nlix/apps/egp-clocks"
