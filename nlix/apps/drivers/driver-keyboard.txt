@@ -1,0 +1,58 @@
+#
+# This E2 made by scaled
+#
+
+@name driver-keyboard
+
+if (!APPS_INFO:exists("driver-keyboard")) {
+    local Info = table()
+    
+    APPS_INFO["driver-keyboard", table] = Info
+}
+
+if (app("driver-keyboard")) {
+    switch (ThisAppState) {
+        # Initialize
+        case 0,
+            # Init first keyboard
+            local Device = findDeviceByType("keyboard")
+            
+            if (Device != NULL) {
+                Device["busy", number] = 1
+                varWrite("device", Device)
+                varWrite("keys", array())
+                appNextState()
+            }
+            else {
+                local Device = findDeviceByType("virtual-keyboard")
+                
+                if (Device != NULL) {
+                    Device["busy", number] = 1
+                    varWrite("device", Device)
+                    varWrite("keys", array())
+                    appNextState()
+                }
+            }
+            
+            break
+        
+        # Track keys
+        case 1,
+            local Device = varTable("device")
+            DeviceType = Device["type", string]
+            
+            switch (DeviceType) {
+                case "keyboard",
+                    local Keys = varArray("keys")
+                    for (I = 1, 5) {
+                        Keys[I, number] = Device["port", wirelink][I - 1]
+                    }
+                    break
+                
+                case "virtual-keyboard",
+                    varWrite("keys", Device["keys", array])
+                    break
+            }
+            break
+    }
+}

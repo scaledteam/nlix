@@ -1,0 +1,33 @@
+#
+# This E2 made by scaled
+#
+
+@name settings
+@persist RESET
+@persist [AUTOSTART_TERMINAL AUTOSTART_EGP]:array
+@persist FONT_MONOSPACED:string
+@persist TICKS_INSIDE
+@persist ROOT_USER:string
+
+FONT_MONOSPACED = "Courier New"
+
+TICKS_INSIDE = 10
+
+AUTOSTART_TERMINAL = array(
+    "driver-terminal",
+    "driver-keyboard",
+    "driver-digi",
+    "simple-keyboard",
+    "sh"
+)
+
+AUTOSTART_EGP = array(
+    "driver-egp",
+    "driver-cursor",
+    "driver-keyboard",
+    "egp-terminal"
+)
+
+RESET = 0
+
+ROOT_USER = "root"

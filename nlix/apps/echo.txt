@@ -11,7 +11,7 @@ if (!APPS_INFO:exists("echo")) {
 }
 
 if (app("echo")) {
-    consolePrintFast(appS("args") + "\n")
+    terminalPrintFast(appS("args") + "\n")
     appCloseSelf()
 }
 

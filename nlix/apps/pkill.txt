@@ -13,17 +13,17 @@ if (!APPS_INFO:exists("pkill")) {
 if (app("pkill")) {
     local AppName = appS("args")
     if (appExists(AppName)) {
-        local AppId = findAppByName(AppName)
-        if (AppId != -1) {
-            appClose(AppId)
-            consolePrintFast("App with id " + AppId + " killed.\n")
+        local App = findAppByName(AppName)
+        if (App != NULL) {
+            terminalPrintFast("Try kill \"" + App["name", string] + "\".\n")
+            App:appClose()
         }
         else {
-            consolePrintFast("App don't launched!.\n")
+            terminalPrintFast("App don't launched!\n")
         }
     }
     else {
-        consolePrintFast("Error! Wrong app name!\n")
+        terminalPrintFast("Error! Wrong app name!\n")
     }
     appCloseSelf()
 }

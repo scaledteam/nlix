@@ -28,15 +28,17 @@ if (app("egp-wm-shell")) {
         
         # Wait callback device
         case 2,
-            if (ThisWorkspace["devices", table]["other", table]:exists(1)) {
-                appT("callback-device", ThisWorkspace["devices", table]["other", table][1, table])
+            local Device = findDeviceByType("egp-wm-callback")
+            
+            if (Device != NULL) {
+                appT("callback-device", Device)
                 appNextState()
             }
             break
         
         # Main state
         case 3,
-            consolePrint("wm-sh: $ ")
+            terminalPrint("wm-sh: $ ")
             requestKeyboardInput()
             
             appNextState()

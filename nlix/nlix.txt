@@ -1,87 +1,115 @@
 #
-# This E2 made by scaled
+# Created by scaled
 #
 
 @name nlix
-@inputs [Port0 Port1 Port2 Port3 Port4 Port5 Port6 Port7]:wirelink
+@inputs [Port1 Port2 Port3 Port4]:wirelink
 
 if (first()) {
-    #include "nlix/system/system"
-    
-    #include "nlix/libraries/lib-vars"
-    #include "nlix/libraries/lib-vars-2"
-    #include "nlix/libraries/lib-app"
-    #include "nlix/libraries/lib-event"
-    
-    #include "nlix/libraries/drivers/lib-driver-terminal"
-    #include "nlix/libraries/drivers/lib-driver-keyboard"
-    #include "nlix/libraries/drivers/lib-driver-egp"
-    #include "nlix/libraries/drivers/lib-driver-cursor"
-    
-    #include "nlix/libraries/lib-simple-keyboard"
-    #include "nlix/libraries/lib-virtual-workspace"
-}
-
-if (first()) {
-    init()
-    autostart()
+    #include "nlix/system/first"
 }
 
 if (tickClk()) {
-    while (perf(SysPerf)) {
-        appManager()
-        
-        # Drivers.
-        #include "nlix/drivers/driver-terminal"
-        #include "nlix/drivers/driver-keyboard"
-        #include "nlix/drivers/driver-egp"
-        #include "nlix/drivers/driver-cursor"
-        
-        # Simplifier tools.
-        #include "nlix/apps/simple-keyboard"
-        
-        # Shells.
-        #include "nlix/apps/sh"
-        
-        # Quit tools.
-        #include "nlix/apps/halt"
-        #include "nlix/apps/reboot"
-        #include "nlix/apps/exit"
-        
-        # Classic console utilites.
-        #include "nlix/apps/clear"
-        #include "nlix/apps/echo"
-        #include "nlix/apps/test"
-        #include "nlix/apps/dmesg"
-        
-        # Math
-        #include "nlix/apps/bc"
-        
-        # Server utils
-        #include "nlix/apps/server-uptime"
-        #include "nlix/apps/server-players"
-        #include "nlix/apps/server-hostname"
-        
-        # Apps control.
-        #include "nlix/apps/pkill"
-        #include "nlix/apps/kill"
-        #include "nlix/apps/plist"
-        
-        # Performande control and tests.
-        #include "nlix/apps/perf"
-        #include "nlix/apps/ops"
-        #include "nlix/apps/print-pi"
-        #include "nlix/apps/uptime"
-        
-        # Egp tests.
-        #include "nlix/apps/egp-clocks"
-        #include "nlix/apps/egp-eyes"
-        
-        # Virtual workspace managers
-        #include "nlix/apps/egp-terminal"
-        #include "nlix/apps/egp-wm"
-        #include "nlix/apps/egp-wm-launcher"
-        #include "nlix/apps/egp-wm-shell"
-        #include "nlix/apps/virtual-workspace"
+    if (!Loaded) {
+        while (perf(SysPerf)) {
+            LoadState++
+            switch (LoadState) {
+                # System libraries
+                case 1, #include "nlix/libraries/lib-workspaces" break
+                case 2, #include "nlix/libraries/lib-vars" break
+                case 3, #include "nlix/libraries/lib-vars-2" break
+                case 4, #include "nlix/libraries/lib-app" break
+                case 5, #include "nlix/libraries/lib-event" break
+                case 6, #include "nlix/system/settings" break
+                case 7, #include "nlix/system/init-script" break
+                
+                # Drivers libraries
+                case 8, #include "nlix/libraries/drivers/lib-driver-terminal" break
+                case 9, #include "nlix/libraries/drivers/lib-driver-keyboard" break
+                case 10, #[#include "nlix/libraries/drivers/lib-driver-egp"]# break
+                case 11, #[#include "nlix/libraries/drivers/lib-driver-cursor"]# break
+                case 12, #[#include "nlix/libraries/drivers/lib-driver-digi"]# break
+                
+                # Other libraries
+                case 13, #include "nlix/libraries/lib-simple-keyboard" break
+                case 14, #[#include "nlix/libraries/lib-virtual-workspace"]# break
+                
+                # Set "loaded" state if all libraries loaded
+                default,
+                    Loaded = 1
+                    break
+            }
+        }
+    }
+    else {
+        while (perf(SysPerf)) {
+            appManager()
+            
+            # Drivers.
+            #include "nlix/apps/drivers/driver-terminal"
+            #include "nlix/apps/drivers/driver-keyboard"
+            ##include "nlix/apps/drivers/driver-egp"
+            ##include "nlix/apps/drivers/driver-cursor"
+            ##include "nlix/apps/drivers/driver-digi"
+            
+            # System daemons
+            #include "nlix/apps/hotplugd"
+            
+            # Simplifier tools.
+            #include "nlix/apps/simple-keyboard"
+            
+            # Shells.
+            #include "nlix/apps/sh"
+            
+            # Quit tools.
+            ##include "nlix/apps/halt"
+            ##include "nlix/apps/reboot"
+            ##include "nlix/apps/exit"
+            
+            # Classic console utilites.
+            #include "nlix/apps/clear"
+            ##include "nlix/apps/echo"
+            ##include "nlix/apps/test"
+            ##include "nlix/apps/dmesg"
+            
+            # Math
+            ##include "nlix/apps/bc"
+            
+            # Server utils
+            ##include "nlix/apps/server-uptime"
+            ##include "nlix/apps/server-players"
+            ##include "nlix/apps/server-hostname"
+            
+            # Apps control.
+            ##include "nlix/apps/pkill"
+            ##include "nlix/apps/kill"
+            #include "nlix/apps/plist"
+            ##include "nlix/apps/applist"
+            
+            # Performande control and tests.
+            #include "nlix/apps/perf"
+            #include "nlix/apps/ops"
+            #include "nlix/apps/print-pi"
+            #include "nlix/apps/uptime"
+            
+            # Virtual workspace managers
+            ##include "nlix/apps/virtual-workspace"
+            ##include "nlix/apps/egp-terminal"
+            
+            # Egp tests.
+            ##include "nlix/apps/egp-clocks"
+            ##include "nlix/apps/egp-eyes"
+            
+            # Window manager
+            ##include "nlix/apps/egp-wm"
+            ##include "nlix/apps/egp-wm-launcher"
+            ##include "nlix/apps/egp-wm-shell"
+            
+            # Workspace management
+            #include "nlix/apps/workspaces-manager"
+            
+            # Digital screen
+            ##include "nlix/apps/digi-scanner"
+        }
     }
 }

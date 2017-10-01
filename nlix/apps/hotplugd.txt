@@ -1,0 +1,30 @@
+#
+# This E2 made by scaled
+#
+
+@name hotplugd
+
+if (!APPS_INFO:exists("hotplugd")) {
+    local Info = table()
+    
+    APPS_INFO["hotplugd", table] = Info
+}
+
+if (app("hotplugd")) {
+    local Counter = varNumber("counter") % 4
+    
+    local Wirelink = select(Counter + 1,
+        Port1,
+        Port2,
+        Port3,
+        Port4
+    )
+    
+    if ((Wirelink != varWirelink("wirelinkOld" + Counter)) & Wirelink) {
+        ThisWorkspace:initPort(Wirelink)
+    }
+    varWrite("wirelinkOld" + Counter, Wirelink)
+    
+    varWrite("counter", Counter + 1)
+}
+

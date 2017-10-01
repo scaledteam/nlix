@@ -1,0 +1,36 @@
+#
+# This E2 made by scaled
+#
+
+@name lib-driver-digi
+
+function number initDigi() {
+    local App = findAppByName("driver-digi")
+    if (App != NULL) {
+        varWrite("driver-digi", App)
+        return 1
+    }
+    else {
+        return 0
+    }
+}
+
+function digiDrawPixel(Pos:vector2, Color:vector) {
+    local App = varTable("driver-digi")
+    
+    App:sendEvent("drawPixel")
+    App:sendEvent(Pos)
+    App:sendEvent(Color)
+}
+
+function vector2 digiResolution() {
+    return varTable("driver-digi"):varVector2("resolution")
+}
+
+function number digiIsIdle() {
+    return varTable("driver-digi"):varNumber("idle")
+}
+
+function entity digiEntity() {
+    return varTable("driver-digi"):varEntity("entity")
+}

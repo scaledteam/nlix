@@ -11,13 +11,13 @@ if (!APPS_INFO:exists("kill")) {
 }
 
 if (app("kill")) {
-    local AppId = appS("args"):toNumber()
-    if (AppId != -1) {
-        appClose(AppId)
-        consolePrintFast("App with id " + AppId + " killed.\n")
+    local App = Apps[appS("args"):toNumber(), table]
+    if (App != NULL) {
+        terminalPrintFast("Try kill \"" + App["name", string] + "\".\n")
+        App:appClose()
     }
     else {
-        consolePrintFast("App don't launched!.\n")
+        terminalPrintFast("App don't launched!.\n")
     }
     appCloseSelf()
 }

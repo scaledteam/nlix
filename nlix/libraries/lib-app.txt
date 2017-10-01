@@ -7,20 +7,20 @@
 # Persists
 @persist Apps:table
 @persist ThisAppName:string ThisAppData:table ThisAppState ThisWorkspace:table
-@persist ThisApp:table ThisAppId
+@persist ThisApp:table ThisAppId ThisAppUser:string
 
 # Const
 @persist APPS_INFO:table
 
 function appManager() {
-    if (AllData["app-count", number] > 1) {
-        AllData["this-app-id", number] = AllData["this-app-id", number] % AllData["app-count", number] + 1
+    if (Apps:count() > 1) {
+        AllData["ThisAppId", number] = AllData["ThisAppId", number] % Apps:count() + 1
     }
     else {
-        AllData["this-app-id", number] = 1
+        AllData["ThisAppId", number] = 1
     }
     
-    ThisAppId = AllData["this-app-id", number]
+    ThisAppId = AllData["ThisAppId", number]
     ThisApp = Apps[ThisAppId, table]
     ThisAppName = ThisApp["name", string]
 }
@@ -29,37 +29,34 @@ function number appExists(AppName:string) {
     return APPS_INFO:exists(AppName)
 }
 
-function number findAppByName(AppName:string) {
-    for (I = 1, AllData["app-count", number]) {
-        if (Apps[I, table]["workspace", table]["name", string] != ThisWorkspace["name", string]) {
-            continue
-        }
-        elseif (Apps[I, table]["name", string] == AppName) {
-            return I
+function table findAppByName(AppName:string) {
+    for (I = 1, Apps:count()) {
+        local App = Apps[I, table]
+        if (App["name", string] == AppName & App["workspace", table] == ThisWorkspace) {
+            return App
         }
     }
-    return -1
+    return NULL
 }
 
-function number appLaunch(AppName:string) {
+function table table:appLaunch(AppName:string) {
     local AppId = 0
-    if (AllData["app-closed", array]:count() > 0) {
-        AppId = AllData["app-closed", array]:shiftNumber()
-    }
-    else {
-        AllData["app-count", number] = AllData["app-count", number] + 1
-        AppId = AllData["app-count", number]
-    }
     
-    Apps[AppId, table] = table()
-    Apps[AppId, table]["name", string] = AppName
-    Apps[AppId, table]["data", table] = table()
-    Apps[AppId, table]["events", array] = array()
-    Apps[AppId, table]["workspace", table] = ThisWorkspace
-    return AppId
+    local App = table()
+    App["name", string] = AppName
+    App["user", string] = ROOT_USER
+    App["data", table] = table()
+    App["events", table] = table()
+    App["workspace", table] = This
+    Apps:pushTable(App)
+    return App
 }
 
-function number command(Command:string) {
+function table appLaunch(AppName:string) {
+    return ThisWorkspace:appLaunch(AppName)
+}
+
+function table command(Command:string) {
     Command = Command:trim()
     local AppName = Command
     local Args = ""
@@ -71,32 +68,37 @@ function number command(Command:string) {
     }
     
     if (appExists(AppName)) {
-        local AppId = appLaunch(AppName)
+        local App = appLaunch(AppName)
         if (WithArgs) {
-            glbS(AppId, "args", Args)
+            App:varWrite("args", Args)
         }
-        return AppId
+        return App
     }
     else {
-        return -1
+        return NULL
     }
 }
 
-function appClose(AppId) {
-    Apps[AppId, table]:clear()
-    Apps[AppId, table]:remove("data")
-    Apps[AppId, table]:remove("events")
-    Apps:remove(AppId)
-    if (AppId == AllData["app-count", number]) {
-        AllData["app-count", number] = AllData["app-count", number] - 1
+function table:appClose() {
+    This["data", table]:clear()
+    This["events", table]:clear()
+    for (I = 1, Apps:count()) {
+        if (Apps[I, table] == This) {
+            #print(Apps[I, table])
+            Apps:remove(I)
+        }
     }
-    else {
-        AllData["app-closed", array]:pushNumber(AppId)
-    }
+    This:clear()
+    #This = NULL
 }
 
+function appClose() {
+    ThisApp:appClose()
+}
+
+# Deprecated
 function appCloseSelf() {
-    appClose(ThisAppId)
+    ThisApp:appClose()
 }
 
 function appSetState(State) {
@@ -119,6 +121,7 @@ function number app(AppName:string) {
     if (ThisAppName == AppName) {
         ThisAppData = ThisApp["data", table]
         ThisAppState = ThisAppData["state", number]
+        ThisAppUser = ThisApp["user", string]
         
         ThisWorkspace = ThisApp["workspace", table]
         
@@ -131,35 +134,20 @@ function number app(AppName:string) {
     }
 }
 
-function number appLaunched(AppId) {
-    return Apps:exists(AppId)
+function number table:appIsLaunched() {
+    for (I = 1, Apps:count()) {
+        if (Apps[I, table] == This) {
+            return 1
+        }
+    }
+    return 0
+    #return This != NULL
 }
 
 
-function autostart() {
-    foreach (WorkspaceName, Workspace:table = Workspaces) {
-        ThisWorkspace = Workspace
-        log("Starting apps on workspace \"" + Workspace["name", string] + "\" from autostart...\n")
-        
-        local AutoStarted = 0
-        foreach (I, AppName:string = Workspace["autostart", array]) {
-            log("Starting " + AppName + "...")
-            if (appLaunch(AppName) == -1) {
-                log(" Failed.\n")
-            }
-            else {
-                log(" Ok.\n")
-                AutoStarted++
-            }
-        }
-        
-        if (AutoStarted < Workspace["autostart", array]:count()) {
-            log("Some apps failed to start.\n")
-        }
-        else {
-            log("All apps from autostart started.\n")
-        }
-        
-        Workspace:remove("autostart")
+function table table:startWorkspace() {
+    foreach (I, AppName:string = This["autostart", array]) {
+        This:appLaunch(AppName)
     }
+    return This
 }

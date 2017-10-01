@@ -11,7 +11,7 @@ if (!APPS_INFO:exists("dmesg")) {
 }
 
 if (app("dmesg")) {
-    consolePrintFast(Dmesg)
+    terminalPrintFast(Dmesg)
     appCloseSelf()
 }
 

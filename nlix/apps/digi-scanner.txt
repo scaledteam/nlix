@@ -1,0 +1,57 @@
+#
+# Created by scaled
+#
+
+@name digi-scanner
+
+if (!APPS_INFO:exists("digi-scanner")) {
+    local Info = table()
+    
+    APPS_INFO["digi-scanner", table] = Info
+}
+
+if (app("digi-scanner")) {
+    switch (ThisAppState) {
+        case 0,
+            if (initDigi()) {
+                varWrite("PIXELS_COUNT", digiResolution()[1] * digiResolution()[2])
+                varWrite("color", vec(255))
+                
+                appNextState()
+            }
+            break
+        
+        case 1,
+            #if (digiIsIdle()) {
+                local Color = varVector("color")
+                local Counter = varNumber("counter")
+                local DIGI_RESOLUTION = digiResolution()
+                local DIGI_OFFSET = DIGI_RESOLUTION / 2 * vec2(1, -1)
+                local RANGER_DISTANCE = 1000
+                
+                for (I = 1, TICKS_INSIDE) {
+                    local X = Counter % DIGI_RESOLUTION[1]
+                    local Y = int(Counter / DIGI_RESOLUTION[1])
+                    
+                    local Direction = digiEntity():toWorldAxis(vec(vec2(Y, -X) - DIGI_OFFSET, DIGI_RESOLUTION[2]))
+                    local RangerMain = rangerOffset(RANGER_DISTANCE, digiEntity():toWorld(vec(0, 0, 10)), Direction)
+                    local Brightness = 0
+                    if (RangerMain:hit()) {
+                        Brightness = min(1, 1 - RangerMain:distance() / RANGER_DISTANCE)
+                    }
+                    
+                    digiDrawPixel(vec2(X, Y), Color * Brightness)
+                    
+                    if (Counter >= varNumber("PIXELS_COUNT")) {
+                        appClose()
+                        break
+                    }
+                    else {
+                        Counter++
+                    }
+                }
+                varWrite("counter", Counter)
+            #}
+            break
+    }
+}

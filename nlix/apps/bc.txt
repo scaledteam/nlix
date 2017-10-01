@@ -12,10 +12,10 @@ if (!APPS_INFO:exists("bc")) {
 
 if (app("bc")) {
     switch (ThisAppState) {
-        # Wait console driver
+        # Wait terminal driver
         case 0,
             if (initTerminal()) {
-                consolePrint("Calculator shell. Write \"quit\" for exit.\n")
+                terminalPrint("Calculator shell. Write \"quit\" for exit.\n")
                 appNextState()
             }
             break
@@ -29,8 +29,8 @@ if (app("bc")) {
         
         # Main state
         case 2,
-            consolePrint("bc: ")
-            varWrite("outputCount", varNumber("outputCount") + 4)
+            terminalPrint("> ")
+            varWrite("outputCount", varNumber("outputCount") + 2)
             requestKeyboardInput()
             
             appNextState()
@@ -56,7 +56,7 @@ if (app("bc")) {
                         break
                     
                     case "clear",
-                        consoleErase(varNumber("outputCount"))
+                        terminalErase(varNumber("outputCount"))
                         varWrite("outputCount", 0)
                         appSetState(2)
                         break
@@ -129,7 +129,7 @@ if (app("bc")) {
             }
             
             local Output = InputExplode:concat(" ") + "\n"
-            consolePrint(Output)
+            terminalPrint(Output)
             varWrite("outputCount", varNumber("outputCount") + Output:length())
             appSetState(2)
             break

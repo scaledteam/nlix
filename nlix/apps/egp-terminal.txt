@@ -27,20 +27,17 @@ if (app("egp-terminal")) {
             break
         
         case 2,
-            appT("workspace", createVirtualWorkspace(AUTOSTART_TERMINAL))
+            local Workspace = createWorkspace(AUTOSTART_TERMINAL)
+            local VirtualTerminal = createVirtualTerminal()
+            local VirtualKeyboard = createVirtualKeyboard()
             
-            appT("console-screen", createVirtualConsoleScreen())
-            appT("keyboard", createVirtualKeyboard())
+            Workspace:addDevice(VirtualTerminal)
+            Workspace:addDevice(VirtualKeyboard)
+            Workspace:startWorkspace()
             
-            # Send all keys to virtual driver
-            local VirtualKeyboardDevice = appT("keyboard")
-            VirtualKeyboardDevice["keys", array] = keyboardGetKeys()
-            
-            local Workspace = appT("workspace")
-            Workspace["devices", table]["console-screens", table]:pushTable(appT("console-screen"))
-            Workspace["devices", table]["keyboards", table]:pushTable(VirtualKeyboardDevice)
-            
-            autostartVirtualWorkspace(Workspace)
+            appT("workspace", Workspace)
+            appT("terminalDevice", VirtualTerminal)
+            appT("keyboardDevice", VirtualKeyboard)
             
             appNextState()
             break
@@ -59,27 +56,24 @@ if (app("egp-terminal")) {
         
         case 4,
             # Virtual screen driver
-            local ConsoleScreenDevice = appT("console-screen")
-            if (ConsoleScreenDevice["new-output", string] != "") {
-                appS("console-text", appS("console-text") + ConsoleScreenDevice["new-output", string])
-                ConsoleScreenDevice["new-output", string] = ""
+            local VirtualTerminal = appT("terminalDevice")
+            if (VirtualTerminal["new-output", string] != "") {
+                appS("console-text", appS("console-text") + VirtualTerminal["new-output", string])
+                VirtualTerminal["new-output", string] = ""
                 
                 egpSetText(2, appS("console-text"))
             }
             
-            if (ConsoleScreenDevice["new-erase", number] != 0) {
-                appS("console-text", appS("console-text"):left(appS("console-text"):length() - ConsoleScreenDevice["new-erase", number]))
-                ConsoleScreenDevice["new-erase", number] = 0
+            if (VirtualTerminal["new-erase", number] != 0) {
+                appS("console-text", appS("console-text"):left(appS("console-text"):length() - VirtualTerminal["new-erase", number]))
+                VirtualTerminal["new-erase", number] = 0
                 
                 egpSetText(2, appS("console-text"))
             }
             
             # Virtual keyboard driver
-            #[local Keys = keyboardGetKeys()
-            local VirtualKeyboardDevice = appT("keyboard")
-            for (I = 1, 5) {
-                VirtualKeyboardDevice["keys", array][I, number] = Keys[I, number]
-            }]#
+            local VirtualKeyboard = appT("keyboardDevice")
+            VirtualKeyboard["keys", array] = keyboardGetKeys()
             break
     }
 }

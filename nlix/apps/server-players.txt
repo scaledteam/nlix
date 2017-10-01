@@ -15,7 +15,7 @@ if (app("server-players")) {
     foreach (I, Player:entity = players()) {
         Output += Player:id() + " " + Player:name() + "\n"
     }
-    consolePrintFast(Output)
+    terminalPrintFast(Output)
     appCloseSelf()
 }
 

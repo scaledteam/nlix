@@ -5,9 +5,9 @@
 @name lib-driver-cursor
 
 function number initCursor() {
-    local AppId = findAppByName("driver-cursor")
-    if (AppId != -1) {
-        appN("driver-cursor-appid", AppId)
+    local App = findAppByName("driver-cursor")
+    if (App != NULL) {
+        varWrite("driver-cursor", App)
         return 1
     }
     else {
@@ -16,5 +16,5 @@ function number initCursor() {
 }
 
 function vector2 cursorGetPos() {
-    return glbV2(appN("driver-cursor-appid"), "pos")
+    return varTable("driver-cursor"):varVector2("pos")
 }

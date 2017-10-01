@@ -5,9 +5,9 @@
 @name lib-driver-terminal
 
 function number initTerminal() {
-    local AppId = findAppByName("driver-terminal")
-    if (AppId != -1) {
-        appN("driver-terminal-appid", AppId)
+    local App = findAppByName("driver-terminal")
+    if (App != NULL) {
+        varWrite("driver-terminal", App)
         return 1
     }
     else {
@@ -15,32 +15,33 @@ function number initTerminal() {
     }
 }
 
-function consolePrint(Text:string) {
-    local AppId = appN("driver-terminal-appid")
+function terminalPrint(Text:string) {
+    local App = varTable("driver-terminal")
     
-    sendEvent(AppId, "print")
-    sendEventData(AppId, Text)
+    App:sendEvent("print")
+    App:sendEvent(Text)
 }
 
-function consolePrintFast(Text:string) {
-    local AppId = findAppByName("driver-terminal")
+function terminalErase(Count) {
+    local App = varTable("driver-terminal")
     
-    sendEvent(AppId, "print")
-    sendEventData(AppId, Text)
+    App:sendEvent("erase")
+    App:sendEvent(Count)
 }
 
-function consoleErase(Count) {
-    local AppId = findAppByName("driver-terminal")
+function terminalClear() {
+    varTable("driver-terminal"):sendEvent("clear")
+}
+
+
+function terminalPrintFast(Text:string) {
+    local App = findAppByName("driver-terminal")
     
-    sendEvent(AppId, "erase")
-    sendEventData(AppId, Count)
+    App:sendEvent("print")
+    App:sendEvent(Text)
 }
 
-function consoleClear() {
-    sendEvent(appN("driver-terminal-appid"), "clear")
-}
-
-function consoleClearFast() {
-    sendEvent(findAppByName("driver-terminal"), "clear")
+function terminalClearFast() {
+    findAppByName("driver-terminal"):sendEvent("clear")
 }
 

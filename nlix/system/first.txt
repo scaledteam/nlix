@@ -1,0 +1,12 @@
+#
+# This E2 made by scaled
+#
+
+@name init
+
+@persist Loaded LoadState
+@persist SysPerf
+@persist NULL:table
+
+runOnTick(1)
+SysPerf = 100

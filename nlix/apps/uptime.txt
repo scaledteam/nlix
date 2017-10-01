@@ -12,7 +12,7 @@ if (!APPS_INFO:exists("uptime")) {
 
 if (app("uptime")) {
     local Uptime = systime() - SysStartTime
-    consolePrintFast(int(Uptime / 60 / 60 / 24) % 30 + " days, " + int(Uptime / 60 / 60) % 24 + ":" + int(Uptime / 60) % 60 + ":" + int(Uptime) % 60 + "\n")
+    terminalPrintFast(int(Uptime / 60 / 60 / 24) % 30 + " days, " + int(Uptime / 60 / 60) % 24 + ":" + int(Uptime / 60) % 60 + ":" + int(Uptime) % 60 + "\n")
     appCloseSelf()
 }
 

@@ -1,0 +1,136 @@
+#
+# This E2 made by scaled
+#
+
+@name driver-terminal
+
+if (!APPS_INFO:exists("driver-terminal")) {
+    local Info = table()
+    
+    APPS_INFO["driver-terminal", table] = Info
+}
+
+if (app("driver-terminal")) {
+    switch (ThisAppState) {
+        # Initialize
+        case 0,
+            # Init first screen
+            appS("console-text", "Welcome to the Nlix operation system!\n")
+            
+            local Device = findDeviceByType("console-screen")
+            
+            if (Device != NULL) {
+                Device["busy", number] = 1
+                local Screen = Device["port", wirelink]
+                Screen[2041] = 1
+                Screen:writeString(appS("console-text"), 0, 0)
+                
+                appT("device", Device)
+                appNextState()
+            }
+            else {
+                local Device = findDeviceByType("egp-screen")
+                
+                if (Device != NULL) {
+                    Device["busy", number] = 1
+                    local Screen = Device["port", wirelink]
+                    Screen:egpClear()
+                    Screen:egpDrawTopLeft(1)
+                    
+                    Screen:egpTextLayout(1, appS("console-text"), vec2(), vec2(512))
+                    Screen:egpFont(1, FONT_MONOSPACED)
+                    
+                    appT("device", Device)
+                    appNextState()
+                }
+                else {
+                    local Device = findDeviceByType("virtual-terminal")
+                    
+                    if (Device != NULL) {
+                        Device["busy", number] = 1
+                        Device["new-output", string] = appS("console-text")
+                        
+                        appT("device", Device)
+                        appNextState()
+                    }
+                }
+            }
+            
+            break
+        
+        # Wait events
+        case 1,
+            #for (I = 1, TICKS_INSIDE) {
+                if (waitAnyEvent()) {
+                    local Device = appT("device")
+                    local ScreenType = Device["type", string]
+                    
+                    local Command = getEventString()
+                    switch (Command) {
+                        case "clear",
+                            switch (ScreenType) {
+                                case "egp-screen",
+                                    Device["port", wirelink]:egpSetText(1, "")
+                                    break
+                                
+                                case "console-screen",
+                                    Device["port", wirelink][2041] = 1
+                                    break
+                                
+                                case "virtual-terminal",
+                                    Device["new-erase", number] = appS("console-text"):length()
+                                    break
+                            }
+                            
+                            appS("console-text", "")
+                            break
+                        
+                        case "print",
+                            local NewPrint = getEventString()
+                            appS("console-text", appS("console-text") + NewPrint)
+                            
+                            switch (ScreenType) {
+                                case "egp-screen",
+                                    Device["port", wirelink]:egpSetText(1, appS("console-text"))
+                                    break
+                                
+                                case "console-screen",
+                                    Device["port", wirelink]:writeString(appS("console-text"), 0, 0)
+                                    break
+                                
+                                case "virtual-terminal",
+                                    Device["new-output", string] = NewPrint
+                                    break
+                            }
+                            break
+                        
+                        case "erase",
+                            local EraseCount = getEventNumber()
+                            appS("console-text", appS("console-text"):left(appS("console-text"):length() - EraseCount))
+                            
+                            switch (ScreenType) {
+                                case "egp-screen",
+                                    Device["port", wirelink]:egpSetText(1, appS("console-text"))
+                                    break
+                                
+                                case "console-screen",
+                                    Device["port", wirelink][2041] = 1
+                                    Device["port", wirelink]:writeString(appS("console-text"), 0, 0)
+                                    break
+                                
+                                case "virtual-terminal",
+                                    Device["new-erase", number] = EraseCount
+                                    break
+                            }
+                            break
+                            
+                    }
+                }
+            #    else {
+            #        break
+            #    }
+            #}
+            break
+    }
+}
+

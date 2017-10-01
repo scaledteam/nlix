@@ -20,7 +20,7 @@ if (app("simple-keyboard")) {
         
         case 1,
             if (initKeyboard()) {
-                appR("keyboardOld", array())
+                varWrite("keyboardOld", array())
                 
                 appNextState()
             }
@@ -29,8 +29,8 @@ if (app("simple-keyboard")) {
         # Wait event
         case 2,
             if (waitEvent("get-input")) {
-                local Sender = getEventDataN()
-                appN("input-sender", Sender)
+                local Sender = getEventTable()
+                varWrite("input-sender", Sender)
                 
                 appNextState()
             }
@@ -39,19 +39,16 @@ if (app("simple-keyboard")) {
         # Track keyboard
         case 3,
             local Keys = keyboardGetKeys()
-            local KeyboardOldKeys = appR("keyboardOld")
+            local KeyboardOldKeys = varArray("keyboardOld")
             if (Keys[1, number] >= KeyboardOldKeys[1, number]) {
                 for (I = 2, 5) {
-                    if (
-                        (Keys[I, number] != KeyboardOldKeys[I, number])
-                        & Keys[I, number]
-                    ) {
+                    if ((Keys[I, number] != KeyboardOldKeys[I, number]) & Keys[I, number] ) {
                         local Key = Keys[I, number]
                         #print(Key)
                         
                         # Enter
                         if (Key == 10 | Key == 142) {
-                            consolePrint("\n")
+                            terminalPrint("\n")
                             appNextState()
                         }
                         # Backspace
@@ -60,7 +57,7 @@ if (app("simple-keyboard")) {
                                 appS("KeyboardBuffer", appS("KeyboardBuffer"):left(appN("KeyboardBufferCount") - 1))
                                 appN("KeyboardBufferCount", appN("KeyboardBufferCount") - 1)
                                 
-                                consoleErase(1)
+                                terminalErase(1)
                             }
                         }
                         # Shift key
@@ -72,7 +69,7 @@ if (app("simple-keyboard")) {
                             appS("KeyboardBuffer", appS("KeyboardBuffer") + Char)
                             appN("KeyboardBufferCount", appN("KeyboardBufferCount") + 1)
                             
-                            consolePrint(Char)
+                            terminalPrint(Char)
                         }
                     }
                 }
@@ -85,12 +82,12 @@ if (app("simple-keyboard")) {
         
         # Send ready data
         case 4,
-            local Sender = appN("input-sender")
-            sendEvent(Sender, "get-input")
-            sendEventData(Sender, appS("KeyboardBuffer"))
+            local Sender = varTable("input-sender")
+            Sender:sendEvent("get-input")
+            Sender:sendEvent(varString("KeyboardBuffer"))
             
-            appS("KeyboardBuffer", "")
-            appN("KeyboardBufferCount", 0)
+            varWrite("KeyboardBuffer", "")
+            varWrite("KeyboardBufferCount", 0)
             
             appSetState(2)
             break

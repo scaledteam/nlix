@@ -53,13 +53,13 @@ if (app("egp-wm")) {
             varWrite("workspacesNameToId", table())
             
             local CallBackDevice = table()
+            CallBackDevice["type", string] = "egp-wm-callback"
             local AppSize = clamp(vec2(300, 160), vec2(), egpResolution() * 0.9 - vec2(0, 25))
             CallBackDevice["queue", array] = array(
                 "create", "wm-sh", randvec2(vec2(0, 25), egpResolution() - AppSize), AppSize, 5,
                 "add-device", "wm-sh", "egp-screen",
                 "add-device", "wm-sh", "keyboard",
                 "add-device", "wm-sh", "callback",
-                "add-app", "wm-sh", "driver-egp",
                 "add-app", "wm-sh", "egp-wm-launcher",
                 "start", "wm-sh"#,
                 #"launch", "egp-eyes"
@@ -220,7 +220,7 @@ if (app("egp-wm")) {
                     switch (Command) {
                         case "create",
                             # Create workspace
-                            local Workspace = createVirtualWorkspace()
+                            local Workspace = createWorkspace(AUTOSTART_EGP)
                             local WorkspaceName = CommandQueue:shiftString()
                             
                             local WmWorkspacesByName = varTable("workspacesByName")
@@ -286,22 +286,22 @@ if (app("egp-wm")) {
                                     local Size = varArray("egp-sizes")[WorkspaceId, vector2]
                                     local EgpIdsCount = varArray("egp-id-counts")[WorkspaceId, number]
                                     
-                                    Workspace["devices", table]["egp-screens", table]:pushTable(createVirtualEgpScreen(Size, EgpIdsCount))
+                                    Workspace:addDevice(createVirtualEgpScreen(Size, EgpIdsCount))
                                     break
                                 
                                 case "keyboard",
                                     local VirtualKeyboardDevice = createVirtualKeyboard()
-                                    Workspace["devices", table]["keyboards", table]:pushTable(VirtualKeyboardDevice)
+                                    Workspace:addDevice(VirtualKeyboardDevice)
                                     # send all keys from real keyboard to virtual keyboard
                                     VirtualKeyboardDevice["keys", array] = keyboardGetKeys()
                                     break
                                 
                                 case "cursor",
-                                    Workspace["devices", table]["cursors", table]:pushTable(createVirtualCursor())
+                                    Workspace:addDevice(createVirtualCursor())
                                     break
                                 
                                 case "callback",
-                                    Workspace["devices", table]["other", table]:pushTable(varTable("callback-device"))
+                                    Workspace:addDevice(varTable("callback-device"))
                                     break
                             }
                             break
@@ -315,7 +315,7 @@ if (app("egp-wm")) {
                         case "start",
                             local WorkspaceName = CommandQueue:shiftString()
                             local Workspace = varTable("workspacesByName")[WorkspaceName, table]
-                            autostartVirtualWorkspace(Workspace)
+                            Workspace:startWorkspace()
                             break
                         
                         case "launch",
@@ -338,9 +338,6 @@ if (app("egp-wm")) {
                                 "add-device", WorkspaceName, "egp-screen",
                                 "add-device", WorkspaceName, "cursor",
                                 "add-device", WorkspaceName, "keyboard",
-                                "add-app", WorkspaceName, "driver-egp",
-                                "add-app", WorkspaceName, "driver-cursor",
-                                "add-app", WorkspaceName, "driver-keyboard",
                                 "add-app", WorkspaceName, AppName,
                                 "start", WorkspaceName
                             ))

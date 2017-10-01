@@ -13,9 +13,9 @@ if (!APPS_INFO:exists("plist")) {
 if (app("plist")) {
     local List = ""
     for (I = 1, Apps:count()) {
-        List += I + ", " + Apps[I, table]["workspace", table]["name", string] + ", " + Apps[I, table]["name", string] + "\n"
+        List += I + ", " + Apps[I, table]["user", string] + ", " + Apps[I, table]["workspace", table]:id():replace("table: ", "") + ", " + Apps[I, table]["name", string] + "\n"
     }
-    consolePrintFast(List)
+    terminalPrintFast(List)
     appCloseSelf()
 }
 

@@ -21,19 +21,17 @@ if (app("egp-wm-launcher")) {
             break
         
         case 1,
-            if (ThisWorkspace["devices", table]["keyboards", table]:exists(1)) {
-                local Workspace = createVirtualWorkspace(array("driver-terminal", "driver-keyboard", "simple-keyboard", "clear", "egp-wm-shell"))
+            local VirtualKeyboardDevice = findDeviceByType("virtual-keyboard")
+            if (VirtualKeyboardDevice != NULL) {
+                local Workspace = createWorkspace(array("driver-terminal", "driver-keyboard", "simple-keyboard", "clear", "egp-wm-shell"))
+                local VirtualTerminal = createVirtualTerminal()
+                
+                Workspace:addDevice(VirtualTerminal)
+                Workspace:addDevice(VirtualKeyboardDevice)
+                Workspace:startWorkspace()
+                
                 appT("workspace", Workspace)
-                
-                appT("console-screen", createVirtualConsoleScreen())
-                
-                Workspace["devices", table]["console-screens", table]:pushTable(appT("console-screen"))
-                # Send all keys to virtual driver
-                local KeyboardDevice = ThisWorkspace["devices", table]["keyboards", table][1, table]
-                appT("keyboard", KeyboardDevice)
-                Workspace["devices", table]["keyboards", table]:pushTable(KeyboardDevice)
-                
-                autostartVirtualWorkspace(Workspace)
+                appT("terminalDevice", VirtualTerminal)
                 
                 appNextState()
             }
@@ -41,10 +39,9 @@ if (app("egp-wm-launcher")) {
         
         # Wait callback device
         case 2,
-            if (ThisWorkspace["devices", table]["other", table]:exists(1)) {
-                appT("callback-device", ThisWorkspace["devices", table]["other", table][1, table])
-                
-                appT("workspace")["devices", table]["other", table]:pushTable(ThisWorkspace["devices", table]["other", table][1, table])
+            local CallbackDevice = findDeviceByType("egp-wm-callback")
+            if (CallbackDevice != NULL) {
+                appT("workspace"):addDevice(CallbackDevice)
                 appNextState()
             }
             break

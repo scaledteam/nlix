@@ -1,0 +1,93 @@
+#
+# This E2 made by scaled
+#
+
+@name workspaces-shell
+
+if (!APPS_INFO:exists("workspaces-manager")) {
+    local Info = table()
+    
+    APPS_INFO["workspaces-manager", table] = Info
+}
+
+if (app("workspaces-manager")) {
+    switch (ThisAppState) {
+        # Wait terminal driver
+        case 0,
+            if (initTerminal()) {
+                terminalPrint("Workspaces manager. Write \"quit\" for exit.\n")
+                appNextState()
+            }
+            break
+        
+        # Wait keyboard driver
+        case 1,
+            if (initSimpleKeyboard()) {
+                appNextState()
+            }
+            break
+        
+        # Main state
+        case 2,
+            terminalPrint("> ")
+            varWrite("outputCount", varNumber("outputCount") + 2)
+            requestKeyboardInput()
+            
+            appNextState()
+            break
+        
+        # Get input
+        case 3,
+            if (waitKeyboardInput()) {
+                local Input = getKeyboardInput()
+                varWrite("input", Input)
+                varWrite("outputCount", varNumber("outputCount") + Input:length() + 1)
+                switch (Input) {
+                    case "",
+                        appSetState(2)
+                        break
+                    
+                    case "auto-terminal",
+                        local Workspace = createWorkspace(AUTOSTART_TERMINAL)
+                        Workspace:addDevice(findDeviceByType("console-screen"))
+                        Workspace:addDevice(findDeviceByType("egp-screen"))
+                        Workspace:addDevice(findDeviceByType("keyboard"))
+                        Workspace:startWorkspace()
+                        appSetState(2)
+                        break
+                    
+                    case "devices",
+                        local Message = ""
+                        for (I = 1, ThisWorkspace["devices", table]:count()) {
+                            Message += I + ", " + ThisWorkspace["devices", table][I, table]["type", string] + "\n"
+                        }
+                        terminalPrint(Message)
+                        varWrite("outputCount", varNumber("outputCount") + Message:length())
+                        appSetState(2)
+                        break
+                    
+                    case "quit",
+                        appCloseSelf()
+                        break
+                    
+                    case "exit",
+                        appCloseSelf()
+                        break
+                    
+                    case "clear",
+                        terminalErase(varNumber("outputCount"))
+                        varWrite("outputCount", 0)
+                        appSetState(2)
+                        break
+                    
+                    default,
+                        local Message = "Wrong command\n"
+                        terminalPrint(Message)
+                        varWrite("outputCount", varNumber("outputCount") + Message:length())
+                        appSetState(2)
+                        break
+                }
+            }
+            break
+    }
+}

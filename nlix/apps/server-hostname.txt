@@ -11,7 +11,7 @@ if (!APPS_INFO:exists("server-hostname")) {
 }
 
 if (app("server-hostname")) {
-    consolePrintFast(hostname() + "\n")
+    terminalPrintFast(hostname() + "\n")
     appCloseSelf()
 }
 

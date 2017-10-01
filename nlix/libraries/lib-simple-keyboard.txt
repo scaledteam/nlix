@@ -5,9 +5,9 @@
 @name lib-simple-keyboard
 
 function number initSimpleKeyboard() {
-    local SimpleKeyboardAppId = findAppByName("simple-keyboard")
-    if (SimpleKeyboardAppId != -1) {
-        appN("simple-keyboard-appid", SimpleKeyboardAppId)
+    local App = findAppByName("simple-keyboard")
+    if (App != NULL) {
+        varWrite("simple-keyboard", App)
         return 1
     }
     else {
@@ -16,10 +16,10 @@ function number initSimpleKeyboard() {
 }
 
 function requestKeyboardInput() {
-    local AppId = appN("simple-keyboard-appid")
+    local App = varTable("simple-keyboard")
     
-    sendEvent(AppId, "get-input")
-    sendEventData(AppId, ThisAppId)
+    App:sendEvent("get-input")
+    App:sendEvent(ThisApp)
 }
 
 function number waitKeyboardInput() {
@@ -27,5 +27,5 @@ function number waitKeyboardInput() {
 }
 
 function string getKeyboardInput() {
-    return getEventDataS()
+    return getEventString()
 }

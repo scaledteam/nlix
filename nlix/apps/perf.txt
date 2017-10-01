@@ -16,7 +16,7 @@ if (app("perf")) {
         SysPerf = ArgNumber
     }
     else {
-        consolePrintFast("Entered value is not a number or 0.\n")
+        terminalPrintFast("Entered value is not a number or 0.\n")
     }
     appCloseSelf()
 }

@@ -4,9 +4,47 @@
 
 @name lib-event
 
+# Push table lib
+function number table:shiftNumber() {
+    local Return = This[1, number]
+    This:shift()
+    return Return
+}
+
+function string table:shiftString() {
+    local Return = This[1, string]
+    This:shift()
+    return Return
+}
+
+function vector table:shiftVector() {
+    local Return = This[1, vector]
+    This:shift()
+    return Return
+}
+
+function vector2 table:shiftVector2() {
+    local Return = This[1, vector2]
+    This:shift()
+    return Return
+}
+
+function vector4 table:shiftVector4() {
+    local Return = This[1, vector4]
+    This:shift()
+    return Return
+}
+
+function table table:shiftTable() {
+    local Return = This[1, table]
+    This:shift()
+    return Return
+}
+# lib end
+
 function number waitEvent(EventName:string) {
-    if (ThisApp["events", array][1, string] == EventName) {
-        ThisApp["events", array]:shiftString()
+    if (ThisApp["events", table][1, string] == EventName) {
+        ThisApp["events", table]:shiftString()
         return 1
     }
     else {
@@ -15,54 +53,24 @@ function number waitEvent(EventName:string) {
 }
 
 function number waitAnyEvent() {
-    return ThisApp["events", array]:count() > 0
+    return ThisApp["events", table]:count() > 0
 }
 
-function number waitAnyEventOfApp(AppId) {
-    return Apps[AppId, table]["events", array]:count() > 0
+function number table:waitAnyEvent() {
+    return This["events", table]:count() > 0
 }
 
-function sendEvent(AppId, EventName:string) {
-    Apps[AppId, table]["events", array]:pushString(EventName)
-}
+function table:sendEvent(Data:number)   { This["events", table]:pushNumber(Data) }
+function table:sendEvent(Data:string)   { This["events", table]:pushString(Data) }
+function table:sendEvent(Data:vector)   { This["events", table]:pushVector(Data) }
+function table:sendEvent(Data:vector2)  { This["events", table]:pushVector2(Data) }
+function table:sendEvent(Data:vector4)  { This["events", table]:pushVector4(Data) }
+function table:sendEvent(Data:table)    { This["events", table]:pushTable(Data) }
 
-function sendEventData(AppId, Data:number) {
-    Apps[AppId, table]["events", array]:pushNumber(Data)
-}
-
-function sendEventData(AppId, Data:string) {
-    Apps[AppId, table]["events", array]:pushString(Data)
-}
-
-function sendEventData(AppId, Data:vector) {
-    Apps[AppId, table]["events", array]:pushVector(Data)
-}
-
-function sendEventData(AppId, Data:vector2) {
-    Apps[AppId, table]["events", array]:pushVector2(Data)
-}
-
-function sendEventData(AppId, Data:vector4) {
-    Apps[AppId, table]["events", array]:pushVector4(Data)
-}
-
-function number getEventDataN() {
-    return ThisApp["events", array]:shiftNumber()
-}
-
-function string getEventDataS() {
-    return ThisApp["events", array]:shiftString()
-}
-
-function vector getEventDataV() {
-    return ThisApp["events", array]:shiftVector()
-}
-
-function vector2 getEventDataV2() {
-    return ThisApp["events", array]:shiftVector2()
-}
-
-function vector4 getEventDataV4() {
-    return ThisApp["events", array]:shiftVector4()
-}
+function number     getEventNumber()    { return ThisApp["events", table]:shiftNumber() }
+function string     getEventString()    { return ThisApp["events", table]:shiftString() }
+function vector     getEventVector()    { return ThisApp["events", table]:shiftVector() }
+function vector2    getEventVector2()   { return ThisApp["events", table]:shiftVector2() }
+function vector4    getEventVector4()   { return ThisApp["events", table]:shiftVector4() }
+function table      getEventTable()     { return ThisApp["events", table]:shiftTable() }
 

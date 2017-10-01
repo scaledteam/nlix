@@ -24,8 +24,8 @@ if (app("print-pi")) {
             appN("last-print-step", 0)
             
             appN("start-time", systime())
-            consolePrint("Computing started...\n")
-            consolePrint("--------------|50%-----------|100%\n")
+            terminalPrint("Computing started...\n")
+            terminalPrint("--------------|50%-----------|100%\n")
             appNextState()
             break
         
@@ -37,12 +37,12 @@ if (app("print-pi")) {
                 appN("result", appN("result") + 4 * ((-1) ^ (N - 1)) / (2 * N - 1))
                 
                 if (N > appN("last-print-step")) {
-                    consolePrint(".")
+                    terminalPrint(".")
                     appN("last-print-step", appN("last-print-step") + appN("print-step")) 
                 }
                 
                 if (N > appN("iterations")) {
-                    consolePrint("\n")
+                    terminalPrint("\n")
                     appNextState()
                     break
                 }
@@ -50,7 +50,7 @@ if (app("print-pi")) {
             break
         
         case 3,
-            consolePrint("Number pi = " + appN("result") + ". Time remaining: " + (int((systime() - appN("start-time")) * 1000) / 1000) + "\n")
+            terminalPrint("Number pi = " + appN("result") + ". Time remaining: " + (int((systime() - appN("start-time")) * 1000) / 1000) + "\n")
             appCloseSelf()
             break
     }

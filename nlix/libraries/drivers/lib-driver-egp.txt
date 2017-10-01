@@ -5,10 +5,9 @@
 @name lib-driver-egp
 
 function number initEgp() {
-    local AppId = findAppByName("driver-egp")
-    if (AppId != -1) {
-        appN("driver-egp-appid", AppId)
-        appV2("driver-egp-resolution", glbV2(AppId, "resolution"))
+    local App = findAppByName("driver-egp")
+    if (App != NULL) {
+        varWrite("driver-egp", App)
         return 1
     }
     else {
@@ -17,150 +16,150 @@ function number initEgp() {
 }
 
 function egpBox(Id, Pos:vector2, Size:vector2) {
-    local DriverAppId = appN("driver-egp-appid")
+    local App = varTable("driver-egp")
     
-    sendEvent(DriverAppId, "egpBox")
-    sendEventData(DriverAppId, Id)
-    sendEventData(DriverAppId, Pos)
-    sendEventData(DriverAppId, Size)
+    App:sendEvent("egpBox")
+    App:sendEvent(Id)
+    App:sendEvent(Pos)
+    App:sendEvent(Size)
 }
 
 function egpText(Id, Text:string, Pos:vector2) {
-    local DriverAppId = appN("driver-egp-appid")
+    local App = varTable("driver-egp")
     
-    sendEvent(DriverAppId, "egpText")
-    sendEventData(DriverAppId, Id)
-    sendEventData(DriverAppId, Text)
-    sendEventData(DriverAppId, Pos)
+    App:sendEvent("egpText")
+    App:sendEvent(Id)
+    App:sendEvent(Text)
+    App:sendEvent(Pos)
 }
 
 function egpTextLayout(Id, Text:string, Pos:vector2, Size:vector2) {
-    local DriverAppId = appN("driver-egp-appid")
+    local App = varTable("driver-egp")
     
-    sendEvent(DriverAppId, "egpTextLayout")
-    sendEventData(DriverAppId, Id)
-    sendEventData(DriverAppId, Text)
-    sendEventData(DriverAppId, Pos)
-    sendEventData(DriverAppId, Size)
+    App:sendEvent("egpTextLayout")
+    App:sendEvent(Id)
+    App:sendEvent(Text)
+    App:sendEvent(Pos)
+    App:sendEvent(Size)
 }
 
 function egpSetText(Id, Text:string) {
-    local DriverAppId = appN("driver-egp-appid")
+    local App = varTable("driver-egp")
     
-    sendEvent(DriverAppId, "egpSetText")
-    sendEventData(DriverAppId, Id)
-    sendEventData(DriverAppId, Text)
+    App:sendEvent("egpSetText")
+    App:sendEvent(Id)
+    App:sendEvent(Text)
 }
 
 function egpColor(Id, Color:vector) {
-    local DriverAppId = appN("driver-egp-appid")
+    local App = varTable("driver-egp")
     
-    sendEvent(DriverAppId, "egpColor")
-    sendEventData(DriverAppId, Id)
-    sendEventData(DriverAppId, Color)
+    App:sendEvent("egpColor")
+    App:sendEvent(Id)
+    App:sendEvent(Color)
 }
 
 function egpSize(Id, Size) {
-    local DriverAppId = appN("driver-egp-appid")
+    local App = varTable("driver-egp")
     
-    sendEvent(DriverAppId, "egpSize")
-    sendEventData(DriverAppId, Id)
-    sendEventData(DriverAppId, Size)
+    App:sendEvent("egpSize")
+    App:sendEvent(Id)
+    App:sendEvent(Size)
 }
 
 function egpParent(Id, Id2) {
-    local DriverAppId = appN("driver-egp-appid")
+    local App = varTable("driver-egp")
     
-    sendEvent(DriverAppId, "egpParent")
-    sendEventData(DriverAppId, Id)
-    sendEventData(DriverAppId, Id2)
+    App:sendEvent("egpParent")
+    App:sendEvent(Id)
+    App:sendEvent(Id2)
 }
 
 function egpParentPoint(Id, Pos:vector2) {
-    local DriverAppId = appN("driver-egp-appid")
+    local App = varTable("driver-egp")
     
-    sendEvent(DriverAppId, "egpParentPoint")
-    sendEventData(DriverAppId, Id)
-    sendEventData(DriverAppId, Pos)
+    App:sendEvent("egpParentPoint")
+    App:sendEvent(Id)
+    App:sendEvent(Pos)
 }
 
 function egpParentToBase(Id) {
-    local DriverAppId = appN("driver-egp-appid")
+    local App = varTable("driver-egp")
     
-    sendEvent(DriverAppId, "egpParentToBase")
-    sendEventData(DriverAppId, Id)
+    App:sendEvent("egpParentToBase")
+    App:sendEvent(Id)
 }
 
 function egpAlign(Id, Align) {
-    local DriverAppId = appN("driver-egp-appid")
+    local App = varTable("driver-egp")
     
-    sendEvent(DriverAppId, "egpAlign")
-    sendEventData(DriverAppId, Id)
-    sendEventData(DriverAppId, Align)
+    App:sendEvent("egpAlign")
+    App:sendEvent(Id)
+    App:sendEvent(Align)
 }
 
 function egpAlign2(Id, Align, Align2) {
-    local DriverAppId = appN("driver-egp-appid")
+    local App = varTable("driver-egp")
     
-    sendEvent(DriverAppId, "egpAlign2")
-    sendEventData(DriverAppId, Id)
-    sendEventData(DriverAppId, Align)
-    sendEventData(DriverAppId, Align2)
+    App:sendEvent("egpAlign2")
+    App:sendEvent(Id)
+    App:sendEvent(Align)
+    App:sendEvent(Align2)
 }
 
 function egpCircle(Id, Pos:vector2, Size:vector2) {
-    local DriverAppId = appN("driver-egp-appid")
+    local App = varTable("driver-egp")
     
-    sendEvent(DriverAppId, "egpCircle")
-    sendEventData(DriverAppId, Id)
-    sendEventData(DriverAppId, Pos)
-    sendEventData(DriverAppId, Size)
+    App:sendEvent("egpCircle")
+    App:sendEvent(Id)
+    App:sendEvent(Pos)
+    App:sendEvent(Size)
 }
 
 function egpCircleOutline(Id, Pos:vector2, Size:vector2) {
-    local DriverAppId = appN("driver-egp-appid")
+    local App = varTable("driver-egp")
     
-    sendEvent(DriverAppId, "egpCircleOutline")
-    sendEventData(DriverAppId, Id)
-    sendEventData(DriverAppId, Pos)
-    sendEventData(DriverAppId, Size)
+    App:sendEvent("egpCircleOutline")
+    App:sendEvent(Id)
+    App:sendEvent(Pos)
+    App:sendEvent(Size)
 }
 
 function egpPos(Id, Pos:vector2) {
-    local DriverAppId = appN("driver-egp-appid")
+    local App = varTable("driver-egp")
     
-    sendEvent(DriverAppId, "egpPos")
-    sendEventData(DriverAppId, Id)
-    sendEventData(DriverAppId, Pos)
+    App:sendEvent("egpPos")
+    App:sendEvent(Id)
+    App:sendEvent(Pos)
 }
 
 function egpRemove(Id) {
-    local DriverAppId = appN("driver-egp-appid")
+    local App = varTable("driver-egp")
     
-    sendEvent(DriverAppId, "egpRemove")
-    sendEventData(DriverAppId, Id)
+    App:sendEvent("egpRemove")
+    App:sendEvent(Id)
 }
 
 function egpCopy(Id, Id2) {
-    local DriverAppId = appN("driver-egp-appid")
+    local App = varTable("driver-egp")
     
-    sendEvent(DriverAppId, "egpCopy")
-    sendEventData(DriverAppId, Id)
-    sendEventData(DriverAppId, Id2)
+    App:sendEvent("egpCopy")
+    App:sendEvent(Id)
+    App:sendEvent(Id2)
 }
 
 function vector2 egpResolution() {
-    return glbV2(appN("driver-egp-appid"), "resolution")
+    return varTable("driver-egp"):varVector2("resolution")
 }
 
 function number egpIsIdle() {
-    return glbN(appN("driver-egp-appid"), "idle")
+    return varTable("driver-egp"):varNumber("idle")
 }
 
 function number egpMaxObjects2() {
-    return glbN(appN("driver-egp-appid"), "egpMaxObjects")
+    return varTable("driver-egp"):varNumber("egpMaxObjects")
 }
 
 function number egpParent(Id) {
-    return glbR(appN("driver-egp-appid"), "egpParents")[Id, number]
+    return varTable("driver-egp"):varArray("egpParents")[Id, number]
 }

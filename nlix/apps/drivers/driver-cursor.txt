@@ -1,0 +1,92 @@
+#
+# This E2 made by scaled
+#
+
+@name driver-cursor
+
+if (!APPS_INFO:exists("driver-cursor")) {
+    local Info = table()
+    
+    APPS_INFO["driver-cursor", table] = Info
+}
+
+if (app("driver-cursor")) {
+    switch (ThisAppState) {
+        # Initialize
+        case 0,
+            local Device = findDeviceByType("egp-cursor")
+            
+            if (Device != NULL) {
+                Device["busy", number] = 1
+                varWrite("device", Device)
+                varWrite("need-to-find-user", 1)
+                appNextState()
+            }
+            else {
+                local Device = findDeviceByType("virtual-cursor")
+                
+                if (Device != NULL) {
+                    Device["busy", number] = 1
+                    varWrite("device", Device)
+                    appNextState()
+                }
+            }
+            break
+        
+        case 1,
+            #ifdef findInSphere(vector,number)
+                if (varNumber("need-to-find-user")) {
+                    findIncludeClass("player")
+                }
+            #endif
+            
+            if (varNumber("need-to-find-user")) {
+                appNextState()
+            }
+            else {
+                appSetState(3)
+            }
+            break
+        
+        case 2,
+            if (varNumber("need-to-find-user")) {
+                #ifdef findInSphere(vector,number)
+                    local ScanPos = appT("device")["port", wirelink]:entity():pos()
+                    findInSphere(ScanPos, 100)
+                    findSortByDistance(ScanPos)
+                    appE("user", find())
+                #else
+                    local ScanPos = appT("device")["port", wirelink]:entity():pos()
+                    local Player_Distance = 100
+                    foreach(I, Player:entity = players()){
+                        local Distance = ScanPos:distance(Player:pos())
+                        if (Distance < Player_Distance){
+                            Player_Distance = Distance
+                            appE("user", Player)
+                        }
+                    }
+                #endif
+            }
+            
+            appNextState()
+            break
+        
+        case 3,
+            local Device = varTable("device")
+            
+            local DeviceType = Device["type", string]
+            switch (DeviceType) {
+                case "egp-cursor",
+                    varWrite("pos", Device["port", wirelink]:egpCursor(appE("user")))
+                    break
+                
+                case "virtual-cursor",
+                    varWrite("pos", Device["pos", vector2])
+                    break
+            }
+            if (varNumber("need-to-find-user")) {
+                appSetState(2)
+            }
+            break
+    }
+}

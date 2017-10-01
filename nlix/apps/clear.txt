@@ -12,6 +12,6 @@ if (!APPS_INFO:exists("clear")) {
 }
 
 if (app("clear")) {
-    consoleClearFast()
+    terminalClearFast()
     appCloseSelf()
 }
