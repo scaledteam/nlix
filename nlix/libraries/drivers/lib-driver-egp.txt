@@ -5,14 +5,29 @@
 @name lib-driver-egp
 
 function number initEgp() {
-    local App = findAppByName("driver-egp")
-    if (App != NULL) {
-        varWrite("driver-egp", App)
-        return 1
+    
+    if (varExists("driver-egp")) {
+        local App = varTable("driver-egp")
+        if (App:varNumber("ready")) {
+            return 0
+        }
     }
     else {
-        return 0
+        local App = findAppByName("driver-egp")
+        if (App == NULL) {
+            return 0
+        }
+        else {
+            varWrite("driver-egp", App)
+            if (App:varNumber("ready")) {
+                return 1
+            }
+            else {
+                return 0
+            }
+        }
     }
+    
 }
 
 function egpBox(Id, Pos:vector2, Size:vector2) {

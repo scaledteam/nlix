@@ -15,6 +15,7 @@ if (app("sh")) {
         # Wait terminal driver
         case 0,
             if (initTerminal()) {
+                terminalPrint("Welcome to the Nlix operation system!\n")
                 appNextState()
             }
             break

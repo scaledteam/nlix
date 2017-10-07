@@ -77,3 +77,4 @@ if (app("egp-terminal")) {
             break
     }
 }
+

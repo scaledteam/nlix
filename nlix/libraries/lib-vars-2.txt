@@ -98,3 +98,6 @@ function varWrite(VarName:string, Write:effect)      { ThisAppData[VarName, effe
 
 function varRemove(VarName:string) { ThisAppData:remove(VarName) }
 function table:varRemove(VarName:string) { This["data", table]:remove(VarName) }
+
+function number varExists(VarName:string) { return ThisApp:exists(VarName) }
+function number table:varExists(VarName:string) { return This["data", table]:exists(VarName) }

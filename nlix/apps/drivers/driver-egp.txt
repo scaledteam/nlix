@@ -1,5 +1,5 @@
 #
-# This E2 made by scaled
+# Created by scaled
 #
 
 @name driver-egp
@@ -24,9 +24,10 @@ if (app("driver-egp")) {
                 Screen:egpDrawTopLeft(1)
                 
                 Screen:egpBox(1, vec2(), vec2())
-                appN("egpMaxObjects", Device["max-objects", number] - 1)
+                varWrite("resolution", Device["resolution", vector2])
+                varWrite("egpMaxObjects", Device["max-objects", number] - 1)
                 
-                appT("device", Device)
+                varWrite("device", Device)
                 appNextState()
             }
             else {
@@ -35,297 +36,318 @@ if (app("driver-egp")) {
                 if (Device != NULL) {
                     Device["busy", number] = 1
                     
-                    appN("egpMaxObjects", Device["max-objects", number])
-                    appT("device", Device)
+                    varWrite("resolution", Device["resolution", vector2])
+                    varWrite("egpMaxObjects", Device["max-objects", number])
+                    
+                    varWrite("device", Device)
                     appNextState()
                 }
             }
             break
         
         case 1,
-            appV2("resolution", appT("device")["resolution", vector2])
-            appN("idle", 1)
+            varWrite("egpParents", array())
             
-            appR("egpParents", array())
+            varWrite("idle", 1)
+            varWrite("ready", 1)
             appNextState()
             break
         
         # Wait events
         case 2,
-            for (I = 1, TICKS_INSIDE) {
-                if (waitAnyEvent()) {
-                    appN("idle", 0)
-                    local Command = getEventString()
-                    local Device = appT("device")
-                    local Id = getEventNumber()
-                    
-                    switch (Command) {
-                        case "egpBox",
-                            switch (Device["type", string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpBox(Id + 1, getEventVector2(), getEventVector2())
-                                    break
-                                
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("egpBox")
-                                    OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    break
-                            }
-                            break
+            local Device = varTable("device")
+            if (Device:isValid()) {
+                for (I = 1, TICKS_INSIDE) {
+                    if (waitAnyEvent()) {
+                        varWrite("idle", 0)
+                        local Command = getEventString()
+                        local Id = getEventNumber()
                         
-                        case "egpSetText",
-                            switch (Device["type", string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpSetText(Id + 1, getEventString())
-                                    break
+                        switch (Command) {
+                            case "egpBox",
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpBox(Id + 1, getEventVector2(), getEventVector2())
+                                        break
+                                    
+                                    case "virtual-egp-screen",
+                                        local OutputQueue = Device["output-queue", array]
+                                        OutputQueue:pushString("egpBox")
+                                        OutputQueue:pushNumber(Id)
+                                        OutputQueue:pushVector2(getEventVector2())
+                                        OutputQueue:pushVector2(getEventVector2())
+                                        break
+                                }
+                                break
+                            
+                            case "egpSetText",
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpSetText(Id + 1, getEventString())
+                                        break
+                                    
+                                    case "virtual-egp-screen",
+                                        local OutputQueue = Device["output-queue", array]
+                                        OutputQueue:pushString("egpSetText")
+                                        OutputQueue:pushNumber(Id)
+                                        OutputQueue:pushString(getEventString())
+                                        break
+                                }
+                                break
+                            
+                            case "egpText",
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpText(Id + 1, getEventString(), getEventVector2())
+                                        Device["port", wirelink]:egpFont(Id + 1, FONT_MONOSPACED)
+                                        break
+                                    
+                                    case "virtual-egp-screen",
+                                        local OutputQueue = Device["output-queue", array]
+                                        OutputQueue:pushString("egpText")
+                                        OutputQueue:pushNumber(Id)
+                                        OutputQueue:pushString(getEventString())
+                                        OutputQueue:pushVector2(getEventVector2())
+                                        break
+                                }
+                                break
+                            
+                            case "egpTextLayout",
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpTextLayout(Id + 1, getEventString(), getEventVector2(), getEventVector2())
+                                        Device["port", wirelink]:egpFont(Id + 1, FONT_MONOSPACED)
+                                        break
+                                    
+                                    case "virtual-egp-screen",
+                                        local OutputQueue = Device["output-queue", array]
+                                        OutputQueue:pushString("egpTextLayout")
+                                        OutputQueue:pushNumber(Id)
+                                        OutputQueue:pushString(getEventString())
+                                        OutputQueue:pushVector2(getEventVector2())
+                                        OutputQueue:pushVector2(getEventVector2())
+                                        break
+                                }
+                                break
+                            
+                            case "egpColor",
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpColor(Id + 1, getEventVector())
+                                        break
+                                    
+                                    case "virtual-egp-screen",
+                                        local OutputQueue = Device["output-queue", array]
+                                        OutputQueue:pushString("egpColor")
+                                        OutputQueue:pushNumber(Id)
+                                        OutputQueue:pushVector(getEventVector())
+                                        break
+                                }
+                                break
+                            
+                            case "egpSize",
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpSize(Id + 1, getEventNumber())
+                                        break
+                                    
+                                    case "virtual-egp-screen",
+                                        local OutputQueue = Device["output-queue", array]
+                                        OutputQueue:pushString("egpSize")
+                                        OutputQueue:pushNumber(Id)
+                                        OutputQueue:pushNumber(getEventNumber())
+                                        break
+                                }
+                                break
+                            
+                            case "egpParent",
+                                local ParentId = getEventNumber()
+                                local EgpParents = appR("egpParents")
+                                EgpParents[Id, number] = ParentId
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpParent(Id + 1, ParentId + 1)
+                                        break
+                                    
+                                    case "virtual-egp-screen",
+                                        local OutputQueue = Device["output-queue", array]
+                                        OutputQueue:pushString("egpParent")
+                                        OutputQueue:pushNumber(Id)
+                                        OutputQueue:pushNumber(ParentId)
+                                        break
+                                }
+                                break
+                            
+                            case "egpParentToBase",
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpParent(Id + 1, 1)
+                                        break
+                                    
+                                    case "virtual-egp-screen",
+                                        local OutputQueue = Device["output-queue", array]
+                                        OutputQueue:pushString("egpParentToBase")
+                                        OutputQueue:pushNumber(Id)
+                                        break
+                                }
+                                break
+                            
+                            case "egpParentPoint",
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpBox(Id + 1, getEventVector2(), vec2())
+                                        break
+                                    
+                                    case "virtual-egp-screen",
+                                        local OutputQueue = Device["output-queue", array]
+                                        OutputQueue:pushString("egpParentPoint")
+                                        OutputQueue:pushNumber(Id)
+                                        OutputQueue:pushVector2(getEventVector2())
+                                        break
+                                }
+                                break
+                            
+                            case "egpAlign",
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpAlign(Id + 1, getEventNumber())
+                                        break
+                                    
+                                    case "virtual-egp-screen",
+                                        local OutputQueue = Device["output-queue", array]
+                                        OutputQueue:pushString("egpAlign")
+                                        OutputQueue:pushNumber(Id)
+                                        OutputQueue:pushNumber(getEventNumber())
+                                        break
+                                }
+                                break
+                            
+                            case "egpAlign2",
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpAlign(Id + 1, getEventNumber(), getEventNumber())
+                                        break
+                                    
+                                    case "virtual-egp-screen",
+                                        local OutputQueue = Device["output-queue", array]
+                                        OutputQueue:pushString("egpAlign")
+                                        OutputQueue:pushNumber(Id)
+                                        OutputQueue:pushNumber(getEventNumber())
+                                        OutputQueue:pushNumber(getEventNumber())
+                                        break
+                                }
+                                break
+                            
+                            case "egpCircle",
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpCircle(Id + 1, getEventVector2(), getEventVector2())
+                                        break
+                                    
+                                    case "virtual-egp-screen",
+                                        local OutputQueue = Device["output-queue", array]
+                                        OutputQueue:pushString("egpCircle")
+                                        OutputQueue:pushNumber(Id)
+                                        OutputQueue:pushVector2(getEventVector2())
+                                        OutputQueue:pushVector2(getEventVector2())
+                                        break
+                                }
+                                break
+                            
+                            case "egpCircleOutline",
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpCircleOutline(Id + 1, getEventVector2(), getEventVector2())
+                                        break
+                                    
+                                    case "virtual-egp-screen",
+                                        local OutputQueue = Device["output-queue", array]
+                                        OutputQueue:pushString("egpCircleOutline")
+                                        OutputQueue:pushNumber(Id)
+                                        OutputQueue:pushVector2(getEventVector2())
+                                        OutputQueue:pushVector2(getEventVector2())
+                                        break
+                                }
+                                break
+                            
+                            case "egpPos",
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpPos(Id + 1, getEventVector2())
+                                        break
+                                    
+                                    case "virtual-egp-screen",
+                                        local OutputQueue = Device["output-queue", array]
+                                        OutputQueue:pushString("egpPos")
+                                        OutputQueue:pushNumber(Id)
+                                        OutputQueue:pushVector2(getEventVector2())
+                                        break
+                                }
+                                break
+                            
+                            case "egpRemove",
+                                local EgpParents = appR("egpParents")
+                                EgpParents:remove(Id)
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpRemove(Id + 1)
+                                        break
+                                    
+                                    case "virtual-egp-screen",
+                                        local OutputQueue = Device["output-queue", array]
+                                        OutputQueue:pushString("egpRemove")
+                                        OutputQueue:pushNumber(Id)
+                                        break
+                                }
+                                break
+                            
+                            case "egpCopy",
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpCopy(Id + 1, getEventNumber())
+                                        break
+                                    
+                                    case "virtual-egp-screen",
+                                        local OutputQueue = Device["output-queue", array]
+                                        OutputQueue:pushString("egpCopy")
+                                        OutputQueue:pushNumber(Id)
+                                        OutputQueue:pushNumber(getEventNumber())
+                                        break
+                                }
+                                break
+                            
+                            case "exit",
+                                Device["busy", number] = 0
+                                appClose()
                                 
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("egpSetText")
-                                    OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushString(getEventString())
-                                    break
-                            }
-                            break
-                        
-                        case "egpText",
-                            switch (Device["type", string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpText(Id + 1, getEventString(), getEventVector2())
-                                    Device["port", wirelink]:egpFont(Id + 1, FONT_MONOSPACED)
-                                    break
-                                
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("egpText")
-                                    OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushString(getEventString())
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    break
-                            }
-                            break
-                        
-                        case "egpTextLayout",
-                            switch (Device["type", string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpTextLayout(Id + 1, getEventString(), getEventVector2(), getEventVector2())
-                                    Device["port", wirelink]:egpFont(Id + 1, FONT_MONOSPACED)
-                                    break
-                                
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("egpTextLayout")
-                                    OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushString(getEventString())
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    break
-                            }
-                            break
-                        
-                        case "egpColor",
-                            switch (Device["type", string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpColor(Id + 1, getEventVector())
-                                    break
-                                
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("egpColor")
-                                    OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushVector(getEventVector())
-                                    break
-                            }
-                            break
-                        
-                        case "egpSize",
-                            switch (Device["type", string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpSize(Id + 1, getEventNumber())
-                                    break
-                                
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("egpSize")
-                                    OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushNumber(getEventNumber())
-                                    break
-                            }
-                            break
-                        
-                        case "egpParent",
-                            local ParentId = getEventNumber()
-                            local EgpParents = appR("egpParents")
-                            EgpParents[Id, number] = ParentId
-                            switch (Device["type", string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpParent(Id + 1, ParentId + 1)
-                                    break
-                                
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("egpParent")
-                                    OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushNumber(ParentId)
-                                    break
-                            }
-                            break
-                        
-                        case "egpParentToBase",
-                            switch (Device["type", string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpParent(Id + 1, 1)
-                                    break
-                                
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("egpParentToBase")
-                                    OutputQueue:pushNumber(Id)
-                                    break
-                            }
-                            break
-                        
-                        case "egpParentPoint",
-                            switch (Device["type", string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpBox(Id + 1, getEventVector2(), vec2())
-                                    break
-                                
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("egpParentPoint")
-                                    OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    break
-                            }
-                            break
-                        
-                        case "egpAlign",
-                            switch (Device["type", string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpAlign(Id + 1, getEventNumber())
-                                    break
-                                
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("egpAlign")
-                                    OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushNumber(getEventNumber())
-                                    break
-                            }
-                            break
-                        
-                        case "egpAlign2",
-                            switch (Device["type", string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpAlign(Id + 1, getEventNumber(), getEventNumber())
-                                    break
-                                
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("egpAlign")
-                                    OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushNumber(getEventNumber())
-                                    OutputQueue:pushNumber(getEventNumber())
-                                    break
-                            }
-                            break
-                        
-                        case "egpCircle",
-                            switch (Device["type", string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpCircle(Id + 1, getEventVector2(), getEventVector2())
-                                    break
-                                
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("egpCircle")
-                                    OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    break
-                            }
-                            break
-                        
-                        case "egpCircleOutline",
-                            switch (Device["type", string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpCircleOutline(Id + 1, getEventVector2(), getEventVector2())
-                                    break
-                                
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("egpCircleOutline")
-                                    OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    break
-                            }
-                            break
-                        
-                        case "egpPos",
-                            switch (Device["type", string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpPos(Id + 1, getEventVector2())
-                                    break
-                                
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("egpPos")
-                                    OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    break
-                            }
-                            break
-                        
-                        case "egpRemove",
-                            local EgpParents = appR("egpParents")
-                            EgpParents:remove(Id)
-                            switch (Device["type", string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpRemove(Id + 1)
-                                    break
-                                
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("egpRemove")
-                                    OutputQueue:pushNumber(Id)
-                                    break
-                            }
-                            break
-                        
-                        case "egpCopy",
-                            switch (Device["type", string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpCopy(Id + 1, getEventNumber())
-                                    break
-                                
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("egpCopy")
-                                    OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushNumber(getEventNumber())
-                                    break
-                            }
-                            break
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpClear()
+                                        break
+                                    
+                                    case "virtual-egp-screen",
+                                        break
+                                }
+                                break
+                        }
+                    }
+                    else {
+                        local Device = appT("device")
+                        switch (Device["type", string]) {
+                            case "egp-screen",
+                                varWrite("idle", 1)
+                                break
+                            
+                            case "virtual-egp-screen",
+                                varWrite("idle", Device["idle", number])
+                                break
+                        }
+                        break
                     }
                 }
-                else {
-                    local Device = appT("device")
-                    switch (Device["type", string]) {
-                        case "egp-screen",
-                            appN("idle", 1)
-                            break
-                        
-                        case "virtual-egp-screen",
-                            appN("idle", Device["idle", number])
-                            break
-                    }
-                    break
-                }
+            }
+            else {
+                appSetState(0)
             }
             break
         }

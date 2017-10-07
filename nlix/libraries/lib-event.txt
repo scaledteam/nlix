@@ -1,46 +1,8 @@
 #
-# This E2 made by scaled
+# Created by scaled
 #
 
 @name lib-event
-
-# Push table lib
-function number table:shiftNumber() {
-    local Return = This[1, number]
-    This:shift()
-    return Return
-}
-
-function string table:shiftString() {
-    local Return = This[1, string]
-    This:shift()
-    return Return
-}
-
-function vector table:shiftVector() {
-    local Return = This[1, vector]
-    This:shift()
-    return Return
-}
-
-function vector2 table:shiftVector2() {
-    local Return = This[1, vector2]
-    This:shift()
-    return Return
-}
-
-function vector4 table:shiftVector4() {
-    local Return = This[1, vector4]
-    This:shift()
-    return Return
-}
-
-function table table:shiftTable() {
-    local Return = This[1, table]
-    This:shift()
-    return Return
-}
-# lib end
 
 function number waitEvent(EventName:string) {
     if (ThisApp["events", table][1, string] == EventName) {
@@ -73,4 +35,3 @@ function vector     getEventVector()    { return ThisApp["events", table]:shiftV
 function vector2    getEventVector2()   { return ThisApp["events", table]:shiftVector2() }
 function vector4    getEventVector4()   { return ThisApp["events", table]:shiftVector4() }
 function table      getEventTable()     { return ThisApp["events", table]:shiftTable() }
-

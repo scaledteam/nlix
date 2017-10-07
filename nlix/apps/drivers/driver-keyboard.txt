@@ -39,19 +39,29 @@ if (app("driver-keyboard")) {
         # Track keys
         case 1,
             local Device = varTable("device")
-            DeviceType = Device["type", string]
-            
-            switch (DeviceType) {
-                case "keyboard",
-                    local Keys = varArray("keys")
-                    for (I = 1, 5) {
-                        Keys[I, number] = Device["port", wirelink][I - 1]
-                    }
-                    break
+            if (Device:isValid()) {
+                DeviceType = Device["type", string]
                 
-                case "virtual-keyboard",
-                    varWrite("keys", Device["keys", array])
-                    break
+                switch (DeviceType) {
+                    case "keyboard",
+                        local Keys = varArray("keys")
+                        for (I = 1, 5) {
+                            Keys[I, number] = Device["port", wirelink][I - 1]
+                        }
+                        break
+                    
+                    case "virtual-keyboard",
+                        varWrite("keys", Device["keys", array])
+                        break
+                }
+            }
+            else {
+                appSetState(0)
+            }
+            
+            if (waitEvent("exit")) {
+                Device["busy", number] = 0
+                appClose()
             }
             break
     }

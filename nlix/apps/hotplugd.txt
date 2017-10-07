@@ -1,5 +1,5 @@
 #
-# This E2 made by scaled
+# Created by scaled
 #
 
 @name hotplugd
@@ -11,20 +11,50 @@ if (!APPS_INFO:exists("hotplugd")) {
 }
 
 if (app("hotplugd")) {
-    local Counter = varNumber("counter") % 4
-    
-    local Wirelink = select(Counter + 1,
-        Port1,
-        Port2,
-        Port3,
-        Port4
-    )
-    
-    if ((Wirelink != varWirelink("wirelinkOld" + Counter)) & Wirelink) {
-        ThisWorkspace:initPort(Wirelink)
+    switch (ThisAppState) {
+        # Hot plug
+        case 0,
+            local Counter = varNumber("counter") + 1
+            
+            local Port = select(Counter,
+                Port1,
+                Port2,
+                Port3,
+                Port4
+            )
+            
+            if ((Port != varWirelink("PortOld" + Counter)) & Port) {
+                ThisWorkspace:initPort(Port)
+            }
+            varWrite("PortOld" + Counter, Port)
+            
+            if (Counter >= PORTS_COUNT) {
+                appNextState()
+                varWrite("counter", 0)
+            }
+            else {
+                varWrite("counter", Counter)
+            }
+            break
+        
+        # Hot unplug
+        case 1,
+            local Counter = varNumber("counter") + 1
+            
+            local Device = ThisWorkspace["devices", table][Counter, table]
+            if (!Device["type", string]:find("virtual") & !Device["port", wirelink]:entity():isValid()) {
+                Device:clear()
+                ThisWorkspace["devices", table]:remove(Counter)
+                Counter--
+            }
+            
+            if (Counter >= ThisWorkspace["devices", table]:count()) {
+                appPrevState()
+                varWrite("counter", 0)
+            }
+            else {
+                varWrite("counter", Counter)
+            }
+            break
     }
-    varWrite("wirelinkOld" + Counter, Wirelink)
-    
-    varWrite("counter", Counter + 1)
 }
-

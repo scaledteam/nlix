@@ -1,0 +1,40 @@
+#
+# Created by scaled
+#
+
+@name lib-driver-gl
+
+function number initGl() {
+    if (varExists("driver-gl")) {
+        local App = varTable("driver-gl")
+        if (App:varNumber("ready")) {
+            return 0
+        }
+    }
+    else {
+        local App = findAppByName("driver-gl")
+        if (App == NULL) {
+            return 0
+        }
+        else {
+            varWrite("driver-gl", App)
+            if (App:varNumber("ready")) {
+                return 1
+            }
+            else {
+                return 0
+            }
+        }
+    }
+    
+}
+
+function glTriangle(Pos1:vector2, Pos2:vector2, Pos3:vector2) {
+    local App = varTable("driver-gl")
+    
+    App:sendEvent("triangle")
+    App:sendEvent(Pos1)
+    App:sendEvent(Pos2)
+    App:sendEvent(Pos3)
+}
+

@@ -1,0 +1,41 @@
+#
+# Created by scaled
+#
+
+@name lib-table-shift
+
+function number table:shiftNumber() {
+    local Return = This[1, number]
+    This:shift()
+    return Return
+}
+
+function string table:shiftString() {
+    local Return = This[1, string]
+    This:shift()
+    return Return
+}
+
+function vector table:shiftVector() {
+    local Return = This[1, vector]
+    This:shift()
+    return Return
+}
+
+function vector2 table:shiftVector2() {
+    local Return = This[1, vector2]
+    This:shift()
+    return Return
+}
+
+function vector4 table:shiftVector4() {
+    local Return = This[1, vector4]
+    This:shift()
+    return Return
+}
+
+function table table:shiftTable() {
+    local Return = This[1, table]
+    This:shift()
+    return Return
+}

@@ -18,3 +18,7 @@ function number initCursor() {
 function vector2 cursorGetPos() {
     return varTable("driver-cursor"):varVector2("pos")
 }
+
+function number cursorGetUse() {
+    return varTable("driver-cursor"):varNumber("use")
+}

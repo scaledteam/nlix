@@ -29,78 +29,104 @@ function table:addDevice(Device:table) {
 }
 
 function table:initPort(Port:wirelink) {
-    switch (Port:entity():type()) {
-        case "gmod_wire_egp",
-            # Connect as screen
-            local Device = table()
-            Device["type", string] = "egp-screen"
-            
-            Device["resolution", vector2] = vec2(512)
-            Device["max-objects", number] = egpMaxObjects()
-            
-            Device["port", wirelink] = Port
-            Device["busy", number] = 0
-            
-            This:addDevice(Device)
-            
-            log("egp-screen connected\n")
-            
-            # Connect as cursor
-            Device = table()
-            Device["type", string] = "egp-cursor"
-            
-            Device["resolution", vector2] = vec2(512)
-            
-            Device["port", wirelink] = Port
-            Device["busy", number] = 0
-            
-            This:addDevice(Device)
-            
-            log("egp-cursor connected\n")
+    local Devices = ThisWorkspace["devices", table]
+    # Check if device exists
+    local DeviceExists = 0
+    for (I = 1, Devices:count()) {
+        if (Devices[I, table]["port", wirelink] == Port) {
+            DeviceExists = 1
             break
-        
-        case "gmod_wire_consolescreen",
-            local Device = table()
-            Device["type", string] = "console-screen"
-            Device["resolution", vector2] = vec2(30, 18)
-            Device["port", wirelink] = Port
-            Device["busy", number] = 0
+        }
+    }
+    
+    if (!DeviceExists) {
+        switch (Port:entity():type()) {
+            case "gmod_wire_egp",
+                # Connect as screen
+                local Device = table()
+                Device["type", string] = "egp-screen"
+                
+                Device["resolution", vector2] = vec2(512)
+                Device["max-objects", number] = egpMaxObjects()
+                
+                Device["port", wirelink] = Port
+                Device["busy", number] = 0
+                Device["valid", number] = 1
+                
+                This:addDevice(Device)
+                
+                log("egp-screen connected\n")
+                
+                # Connect as cursor
+                Device = table()
+                Device["type", string] = "egp-cursor"
+                
+                Device["resolution", vector2] = vec2(512)
+                
+                Device["port", wirelink] = Port
+                Device["busy", number] = 0
+                Device["valid", number] = 1
+                
+                This:addDevice(Device)
+                
+                log("egp-cursor connected\n")
+                break
             
-            This:addDevice(Device)
+            case "gmod_wire_consolescreen",
+                local Device = table()
+                Device["type", string] = "console-screen"
+                Device["resolution", vector2] = vec2(30, 18)
+                Device["port", wirelink] = Port
+                Device["busy", number] = 0
+                Device["valid", number] = 1
+                
+                This:addDevice(Device)
+                
+                log("console-screen connected\n")
+                break
             
-            log("console-screen connected\n")
-            break
-        
-        case "gmod_wire_keyboard",
-            local Device = table()
-            Device["type", string] = "keyboard"
-            Device["port", wirelink] = Port
-            Device["busy", number] = 0
+            case "gmod_wire_keyboard",
+                local Device = table()
+                Device["type", string] = "keyboard"
+                Device["port", wirelink] = Port
+                Device["busy", number] = 0
+                Device["valid", number] = 1
+                
+                This:addDevice(Device)
+                
+                log("keyboard connected\n")
+                break
             
-            This:addDevice(Device)
+            case "gmod_wire_digitalscreen",
+                local Device = table()
+                Device["type", string] = "digital-screen"
+                Device["resolution", vector2] = vec2(128)
+                Device["port", wirelink] = Port
+                Device["busy", number] = 0
+                Device["valid", number] = 1
+                
+                This:addDevice(Device)
+                
+                log("digital-screen connected\n")
+                break
             
-            log("keyboard connected\n")
-            break
-        
-        case "gmod_wire_digitalscreen",
-            local Device = table()
-            Device["type", string] = "digital-screen"
-            Device["resolution", vector2] = vec2(128)
-            Device["port", wirelink] = Port
-            Device["busy", number] = 0
-            
-            This:addDevice(Device)
-            
-            log("digital-screen connected\n")
-            break
+            case "gmod_wire_expression2",
+                local Devices = Port["NlixDevices", table]
+                printTable(Devices)
+                for (I = 1, Devices:count()) {
+                    This:addDevice(Devices[I, table])
+                }
+                
+                log("nlix-device connected\n")
+                break
+        }
     }
 }
 
-function halt() {
-    AllData:clear()
+function clearAll() {
     Apps:clear()
-    
-    runOnTick(0)
+    APPS_INFO:clear()
+    AllData:clear()
 }
 
 function table table:findDeviceByType(DeviceType:string) {
@@ -117,4 +143,9 @@ function table table:findDeviceByType(DeviceType:string) {
 
 function table findDeviceByType(DeviceType:string) {
     return ThisWorkspace:findDeviceByType(DeviceType)
+}
+
+
+function number table:isValid() {
+    return This:exists("valid")
 }

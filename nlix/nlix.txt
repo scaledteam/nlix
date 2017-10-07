@@ -3,7 +3,6 @@
 #
 
 @name nlix
-@inputs [Port1 Port2 Port3 Port4]:wirelink
 
 if (first()) {
     #include "nlix/system/first"
@@ -19,20 +18,22 @@ if (tickClk()) {
                 case 2, #include "nlix/libraries/lib-vars" break
                 case 3, #include "nlix/libraries/lib-vars-2" break
                 case 4, #include "nlix/libraries/lib-app" break
-                case 5, #include "nlix/libraries/lib-event" break
-                case 6, #include "nlix/system/settings" break
-                case 7, #include "nlix/system/init-script" break
+                case 5, #include "nlix/libraries/lib-table-shift" break
+                case 6, #include "nlix/libraries/lib-event" break
+                case 7, #include "nlix/system/settings" break
+                case 8, #include "nlix/system/init-script" break
                 
                 # Drivers libraries
-                case 8, #include "nlix/libraries/drivers/lib-driver-terminal" break
-                case 9, #include "nlix/libraries/drivers/lib-driver-keyboard" break
-                case 10, #[#include "nlix/libraries/drivers/lib-driver-egp"]# break
-                case 11, #[#include "nlix/libraries/drivers/lib-driver-cursor"]# break
-                case 12, #[#include "nlix/libraries/drivers/lib-driver-digi"]# break
+                case 9, #include "nlix/libraries/drivers/lib-driver-terminal" break
+                case 10, #include "nlix/libraries/drivers/lib-driver-keyboard" break
+                case 11, #include "nlix/libraries/drivers/lib-driver-egp" break
+                case 12, #include "nlix/libraries/drivers/lib-driver-cursor" break
+                case 13, #include "nlix/libraries/drivers/lib-driver-digi" break
+                case 14, #include "nlix/libraries/drivers/lib-driver-gl" break
                 
                 # Other libraries
-                case 13, #include "nlix/libraries/lib-simple-keyboard" break
-                case 14, #[#include "nlix/libraries/lib-virtual-workspace"]# break
+                case 15, #include "nlix/libraries/lib-simple-keyboard" break
+                case 16, #include "nlix/libraries/lib-virtual-workspace" break
                 
                 # Set "loaded" state if all libraries loaded
                 default,
@@ -48,9 +49,10 @@ if (tickClk()) {
             # Drivers.
             #include "nlix/apps/drivers/driver-terminal"
             #include "nlix/apps/drivers/driver-keyboard"
-            ##include "nlix/apps/drivers/driver-egp"
-            ##include "nlix/apps/drivers/driver-cursor"
-            ##include "nlix/apps/drivers/driver-digi"
+            #include "nlix/apps/drivers/driver-egp"
+            #include "nlix/apps/drivers/driver-cursor"
+            #include "nlix/apps/drivers/driver-digi"
+            #include "nlix/apps/drivers/driver-gl"
             
             # System daemons
             #include "nlix/apps/hotplugd"
@@ -63,8 +65,8 @@ if (tickClk()) {
             
             # Quit tools.
             ##include "nlix/apps/halt"
-            ##include "nlix/apps/reboot"
-            ##include "nlix/apps/exit"
+            #include "nlix/apps/reboot"
+            #include "nlix/apps/exit"
             
             # Classic console utilites.
             #include "nlix/apps/clear"
@@ -94,22 +96,25 @@ if (tickClk()) {
             
             # Virtual workspace managers
             ##include "nlix/apps/virtual-workspace"
-            ##include "nlix/apps/egp-terminal"
+            #include "nlix/apps/egp-terminal"
             
             # Egp tests.
-            ##include "nlix/apps/egp-clocks"
-            ##include "nlix/apps/egp-eyes"
+            #include "nlix/apps/egp-clocks"
+            #include "nlix/apps/egp-eyes"
             
             # Window manager
-            ##include "nlix/apps/egp-wm"
-            ##include "nlix/apps/egp-wm-launcher"
-            ##include "nlix/apps/egp-wm-shell"
+            #include "nlix/apps/egp-wm"
+            #include "nlix/apps/egp-wm-launcher"
+            #include "nlix/apps/egp-wm-shell"
             
             # Workspace management
             #include "nlix/apps/workspaces-manager"
             
             # Digital screen
             ##include "nlix/apps/digi-scanner"
+            
+            # Egp 3d
+            #include "nlix/apps/wustdd"
         }
     }
 }

@@ -1,5 +1,5 @@
 #
-# This E2 made by scaled
+# Created by scaled
 #
 
 @name init
@@ -9,4 +9,4 @@
 @persist NULL:table
 
 runOnTick(1)
-SysPerf = 100
+SysPerf = 20

@@ -45,6 +45,7 @@ function table table:appLaunch(AppName:string) {
     local App = table()
     App["name", string] = AppName
     App["user", string] = ROOT_USER
+    App["valid", number] = 1
     App["data", table] = table()
     App["events", table] = table()
     App["workspace", table] = This
@@ -89,7 +90,6 @@ function table:appClose() {
         }
     }
     This:clear()
-    #This = NULL
 }
 
 function appClose() {
@@ -135,13 +135,7 @@ function number app(AppName:string) {
 }
 
 function number table:appIsLaunched() {
-    for (I = 1, Apps:count()) {
-        if (Apps[I, table] == This) {
-            return 1
-        }
-    }
-    return 0
-    #return This != NULL
+    return This:isValid()
 }
 
 

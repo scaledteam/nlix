@@ -54,7 +54,7 @@ if (app("driver-cursor")) {
                     local ScanPos = appT("device")["port", wirelink]:entity():pos()
                     findInSphere(ScanPos, 100)
                     findSortByDistance(ScanPos)
-                    appE("user", find())
+                    varWrite("user", find())
                 #else
                     local ScanPos = appT("device")["port", wirelink]:entity():pos()
                     local Player_Distance = 100
@@ -62,7 +62,7 @@ if (app("driver-cursor")) {
                         local Distance = ScanPos:distance(Player:pos())
                         if (Distance < Player_Distance){
                             Player_Distance = Distance
-                            appE("user", Player)
+                            varWrite("user", Player)
                         }
                     }
                 #endif
@@ -77,15 +77,22 @@ if (app("driver-cursor")) {
             local DeviceType = Device["type", string]
             switch (DeviceType) {
                 case "egp-cursor",
-                    varWrite("pos", Device["port", wirelink]:egpCursor(appE("user")))
+                    varWrite("pos", Device["port", wirelink]:egpCursor(varEntity("user")))
+                    varWrite("use", varEntity("user"):keyUse())
                     break
                 
                 case "virtual-cursor",
                     varWrite("pos", Device["pos", vector2])
+                    varWrite("use", Device["use", number])
                     break
             }
             if (varNumber("need-to-find-user")) {
                 appSetState(2)
+            }
+            
+            if (waitEvent("exit")) {
+                Device["busy", number] = 0
+                appClose()
             }
             break
     }

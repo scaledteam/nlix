@@ -60,10 +60,14 @@ if (app("egp-wm")) {
                 "add-device", "wm-sh", "egp-screen",
                 "add-device", "wm-sh", "keyboard",
                 "add-device", "wm-sh", "callback",
+                "add-app", "wm-sh", "driver-egp",
                 "add-app", "wm-sh", "egp-wm-launcher",
-                "start", "wm-sh"#,
-                #"launch", "egp-eyes"
+                "start", "wm-sh"
             )
+            #[CallBackDevice["queue", array] = array(
+                "start", "wm-sh",
+                "launch", "egp-eyes"
+            )]#
             varWrite("callback-device", CallBackDevice)
             
             appNextState()
@@ -90,7 +94,8 @@ if (app("egp-wm")) {
                     # Virtual screen driver
                     local Workspace = varTable("workspacesById")[WorkspaceId, table]
                     
-                    local VirtualScreenDevice = Workspace["devices", table]["egp-screens", table][1, table]
+                    local VirtualScreenDevice = Workspace["devices", table][1, table]
+                    #local VirtualScreenDevice = Workspace:findDeviceByType("virtual-egp-screen")
                     local EgpQueue = VirtualScreenDevice["output-queue", array]
                     if (EgpQueue:count() > 0) {
                         VirtualScreenDevice["idle", number] = 0
@@ -169,7 +174,8 @@ if (app("egp-wm")) {
                     }
                     
                     # Virtual cursor device driver
-                    local VirtualCursorDevice = Workspace["devices", table]["cursors", table][1, table]
+                    local VirtualCursorDevice = Workspace["devices", table][2, table]
+                    #local VirtualCursorDevice = Workspace:findDeviceByType("virtual-cursor")
                     local CursorPos = cursorGetPos()
                     if (CursorPos == varVector2("EGP_CURSOR_INVALID_POS")) {
                         VirtualCursorDevice["pos", vector2] = varVector2("EGP_CURSOR_INVALID_POS")
@@ -180,7 +186,8 @@ if (app("egp-wm")) {
                     
                     
                     # Window management
-                    local UseKey = keyboardGetKeys()[2, number] == 101
+                    #local UseKey = keyboardGetKeys()[2, number] == 101
+                    local UseKey = cursorGetUse()
                     if (WorkspaceId == varNumber("window-focus")) {
                         if (UseKey & inrange(cursorGetPos() - varArray("egp-poses")[WorkspaceId, vector2], vec2(0, -25), vec2(varArray("egp-sizes")[WorkspaceId, vector2][1], 0))) {
                             local NewPos = cursorGetPos() - vec2(varArray("egp-sizes")[WorkspaceId, vector2][1] / 2, -12)
@@ -199,11 +206,11 @@ if (app("egp-wm")) {
                             varWrite("counter", varNumber("counterStart"))
                             
                             # Change keyboard target
-                            WindowFocusOld = varNumber("window-focus")
-                            varWrite("window-focus", WorkspaceId)
                             local WorkspacesById = varTable("workspacesById")
-                            WorkspacesById[WorkspaceId, table]["devices", table]["keyboards", table][1, table]["keys", array] = keyboardGetKeys()
-                            WorkspacesById[WindowFocusOld, table]["devices", table]["keyboards", table][1, table]["keys", array] = varArray("KEYS_NULL")
+                            local WindowFocusOld = varNumber("window-focus")
+                            varWrite("window-focus", WorkspaceId)
+                            WorkspacesById[WorkspaceId, table]["devices", table][3, table]["keys", array] = keyboardGetKeys()
+                            WorkspacesById[WindowFocusOld, table]["devices", table][3, table]["keys", array] = varArray("KEYS_NULL")
                             
                             # Move to redraw state
                             appSetState(6)
@@ -220,7 +227,7 @@ if (app("egp-wm")) {
                     switch (Command) {
                         case "create",
                             # Create workspace
-                            local Workspace = createWorkspace(AUTOSTART_EGP)
+                            local Workspace = createWorkspace(array())
                             local WorkspaceName = CommandQueue:shiftString()
                             
                             local WmWorkspacesByName = varTable("workspacesByName")
@@ -291,9 +298,8 @@ if (app("egp-wm")) {
                                 
                                 case "keyboard",
                                     local VirtualKeyboardDevice = createVirtualKeyboard()
-                                    Workspace:addDevice(VirtualKeyboardDevice)
-                                    # send all keys from real keyboard to virtual keyboard
                                     VirtualKeyboardDevice["keys", array] = keyboardGetKeys()
+                                    Workspace:addDevice(VirtualKeyboardDevice)
                                     break
                                 
                                 case "cursor",
@@ -336,8 +342,11 @@ if (app("egp-wm")) {
                             CallBackDevice["queue", array] = CallBackDevice["queue", array]:add(array(
                                 "create", WorkspaceName, randvec2(vec2(0, 25), egpResolution() - AppSize), AppSize, AppEgpids,
                                 "add-device", WorkspaceName, "egp-screen",
+                                "add-app", WorkspaceName, "driver-egp",
                                 "add-device", WorkspaceName, "cursor",
+                                "add-app", WorkspaceName, "driver-cursor",
                                 "add-device", WorkspaceName, "keyboard",
+                                "add-app", WorkspaceName, "driver-keyboard",
                                 "add-app", WorkspaceName, AppName,
                                 "start", WorkspaceName
                             ))

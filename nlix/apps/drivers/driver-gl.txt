@@ -1,0 +1,112 @@
+#
+# Created by scaled
+#
+
+@name driver-gl
+
+if (!APPS_INFO:exists("driver-gl")) {
+    local Info = table()
+    
+    APPS_INFO["driver-gl", table] = Info
+}
+
+if (app("driver-gl")) {
+    switch (ThisAppState) {
+        # Initialize
+        case 0,
+            local Device = findDeviceByType("egp-screen")
+            
+            if (Device != NULL) {
+                Device["busy", number] = 1
+                
+                local Screen = Device["port", wirelink]
+                Screen:egpClear()
+                Screen:egpDrawTopLeft(1)
+                
+                Screen:egpBox(1, vec2(), vec2())
+                varWrite("resolution", Device["resolution", vector2])
+                varWrite("egpMaxObjects", Device["max-objects", number] - 1)
+                varWrite("egp-ids-count", 1)
+                
+                varWrite("device", Device)
+                appNextState()
+            }
+            else {
+                local Device = findDeviceByType("virtual-gl")
+                
+                if (Device != NULL) {
+                    Device["busy", number] = 1
+                    
+                    varWrite("resolution", Device["resolution", vector2])
+                    
+                    varWrite("device", Device)
+                    appNextState()
+                }
+            }
+            break
+        
+        case 1,
+            varWrite("egpParents", array())
+            
+            varWrite("idle", 1)
+            varWrite("ready", 1)
+            appNextState()
+            break
+        
+        # Wait events
+        case 2,
+            local Device = varTable("device")
+            if (Device:isValid()) {
+                for (I = 1, TICKS_INSIDE) {
+                    if (waitAnyEvent()) {
+                        varWrite("idle", 0)
+                        local Command = getEventString()
+                        
+                        switch (Command) {
+                            case "triangle",
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpTriangle(varNumber("egp-ids-count"), getEventVector2(), getEventVector2(), getEventVector2())
+                                        break
+                                    
+                                    case "virtual-gl",
+                                        break
+                                }
+                                break
+                            
+                            case "exit",
+                                Device["busy", number] = 0
+                                appClose()
+                                
+                                switch (Device["type", string]) {
+                                    case "egp-screen",
+                                        Device["port", wirelink]:egpClear()
+                                        break
+                                    
+                                    case "virtual-gl",
+                                        break
+                                }
+                                break
+                        }
+                    }
+                    else {
+                        local Device = appT("device")
+                        switch (Device["type", string]) {
+                            case "egp-screen",
+                                varWrite("idle", 1)
+                                break
+                            
+                            case "virtual-gl",
+                                varWrite("idle", Device["idle", number])
+                                break
+                        }
+                        break
+                    }
+                }
+            }
+            else {
+                appSetState(0)
+            }
+            break
+        }
+}

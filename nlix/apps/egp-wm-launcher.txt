@@ -23,7 +23,7 @@ if (app("egp-wm-launcher")) {
         case 1,
             local VirtualKeyboardDevice = findDeviceByType("virtual-keyboard")
             if (VirtualKeyboardDevice != NULL) {
-                local Workspace = createWorkspace(array("driver-terminal", "driver-keyboard", "simple-keyboard", "clear", "egp-wm-shell"))
+                local Workspace = createWorkspace(array("driver-terminal", "driver-keyboard", "simple-keyboard", "egp-wm-shell"))
                 local VirtualTerminal = createVirtualTerminal()
                 
                 Workspace:addDevice(VirtualTerminal)
@@ -60,7 +60,7 @@ if (app("egp-wm-launcher")) {
         
         case 4,
             # Virtual screen driver
-            local ConsoleScreenDevice = appT("console-screen")
+            local ConsoleScreenDevice = appT("terminalDevice")
             if (ConsoleScreenDevice["new-output", string] != "") {
                 appS("console-text", appS("console-text") + ConsoleScreenDevice["new-output", string])
                 ConsoleScreenDevice["new-output", string] = ""

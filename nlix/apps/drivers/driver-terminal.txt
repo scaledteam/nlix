@@ -15,7 +15,7 @@ if (app("driver-terminal")) {
         # Initialize
         case 0,
             # Init first screen
-            appS("console-text", "Welcome to the Nlix operation system!\n")
+            #appS("consoleText", "Welcome to the Nlix operation system!\n")
             
             local Device = findDeviceByType("console-screen")
             
@@ -23,7 +23,7 @@ if (app("driver-terminal")) {
                 Device["busy", number] = 1
                 local Screen = Device["port", wirelink]
                 Screen[2041] = 1
-                Screen:writeString(appS("console-text"), 0, 0)
+                Screen:writeString(appS("consoleText"), 0, 0)
                 
                 appT("device", Device)
                 appNextState()
@@ -37,7 +37,7 @@ if (app("driver-terminal")) {
                     Screen:egpClear()
                     Screen:egpDrawTopLeft(1)
                     
-                    Screen:egpTextLayout(1, appS("console-text"), vec2(), vec2(512))
+                    Screen:egpTextLayout(1, appS("consoleText"), vec2(), vec2(512))
                     Screen:egpFont(1, FONT_MONOSPACED)
                     
                     appT("device", Device)
@@ -48,7 +48,7 @@ if (app("driver-terminal")) {
                     
                     if (Device != NULL) {
                         Device["busy", number] = 1
-                        Device["new-output", string] = appS("console-text")
+                        Device["new-output", string] = appS("consoleText")
                         
                         appT("device", Device)
                         appNextState()
@@ -60,9 +60,9 @@ if (app("driver-terminal")) {
         
         # Wait events
         case 1,
-            #for (I = 1, TICKS_INSIDE) {
+            local Device = appT("device")
+            if (Device:isValid()) {
                 if (waitAnyEvent()) {
-                    local Device = appT("device")
                     local ScreenType = Device["type", string]
                     
                     local Command = getEventString()
@@ -78,24 +78,24 @@ if (app("driver-terminal")) {
                                     break
                                 
                                 case "virtual-terminal",
-                                    Device["new-erase", number] = appS("console-text"):length()
+                                    Device["new-erase", number] = appS("consoleText"):length()
                                     break
                             }
                             
-                            appS("console-text", "")
+                            appS("consoleText", "")
                             break
                         
                         case "print",
                             local NewPrint = getEventString()
-                            appS("console-text", appS("console-text") + NewPrint)
+                            appS("consoleText", appS("consoleText") + NewPrint)
                             
                             switch (ScreenType) {
                                 case "egp-screen",
-                                    Device["port", wirelink]:egpSetText(1, appS("console-text"))
+                                    Device["port", wirelink]:egpSetText(1, appS("consoleText"))
                                     break
                                 
                                 case "console-screen",
-                                    Device["port", wirelink]:writeString(appS("console-text"), 0, 0)
+                                    Device["port", wirelink]:writeString(appS("consoleText"), 0, 0)
                                     break
                                 
                                 case "virtual-terminal",
@@ -106,16 +106,16 @@ if (app("driver-terminal")) {
                         
                         case "erase",
                             local EraseCount = getEventNumber()
-                            appS("console-text", appS("console-text"):left(appS("console-text"):length() - EraseCount))
+                            appS("consoleText", appS("consoleText"):left(appS("consoleText"):length() - EraseCount))
                             
                             switch (ScreenType) {
                                 case "egp-screen",
-                                    Device["port", wirelink]:egpSetText(1, appS("console-text"))
+                                    Device["port", wirelink]:egpSetText(1, appS("consoleText"))
                                     break
                                 
                                 case "console-screen",
                                     Device["port", wirelink][2041] = 1
-                                    Device["port", wirelink]:writeString(appS("console-text"), 0, 0)
+                                    Device["port", wirelink]:writeString(appS("consoleText"), 0, 0)
                                     break
                                 
                                 case "virtual-terminal",
@@ -123,13 +123,31 @@ if (app("driver-terminal")) {
                                     break
                             }
                             break
+                        
+                        case "exit",
+                            Device["busy", number] = 0
+                            appClose()
                             
+                            switch (ScreenType) {
+                                case "egp-screen",
+                                    Device["port", wirelink]:egpClear()
+                                    break
+                                
+                                case "console-screen",
+                                    Device["port", wirelink][2041] = 1
+                                    break
+                                
+                                case "virtual-terminal",
+                                    Device["new-erase", number] = appS("consoleText"):length()
+                                    break
+                            }
+                            break
                     }
                 }
-            #    else {
-            #        break
-            #    }
-            #}
+            }
+            else {
+                appSetState(0)
+            }
             break
     }
 }

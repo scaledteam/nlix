@@ -1,13 +1,19 @@
 #
-# This E2 made by scaled
+# Created by scaled
 #
 
 @name settings
 @persist RESET
-@persist [AUTOSTART_TERMINAL AUTOSTART_EGP]:array
+@persist [AUTOSTART_TERMINAL AUTOSTART_EGP AUTOSTART_GL]:array
 @persist FONT_MONOSPACED:string
 @persist TICKS_INSIDE
 @persist ROOT_USER:string
+
+@inputs [Port1 Port2 Port3 Port4]:wirelink
+@persist PORTS_COUNT
+PORTS_COUNT = 4
+
+SysPerf = 60
 
 FONT_MONOSPACED = "Courier New"
 
@@ -16,7 +22,6 @@ TICKS_INSIDE = 10
 AUTOSTART_TERMINAL = array(
     "driver-terminal",
     "driver-keyboard",
-    "driver-digi",
     "simple-keyboard",
     "sh"
 )
@@ -25,7 +30,14 @@ AUTOSTART_EGP = array(
     "driver-egp",
     "driver-cursor",
     "driver-keyboard",
-    "egp-terminal"
+    "egp-wm"
+)
+
+AUTOSTART_GL = array(
+    "driver-gl",
+    "driver-cursor",
+    "driver-keyboard",
+    "wustdd"
 )
 
 RESET = 0

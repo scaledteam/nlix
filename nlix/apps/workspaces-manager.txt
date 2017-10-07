@@ -2,7 +2,7 @@
 # This E2 made by scaled
 #
 
-@name workspaces-shell
+@name workspaces-manager
 
 if (!APPS_INFO:exists("workspaces-manager")) {
     local Info = table()
@@ -42,12 +42,14 @@ if (app("workspaces-manager")) {
                 local Input = getKeyboardInput()
                 varWrite("input", Input)
                 varWrite("outputCount", varNumber("outputCount") + Input:length() + 1)
-                switch (Input) {
+                local InputExplode = Input:explode(" ")
+                local Command = InputExplode[1, string]
+                switch (Command) {
                     case "",
                         appSetState(2)
                         break
                     
-                    case "auto-terminal",
+                    case "ws-term",
                         local Workspace = createWorkspace(AUTOSTART_TERMINAL)
                         Workspace:addDevice(findDeviceByType("console-screen"))
                         Workspace:addDevice(findDeviceByType("egp-screen"))
@@ -56,13 +58,21 @@ if (app("workspaces-manager")) {
                         appSetState(2)
                         break
                     
-                    case "devices",
+                    case "dev-list",
                         local Message = ""
                         for (I = 1, ThisWorkspace["devices", table]:count()) {
-                            Message += I + ", " + ThisWorkspace["devices", table][I, table]["type", string] + "\n"
+                            local Device = ThisWorkspace["devices", table][I, table]
+                            Message += I + ", " + (Device["busy", number] ? "busy" : "free") + ", " + Device["type", string] + "\n"
                         }
                         terminalPrint(Message)
                         varWrite("outputCount", varNumber("outputCount") + Message:length())
+                        appSetState(2)
+                        break
+                    
+                    case "dev-del",
+                        local Id = InputExplode[2, string]:toNumber()
+                        ThisWorkspace["devices", table][Id, table]:clear()
+                        ThisWorkspace["devices", table]:remove(Id)
                         appSetState(2)
                         break
                     
@@ -77,6 +87,19 @@ if (app("workspaces-manager")) {
                     case "clear",
                         terminalErase(varNumber("outputCount"))
                         varWrite("outputCount", 0)
+                        appSetState(2)
+                        break
+                    
+                    case "help",
+                        local Message = "ws-term\n" +
+                            "dev-list\n" +
+                            "dev-del\n" +
+                            "quit\n" + 
+                            "exit\n" +
+                            "clear\n" + 
+                            "help\n"
+                        terminalPrint(Message)
+                        varWrite("outputCount", varNumber("outputCount") + Message:length())
                         appSetState(2)
                         break
                     

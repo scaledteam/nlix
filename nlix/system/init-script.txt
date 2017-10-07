@@ -19,3 +19,4 @@ else {
     
     createWorkspace(AUTOSTART_TERMINAL):startWorkspace():appLaunch("hotplugd")
 }
+
