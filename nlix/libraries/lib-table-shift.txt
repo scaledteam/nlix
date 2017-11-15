@@ -39,3 +39,10 @@ function table table:shiftTable() {
     This:shift()
     return Return
 }
+
+function angle table:shiftAngle() {
+    local Return = This[1, angle]
+    This:shift()
+    return Return
+}
+

@@ -7,7 +7,7 @@
 
 function table createVirtualKeyboard() {
     local Device = table()
-    Device["type", string] = "virtual-keyboard"
+    Device[TYPE, string] = "virtual-keyboard"
     Device["busy", number] = 0
     Device["valid", number] = 1
     
@@ -18,7 +18,7 @@ function table createVirtualKeyboard() {
 
 function table createVirtualTerminal() {
     local Device = table()
-    Device["type", string] = "virtual-terminal"
+    Device[TYPE, string] = "virtual-terminal"
     Device["busy", number] = 0
     Device["valid", number] = 1
     
@@ -31,7 +31,7 @@ function table createVirtualTerminal() {
 
 function table createVirtualEgpScreen(Resolution:vector2, MaxObjects) {
     local Device = table()
-    Device["type", string] = "virtual-egp-screen"
+    Device[TYPE, string] = "virtual-egp-screen"
     Device["busy", number] = 0
     Device["idle", number] = 1
     Device["valid", number] = 1
@@ -47,7 +47,7 @@ function table createVirtualEgpScreen(Resolution:vector2, MaxObjects) {
 
 function table createVirtualCursor() {
     local Device = table()
-    Device["type", string] = "virtual-cursor"
+    Device[TYPE, string] = "virtual-cursor"
     Device["busy", number] = 0
     Device["valid", number] = 1
     

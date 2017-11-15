@@ -28,6 +28,7 @@ function table:sendEvent(Data:vector)   { This["events", table]:pushVector(Data)
 function table:sendEvent(Data:vector2)  { This["events", table]:pushVector2(Data) }
 function table:sendEvent(Data:vector4)  { This["events", table]:pushVector4(Data) }
 function table:sendEvent(Data:table)    { This["events", table]:pushTable(Data) }
+function table:sendEvent(Data:angle)    { This["events", table]:pushAngle(Data) }
 
 function number     getEventNumber()    { return ThisApp["events", table]:shiftNumber() }
 function string     getEventString()    { return ThisApp["events", table]:shiftString() }
@@ -35,3 +36,4 @@ function vector     getEventVector()    { return ThisApp["events", table]:shiftV
 function vector2    getEventVector2()   { return ThisApp["events", table]:shiftVector2() }
 function vector4    getEventVector4()   { return ThisApp["events", table]:shiftVector4() }
 function table      getEventTable()     { return ThisApp["events", table]:shiftTable() }
+function angle      getEventAngle()     { return ThisApp["events", table]:shiftAngle() }

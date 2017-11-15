@@ -4,18 +4,9 @@
 
 @name server-players
 
-if (!APPS_INFO:exists("server-players")) {
-    local Info = table()
-    
-    APPS_INFO["server-players", table] = Info
+local Output = ""
+foreach (I, Player:entity = players()) {
+    Output += Player:id() + " " + Player:name() + "\n"
 }
-
-if (app("server-players")) {
-    local Output = ""
-    foreach (I, Player:entity = players()) {
-        Output += Player:id() + " " + Player:name() + "\n"
-    }
-    terminalPrintFast(Output)
-    appCloseSelf()
-}
-
+terminalPrintFast(Output)
+appCloseSelf()

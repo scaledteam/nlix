@@ -4,134 +4,126 @@
 
 @name bc
 
-if (!APPS_INFO:exists("bc")) {
-    local Info = table()
-    
-    APPS_INFO["bc", table] = Info
-}
-
-if (app("bc")) {
-    switch (ThisAppState) {
-        # Wait terminal driver
-        case 0,
-            if (initTerminal()) {
-                terminalPrint("Calculator shell. Write \"quit\" for exit.\n")
-                appNextState()
-            }
-            break
-        
-        # Wait keyboard driver
-        case 1,
-            if (initSimpleKeyboard()) {
-                appNextState()
-            }
-            break
-        
-        # Main state
-        case 2,
-            terminalPrint("> ")
-            varWrite("outputCount", varNumber("outputCount") + 2)
-            requestKeyboardInput()
-            
+switch (ThisAppState) {
+    # Wait terminal driver
+    case 0,
+        if (initTerminal()) {
+            terminalPrint("Calculator shell. Write \"quit\" for exit.\n")
             appNextState()
-            break
+        }
+        break
+    
+    # Wait keyboard driver
+    case 1,
+        if (initSimpleKeyboard()) {
+            appNextState()
+        }
+        break
+    
+    # Main state
+    case 2,
+        terminalPrint("> ")
+        varWrite("outputCount", varNumber("outputCount") + 2)
+        requestKeyboardInput()
         
-        # Get input
-        case 3,
-            if (waitKeyboardInput()) {
-                local Input = getKeyboardInput()
-                varWrite("input", Input)
-                varWrite("outputCount", varNumber("outputCount") + Input:length() + 1)
-                switch (Input) {
-                    case "",
-                        appSetState(2)
-                        break
-                    
-                    case "quit",
-                        appCloseSelf()
-                        break
-                    
-                    case "exit",
-                        appCloseSelf()
-                        break
-                    
-                    case "clear",
-                        terminalErase(varNumber("outputCount"))
-                        varWrite("outputCount", 0)
-                        appSetState(2)
-                        break
-                    
-                    default,
-                        appSetState(4)
-                        break
-                }
+        appNextState()
+        break
+    
+    # Get input
+    case 3,
+        if (waitKeyboardInput()) {
+            local Input = getKeyboardInput()
+            varWrite("input", Input)
+            varWrite("outputCount", varNumber("outputCount") + Input:length() + 1)
+            switch (Input) {
+                case "",
+                    appSetState(2)
+                    break
+                
+                case "quit",
+                    appCloseSelf()
+                    break
+                
+                case "exit",
+                    appCloseSelf()
+                    break
+                
+                case "clear",
+                    terminalErase(varNumber("outputCount"))
+                    varWrite("outputCount", 0)
+                    appSetState(2)
+                    break
+                
+                default,
+                    appSetState(4)
+                    break
             }
-            break
+        }
+        break
+    
+    # Compute
+    case 4,
+        local Input = varString("input")
         
-        # Compute
-        case 4,
-            local Input = varString("input")
-            
-            local InputExplode = array()
-            local LastDivider = 0
-            
-            local InputActions = array()
-            
-            local Result = 0
-            
-            # Separate numbers
-            for (I = 1, Input:length()) {
-                local Char = Input[I]
-                if (Char == "+" | Char == "-" | Char == "*" | Char == "/") {
-                    InputExplode:pushNumber(Input:sub(LastDivider + 1, I - 1):toNumber())
-                    LastDivider = I
-                    
-                    InputActions:pushString(Char)
-                }
+        local InputExplode = array()
+        local LastDivider = 0
+        
+        local InputActions = array()
+        
+        local Result = 0
+        
+        # Separate numbers
+        for (I = 1, Input:length()) {
+            local Char = Input[I]
+            if (Char == "+" | Char == "-" | Char == "*" | Char == "/") {
+                InputExplode:pushNumber(Input:sub(LastDivider + 1, I - 1):toNumber())
+                LastDivider = I
+                
+                InputActions:pushString(Char)
             }
-            InputExplode:pushNumber(Input:sub(LastDivider + 1):toNumber())
-            
-            # Replace actions on numbers
-            ## *, /
-            local I = 1
-            while (I <= InputActions:count()) {
-                if (InputActions[I, string] == "*") {
-                    InputExplode[I, number] = InputExplode[I, number] * InputExplode[I + 1, number]
-                    InputActions:remove(I)
-                    InputExplode:remove(I + 1)
-                }
-                elseif (InputActions[I, string] == "/") {
-                    InputExplode[I, number] = InputExplode[I, number] / InputExplode[I + 1, number]
-                    InputActions:remove(I)
-                    InputExplode:remove(I + 1)
-                }
-                else {
-                    I++
-                }
+        }
+        InputExplode:pushNumber(Input:sub(LastDivider + 1):toNumber())
+        
+        # Replace actions on numbers
+        ## *, /
+        local I = 1
+        while (I <= InputActions:count()) {
+            if (InputActions[I, string] == "*") {
+                InputExplode[I, number] = InputExplode[I, number] * InputExplode[I + 1, number]
+                InputActions:remove(I)
+                InputExplode:remove(I + 1)
             }
-            
-            ## +, -
-            I = 1
-            while (I <= InputActions:count()) {
-                if (InputActions[I, string] == "+") {
-                    InputExplode[I, number] = InputExplode[I, number] + InputExplode[I + 1, number]
-                    InputActions:remove(I)
-                    InputExplode:remove(I + 1)
-                }
-                elseif (InputActions[I, string] == "-") {
-                    InputExplode[I, number] = InputExplode[I, number] - InputExplode[I + 1, number]
-                    InputActions:remove(I)
-                    InputExplode:remove(I + 1)
-                }
-                else {
-                    I++
-                }
+            elseif (InputActions[I, string] == "/") {
+                InputExplode[I, number] = InputExplode[I, number] / InputExplode[I + 1, number]
+                InputActions:remove(I)
+                InputExplode:remove(I + 1)
             }
-            
-            local Output = InputExplode:concat(" ") + "\n"
-            terminalPrint(Output)
-            varWrite("outputCount", varNumber("outputCount") + Output:length())
-            appSetState(2)
-            break
-    }
+            else {
+                I++
+            }
+        }
+        
+        ## +, -
+        I = 1
+        while (I <= InputActions:count()) {
+            if (InputActions[I, string] == "+") {
+                InputExplode[I, number] = InputExplode[I, number] + InputExplode[I + 1, number]
+                InputActions:remove(I)
+                InputExplode:remove(I + 1)
+            }
+            elseif (InputActions[I, string] == "-") {
+                InputExplode[I, number] = InputExplode[I, number] - InputExplode[I + 1, number]
+                InputActions:remove(I)
+                InputExplode:remove(I + 1)
+            }
+            else {
+                I++
+            }
+        }
+        
+        local Output = InputExplode:concat(" ") + "\n"
+        terminalPrint(Output)
+        varWrite("outputCount", varNumber("outputCount") + Output:length())
+        appSetState(2)
+        break
 }

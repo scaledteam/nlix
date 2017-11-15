@@ -29,12 +29,48 @@ function number initGl() {
     
 }
 
-function glTriangle(Pos1:vector2, Pos2:vector2, Pos3:vector2) {
+function glTriangle(Pos1:vector, Pos2:vector, Pos3:vector) {
     local App = varTable("driver-gl")
     
-    App:sendEvent("triangle")
+    App:sendEvent("glTriangle")
     App:sendEvent(Pos1)
     App:sendEvent(Pos2)
     App:sendEvent(Pos3)
 }
 
+function number glReady() {
+    return varTable("driver-gl"):varNumber("idle")
+}
+
+function glStart() {
+    varTable("driver-gl"):sendEvent("glStart")
+}
+
+function glColor(Color:vector) {
+    local App = varTable("driver-gl")
+    
+    App:sendEvent("glColor")
+    App:sendEvent(Color)
+}
+
+function glFillColor(Color:vector) {
+    local App = varTable("driver-gl")
+    
+    App:sendEvent("glFillColor")
+    App:sendEvent(Color)
+}
+
+function glPos(Pos:vector) {
+    local App = varTable("driver-gl")
+    
+    App:sendEvent("glPos")
+    App:sendEvent(Pos)
+}
+
+
+function glAng(Angle:angle) {
+    local App = varTable("driver-gl")
+    
+    App:sendEvent("glAng")
+    App:sendEvent(Angle)
+}

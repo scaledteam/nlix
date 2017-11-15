@@ -4,46 +4,48 @@
 
 @name exit
 
-if (!APPS_INFO:exists("exit")) {
-    local Info = table()
-    
-    APPS_INFO["exit", table] = Info
-}
-
-if (app("exit")) {
-    switch (ThisAppState) {
-        case 0,
-            local ThisWorkspaceApps = table()
-            for (I = 1, Apps:count()) {
-                local App = Apps[I, table]
-                if (App["workspace", table] == ThisWorkspace) {
-                    ThisWorkspaceApps:pushTable(App)
-                }
-            }
-            varWrite("apps", ThisWorkspaceApps)
+switch (ThisAppState) {
+    case 0,
+        if (findAppByName("hotplugd") != NULL & varString("args") != "--force") {
+            terminalPrintFast("You can lost hotplug function after exit. Use --force if you really want it.\n")
+            appClose()
+        }
+        else {
             appNextState()
-            break
-        
-        case 1,
-            varWrite("exitAllTime", systime() + 2)
+        }
+        break
+    
+    case 1,
+        local ThisWorkspaceApps = table()
+        for (I = 1, Apps:count()) {
+            local App = Apps[I, table]
+            if (App["workspace", table] == ThisWorkspace) {
+                ThisWorkspaceApps:pushTable(App)
+            }
+        }
+        varWrite("apps", ThisWorkspaceApps)
+        appNextState()
+        break
+    
+    case 2,
+        varWrite("exitAllTime", systime() + 2)
+        local ThisWorkspaceApps = varTable("apps")
+        for (I = 1, ThisWorkspaceApps:count()) {
+            ThisWorkspaceApps[I, table]:sendEvent("exit")
+        }
+        appNextState()
+        break
+    
+    case 3,
+        if (systime() >= varNumber("exitAllTime")) {
             local ThisWorkspaceApps = varTable("apps")
             for (I = 1, ThisWorkspaceApps:count()) {
-                ThisWorkspaceApps[I, table]:sendEvent("exit")
-            }
-            appNextState()
-            break
-        
-        case 2,
-            if (systime() >= varNumber("exitAllTime")) {
-                local ThisWorkspaceApps = varTable("apps")
-                for (I = 1, ThisWorkspaceApps:count()) {
-                    local App = ThisWorkspaceApps[I, table]
-                    if (App:isValid()) {
-                        App:appClose()
-                    }
+                local App = ThisWorkspaceApps[I, table]
+                if (App:isValid()) {
+                    App:appClose()
                 }
-                ThisWorkspace:clear()
             }
-            break
-    }
+            ThisWorkspace:clear()
+        }
+        break
 }

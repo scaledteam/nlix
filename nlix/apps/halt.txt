@@ -4,12 +4,11 @@
 
 @name halt
 
-if (!APPS_INFO:exists("halt")) {
-    local Info = table()
-    
-    APPS_INFO["halt", table] = Info
+if (ThisAppUser == ROOT_USER) {
+    clearAll()
+    runOnTick(0)
 }
-
-if (app("halt")) {
-    halt()
+else {
+    terminalPrintFast("You don't have permission for this action\n")
+    appClose()
 }

@@ -4,16 +4,15 @@
 
 @name settings
 @persist RESET
-@persist [AUTOSTART_TERMINAL AUTOSTART_EGP AUTOSTART_GL]:array
+@persist [AUTOSTART AUTOSTART_TERMINAL AUTOSTART_EGP AUTOSTART_GL]:array
 @persist FONT_MONOSPACED:string
 @persist TICKS_INSIDE
-@persist ROOT_USER:string
 
 @inputs [Port1 Port2 Port3 Port4]:wirelink
 @persist PORTS_COUNT
 PORTS_COUNT = 4
 
-SysPerf = 60
+SysPerf = 80
 
 FONT_MONOSPACED = "Courier New"
 
@@ -40,6 +39,7 @@ AUTOSTART_GL = array(
     "wustdd"
 )
 
+AUTOSTART = AUTOSTART_TERMINAL
+
 RESET = 0
 
-ROOT_USER = "root"

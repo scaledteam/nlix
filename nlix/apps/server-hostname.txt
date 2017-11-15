@@ -4,14 +4,5 @@
 
 @name server-hostname
 
-if (!APPS_INFO:exists("server-hostname")) {
-    local Info = table()
-    
-    APPS_INFO["server-hostname", table] = Info
-}
-
-if (app("server-hostname")) {
-    terminalPrintFast(hostname() + "\n")
-    appCloseSelf()
-}
-
+terminalPrintFast(hostname() + "\n")
+appCloseSelf()

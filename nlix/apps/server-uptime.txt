@@ -4,14 +4,5 @@
 
 @name server-uptime
 
-if (!APPS_INFO:exists("server-uptime")) {
-    local Info = table()
-    
-    APPS_INFO["server-uptime", table] = Info
-}
-
-if (app("server-uptime")) {
-    terminalPrintFast(int(systime() / 60 / 60 / 24) % 30 + " days, " + int(systime() / 60 / 60) % 24 + ":" + int(systime() / 60) % 60 + ":" + int(systime()) % 60 + "\n")
-    appCloseSelf()
-}
-
+terminalPrintFast(int(systime() / 60 / 60 / 24) % 30 + " days, " + int(systime() / 60 / 60) % 24 + ":" + int(systime() / 60) % 60 + ":" + int(systime()) % 60 + "\n")
+appCloseSelf()

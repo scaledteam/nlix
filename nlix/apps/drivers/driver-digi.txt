@@ -4,82 +4,74 @@
 
 @name driver-digi
 
-if (!APPS_INFO:exists("driver-digi")) {
-    local Info = table()
-    
-    APPS_INFO["driver-digi", table] = Info
-}
-
-if (app("driver-digi")) {
-    switch (ThisAppState) {
-        # Initialize
-        case 0,
-            local Device = findDeviceByType("digital-screen")
-            
-            if (Device != NULL) {
-                Device["busy", number] = 1
-                
-                local Port = Device["port", wirelink]
-                Port[1048574] = 0
-                Port[1048569] = 3
-                Port[1048575] = 1
-                Port[1048573] = Device["resolution", vector2][1]
-                Port[1048572] = Device["resolution", vector2][2]
-                
-                appT("device", Device)
-                appE("entity", Device["port", wirelink]:entity())
-                appNextState()
-            }
-            break
+switch (ThisAppState) {
+    # Initialize
+    case 0,
+        local Device = findDeviceByType("digital-screen")
         
-        case 1,
-            appV2("resolution", appT("device")["resolution", vector2])
-            appN("idle", 1)
+        if (Device != NULL) {
+            Device["busy", number] = 1
             
+            local Port = Device["port", wirelink]
+            Port[1048574] = 0
+            Port[1048569] = 3
+            Port[1048575] = 1
+            Port[1048573] = Device["resolution", vector2][1]
+            Port[1048572] = Device["resolution", vector2][2]
+            
+            appT("device", Device)
+            appE("entity", Device["port", wirelink]:entity())
             appNextState()
-            break
+        }
+        break
+    
+    case 1,
+        appV2("resolution", appT("device")["resolution", vector2])
+        appN("idle", 1)
         
-        # Wait events
-        case 2,
-            for (I = 1, TICKS_INSIDE) {
-                if (waitAnyEvent()) {
-                    appN("idle", 0)
-                    local Command = getEventString()
-                    local Device = appT("device")
-                    
-                    switch (Command) {
-                        case "drawPixel",
-                            switch (Device["type", string]) {
-                                case "digital-screen",
-                                    local Pos = getEventVector2()
-                                    local Color = getEventVector()
-                                    Device["port", wirelink][Pos[1] + Pos[2] * appV2("resolution")[1]] = rgb2digi(Color, 3)
-                                    break
-                                
-                                case "virtual-digital-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("drawPixel")
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    OutputQueue:pushVector(getEventVector())
-                                    break
-                            }
-                            break
-                    }
-                }
-                else {
-                    local Device = appT("device")
-                    switch (Device["type", string]) {
-                        case "digital-screen",
-                            appN("idle", 1)
-                            break
-                        
-                        case "virtual-digital-screen",
-                            appN("idle", Device["idle", number])
-                            break
-                    }
-                    break
+        appNextState()
+        break
+    
+    # Wait events
+    case 2,
+        for (I = 1, TICKS_INSIDE) {
+            if (waitAnyEvent()) {
+                appN("idle", 0)
+                local Command = getEventString()
+                local Device = appT("device")
+                
+                switch (Command) {
+                    case "drawPixel",
+                        switch (Device[TYPE, string]) {
+                            case "digital-screen",
+                                local Pos = getEventVector2()
+                                local Color = getEventVector()
+                                Device["port", wirelink][Pos[1] + Pos[2] * appV2("resolution")[1]] = rgb2digi(Color, 3)
+                                break
+                            
+                            case "virtual-digital-screen",
+                                local OutputQueue = Device["output-queue", array]
+                                OutputQueue:pushString("drawPixel")
+                                OutputQueue:pushVector2(getEventVector2())
+                                OutputQueue:pushVector(getEventVector())
+                                break
+                        }
+                        break
                 }
             }
-            break
+            else {
+                local Device = appT("device")
+                switch (Device[TYPE, string]) {
+                    case "digital-screen",
+                        appN("idle", 1)
+                        break
+                    
+                    case "virtual-digital-screen",
+                        appN("idle", Device["idle", number])
+                        break
+                }
+                break
+            }
         }
+        break
 }

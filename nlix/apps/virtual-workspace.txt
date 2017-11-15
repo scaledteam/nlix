@@ -4,58 +4,50 @@
 
 @name virtual-workspace
 
-if (!APPS_INFO:exists("virtual-workspace")) {
-    local Info = table()
-    
-    APPS_INFO["virtual-workspace", table] = Info
-}
-
-if (app("virtual-workspace")) {
-    switch (ThisAppState) {
-        case 0,
-            if (initTerminal()) {
-                appNextState()
-            }
-            break
-        
-        case 1,
-            if (initKeyboard()) {
-                appNextState()
-            }
-            break
-        
-        case 2,
-            local Workspace = createWorkspace(AUTOSTART_TERMINAL)
-            local VirtualTerminal = createVirtualTerminal()
-            local VirtualKeyboard = createVirtualKeyboard()
-            
-            Workspace:addDevice(VirtualTerminal)
-            Workspace:addDevice(VirtualKeyboard)
-            Workspace:startWorkspace()
-            
-            appT("workspace", Workspace)
-            appT("terminalDevice", VirtualTerminal)
-            appT("keyboardDevice", VirtualKeyboard)
-            
+switch (ThisAppState) {
+    case 0,
+        if (initTerminal()) {
             appNextState()
-            break
+        }
+        break
+    
+    case 1,
+        if (initKeyboard()) {
+            appNextState()
+        }
+        break
+    
+    case 2,
+        local Workspace = createWorkspace(AUTOSTART_TERMINAL)
+        local VirtualTerminal = createVirtualTerminal()
+        local VirtualKeyboard = createVirtualKeyboard()
         
-        case 3,
-            # Virtual screen driver
-            local VirtualTerminal = appT("terminalDevice")
-            if (VirtualTerminal["new-output", string] != "") {
-                terminalPrint(VirtualTerminal["new-output", string])
-                VirtualTerminal["new-output", string] = ""
-            }
-            
-            if (VirtualTerminal["new-erase", number] != 0) {
-                terminalErase(VirtualTerminal["new-erase", number])
-                VirtualTerminal["new-erase", number] = 0
-            }
-            
-            # Virtual keyboard driver
-            local VirtualKeyboard = appT("keyboardDevice")
-            VirtualKeyboard["keys", array] = keyboardGetKeys()
-            break
-    }
+        Workspace:addDevice(VirtualTerminal)
+        Workspace:addDevice(VirtualKeyboard)
+        Workspace:startWorkspace()
+        
+        appT("workspace", Workspace)
+        appT("terminalDevice", VirtualTerminal)
+        appT("keyboardDevice", VirtualKeyboard)
+        
+        appNextState()
+        break
+    
+    case 3,
+        # Virtual screen driver
+        local VirtualTerminal = appT("terminalDevice")
+        if (VirtualTerminal["new-output", string] != "") {
+            terminalPrint(VirtualTerminal["new-output", string])
+            VirtualTerminal["new-output", string] = ""
+        }
+        
+        if (VirtualTerminal["new-erase", number] != 0) {
+            terminalErase(VirtualTerminal["new-erase", number])
+            VirtualTerminal["new-erase", number] = 0
+        }
+        
+        # Virtual keyboard driver
+        local VirtualKeyboard = appT("keyboardDevice")
+        VirtualKeyboard["keys", array] = keyboardGetKeys()
+        break
 }

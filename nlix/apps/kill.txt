@@ -4,21 +4,12 @@
 
 @name kill
 
-if (!APPS_INFO:exists("kill")) {
-    local Info = table()
-    
-    APPS_INFO["kill", table] = Info
+local App = Apps[appS("args"):toNumber(), table]
+if (App != NULL) {
+    terminalPrintFast("Try kill \"" + App["name", string] + "\".\n")
+    App:appClose()
 }
-
-if (app("kill")) {
-    local App = Apps[appS("args"):toNumber(), table]
-    if (App != NULL) {
-        terminalPrintFast("Try kill \"" + App["name", string] + "\".\n")
-        App:appClose()
-    }
-    else {
-        terminalPrintFast("App don't launched!.\n")
-    }
-    appCloseSelf()
+else {
+    terminalPrintFast("App don't launched!.\n")
 }
-
+appCloseSelf()

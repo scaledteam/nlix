@@ -4,109 +4,148 @@
 
 @name driver-gl
 
-if (!APPS_INFO:exists("driver-gl")) {
-    local Info = table()
-    
-    APPS_INFO["driver-gl", table] = Info
-}
-
-if (app("driver-gl")) {
-    switch (ThisAppState) {
-        # Initialize
-        case 0,
-            local Device = findDeviceByType("egp-screen")
+switch (ThisAppState) {
+    # Initialize
+    case 0,
+        local Device = findDeviceByType("egp-screen")
+        
+        if (Device != NULL) {
+            Device["busy", number] = 1
+            
+            local Screen = Device["port", wirelink]
+            Screen:egpClear()
+            Screen:egpDrawTopLeft(1)
+            Screen:egpBox(1, vec2(), Device["resolution", vector2])
+            
+            local Id = egpMaxObjects()
+            while (Id >= 2) {
+                Screen:egpTriangle(Id, vec2(), vec2(), vec2())
+                Id--
+            }
+            
+            varWrite("resolution", Device["resolution", vector2])
+            
+            varWrite("device", Device)
+            appNextState()
+        }
+        else {
+            local Device = findDeviceByType("virtual-gl")
             
             if (Device != NULL) {
                 Device["busy", number] = 1
                 
-                local Screen = Device["port", wirelink]
-                Screen:egpClear()
-                Screen:egpDrawTopLeft(1)
-                
-                Screen:egpBox(1, vec2(), vec2())
                 varWrite("resolution", Device["resolution", vector2])
-                varWrite("egpMaxObjects", Device["max-objects", number] - 1)
-                varWrite("egp-ids-count", 1)
                 
                 varWrite("device", Device)
                 appNextState()
             }
-            else {
-                local Device = findDeviceByType("virtual-gl")
-                
-                if (Device != NULL) {
-                    Device["busy", number] = 1
-                    
-                    varWrite("resolution", Device["resolution", vector2])
-                    
-                    varWrite("device", Device)
-                    appNextState()
-                }
-            }
-            break
-        
-        case 1,
-            varWrite("egpParents", array())
-            
-            varWrite("idle", 1)
-            varWrite("ready", 1)
-            appNextState()
-            break
-        
-        # Wait events
-        case 2,
-            local Device = varTable("device")
-            if (Device:isValid()) {
-                for (I = 1, TICKS_INSIDE) {
-                    if (waitAnyEvent()) {
-                        varWrite("idle", 0)
-                        local Command = getEventString()
-                        
-                        switch (Command) {
-                            case "triangle",
-                                switch (Device["type", string]) {
-                                    case "egp-screen",
-                                        Device["port", wirelink]:egpTriangle(varNumber("egp-ids-count"), getEventVector2(), getEventVector2(), getEventVector2())
-                                        break
-                                    
-                                    case "virtual-gl",
-                                        break
-                                }
-                                break
-                            
-                            case "exit",
-                                Device["busy", number] = 0
-                                appClose()
-                                
-                                switch (Device["type", string]) {
-                                    case "egp-screen",
-                                        Device["port", wirelink]:egpClear()
-                                        break
-                                    
-                                    case "virtual-gl",
-                                        break
-                                }
-                                break
-                        }
-                    }
-                    else {
-                        local Device = appT("device")
-                        switch (Device["type", string]) {
-                            case "egp-screen",
-                                varWrite("idle", 1)
-                                break
-                            
-                            case "virtual-gl",
-                                varWrite("idle", Device["idle", number])
-                                break
-                        }
-                        break
-                    }
-                }
-            }
-            else {
-                appSetState(0)
-            }
-            break
         }
-}
+        break
+    
+    case 1,
+        varWrite("usedIds", array())
+        
+        varWrite("idle", 1)
+        varWrite("ready", 1)
+        appNextState()
+        break
+    
+    # Wait events
+    case 2,
+        local Device = varTable("device")
+        local Screen = Device["port", wirelink]
+        local ResolutionY = Device["resolution", vector2][2] / 2
+        if (Device:isValid()) {
+            for (Tick = 1, TICKS_INSIDE) {
+                if (waitAnyEvent()) {
+                    varWrite("idle", 0)
+                    local Command = getEventString()
+                    
+                    switch (Command) {
+                        case "glStart",
+                            local Id = egpMaxObjects()
+                            
+                            local UsedIds = varArray("usedIds")
+                            local UsedIdsOld = varArray("usedIdsOld")
+                            while (Id >= 2) {
+                                if (!UsedIds:exists(Id) & UsedIdsOld:exists(Id)) {
+                                    Screen:egpTriangle(Id, vec2(), vec2(), vec2())
+                                    UsedIds:remove(Id)
+                                }
+                                Id--
+                            }
+                            varWrite("usedIdsOld", UsedIds)
+                            
+                            UsedIdsOld:clear()
+                            varWrite("usedIds", UsedIdsOld)
+                        
+                        case "glFillColor",
+                            Screen:egpColor(1, getEventVector())
+                            break
+                        
+                        case "glColor",
+                            varWrite("color", getEventVector())
+                            break
+                        
+                        case "glPos",
+                            varWrite("pos", getEventVector())
+                            break
+                        
+                        case "glAng",
+                            varWrite("matrix", matrix(getEventAngle()))
+                            break
+                        
+                        case "glTriangle",
+                            local Matrix = varMatrix("matrix")
+                            local Pos = varVector("pos")
+                            
+                            local Pos1 = Matrix * (getEventVector() - Pos)
+                            local Pos2 = Matrix * (getEventVector() - Pos)
+                            local Pos3 = Matrix * (getEventVector() - Pos)
+                            
+                            local UsedIds = varArray("usedIds")
+                            local Id = int(egpMaxObjects() / 10 * (Pos1 + Pos2 + Pos3)[3] / 3) + 1
+                            
+                            while (UsedIds:exists(Id)) {
+                                Id++
+                            }
+                            UsedIds[Id, number] = 1
+                            
+                            if (Pos1[3] > 0 & Pos2[3] > 0 & Pos3[3] > 0) {
+                                Screen:egpTriangle(Id,
+                                    ResolutionY * Pos1:dehomogenized(),
+                                    ResolutionY * Pos2:dehomogenized(),
+                                    ResolutionY * Pos3:dehomogenized()
+                                )
+                                Screen:egpColor(Id, varVector("color"))
+                                Screen:egpParent(Id, 1)
+                            }
+                            break
+                        
+                        case "exit",
+                            Device["busy", number] = 0
+                            Screen:egpClear()
+                            appClose()
+                            break
+                    }
+                }
+                else {
+                    local Device = appT("device")
+                    switch (Device[TYPE, string]) {
+                        case "egp-screen",
+                            varWrite("idle", 1)
+                            break
+                        
+                        case "virtual-gl",
+                            varWrite("idle", Device["idle", number])
+                            break
+                    }
+                    break
+                }
+            }
+        }
+        else {
+            appSetState(0)
+        }
+        break
+    }

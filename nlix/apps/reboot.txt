@@ -4,13 +4,11 @@
 
 @name reboot
 
-if (!APPS_INFO:exists("reboot")) {
-    local Info = table()
-    
-    APPS_INFO["reboot", table] = Info
-}
-
-if (app("reboot")) {
+if (ThisAppUser == ROOT_USER) {
     clearAll()
     reset()
+}
+else {
+    terminalPrintFast("You don't have permission for this action\n")
+    appClose()
 }

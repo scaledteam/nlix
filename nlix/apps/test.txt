@@ -4,13 +4,4 @@
 
 @name test
 
-if (!APPS_INFO:exists("test")) {
-    local Info = table()
-    
-    APPS_INFO["test", table] = Info
-}
-
-if (app("test")) {
-    appCloseSelf()
-}
-
+appCloseSelf()

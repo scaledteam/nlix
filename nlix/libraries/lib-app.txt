@@ -4,13 +4,9 @@
 
 @name lib-app
 
-# Persists
 @persist Apps:table
 @persist ThisAppName:string ThisAppData:table ThisAppState ThisWorkspace:table
 @persist ThisApp:table ThisAppId ThisAppUser:string
-
-# Const
-@persist APPS_INFO:table
 
 function appManager() {
     if (Apps:count() > 1) {
@@ -23,6 +19,12 @@ function appManager() {
     ThisAppId = AllData["ThisAppId", number]
     ThisApp = Apps[ThisAppId, table]
     ThisAppName = ThisApp["name", string]
+    
+    ThisAppData = ThisApp["data", table]
+    ThisAppState = ThisAppData["state", number]
+    ThisAppUser = ThisApp["user", string]
+    
+    ThisWorkspace = ThisApp["workspace", table]
 }
 
 function number appExists(AppName:string) {
@@ -44,7 +46,7 @@ function table table:appLaunch(AppName:string) {
     
     local App = table()
     App["name", string] = AppName
-    App["user", string] = ROOT_USER
+    App["user", string] = ThisAppUser
     App["valid", number] = 1
     App["data", table] = table()
     App["events", table] = table()
@@ -117,22 +119,9 @@ function appPrevState() {
     ThisAppData["state", number] = ThisAppData["state", number] - 1
 }
 
-function number app(AppName:string) {
-    if (ThisAppName == AppName) {
-        ThisAppData = ThisApp["data", table]
-        ThisAppState = ThisAppData["state", number]
-        ThisAppUser = ThisApp["user", string]
-        
-        ThisWorkspace = ThisApp["workspace", table]
-        
-        AppBreak = 1
-        
-        return 1
-    }
-    else {
-        return 0
-    }
-}
+#[function number app(AppName:string) {
+    return ThisAppName == AppName
+}]#
 
 function number table:appIsLaunched() {
     return This:isValid()

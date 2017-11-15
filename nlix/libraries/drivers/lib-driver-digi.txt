@@ -23,10 +23,14 @@ function digiDrawPixel(Pos:vector2, Color:vector) {
     App:sendEvent(Color)
 }
 
-function vector2 dlResolution() {
+function vector2 digiResolution() {
     return varTable("driver-digi"):varVector2("resolution")
 }
 
-function number glReady() {
+function entity digiEntity() {
+    return varTable("driver-digi"):varEntity("entity")
+}
+
+function number digiReady() {
     return varTable("driver-digi"):varNumber("idle")
 }

@@ -4,61 +4,63 @@
 
 @name sh
 
-if (!APPS_INFO:exists("sh")) {
-    local Info = table()
-    
-    APPS_INFO["sh", table] = Info
-}
-
-if (app("sh")) {
-    switch (ThisAppState) {
-        # Wait terminal driver
-        case 0,
-            if (initTerminal()) {
-                terminalPrint("Welcome to the Nlix operation system!\n")
-                appNextState()
-            }
-            break
-        # Wait keyboard driver
-        case 1,
-            if (initSimpleKeyboard()) {
-                appNextState()
-            }
-            break
-        # Main state
-        case 2,
-            terminalPrint(ThisAppUser + " $ ")
-            requestKeyboardInput()
-            
+switch (ThisAppState) {
+    case 0,
+        if (initTerminal()) {
+            terminalPrint("Welcome to the Nlix operation system!\n")
             appNextState()
-            break
-        # Get input
-        case 3,
-            if (waitKeyboardInput()) {
-                local Command = getKeyboardInput()
-                if (Command == "") {
-                    appSetState(2)
+        }
+        break
+    
+    case 1,
+        if (initKeyboard()) {
+            appNextState()
+        }
+        break
+    
+    case 2,
+        if (initSimpleKeyboard()) {
+            appNextState()
+        }
+        break
+    
+    case 3,
+        terminalPrint(ThisAppUser + " $ ")
+        requestKeyboardInput()
+        
+        appNextState()
+        break
+    
+    case 4,
+        if (waitKeyboardInput()) {
+            local Command = getKeyboardInput()
+            if (Command == "") {
+                appSetState(3)
+            }
+            else {
+                local App = command(Command)
+                
+                if (App != NULL) {
+                    varWrite("LaunchedApp", App)
+                    appNextState()
                 }
                 else {
-                    local App = command(Command)
-                    
-                    if (App != NULL) {
-                        varWrite("LaunchedApp", App)
-                        appNextState()
-                    }
-                    else {
-                        terminalPrint("Error! App \"" + Command + "\" not found.\n")
-                        appSetState(2)
-                    }
+                    terminalPrint("Error! App \"" + Command + "\" not found.\n")
+                    appSetState(3)
                 }
             }
-            
-            break
-        # Track launcher app
-        case 4,
-            if (!varTable("LaunchedApp"):appIsLaunched()) {
-                appSetState(2)
-            }
-            break
-    }
+        }
+        
+        break
+    
+    case 5,
+        if (!varTable("LaunchedApp"):appIsLaunched()) {
+            appSetState(3)
+        }
+        
+        local KeyboardKeys = keyboardGetKeys()
+        if (KeyboardKeys[2, number] == 158 & KeyboardKeys[3, number] == 99) {
+            varTable("LaunchedApp"):appClose()
+        }
+        break
 }

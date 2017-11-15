@@ -4,59 +4,51 @@
 
 @name egp-wm-shell
 
-if (!APPS_INFO:exists("egp-wm-shell")) {
-    local Info = table()
-    
-    APPS_INFO["egp-wm-shell", table] = Info
-}
-
-if (app("egp-wm-shell")) {
-    switch (ThisAppState) {
-        # Wait console driver
-        case 0,
-            if (initTerminal()) {
-                appNextState()
-            }
-            break
-        
-        # Wait keyboard driver
-        case 1,
-            if (initSimpleKeyboard()) {
-                appNextState()
-            }
-            break
-        
-        # Wait callback device
-        case 2,
-            local Device = findDeviceByType("egp-wm-callback")
-            
-            if (Device != NULL) {
-                appT("callback-device", Device)
-                appNextState()
-            }
-            break
-        
-        # Main state
-        case 3,
-            terminalPrint("wm-sh: $ ")
-            requestKeyboardInput()
-            
+switch (ThisAppState) {
+    # Wait console driver
+    case 0,
+        if (initTerminal()) {
             appNextState()
-            break
+        }
+        break
+    
+    # Wait keyboard driver
+    case 1,
+        if (initSimpleKeyboard()) {
+            appNextState()
+        }
+        break
+    
+    # Wait callback device
+    case 2,
+        local Device = findDeviceByType("egp-wm-callback")
         
-        # Get input
-        case 4,
-            if (waitKeyboardInput()) {
-                local Input = getKeyboardInput()
-                local Commands = Input:trim():explode(" ")
-                
-                local CallbackDevice = appT("callback-device")
-                foreach (I, Command:string = Commands) {
-                    CallbackDevice["queue", array]:pushString(Command)
-                }
-                appSetState(3)
-            }
+        if (Device != NULL) {
+            appT("callback-device", Device)
+            appNextState()
+        }
+        break
+    
+    # Main state
+    case 3,
+        terminalPrint("wm-sh: $ ")
+        requestKeyboardInput()
+        
+        appNextState()
+        break
+    
+    # Get input
+    case 4,
+        if (waitKeyboardInput()) {
+            local Input = getKeyboardInput()
+            local Commands = Input:trim():explode(" ")
             
-            break
-    }
+            local CallbackDevice = appT("callback-device")
+            foreach (I, Command:string = Commands) {
+                CallbackDevice["queue", array]:pushString(Command)
+            }
+            appSetState(3)
+        }
+        
+        break
 }

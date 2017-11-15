@@ -4,57 +4,49 @@
 
 @name hotplugd
 
-if (!APPS_INFO:exists("hotplugd")) {
-    local Info = table()
-    
-    APPS_INFO["hotplugd", table] = Info
-}
-
-if (app("hotplugd")) {
-    switch (ThisAppState) {
-        # Hot plug
-        case 0,
-            local Counter = varNumber("counter") + 1
-            
-            local Port = select(Counter,
-                Port1,
-                Port2,
-                Port3,
-                Port4
-            )
-            
-            if ((Port != varWirelink("PortOld" + Counter)) & Port) {
-                ThisWorkspace:initPort(Port)
-            }
-            varWrite("PortOld" + Counter, Port)
-            
-            if (Counter >= PORTS_COUNT) {
-                appNextState()
-                varWrite("counter", 0)
-            }
-            else {
-                varWrite("counter", Counter)
-            }
-            break
+switch (ThisAppState) {
+    # Hot plug
+    case 0,
+        local Counter = varNumber("counter") + 1
         
-        # Hot unplug
-        case 1,
-            local Counter = varNumber("counter") + 1
-            
-            local Device = ThisWorkspace["devices", table][Counter, table]
-            if (!Device["type", string]:find("virtual") & !Device["port", wirelink]:entity():isValid()) {
-                Device:clear()
-                ThisWorkspace["devices", table]:remove(Counter)
-                Counter--
-            }
-            
-            if (Counter >= ThisWorkspace["devices", table]:count()) {
-                appPrevState()
-                varWrite("counter", 0)
-            }
-            else {
-                varWrite("counter", Counter)
-            }
-            break
-    }
+        local Port = select(Counter,
+            Port1,
+            Port2,
+            Port3,
+            Port4
+        )
+        
+        if ((Port != varWirelink("PortOld" + Counter)) & Port) {
+            ThisWorkspace:initPort(Port)
+        }
+        varWrite("PortOld" + Counter, Port)
+        
+        if (Counter >= PORTS_COUNT) {
+            appNextState()
+            varWrite("counter", 0)
+        }
+        else {
+            varWrite("counter", Counter)
+        }
+        break
+    
+    # Hot unplug
+    case 1,
+        local Counter = varNumber("counter") + 1
+        
+        local Device = ThisWorkspace["devices", table][Counter, table]
+        if (!Device["type", string]:find("virtual") & !Device["port", wirelink]:entity():isValid()) {
+            Device:clear()
+            ThisWorkspace["devices", table]:remove(Counter)
+            Counter--
+        }
+        
+        if (Counter >= ThisWorkspace["devices", table]:count()) {
+            appPrevState()
+            varWrite("counter", 0)
+        }
+        else {
+            varWrite("counter", Counter)
+        }
+        break
 }

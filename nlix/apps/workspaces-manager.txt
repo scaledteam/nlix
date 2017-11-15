@@ -4,113 +4,119 @@
 
 @name workspaces-manager
 
-if (!APPS_INFO:exists("workspaces-manager")) {
-    local Info = table()
-    
-    APPS_INFO["workspaces-manager", table] = Info
-}
-
-if (app("workspaces-manager")) {
-    switch (ThisAppState) {
-        # Wait terminal driver
-        case 0,
-            if (initTerminal()) {
-                terminalPrint("Workspaces manager. Write \"quit\" for exit.\n")
-                appNextState()
-            }
-            break
-        
-        # Wait keyboard driver
-        case 1,
-            if (initSimpleKeyboard()) {
-                appNextState()
-            }
-            break
-        
-        # Main state
-        case 2,
-            terminalPrint("> ")
-            varWrite("outputCount", varNumber("outputCount") + 2)
-            requestKeyboardInput()
-            
+switch (ThisAppState) {
+    # Wait terminal driver
+    case 0,
+        if (initTerminal()) {
+            terminalPrint("Workspaces manager. Write \"quit\" for exit.\n")
             appNextState()
-            break
+        }
+        break
+    
+    # Wait keyboard driver
+    case 1,
+        if (initSimpleKeyboard()) {
+            appNextState()
+        }
+        break
+    
+    # Main state
+    case 2,
+        terminalPrint("> ")
+        varWrite("outputCount", varNumber("outputCount") + 2)
+        requestKeyboardInput()
         
-        # Get input
-        case 3,
-            if (waitKeyboardInput()) {
-                local Input = getKeyboardInput()
-                varWrite("input", Input)
-                varWrite("outputCount", varNumber("outputCount") + Input:length() + 1)
-                local InputExplode = Input:explode(" ")
-                local Command = InputExplode[1, string]
-                switch (Command) {
-                    case "",
-                        appSetState(2)
-                        break
-                    
-                    case "ws-term",
-                        local Workspace = createWorkspace(AUTOSTART_TERMINAL)
-                        Workspace:addDevice(findDeviceByType("console-screen"))
-                        Workspace:addDevice(findDeviceByType("egp-screen"))
-                        Workspace:addDevice(findDeviceByType("keyboard"))
-                        Workspace:startWorkspace()
-                        appSetState(2)
-                        break
-                    
-                    case "dev-list",
-                        local Message = ""
-                        for (I = 1, ThisWorkspace["devices", table]:count()) {
-                            local Device = ThisWorkspace["devices", table][I, table]
-                            Message += I + ", " + (Device["busy", number] ? "busy" : "free") + ", " + Device["type", string] + "\n"
-                        }
-                        terminalPrint(Message)
-                        varWrite("outputCount", varNumber("outputCount") + Message:length())
-                        appSetState(2)
-                        break
-                    
-                    case "dev-del",
-                        local Id = InputExplode[2, string]:toNumber()
-                        ThisWorkspace["devices", table][Id, table]:clear()
-                        ThisWorkspace["devices", table]:remove(Id)
-                        appSetState(2)
-                        break
-                    
-                    case "quit",
-                        appCloseSelf()
-                        break
-                    
-                    case "exit",
-                        appCloseSelf()
-                        break
-                    
-                    case "clear",
-                        terminalErase(varNumber("outputCount"))
-                        varWrite("outputCount", 0)
-                        appSetState(2)
-                        break
-                    
-                    case "help",
-                        local Message = "ws-term\n" +
-                            "dev-list\n" +
-                            "dev-del\n" +
-                            "quit\n" + 
-                            "exit\n" +
-                            "clear\n" + 
-                            "help\n"
-                        terminalPrint(Message)
-                        varWrite("outputCount", varNumber("outputCount") + Message:length())
-                        appSetState(2)
-                        break
-                    
-                    default,
-                        local Message = "Wrong command\n"
-                        terminalPrint(Message)
-                        varWrite("outputCount", varNumber("outputCount") + Message:length())
-                        appSetState(2)
-                        break
-                }
+        appNextState()
+        break
+    
+    # Get input
+    case 3,
+        if (waitKeyboardInput()) {
+            local Input = getKeyboardInput()
+            varWrite("input", Input)
+            varWrite("outputCount", varNumber("outputCount") + Input:length() + 1)
+            local InputExplode = Input:explode(" ")
+            local Command = InputExplode[1, string]
+            switch (Command) {
+                case "",
+                    appSetState(2)
+                    break
+                
+                case "ws-term",
+                    local Workspace = createWorkspace(AUTOSTART_TERMINAL)
+                    Workspace:addDevice(findDeviceByType("console-screen"))
+                    Workspace:addDevice(findDeviceByType("egp-screen"))
+                    Workspace:addDevice(findDeviceByType("keyboard"))
+                    Workspace:startWorkspace()
+                    appSetState(2)
+                    break
+                
+                case "dev-list",
+                    local Message = ""
+                    for (I = 1, ThisWorkspace["devices", table]:count()) {
+                        local Device = ThisWorkspace["devices", table][I, table]
+                        Message += I + ", " + (Device["busy", number] ? "busy" : "free") + ", " + Device[TYPE, string] + "\n"
+                    }
+                    terminalPrint(Message)
+                    varWrite("outputCount", varNumber("outputCount") + Message:length())
+                    appSetState(2)
+                    break
+                
+                case "dev-del",
+                    local Id = InputExplode[2, string]:toNumber()
+                    ThisWorkspace["devices", table][Id, table]:clear()
+                    ThisWorkspace["devices", table]:remove(Id)
+                    appSetState(2)
+                    break
+                
+                case "quit",
+                    appCloseSelf()
+                    break
+                
+                case "exit",
+                    appCloseSelf()
+                    break
+                
+                case "dev-free",
+                    local Device = ThisWorkspace[InputExplode[2, string]:toNumber(), table]
+                    Device["busy", number] = 0
+                    appSetState(2)
+                    break
+                
+                case "dev-busy",
+                    local Device = ThisWorkspace[InputExplode[2, string]:toNumber(), table]
+                    Device["busy", number] = 1
+                    appSetState(2)
+                    break
+                
+                case "clear",
+                    terminalErase(varNumber("outputCount"))
+                    varWrite("outputCount", 0)
+                    appSetState(2)
+                    break
+                
+                case "help",
+                    local Message = "ws-term\n" +
+                        "dev-list\n" +
+                        "dev-del\n" +
+                        "quit\n" + 
+                        "exit\n" +
+                        "clear\n" + 
+                        "help\n" + 
+                        "dev-free\n" + 
+                        "dev-busy\n"
+                    terminalPrint(Message)
+                    varWrite("outputCount", varNumber("outputCount") + Message:length())
+                    appSetState(2)
+                    break
+                
+                default,
+                    local Message = "Wrong command\n"
+                    terminalPrint(Message)
+                    varWrite("outputCount", varNumber("outputCount") + Message:length())
+                    appSetState(2)
+                    break
             }
-            break
-    }
+        }
+        break
 }

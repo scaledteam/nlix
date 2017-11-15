@@ -4,14 +4,5 @@
 
 @name echo
 
-if (!APPS_INFO:exists("echo")) {
-    local Info = table()
-    
-    APPS_INFO["echo", table] = Info
-}
-
-if (app("echo")) {
-    terminalPrintFast(appS("args") + "\n")
-    appCloseSelf()
-}
-
+terminalPrintFast(appS("args") + "\n")
+appCloseSelf()

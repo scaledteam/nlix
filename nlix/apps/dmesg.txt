@@ -4,14 +4,5 @@
 
 @name dmesg
 
-if (!APPS_INFO:exists("dmesg")) {
-    local Info = table()
-    
-    APPS_INFO["dmesg", table] = Info
-}
-
-if (app("dmesg")) {
-    terminalPrintFast(Dmesg)
-    appCloseSelf()
-}
-
+terminalPrintFast(Dmesg)
+appCloseSelf()

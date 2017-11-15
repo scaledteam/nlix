@@ -17,6 +17,7 @@ else {
     AllData["this-app-id", number] = 0
     AllData["SysStartTime", number] = SysStartTime = systime()
     
-    createWorkspace(AUTOSTART_TERMINAL):startWorkspace():appLaunch("hotplugd")
+    ThisAppUser = ROOT_USER
+    createWorkspace(AUTOSTART):startWorkspace():appLaunch("hotplugd")
 }
 

@@ -4,14 +4,5 @@
 
 @name applist
 
-if (!APPS_INFO:exists("applist")) {
-    local Info = table()
-    
-    APPS_INFO["applist", table] = Info
-}
-
-if (app("applist")) {
-    terminalPrintFast(APPS_INFO:keys():concat(", ") + "\n")
-    appCloseSelf()
-}
-
+terminalPrintFast(APPS_INFO:keys():concat(", ") + "\n")
+appCloseSelf()

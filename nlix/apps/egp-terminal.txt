@@ -4,77 +4,67 @@
 
 @name egp-terminal
 
-if (!APPS_INFO:exists("egp-terminal")) {
-    local Info = table()
-    Info["min-egpid-count", number] = 2
+switch (ThisAppState) {
+    # Initialize egp
+    case 0,
+        if (initEgp()) {
+            appNextState()
+        }
+        break
     
-    APPS_INFO["egp-terminal", table] = Info
-}
-
-if (app("egp-terminal")) {
-    switch (ThisAppState) {
-        # Initialize egp
-        case 0,
-            if (initEgp()) {
-                appNextState()
-            }
-            break
-        
-        case 1,
-            if (initKeyboard()) {
-                appNextState()
-            }
-            break
-        
-        case 2,
-            local Workspace = createWorkspace(AUTOSTART_TERMINAL)
-            local VirtualTerminal = createVirtualTerminal()
-            local VirtualKeyboard = createVirtualKeyboard()
-            
-            Workspace:addDevice(VirtualTerminal)
-            Workspace:addDevice(VirtualKeyboard)
-            Workspace:startWorkspace()
-            
-            appT("workspace", Workspace)
-            appT("terminalDevice", VirtualTerminal)
-            appT("keyboardDevice", VirtualKeyboard)
-            
+    case 1,
+        if (initKeyboard()) {
             appNextState()
-            break
+        }
+        break
+    
+    case 2,
+        local Workspace = createWorkspace(AUTOSTART_TERMINAL)
+        local VirtualTerminal = createVirtualTerminal()
+        local VirtualKeyboard = createVirtualKeyboard()
         
-        case 3,
-            local Size = egpResolution()
-            egpBox(1, vec2(), Size)
-            egpParentToBase(1)
-            egpColor(1, vec(50))
-            
-            egpTextLayout(2, "Waiting workspace...", vec2(), Size)
-            egpParentToBase(2)
-            
-            appNextState()
-            break
+        Workspace:addDevice(VirtualTerminal)
+        Workspace:addDevice(VirtualKeyboard)
+        Workspace:startWorkspace()
         
-        case 4,
-            # Virtual screen driver
-            local VirtualTerminal = appT("terminalDevice")
-            if (VirtualTerminal["new-output", string] != "") {
-                appS("console-text", appS("console-text") + VirtualTerminal["new-output", string])
-                VirtualTerminal["new-output", string] = ""
-                
-                egpSetText(2, appS("console-text"))
-            }
+        appT("workspace", Workspace)
+        appT("terminalDevice", VirtualTerminal)
+        appT("keyboardDevice", VirtualKeyboard)
+        
+        appNextState()
+        break
+    
+    case 3,
+        local Size = egpResolution()
+        egpBox(1, vec2(), Size)
+        egpParentToBase(1)
+        egpColor(1, vec(50))
+        
+        egpTextLayout(2, "Waiting workspace...", vec2(), Size)
+        egpParentToBase(2)
+        
+        appNextState()
+        break
+    
+    case 4,
+        # Virtual screen driver
+        local VirtualTerminal = appT("terminalDevice")
+        if (VirtualTerminal["new-output", string] != "") {
+            appS("console-text", appS("console-text") + VirtualTerminal["new-output", string])
+            VirtualTerminal["new-output", string] = ""
             
-            if (VirtualTerminal["new-erase", number] != 0) {
-                appS("console-text", appS("console-text"):left(appS("console-text"):length() - VirtualTerminal["new-erase", number]))
-                VirtualTerminal["new-erase", number] = 0
-                
-                egpSetText(2, appS("console-text"))
-            }
+            egpSetText(2, appS("console-text"))
+        }
+        
+        if (VirtualTerminal["new-erase", number] != 0) {
+            appS("console-text", appS("console-text"):left(appS("console-text"):length() - VirtualTerminal["new-erase", number]))
+            VirtualTerminal["new-erase", number] = 0
             
-            # Virtual keyboard driver
-            local VirtualKeyboard = appT("keyboardDevice")
-            VirtualKeyboard["keys", array] = keyboardGetKeys()
-            break
-    }
+            egpSetText(2, appS("console-text"))
+        }
+        
+        # Virtual keyboard driver
+        local VirtualKeyboard = appT("keyboardDevice")
+        VirtualKeyboard["keys", array] = keyboardGetKeys()
+        break
 }
-

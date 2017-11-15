@@ -4,14 +4,5 @@
 
 @name ops
 
-if (!APPS_INFO:exists("ops")) {
-    local Info = table()
-    
-    APPS_INFO["ops", table] = Info
-}
-
-if (app("ops")) {
-    terminalPrintFast(ops() + "\n")
-    appCloseSelf()
-}
-
+terminalPrintFast(ops() + "\n")
+appCloseSelf()

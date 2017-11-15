@@ -44,7 +44,7 @@ function table:initPort(Port:wirelink) {
             case "gmod_wire_egp",
                 # Connect as screen
                 local Device = table()
-                Device["type", string] = "egp-screen"
+                Device[TYPE, string] = "egp-screen"
                 
                 Device["resolution", vector2] = vec2(512)
                 Device["max-objects", number] = egpMaxObjects()
@@ -59,7 +59,7 @@ function table:initPort(Port:wirelink) {
                 
                 # Connect as cursor
                 Device = table()
-                Device["type", string] = "egp-cursor"
+                Device[TYPE, string] = "egp-cursor"
                 
                 Device["resolution", vector2] = vec2(512)
                 
@@ -74,7 +74,7 @@ function table:initPort(Port:wirelink) {
             
             case "gmod_wire_consolescreen",
                 local Device = table()
-                Device["type", string] = "console-screen"
+                Device[TYPE, string] = "console-screen"
                 Device["resolution", vector2] = vec2(30, 18)
                 Device["port", wirelink] = Port
                 Device["busy", number] = 0
@@ -87,7 +87,7 @@ function table:initPort(Port:wirelink) {
             
             case "gmod_wire_keyboard",
                 local Device = table()
-                Device["type", string] = "keyboard"
+                Device[TYPE, string] = "keyboard"
                 Device["port", wirelink] = Port
                 Device["busy", number] = 0
                 Device["valid", number] = 1
@@ -99,7 +99,7 @@ function table:initPort(Port:wirelink) {
             
             case "gmod_wire_digitalscreen",
                 local Device = table()
-                Device["type", string] = "digital-screen"
+                Device[TYPE, string] = "digital-screen"
                 Device["resolution", vector2] = vec2(128)
                 Device["port", wirelink] = Port
                 Device["busy", number] = 0
@@ -132,7 +132,7 @@ function clearAll() {
 function table table:findDeviceByType(DeviceType:string) {
     for (I = 1, This["devices", table]:count()) {
         local Device = This["devices", table][I, table]
-        if (Device["type", string] == DeviceType) {
+        if (Device[TYPE, string] == DeviceType) {
             if (!Device["busy", number]) {
                 return Device
             }

@@ -4,14 +4,5 @@
 
 @name clear
 
-if (!APPS_INFO:exists("clear")) {
-    local Info = table()
-    Info["man", string] = "Clear terminal screen"
-    
-    APPS_INFO["clear", table] = Info
-}
-
-if (app("clear")) {
-    terminalClearFast()
-    appCloseSelf()
-}
+terminalClearFast()
+appCloseSelf()

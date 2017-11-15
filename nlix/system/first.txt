@@ -2,11 +2,17 @@
 # Created by scaled
 #
 
-@name init
+@name first
 
 @persist Loaded LoadState
 @persist SysPerf
-@persist NULL:table
+
+@persist ROOT_USER:string
+@persist TYPE:string
+@persist NULL:table NULL_ARRAY:array
 
 runOnTick(1)
 SysPerf = 20
+
+ROOT_USER = "root"
+TYPE = "$type"

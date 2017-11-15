@@ -4,474 +4,488 @@
 
 @name egp-wm
 
-if (!APPS_INFO:exists("egp-wm")) {
-    local Info = table()
-    Info["min-egpid-count", number] = 160
-    Info["min-egp-size", vector2] = vec2(400, 300)
-    
-    APPS_INFO["egp-wm", table] = Info
-}
-
-if (app("egp-wm")) {
-    switch (ThisAppState) {
-        case 0,
-            if (initEgp()) {
-                egpBox(1, vec2(), egpResolution())
-                egpParentToBase(1)
-                egpColor(1, vec(127 * egpResolution()[1] / 512))
-                
-                appNextState()
-            }
-            break
-        
-        case 1,
-            if (initCursor()) {
-                appNextState()
-            }
-            break
-        
-        case 2,
-            if (initKeyboard()) {
-                appNextState()
-            }
-            break
-        
-        case 3,
-            varWrite("egp-size-standart", vec2(300, 150))
-            varWrite("egpids-standart", 20)
-            
-            varWrite("EGP_CURSOR_INVALID_POS", vec2(-1))
-            varWrite("KEYS_NULL", array())
-            
-            varWrite("egp-last", 1)
-            varWrite("egp-ids", array())
-            varWrite("egp-poses", array())
-            varWrite("egp-sizes", array())
-            varWrite("egp-id-counts", array())
-            varWrite("workspacesByName", table())
-            varWrite("workspacesById", table())
-            varWrite("workspacesNameToId", table())
-            
-            local CallBackDevice = table()
-            CallBackDevice["type", string] = "egp-wm-callback"
-            local AppSize = clamp(vec2(300, 160), vec2(), egpResolution() * 0.9 - vec2(0, 25))
-            CallBackDevice["queue", array] = array(
-                "create", "wm-sh", randvec2(vec2(0, 25), egpResolution() - AppSize), AppSize, 5,
-                "add-device", "wm-sh", "egp-screen",
-                "add-device", "wm-sh", "keyboard",
-                "add-device", "wm-sh", "callback",
-                "add-app", "wm-sh", "driver-egp",
-                "add-app", "wm-sh", "egp-wm-launcher",
-                "start", "wm-sh"
-            )
-            #[CallBackDevice["queue", array] = array(
-                "start", "wm-sh",
-                "launch", "egp-eyes"
-            )]#
-            varWrite("callback-device", CallBackDevice)
+switch (ThisAppState) {
+    case 0,
+        if (initEgp()) {
+            egpBox(1, vec2(), egpResolution())
+            egpParentToBase(1)
+            egpColor(1, vec(127 * egpResolution()[1] / 512))
             
             appNextState()
-            break
+        }
+        break
+    
+    case 1,
+        if (initCursor()) {
+            appNextState()
+        }
+        break
+    
+    case 2,
+        if (initKeyboard()) {
+            appNextState()
+        }
+        break
+    
+    case 3,
+        varWrite("egp-size-standart", vec2(300, 150))
+        varWrite("egpids-standart", 20)
         
-        case 4,
-            if (egpIsIdle()) {
-                appNextState()
-            }
-            break
+        varWrite("EGP_CURSOR_INVALID_POS", vec2(-1))
+        varWrite("KEYS_NULL", array())
         
-        case 5,
-            for (I = 1, TICKS_INSIDE) {
-                if (varNumber("workspacesCount") > 0) {
-                    # Workspaces counter
-                    if (varNumber("workspacesCount") > 1) {
-                        varWrite("workspaceId", varNumber("workspaceId") % varNumber("workspacesCount") + 1)
-                    }
-                    else {
-                        varWrite("workspaceId", 1)
-                    }
-                    local WorkspaceId = varNumber("workspaceId")
-                    
-                    # Virtual screen driver
-                    local Workspace = varTable("workspacesById")[WorkspaceId, table]
-                    
-                    local VirtualScreenDevice = Workspace["devices", table][1, table]
-                    #local VirtualScreenDevice = Workspace:findDeviceByType("virtual-egp-screen")
-                    local EgpQueue = VirtualScreenDevice["output-queue", array]
-                    if (EgpQueue:count() > 0) {
-                        VirtualScreenDevice["idle", number] = 0
-                        
-                        local Command = EgpQueue:shiftString()
-                        local ParentId = varArray("egp-ids")[WorkspaceId, number]
-                        
-                        switch (Command) {
-                            case "egpBox",
-                                egpBox(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector2(), EgpQueue:shiftVector2())
-                                break
-                            
-                            case "egpSetText",
-                                egpSetText(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftString())
-                                break
-                            
-                            case "egpText",
-                                egpText(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftString(), EgpQueue:shiftVector2())
-                                break
-                            
-                            case "egpTextLayout",
-                                egpTextLayout(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftString(), EgpQueue:shiftVector2(), EgpQueue:shiftVector2())
-                                break
-                            
-                            case "egpColor",
-                                egpColor(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector())
-                                break
-                            
-                            case "egpSize",
-                                egpSize(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftNumber())
-                                break
-                            
-                            case "egpParent",
-                                egpParent(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftNumber() + ParentId)
-                                break
-                            
-                            case "egpParentToBase",
-                                egpParent(EgpQueue:shiftNumber() + ParentId, ParentId)
-                                break
-                            
-                            case "egpParentPoint",
-                                egpParentPoint(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector2())
-                                break
-                            
-                            case "egpAlign",
-                                egpAlign(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftNumber())
-                                break
-                            
-                            case "egpAlign2",
-                                egpAlign2(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftNumber(), EgpQueue:shiftNumber())
-                                break
-                            
-                            case "egpCircle",
-                                egpCircle(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector2(), EgpQueue:shiftVector2())
-                                break
-                            
-                            case "egpCircleOutline",
-                                egpCircleOutline(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector2(), EgpQueue:shiftVector2())
-                                break
-                            
-                            case "egpPos",
-                                egpPos(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector2())
-                                break
-                            
-                            case "egpRemove",
-                                egpRemove(EgpQueue:shiftNumber() + ParentId)
-                                break
-                            
-                            case "egpCopy",
-                                egpCopy(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftNumber())
-                                break
-                        }
-                    }
-                    else {
-                        VirtualScreenDevice["idle", number] = 1
-                    }
-                    
-                    # Virtual cursor device driver
-                    local VirtualCursorDevice = Workspace["devices", table][2, table]
-                    #local VirtualCursorDevice = Workspace:findDeviceByType("virtual-cursor")
-                    local CursorPos = cursorGetPos()
-                    if (CursorPos == varVector2("EGP_CURSOR_INVALID_POS")) {
-                        VirtualCursorDevice["pos", vector2] = varVector2("EGP_CURSOR_INVALID_POS")
-                    }
-                    else {
-                        VirtualCursorDevice["pos", vector2] = CursorPos - varArray("egp-poses")[WorkspaceId, vector2]
-                    }
-                    
-                    
-                    # Window management
-                    #local UseKey = keyboardGetKeys()[2, number] == 101
-                    local UseKey = cursorGetUse()
-                    if (WorkspaceId == varNumber("window-focus")) {
-                        if (UseKey & inrange(cursorGetPos() - varArray("egp-poses")[WorkspaceId, vector2], vec2(0, -25), vec2(varArray("egp-sizes")[WorkspaceId, vector2][1], 0))) {
-                            local NewPos = cursorGetPos() - vec2(varArray("egp-sizes")[WorkspaceId, vector2][1] / 2, -12)
-                            
-                            EgpPoses = varArray("egp-poses")
-                            EgpPoses[WorkspaceId, vector2] = NewPos
-                            egpPos(varArray("egp-ids")[WorkspaceId, number], NewPos)
-                        }
-                    }
-                    else {
-                        if ((UseKey != varNumber("UseKeyOld")) & UseKey & inrange(cursorGetPos() - varArray("egp-poses")[WorkspaceId, vector2], vec2(0, -25), varArray("egp-sizes")[WorkspaceId, vector2])) {
-                            # Send data for redraw window
-                            local EgpIds = varArray("egp-ids")[WorkspaceId, number]
-                            varWrite("counterStart", EgpIds - 2)
-                            varWrite("counterLimit", EgpIds + varArray("egp-id-counts")[WorkspaceId, number])
-                            varWrite("counter", varNumber("counterStart"))
-                            
-                            # Change keyboard target
-                            local WorkspacesById = varTable("workspacesById")
-                            local WindowFocusOld = varNumber("window-focus")
-                            varWrite("window-focus", WorkspaceId)
-                            WorkspacesById[WorkspaceId, table]["devices", table][3, table]["keys", array] = keyboardGetKeys()
-                            WorkspacesById[WindowFocusOld, table]["devices", table][3, table]["keys", array] = varArray("KEYS_NULL")
-                            
-                            # Move to redraw state
-                            appSetState(6)
-                        }
-                    }
-                    varWrite("UseKeyOld", UseKey)
+        varWrite("egp-last", 1)
+        varWrite("egp-ids", array())
+        varWrite("egp-poses", array())
+        varWrite("egp-sizes", array())
+        varWrite("egp-id-counts", array())
+        varWrite("workspacesByName", table())
+        varWrite("workspacesById", table())
+        varWrite("workspacesNameToId", table())
+        
+        local CallBackDevice = table()
+        CallBackDevice["type", string] = "egp-wm-callback"
+        local AppSize = clamp(vec2(300, 160), vec2(), egpResolution() * 0.9 - vec2(0, 25))
+        #[CallBackDevice["queue", array] = array(
+            "create", "wm-sh", randvec2(vec2(0, 25), egpResolution() - AppSize), AppSize, 5,
+            "add-device", "wm-sh", "egp-screen",
+            "add-device", "wm-sh", "keyboard",
+            "add-device", "wm-sh", "callback",
+            "add-app", "wm-sh", "driver-egp",
+            "add-app", "wm-sh", "egp-wm-launcher",
+            "start", "wm-sh"
+        )]#
+        CallBackDevice["queue", array] = array(
+            "create", "wm-sh", randvec2(vec2(0, 25), egpResolution() - AppSize), AppSize, 5,
+            "add-device", "wm-sh", "egp-screen",
+            "add-device", "wm-sh", "keyboard",
+            "add-device", "wm-sh", "callback",
+            "add-app", "wm-sh", "driver-terminal",
+            "add-app", "wm-sh", "driver-keyboard",
+            "add-app", "wm-sh", "simple-keyboard",
+            "add-app", "wm-sh", "egp-wm-shell",
+            "start", "wm-sh"
+        )
+        varWrite("callback-device", CallBackDevice)
+        
+        appNextState()
+        break
+    
+    case 4,
+        if (egpIsIdle()) {
+            appNextState()
+        }
+        break
+    
+    case 5,
+        for (I = 1, TICKS_INSIDE) {
+            if (varNumber("workspacesCount") > 0) {
+                # Workspaces counter
+                if (varNumber("workspacesCount") > 1) {
+                    varWrite("workspaceId", varNumber("workspaceId") % varNumber("workspacesCount") + 1)
                 }
+                else {
+                    varWrite("workspaceId", 1)
+                }
+                local WorkspaceId = varNumber("workspaceId")
                 
-                # Callback device
-                local CommandQueue = varTable("callback-device")["queue", array]
-                if (CommandQueue:count() > 0) {
-                    local Command = CommandQueue:shiftString()
+                # Virtual screen driver
+                local Workspace = varTable("workspacesById")[WorkspaceId, table]
+                
+                local VirtualScreenDevice = Workspace["devices", table][1, table]
+                #local VirtualScreenDevice = Workspace:findDeviceByType("virtual-egp-screen")
+                local EgpQueue = VirtualScreenDevice["output-queue", array]
+                if (EgpQueue:count() > 0) {
+                    VirtualScreenDevice["idle", number] = 0
+                    
+                    local Command = EgpQueue:shiftString()
+                    local ParentId = varArray("egp-ids")[WorkspaceId, number]
                     
                     switch (Command) {
-                        case "create",
-                            # Create workspace
-                            local Workspace = createWorkspace(array())
-                            local WorkspaceName = CommandQueue:shiftString()
-                            
-                            local WmWorkspacesByName = varTable("workspacesByName")
-                            WmWorkspacesByName[WorkspaceName, table] = Workspace
-                            
-                            varTable("workspacesById"):pushTable(Workspace)
-                            local WorkspaceId = varNumber("workspacesCount") + 1
-                            varWrite("workspacesCount", WorkspaceId)
-                            
-                            local WmWorkspacesNameToId = varTable("workspacesNameToId")
-                            WmWorkspacesNameToId[WorkspaceName, number] = WorkspaceId
-                            
-                            # Draw workspace
-                            ## Prepare
-                            local BorderWidth = 2
-                            local LabelHeight = 25
-                            
-                            local NewEgpId = varNumber("egp-last") + 5
-                            varWrite("egp-last", NewEgpId)
-                            varArray("egp-ids"):pushNumber(NewEgpId)
-                            
-                            local Pos = CommandQueue:shiftVector2()
-                            varArray("egp-poses"):pushVector2(Pos)
-                            
-                            local Size = CommandQueue:shiftVector2()
-                            varArray("egp-sizes"):pushVector2(Size)
-                            
-                            ## Drawing
-                            egpParentPoint(NewEgpId, Pos)
-                            egpParentToBase(NewEgpId)
-                            
-                            egpBox(NewEgpId - 2, vec2(-BorderWidth, -BorderWidth - LabelHeight), Size + vec2(2 * BorderWidth, 2 * BorderWidth + LabelHeight))
-                            egpParent(NewEgpId - 2, NewEgpId)
-                            egpColor(NewEgpId - 2, vec(127, 127, 255))
-                            
-                            egpTextLayout(NewEgpId - 1, WorkspaceName, vec2(0, -LabelHeight), vec2(Size[1], LabelHeight))
-                            egpParent(NewEgpId - 1, NewEgpId)
-                            egpAlign2(NewEgpId - 1, 1, 1)
-                            
-                            # Initialize place for app
-                            local EgpIdsCount = CommandQueue:shiftNumber()
-                            varArray("egp-id-counts"):pushNumber(EgpIdsCount + 1)
-                            varWrite("egp-last", varNumber("egp-last") + EgpIdsCount + 1)
-                            
-                            WindowFocusOld = varNumber("window-focus")
-                            varWrite("window-focus", WorkspaceId)
-                            local WorkspacesById = varTable("workspacesById")
-                            if (varNumber("window-focus-old") != 0) {
-                                WorkspacesById[WindowFocusOld, table]["devices", table]["keyboards", table][1, table]["keys", array] = varArray("KEYS_NULL")
-                            }
+                        case "egpBox",
+                            egpBox(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector2(), EgpQueue:shiftVector2())
                             break
                         
-                        case "add-device",
-                            local WorkspaceName = CommandQueue:shiftString()
-                            local DeviceType = CommandQueue:shiftString()
-                            
-                            local Workspace = varTable("workspacesByName")[WorkspaceName, table]
-                            
-                            switch (DeviceType) {
-                                case "egp-screen",
-                                    local WorkspaceId = varTable("workspacesNameToId")[WorkspaceName, number]
-                                    
-                                    local Size = varArray("egp-sizes")[WorkspaceId, vector2]
-                                    local EgpIdsCount = varArray("egp-id-counts")[WorkspaceId, number]
-                                    
-                                    Workspace:addDevice(createVirtualEgpScreen(Size, EgpIdsCount))
-                                    break
-                                
-                                case "keyboard",
-                                    local VirtualKeyboardDevice = createVirtualKeyboard()
-                                    VirtualKeyboardDevice["keys", array] = keyboardGetKeys()
-                                    Workspace:addDevice(VirtualKeyboardDevice)
-                                    break
-                                
-                                case "cursor",
-                                    Workspace:addDevice(createVirtualCursor())
-                                    break
-                                
-                                case "callback",
-                                    Workspace:addDevice(varTable("callback-device"))
-                                    break
-                            }
+                        case "egpSetText",
+                            egpSetText(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftString())
                             break
                         
-                        case "add-app",
-                            local WorkspaceName = CommandQueue:shiftString()
-                            local Workspace = varTable("workspacesByName")[WorkspaceName, table]
-                            Workspace["autostart", array]:pushString(CommandQueue:shiftString())
+                        case "egpText",
+                            egpText(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftString(), EgpQueue:shiftVector2())
                             break
                         
-                        case "start",
-                            local WorkspaceName = CommandQueue:shiftString()
-                            local Workspace = varTable("workspacesByName")[WorkspaceName, table]
-                            Workspace:startWorkspace()
+                        case "egpTextLayout",
+                            egpTextLayout(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftString(), EgpQueue:shiftVector2(), EgpQueue:shiftVector2())
                             break
                         
-                        case "launch",
-                            local AppName = CommandQueue:shiftString()
-                            local WorkspaceName = "window" + varNumber("workspacesCount")
-                            
-                            local AppSize = varVector2("egp-size-standart")
-                            if (APPS_INFO[AppName, table]:exists("min-egp-size")) {
-                                AppSize = clamp(APPS_INFO[AppName, table]["min-egp-size", vector2], vec2(), egpResolution() * 0.75 - vec2(0, 25))
-                            }
-                            
-                            local AppEgpids = varNumber("egpids-standart")
-                            if (APPS_INFO[AppName, table]:exists("min-egpid-count")) {
-                                AppEgpids = APPS_INFO[AppName, table]["min-egpid-count", number]
-                            }
-                            
-                            local CallBackDevice = varTable("callback-device")
-                            CallBackDevice["queue", array] = CallBackDevice["queue", array]:add(array(
-                                "create", WorkspaceName, randvec2(vec2(0, 25), egpResolution() - AppSize), AppSize, AppEgpids,
-                                "add-device", WorkspaceName, "egp-screen",
-                                "add-app", WorkspaceName, "driver-egp",
-                                "add-device", WorkspaceName, "cursor",
-                                "add-app", WorkspaceName, "driver-cursor",
-                                "add-device", WorkspaceName, "keyboard",
-                                "add-app", WorkspaceName, "driver-keyboard",
-                                "add-app", WorkspaceName, AppName,
-                                "start", WorkspaceName
-                            ))
+                        case "egpColor",
+                            egpColor(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector())
                             break
                         
-                        case "test",
-                            egpColor(1, randvec(0, 255))
+                        case "egpSize",
+                            egpSize(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftNumber())
+                            break
+                        
+                        case "egpParent",
+                            egpParent(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftNumber() + ParentId)
+                            break
+                        
+                        case "egpParentToBase",
+                            egpParent(EgpQueue:shiftNumber() + ParentId, ParentId)
+                            break
+                        
+                        case "egpParentPoint",
+                            egpParentPoint(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector2())
+                            break
+                        
+                        case "egpAlign",
+                            egpAlign(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftNumber())
+                            break
+                        
+                        case "egpAlign2",
+                            egpAlign2(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftNumber(), EgpQueue:shiftNumber())
+                            break
+                        
+                        case "egpCircle",
+                            egpCircle(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector2(), EgpQueue:shiftVector2())
+                            break
+                        
+                        case "egpCircleOutline",
+                            egpCircleOutline(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector2(), EgpQueue:shiftVector2())
+                            break
+                        
+                        case "egpPos",
+                            egpPos(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftVector2())
+                            break
+                        
+                        case "egpRemove",
+                            egpRemove(EgpQueue:shiftNumber() + ParentId)
+                            break
+                        
+                        case "egpCopy",
+                            egpCopy(EgpQueue:shiftNumber() + ParentId, EgpQueue:shiftNumber())
                             break
                     }
                 }
-            }
-            break
-        
-        case 6,
-            if (egpIsIdle()) {
-                varWrite("egpParents", array())
-                appNextState()
-            }
-            break
-            
-        case 7,
-            local EgpParents = varArray("egpParents")
-            for (I = 1, TICKS_INSIDE) {
-                local Counter = varNumber("counter")
-                
-                local ThisEgpParent = egpParent(Counter)
-                if (ThisEgpParent) {
-                    EgpParents[Counter, number] = ThisEgpParent
+                else {
+                    VirtualScreenDevice["idle", number] = 1
                 }
                 
-                egpCopy(egpMaxObjects2() - Counter, Counter)
-                
-                if (Counter >= varNumber("counterLimit")) {
-                    appNextState()
-                    break
+                # Virtual cursor device driver
+                local VirtualCursorDevice = Workspace["devices", table][2, table]
+                #local VirtualCursorDevice = Workspace:findDeviceByType("virtual-cursor")
+                local CursorPos = cursorGetPos()
+                if (CursorPos == varVector2("EGP_CURSOR_INVALID_POS")) {
+                    VirtualCursorDevice["pos", vector2] = varVector2("EGP_CURSOR_INVALID_POS")
                 }
                 else {
-                    varWrite("counter", Counter + 1)
+                    VirtualCursorDevice["pos", vector2] = CursorPos - varArray("egp-poses")[WorkspaceId, vector2]
                 }
-            }
-            break
-        
-        case 8,
-            if (egpIsIdle()) {
-                varWrite("counter", varNumber("counterStart"))
-                appNextState()
-            }
-            break
-            
-        case 9,
-            for (I = 1, TICKS_INSIDE) {
-                local Counter = varNumber("counter")
                 
-                egpRemove(Counter)
                 
-                if (Counter >= varNumber("counterLimit")) {
-                    appNextState()
-                    break
+                # Window management
+                #local UseKey = keyboardGetKeys()[2, number] == 101
+                local UseKey = cursorGetUse()
+                if (WorkspaceId == varNumber("window-focus")) {
+                    if (UseKey & inrange(cursorGetPos() - varArray("egp-poses")[WorkspaceId, vector2], vec2(0, -25), vec2(varArray("egp-sizes")[WorkspaceId, vector2][1], 0))) {
+                        local NewPos = cursorGetPos() - vec2(varArray("egp-sizes")[WorkspaceId, vector2][1] / 2, -12)
+                        
+                        EgpPoses = varArray("egp-poses")
+                        EgpPoses[WorkspaceId, vector2] = NewPos
+                        egpPos(varArray("egp-ids")[WorkspaceId, number], NewPos)
+                    }
                 }
                 else {
-                    varWrite("counter", Counter + 1)
+                    if ((UseKey != varNumber("UseKeyOld")) & UseKey & inrange(cursorGetPos() - varArray("egp-poses")[WorkspaceId, vector2], vec2(0, -25), varArray("egp-sizes")[WorkspaceId, vector2])) {
+                        # Send data for redraw window
+                        local EgpIds = varArray("egp-ids")[WorkspaceId, number]
+                        varWrite("counterStart", EgpIds - 2)
+                        varWrite("counterLimit", EgpIds + varArray("egp-id-counts")[WorkspaceId, number])
+                        varWrite("counter", varNumber("counterStart"))
+                        
+                        # Change keyboard target
+                        local WorkspacesById = varTable("workspacesById")
+                        local WindowFocusOld = varNumber("window-focus")
+                        varWrite("window-focus", WorkspaceId)
+                        WorkspacesById[WorkspaceId, table]["devices", table][3, table]["keys", array] = keyboardGetKeys()
+                        WorkspacesById[WindowFocusOld, table]["devices", table][3, table]["keys", array] = varArray("KEYS_NULL")
+                        
+                        # Move to redraw state
+                        appSetState(6)
+                    }
                 }
+                varWrite("UseKeyOld", UseKey)
             }
-            break
-        
-        case 10,
-            if (egpIsIdle()) {
-                varWrite("counter", varNumber("counterStart"))
-                appNextState()
-            }
-            break
             
-        case 11,
-            for (I = 1, TICKS_INSIDE) {
-                local Counter = varNumber("counter")
+            # Callback device
+            local CommandQueue = varTable("callback-device")["queue", array]
+            if (CommandQueue:count() > 0) {
+                local Command = CommandQueue:shiftString()
                 
-                egpCopy(Counter, egpMaxObjects2() - Counter)
-                
-                if (Counter >= varNumber("counterLimit")) {
-                    appNextState()
-                    break
-                }
-                else {
-                    varWrite("counter", Counter + 1)
+                switch (Command) {
+                    case "create",
+                        # Create workspace
+                        local Workspace = createWorkspace(array())
+                        local WorkspaceName = CommandQueue:shiftString()
+                        
+                        local WmWorkspacesByName = varTable("workspacesByName")
+                        WmWorkspacesByName[WorkspaceName, table] = Workspace
+                        
+                        varTable("workspacesById"):pushTable(Workspace)
+                        local WorkspaceId = varNumber("workspacesCount") + 1
+                        varWrite("workspacesCount", WorkspaceId)
+                        
+                        local WmWorkspacesNameToId = varTable("workspacesNameToId")
+                        WmWorkspacesNameToId[WorkspaceName, number] = WorkspaceId
+                        
+                        # Draw workspace
+                        ## Prepare
+                        local BorderWidth = 2
+                        local LabelHeight = 25
+                        
+                        local NewEgpId = varNumber("egp-last") + 5
+                        varWrite("egp-last", NewEgpId)
+                        varArray("egp-ids"):pushNumber(NewEgpId)
+                        
+                        local Pos = CommandQueue:shiftVector2()
+                        varArray("egp-poses"):pushVector2(Pos)
+                        
+                        local Size = CommandQueue:shiftVector2()
+                        varArray("egp-sizes"):pushVector2(Size)
+                        
+                        ## Drawing
+                        egpParentPoint(NewEgpId, Pos)
+                        egpParentToBase(NewEgpId)
+                        
+                        egpBox(NewEgpId - 2, vec2(-BorderWidth, -BorderWidth - LabelHeight), Size + vec2(2 * BorderWidth, 2 * BorderWidth + LabelHeight))
+                        egpParent(NewEgpId - 2, NewEgpId)
+                        egpColor(NewEgpId - 2, vec(127, 127, 255))
+                        
+                        egpTextLayout(NewEgpId - 1, WorkspaceName, vec2(0, -LabelHeight), vec2(Size[1], LabelHeight))
+                        egpParent(NewEgpId - 1, NewEgpId)
+                        egpAlign2(NewEgpId - 1, 1, 1)
+                        
+                        # Initialize place for app
+                        local EgpIdsCount = CommandQueue:shiftNumber()
+                        varArray("egp-id-counts"):pushNumber(EgpIdsCount + 1)
+                        varWrite("egp-last", varNumber("egp-last") + EgpIdsCount + 1)
+                        
+                        WindowFocusOld = varNumber("window-focus")
+                        varWrite("window-focus", WorkspaceId)
+                        local WorkspacesById = varTable("workspacesById")
+                        if (varNumber("window-focus-old") != 0) {
+                            WorkspacesById[WindowFocusOld, table]["devices", table]["keyboards", table][1, table]["keys", array] = varArray("KEYS_NULL")
+                        }
+                        break
+                    
+                    case "add-device",
+                        local WorkspaceName = CommandQueue:shiftString()
+                        local DeviceType = CommandQueue:shiftString()
+                        
+                        local Workspace = varTable("workspacesByName")[WorkspaceName, table]
+                        
+                        switch (DeviceType) {
+                            case "egp-screen",
+                                local WorkspaceId = varTable("workspacesNameToId")[WorkspaceName, number]
+                                
+                                local Size = varArray("egp-sizes")[WorkspaceId, vector2]
+                                local EgpIdsCount = varArray("egp-id-counts")[WorkspaceId, number]
+                                
+                                Workspace:addDevice(createVirtualEgpScreen(Size, EgpIdsCount))
+                                break
+                            
+                            case "keyboard",
+                                local VirtualKeyboardDevice = createVirtualKeyboard()
+                                VirtualKeyboardDevice["keys", array] = keyboardGetKeys()
+                                Workspace:addDevice(VirtualKeyboardDevice)
+                                break
+                            
+                            case "cursor",
+                                Workspace:addDevice(createVirtualCursor())
+                                break
+                            
+                            case "callback",
+                                Workspace:addDevice(varTable("callback-device"))
+                                break
+                        }
+                        break
+                    
+                    case "add-app",
+                        local WorkspaceName = CommandQueue:shiftString()
+                        local Workspace = varTable("workspacesByName")[WorkspaceName, table]
+                        Workspace["autostart", array]:pushString(CommandQueue:shiftString())
+                        break
+                    
+                    case "start",
+                        local WorkspaceName = CommandQueue:shiftString()
+                        local Workspace = varTable("workspacesByName")[WorkspaceName, table]
+                        Workspace:startWorkspace()
+                        break
+                    
+                    case "launch",
+                        local AppName = CommandQueue:shiftString()
+                        local WorkspaceName = "window" + varNumber("workspacesCount")
+                        
+                        local AppSize = varVector2("egp-size-standart")
+                        if (APPS_INFO[AppName, table]:exists("min-egp-size")) {
+                            AppSize = clamp(APPS_INFO[AppName, table]["min-egp-size", vector2], vec2(), egpResolution() * 0.75 - vec2(0, 25))
+                        }
+                        
+                        local AppEgpids = varNumber("egpids-standart")
+                        if (APPS_INFO[AppName, table]:exists("min-egpid-count")) {
+                            AppEgpids = APPS_INFO[AppName, table]["min-egpid-count", number]
+                        }
+                        
+                        local CallBackDevice = varTable("callback-device")
+                        CallBackDevice["queue", array] = CallBackDevice["queue", array]:add(array(
+                            "create", WorkspaceName, randvec2(vec2(0, 25), egpResolution() - AppSize), AppSize, AppEgpids,
+                            "add-device", WorkspaceName, "egp-screen",
+                            "add-app", WorkspaceName, "driver-egp",
+                            "add-device", WorkspaceName, "cursor",
+                            "add-app", WorkspaceName, "driver-cursor",
+                            "add-device", WorkspaceName, "keyboard",
+                            "add-app", WorkspaceName, "driver-keyboard",
+                            "add-app", WorkspaceName, AppName,
+                            "start", WorkspaceName
+                        ))
+                        break
+                    
+                    case "test",
+                        egpColor(1, randvec(0, 255))
+                        break
+                    
+                    case "terminal",
+                        local WorkspaceName = "window" + varNumber("workspacesCount")
+                        local AppSize = varVector2("egp-size-standart")
+                        
+                        local CallBackDevice = varTable("callback-device")
+                        CallBackDevice["queue", array] = CallBackDevice["queue", array]:add(array(
+                            "create", WorkspaceName, randvec2(vec2(0, 25), egpResolution() - AppSize), AppSize, 5,
+                            "add-device", WorkspaceName, "egp-screen",
+                            "add-device", WorkspaceName, "keyboard",
+                            "add-app", WorkspaceName, "driver-terminal",
+                            "add-app", WorkspaceName, "driver-keyboard",
+                            "add-app", WorkspaceName, "simple-keyboard",
+                            "add-app", WorkspaceName, "sh",
+                            "start", WorkspaceName
+                        ))
+                        break
                 }
             }
-            break
+        }
+        break
+    
+    case 6,
+        if (egpIsIdle()) {
+            varWrite("egpParents", array())
+            appNextState()
+        }
+        break
         
-        case 12,
-            if (egpIsIdle()) {
-                varWrite("counter", varNumber("counterStart"))
-                appNextState()
-            }
-            break
+    case 7,
+        local EgpParents = varArray("egpParents")
+        for (I = 1, TICKS_INSIDE) {
+            local Counter = varNumber("counter")
             
-        case 13,
-            for (I = 1, TICKS_INSIDE) {
-                local Counter = varNumber("counter")
-                
-                egpRemove(egpMaxObjects2() - Counter)
-                
-                local ThisEgpParent = varArray("egpParents")[Counter, number]
-                if (ThisEgpParent) {
-                    egpParent(Counter, ThisEgpParent)
-                }
-                
-                if (Counter >= varNumber("counterLimit")) {
-                    varRemove("counter")
-                    varRemove("counterLimit")
-                    varRemove("counterStart")
-                    varArray("egpParents"):clear()
-                    varRemove("egpParents")
-                    appNextState()
-                    break
-                }
-                else {
-                    varWrite("counter", Counter + 1)
-                }
+            local ThisEgpParent = egpParent(Counter)
+            if (ThisEgpParent) {
+                EgpParents[Counter, number] = ThisEgpParent
             }
-            break
+            
+            egpCopy(egpMaxObjects2() - Counter, Counter)
+            
+            if (Counter >= varNumber("counterLimit")) {
+                appNextState()
+                break
+            }
+            else {
+                varWrite("counter", Counter + 1)
+            }
+        }
+        break
+    
+    case 8,
+        if (egpIsIdle()) {
+            varWrite("counter", varNumber("counterStart"))
+            appNextState()
+        }
+        break
         
-        case 14,
-            if (egpIsIdle()) {
-                appSetState(5)
+    case 9,
+        for (I = 1, TICKS_INSIDE) {
+            local Counter = varNumber("counter")
+            
+            egpRemove(Counter)
+            
+            if (Counter >= varNumber("counterLimit")) {
+                appNextState()
+                break
             }
-            break
-    }
+            else {
+                varWrite("counter", Counter + 1)
+            }
+        }
+        break
+    
+    case 10,
+        if (egpIsIdle()) {
+            varWrite("counter", varNumber("counterStart"))
+            appNextState()
+        }
+        break
+        
+    case 11,
+        for (I = 1, TICKS_INSIDE) {
+            local Counter = varNumber("counter")
+            
+            egpCopy(Counter, egpMaxObjects2() - Counter)
+            
+            if (Counter >= varNumber("counterLimit")) {
+                appNextState()
+                break
+            }
+            else {
+                varWrite("counter", Counter + 1)
+            }
+        }
+        break
+    
+    case 12,
+        if (egpIsIdle()) {
+            varWrite("counter", varNumber("counterStart"))
+            appNextState()
+        }
+        break
+        
+    case 13,
+        for (I = 1, TICKS_INSIDE) {
+            local Counter = varNumber("counter")
+            
+            egpRemove(egpMaxObjects2() - Counter)
+            
+            local ThisEgpParent = varArray("egpParents")[Counter, number]
+            if (ThisEgpParent) {
+                egpParent(Counter, ThisEgpParent)
+            }
+            
+            if (Counter >= varNumber("counterLimit")) {
+                varRemove("counter")
+                varRemove("counterLimit")
+                varRemove("counterStart")
+                varArray("egpParents"):clear()
+                varRemove("egpParents")
+                appNextState()
+                break
+            }
+            else {
+                varWrite("counter", Counter + 1)
+            }
+        }
+        break
+    
+    case 14,
+        if (egpIsIdle()) {
+            appSetState(5)
+        }
+        break
 }

@@ -4,20 +4,11 @@
 
 @name perf
 
-if (!APPS_INFO:exists("perf")) {
-    local Info = table()
-    
-    APPS_INFO["perf", table] = Info
+local ArgNumber = appS("args"):toNumber()
+if (ArgNumber != 0) {
+    SysPerf = ArgNumber
 }
-
-if (app("perf")) {
-    local ArgNumber = appS("args"):toNumber()
-    if (ArgNumber != 0) {
-        SysPerf = ArgNumber
-    }
-    else {
-        terminalPrintFast("Entered value is not a number or 0.\n")
-    }
-    appCloseSelf()
+else {
+    terminalPrintFast("Entered value is not a number or 0.\n")
 }
-
+appCloseSelf()

@@ -4,38 +4,28 @@
 
 @name egp-clocks
 
-if (!APPS_INFO:exists("egp-clocks")) {
-    local Info = table()
-    Info["min-egpid-count", number] = 2
-    Info["min-egp-size", vector2] = vec2(160, 20)
-    
-    APPS_INFO["egp-clocks", table] = Info
-}
-
-if (app("egp-clocks")) {
-    switch (ThisAppState) {
-        # Initialize egp
-        case 0,
-            if (initEgp()) {
-                appNextState()
-            }
-            break
-        
-        case 1,
-            egpBox(1, vec2(), egpResolution())
-            egpParentToBase(1)
-            
-            egpText(2, "", vec2())
-            egpParentToBase(2)
-            egpColor(2, vec())
-            
+switch (ThisAppState) {
+    # Initialize egp
+    case 0,
+        if (initEgp()) {
             appNextState()
-            break
+        }
+        break
+    
+    case 1,
+        egpBox(1, vec2(), egpResolution())
+        egpParentToBase(1)
         
-        case 2,
-            if (egpIsIdle()) {
-                egpSetText(2, format("%02d:%02d, %d-%02d-%02d", time("hour"), time("min"), time("year"), time("month"), time("day")))
-            }
-            break
-    }
+        egpText(2, "", vec2())
+        egpParentToBase(2)
+        egpColor(2, vec())
+        
+        appNextState()
+        break
+    
+    case 2,
+        if (egpIsIdle()) {
+            egpSetText(2, format("%02d:%02d, %d-%02d-%02d", time("hour"), time("min"), time("year"), time("month"), time("day")))
+        }
+        break
 }
