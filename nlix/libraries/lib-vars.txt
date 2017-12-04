@@ -3,6 +3,7 @@
 #
 
 @name lib-vars-2
+@persist ThisProgramVars:table
 
 function angle      table:varAngle(VarName:string)     { return This["vars", table][VarName, angle] }
 function array      table:varArray(VarName:string)     { return This["vars", table][VarName, array] }

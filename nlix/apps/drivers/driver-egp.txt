@@ -80,10 +80,10 @@ switch (stateGet()) {
                     local Port = Device["port", wirelink]
                     
                     for (I = 1, KERNEL_OVERLOAD) {
-                        if (waitAnyEvent()) {
+                        if (eventsExists()) {
                             varWrite("idle", 0)
-                            local Command = getEventString()
-                            local Id = getEventNumber()
+                            local Command = eventGetString()
+                            local Id = eventGetNumber()
                             local Object = EgpObjects[Id, table]
                             
                             switch (Command) {
@@ -96,8 +96,8 @@ switch (stateGet()) {
                                     }
                                     Object["exists", number] = 1
                                     
-                                    Object["pos", vector2] = getEventVector2()
-                                    Object["size", vector2] = getEventVector2()
+                                    Object["pos", vector2] = eventGetVector2()
+                                    Object["size", vector2] = eventGetVector2()
                                     
                                     Port:egpBox(Id + 1, Object["pos", vector2], Object["size", vector2])
                                     break
@@ -111,14 +111,14 @@ switch (stateGet()) {
                                     }
                                     Object["exists", number] = 1
                                     
-                                    Object["pos", vector2] = getEventVector2()
-                                    Object["size", vector2] = getEventVector2()
+                                    Object["pos", vector2] = eventGetVector2()
+                                    Object["size", vector2] = eventGetVector2()
                                     
                                     Port:egpBoxOutline(Id + 1, Object["pos", vector2], Object["size", vector2])
                                     break
                                 
                                 case "egpSetText",
-                                    Object["text", string] = getEventString()
+                                    Object["text", string] = eventGetString()
                                     
                                     Port:egpSetText(Id + 1, Object["text", string])
                                     break
@@ -132,8 +132,8 @@ switch (stateGet()) {
                                     }
                                     Object["exists", number] = 1
                                     
-                                    Object["text", string] = getEventString()
-                                    Object["pos", vector2] = getEventVector2()
+                                    Object["text", string] = eventGetString()
+                                    Object["pos", vector2] = eventGetVector2()
                                     
                                     Port:egpText(Id + 1, Object["text", string], Object["pos", vector2])
                                     Port:egpFont(Id + 1, FONT_MONOSPACED)
@@ -148,47 +148,47 @@ switch (stateGet()) {
                                     }
                                     Object["exists", number] = 1
                                     
-                                    Object["text", string] = getEventString()
-                                    Object["pos", vector2] = getEventVector2()
-                                    Object["size", vector2] = getEventVector2()
+                                    Object["text", string] = eventGetString()
+                                    Object["pos", vector2] = eventGetVector2()
+                                    Object["size", vector2] = eventGetVector2()
                                     
                                     Port:egpTextLayout(Id + 1, Object["text", string], Object["pos", vector2], Object["size", vector2])
                                     Port:egpFont(Id + 1, FONT_MONOSPACED)
                                     break
                                 
                                 case "egpColor",
-                                    local Color = getEventVector()
+                                    local Color = eventGetVector()
                                     Object["color", vector4] = vec4(Color, Object["color", vector4][4])
                                     
                                     Port:egpColor(Id + 1, Color)
                                     break
                                 
                                 case "egpColor4",
-                                    Object["color", vector4] = getEventVector4()
+                                    Object["color", vector4] = eventGetVector4()
                                     
                                     Port:egpColor(Id + 1, Object["color", vector4])
                                     break
                                 
                                 case "egpAlpha",
-                                    local Alpha = getEventNumber()
+                                    local Alpha = eventGetNumber()
                                     Object["color", vector4][4] = Alpha
                                     
                                     Port:egpAlpha(Id + 1, Alpha)
                                 
                                 case "egpSize",
-                                    Object["size", vector2] = getEventVector2()
+                                    Object["size", vector2] = eventGetVector2()
                                     
                                     Port:egpSize(Id + 1, Object["size", vector2])
                                     break
                                 
                                 case "egpSizeNumber",
-                                    Object["sizeNumber", number] = getEventNumber()
+                                    Object["sizeNumber", number] = eventGetNumber()
                                     
                                     Port:egpSize(Id + 1, Object["sizeNumber", number])
                                     break
                                 
                                 case "egpParent",
-                                    Object["parent", number] = getEventNumber()
+                                    Object["parent", number] = eventGetNumber()
                                     
                                     Port:egpParent(Id + 1, Object["parent", number] + 1)
                                     break
@@ -208,21 +208,21 @@ switch (stateGet()) {
                                     }
                                     Object["exists", number] = 1
                                     
-                                    Object["pos", vector2] = getEventVector2()
+                                    Object["pos", vector2] = eventGetVector2()
                                     Object:remove("size")
                                     
                                     Port:egpBox(Id + 1, Object["pos", vector2], vec2())
                                     break
                                 
                                 case "egpAlign",
-                                    Object["align", number] = getEventNumber()
+                                    Object["align", number] = eventGetNumber()
                                     
                                     Port:egpAlign(Id + 1, Object["align", number])
                                     break
                                 
                                 case "egpAlign2",
-                                    Object["align", number] = getEventNumber()
-                                    Object["align2", number] = getEventNumber()
+                                    Object["align", number] = eventGetNumber()
+                                    Object["align2", number] = eventGetNumber()
                                     
                                     Port:egpAlign(Id + 1, Object["align", number], Object["align2", number])
                                     break
@@ -236,8 +236,8 @@ switch (stateGet()) {
                                     }
                                     Object["exists", number] = 1
                                     
-                                    Object["pos", vector2] = getEventVector2()
-                                    Object["size", vector2] = getEventVector2()
+                                    Object["pos", vector2] = eventGetVector2()
+                                    Object["size", vector2] = eventGetVector2()
                                     
                                     Port:egpCircle(Id + 1, Object["pos", vector2], Object["size", vector2])
                                     break
@@ -251,8 +251,8 @@ switch (stateGet()) {
                                     }
                                     Object["exists", number] = 1
                                     
-                                    Object["pos", vector2] = getEventVector2()
-                                    Object["size", vector2] = getEventVector2()
+                                    Object["pos", vector2] = eventGetVector2()
+                                    Object["size", vector2] = eventGetVector2()
                                     
                                     Port:egpCircleOutline(Id + 1, Object["pos", vector2], Object["size", vector2])
                                     break
@@ -266,14 +266,14 @@ switch (stateGet()) {
                                     }
                                     Object["exists", number] = 1
                                     
-                                    Object["pos", vector2] = getEventVector2()
-                                    Object["size", vector2] = getEventVector2()
+                                    Object["pos", vector2] = eventGetVector2()
+                                    Object["size", vector2] = eventGetVector2()
                                     
                                     Port:egpLine(Id + 1, Object["pos", vector2], Object["size", vector2])
                                     break
                                 
                                 case "egpPos",
-                                    Object["pos", vector2] = getEventVector2()
+                                    Object["pos", vector2] = eventGetVector2()
                                     
                                     Port:egpPos(Id + 1, Object["pos", vector2])
                                     break
@@ -294,14 +294,14 @@ switch (stateGet()) {
                                     break
                                 
                                 case "egpCopy",
-                                    local OldId = getEventNumber()
+                                    local OldId = eventGetNumber()
                                     Object = EgpObjects[Id, table] = EgpObjects[OldId, table]:clone()
                                     
                                     Port:egpCopy(Id + 1, OldId + 1)
                                     break
                                 
                                 case "egpMove",
-                                    local OldId = getEventNumber()
+                                    local OldId = eventGetNumber()
                                     Object = EgpObjects[Id, table] = EgpObjects[OldId, table]
                                     
                                     # Spawning new object
@@ -394,10 +394,10 @@ switch (stateGet()) {
                     local OutputQueue = Device["output-queue", array]
                     
                     for (I = 1, KERNEL_OVERLOAD) {
-                        if (waitAnyEvent()) {
+                        if (eventsExists()) {
                             varWrite("idle", 0)
-                            local Command = getEventString()
-                            local Id = getEventNumber()
+                            local Command = eventGetString()
+                            local Id = eventGetNumber()
                             local Object = EgpObjects[Id, table]
                             
                             switch (Command) {
@@ -410,8 +410,8 @@ switch (stateGet()) {
                                     }
                                     Object["exists", number] = 1
                                     
-                                    Object["pos", vector2] = getEventVector2()
-                                    Object["size", vector2] = getEventVector2()
+                                    Object["pos", vector2] = eventGetVector2()
+                                    Object["size", vector2] = eventGetVector2()
                                     
                                     OutputQueue:pushString("egpBox")
                                     OutputQueue:pushNumber(Id)
@@ -428,8 +428,8 @@ switch (stateGet()) {
                                     }
                                     Object["exists", number] = 1
                                     
-                                    Object["pos", vector2] = getEventVector2()
-                                    Object["size", vector2] = getEventVector2()
+                                    Object["pos", vector2] = eventGetVector2()
+                                    Object["size", vector2] = eventGetVector2()
                                     
                                     OutputQueue:pushString("egpBoxOutline")
                                     OutputQueue:pushNumber(Id)
@@ -438,7 +438,7 @@ switch (stateGet()) {
                                     break
                                 
                                 case "egpSetText",
-                                    Object["text", string] = getEventString()
+                                    Object["text", string] = eventGetString()
                                     
                                     OutputQueue:pushString("egpSetText")
                                     OutputQueue:pushNumber(Id)
@@ -454,8 +454,8 @@ switch (stateGet()) {
                                     }
                                     Object["exists", number] = 1
                                     
-                                    Object["text", string] = getEventString()
-                                    Object["pos", vector2] = getEventVector2()
+                                    Object["text", string] = eventGetString()
+                                    Object["pos", vector2] = eventGetVector2()
                                     
                                     OutputQueue:pushString("egpText")
                                     OutputQueue:pushNumber(Id)
@@ -472,9 +472,9 @@ switch (stateGet()) {
                                     }
                                     Object["exists", number] = 1
                                     
-                                    Object["text", string] = getEventString()
-                                    Object["pos", vector2] = getEventVector2()
-                                    Object["size", vector2] = getEventVector2()
+                                    Object["text", string] = eventGetString()
+                                    Object["pos", vector2] = eventGetVector2()
+                                    Object["size", vector2] = eventGetVector2()
                                     
                                     OutputQueue:pushString("egpTextLayout")
                                     OutputQueue:pushNumber(Id)
@@ -484,7 +484,7 @@ switch (stateGet()) {
                                     break
                                 
                                 case "egpColor",
-                                    local Color = getEventVector()
+                                    local Color = eventGetVector()
                                     Object["color", vector4] = vec4(Color, Object["color", vector4][4])
                                     
                                     OutputQueue:pushString("egpColor")
@@ -493,7 +493,7 @@ switch (stateGet()) {
                                     break
                                 
                                 case "egpColor4",
-                                    Object["color", vector4] = getEventVector4()
+                                    Object["color", vector4] = eventGetVector4()
                                     
                                     OutputQueue:pushString("egpColor4")
                                     OutputQueue:pushNumber(Id)
@@ -501,7 +501,7 @@ switch (stateGet()) {
                                     break
                                 
                                 case "egpAlpha",
-                                    local Alpha = getEventNumber()
+                                    local Alpha = eventGetNumber()
                                     Object["color", vector4][4] = Alpha
                                     
                                     OutputQueue:pushString("egpAlpha")
@@ -509,7 +509,7 @@ switch (stateGet()) {
                                     OutputQueue:pushNumber(Alpha)
                                 
                                 case "egpSize",
-                                    Object["size", vector2] = getEventVector2()
+                                    Object["size", vector2] = eventGetVector2()
                                     
                                     OutputQueue:pushString("egpSize")
                                     OutputQueue:pushNumber(Id)
@@ -517,7 +517,7 @@ switch (stateGet()) {
                                     break
                                 
                                 case "egpSizeNumber",
-                                    Object["sizeNumber", number] = getEventNumber()
+                                    Object["sizeNumber", number] = eventGetNumber()
                                     
                                     OutputQueue:pushString("egpSizeNumber")
                                     OutputQueue:pushNumber(Id)
@@ -525,7 +525,7 @@ switch (stateGet()) {
                                     break
                                 
                                 case "egpParent",
-                                    Object["parent", number] = getEventNumber()
+                                    Object["parent", number] = eventGetNumber()
                                     
                                     OutputQueue:pushString("egpParent")
                                     OutputQueue:pushNumber(Id)
@@ -548,7 +548,7 @@ switch (stateGet()) {
                                     }
                                     Object["exists", number] = 1
                                     
-                                    Object["pos", vector2] = getEventVector2()
+                                    Object["pos", vector2] = eventGetVector2()
                                     Object:remove("size")
                                     
                                     OutputQueue:pushString("egpParentPoint")
@@ -557,7 +557,7 @@ switch (stateGet()) {
                                     break
                                 
                                 case "egpAlign",
-                                    Object["align", number] = getEventNumber()
+                                    Object["align", number] = eventGetNumber()
                                     
                                     OutputQueue:pushString("egpAlign")
                                     OutputQueue:pushNumber(Id)
@@ -565,8 +565,8 @@ switch (stateGet()) {
                                     break
                                 
                                 case "egpAlign2",
-                                    Object["align", number] = getEventNumber()
-                                    Object["align2", number] = getEventNumber()
+                                    Object["align", number] = eventGetNumber()
+                                    Object["align2", number] = eventGetNumber()
                                     
                                     OutputQueue:pushString("egpAlign2")
                                     OutputQueue:pushNumber(Id)
@@ -583,8 +583,8 @@ switch (stateGet()) {
                                     }
                                     Object["exists", number] = 1
                                     
-                                    Object["pos", vector2] = getEventVector2()
-                                    Object["size", vector2] = getEventVector2()
+                                    Object["pos", vector2] = eventGetVector2()
+                                    Object["size", vector2] = eventGetVector2()
                                     
                                     OutputQueue:pushString("egpCircle")
                                     OutputQueue:pushNumber(Id)
@@ -601,8 +601,8 @@ switch (stateGet()) {
                                     }
                                     Object["exists", number] = 1
                                     
-                                    Object["pos", vector2] = getEventVector2()
-                                    Object["size", vector2] = getEventVector2()
+                                    Object["pos", vector2] = eventGetVector2()
+                                    Object["size", vector2] = eventGetVector2()
                                     
                                     OutputQueue:pushString("egpCircleOutline")
                                     OutputQueue:pushNumber(Id)
@@ -619,8 +619,8 @@ switch (stateGet()) {
                                     }
                                     Object["exists", number] = 1
                                     
-                                    Object["pos", vector2] = getEventVector2()
-                                    Object["size", vector2] = getEventVector2()
+                                    Object["pos", vector2] = eventGetVector2()
+                                    Object["size", vector2] = eventGetVector2()
                                     
                                     OutputQueue:pushString("egpLine")
                                     OutputQueue:pushNumber(Id)
@@ -629,7 +629,7 @@ switch (stateGet()) {
                                     break
                                 
                                 case "egpPos",
-                                    Object["pos", vector2] = getEventVector2()
+                                    Object["pos", vector2] = eventGetVector2()
                                     
                                     OutputQueue:pushString("egpPos")
                                     OutputQueue:pushNumber(Id)
@@ -647,7 +647,7 @@ switch (stateGet()) {
                                     break
                                 
                                 case "egpCopy",
-                                    local OldId = getEventNumber()
+                                    local OldId = eventGetNumber()
                                     Object = EgpObjects[Id, table] = EgpObjects[OldId, table]:clone()
                                     
                                     OutputQueue:pushString("egpCopy")
@@ -656,7 +656,7 @@ switch (stateGet()) {
                                     break
                                 
                                 case "egpMove",
-                                    local OldId = getEventNumber()
+                                    local OldId = eventGetNumber()
                                     Object = EgpObjects[Id, table] = EgpObjects[OldId, table]
                                     
                                     # Spawning new object

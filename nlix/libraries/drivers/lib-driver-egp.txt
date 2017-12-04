@@ -52,191 +52,191 @@ function number egpInit() {
 function egpBox(Id, Pos:vector2, Size:vector2) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpBox")
-    App:sendEvent(Id)
-    App:sendEvent(Pos)
-    App:sendEvent(Size)
+    App:eventSend("egpBox")
+    App:eventSend(Id)
+    App:eventSend(Pos)
+    App:eventSend(Size)
 }
 
 function egpBoxOutline(Id, Pos:vector2, Size:vector2) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpBoxOutline")
-    App:sendEvent(Id)
-    App:sendEvent(Pos)
-    App:sendEvent(Size)
+    App:eventSend("egpBoxOutline")
+    App:eventSend(Id)
+    App:eventSend(Pos)
+    App:eventSend(Size)
 }
 
 function egpText(Id, Text:string, Pos:vector2) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpText")
-    App:sendEvent(Id)
-    App:sendEvent(Text)
-    App:sendEvent(Pos)
+    App:eventSend("egpText")
+    App:eventSend(Id)
+    App:eventSend(Text)
+    App:eventSend(Pos)
 }
 
 function egpTextLayout(Id, Text:string, Pos:vector2, Size:vector2) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpTextLayout")
-    App:sendEvent(Id)
-    App:sendEvent(Text)
-    App:sendEvent(Pos)
-    App:sendEvent(Size)
+    App:eventSend("egpTextLayout")
+    App:eventSend(Id)
+    App:eventSend(Text)
+    App:eventSend(Pos)
+    App:eventSend(Size)
 }
 
 function egpSetText(Id, Text:string) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpSetText")
-    App:sendEvent(Id)
-    App:sendEvent(Text)
+    App:eventSend("egpSetText")
+    App:eventSend(Id)
+    App:eventSend(Text)
 }
 
 function egpColor(Id, Color:vector) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpColor")
-    App:sendEvent(Id)
-    App:sendEvent(Color)
+    App:eventSend("egpColor")
+    App:eventSend(Id)
+    App:eventSend(Color)
 }
 
 function egpColor4(Id, Color:vector4) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpColor4")
-    App:sendEvent(Id)
-    App:sendEvent(Color)
+    App:eventSend("egpColor4")
+    App:eventSend(Id)
+    App:eventSend(Color)
 }
 
 function egpAlpha(Id, Alpha) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpAlpha")
-    App:sendEvent(Id)
-    App:sendEvent(Alpha)
+    App:eventSend("egpAlpha")
+    App:eventSend(Id)
+    App:eventSend(Alpha)
 }
 
 function egpSize(Id, Size:vector2) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpSize")
-    App:sendEvent(Id)
-    App:sendEvent(Size)
+    App:eventSend("egpSize")
+    App:eventSend(Id)
+    App:eventSend(Size)
 }
 
 function egpSizeNumber(Id, Size) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpSizeNumber")
-    App:sendEvent(Id)
-    App:sendEvent(Size)
+    App:eventSend("egpSizeNumber")
+    App:eventSend(Id)
+    App:eventSend(Size)
 }
 
 function egpParent(Id, Id2) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpParent")
-    App:sendEvent(Id)
-    App:sendEvent(Id2)
+    App:eventSend("egpParent")
+    App:eventSend(Id)
+    App:eventSend(Id2)
 }
 
 function egpParentPoint(Id, Pos:vector2) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpParentPoint")
-    App:sendEvent(Id)
-    App:sendEvent(Pos)
+    App:eventSend("egpParentPoint")
+    App:eventSend(Id)
+    App:eventSend(Pos)
 }
 
 function egpParentToBase(Id) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpParentToBase")
-    App:sendEvent(Id)
+    App:eventSend("egpParentToBase")
+    App:eventSend(Id)
 }
 
 function egpAlign(Id, Align) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpAlign")
-    App:sendEvent(Id)
-    App:sendEvent(Align)
+    App:eventSend("egpAlign")
+    App:eventSend(Id)
+    App:eventSend(Align)
 }
 
 function egpAlign2(Id, Align, Align2) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpAlign2")
-    App:sendEvent(Id)
-    App:sendEvent(Align)
-    App:sendEvent(Align2)
+    App:eventSend("egpAlign2")
+    App:eventSend(Id)
+    App:eventSend(Align)
+    App:eventSend(Align2)
 }
 
 function egpCircle(Id, Pos:vector2, Size:vector2) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpCircle")
-    App:sendEvent(Id)
-    App:sendEvent(Pos)
-    App:sendEvent(Size)
+    App:eventSend("egpCircle")
+    App:eventSend(Id)
+    App:eventSend(Pos)
+    App:eventSend(Size)
 }
 
 function egpCircleOutline(Id, Pos:vector2, Size:vector2) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpCircleOutline")
-    App:sendEvent(Id)
-    App:sendEvent(Pos)
-    App:sendEvent(Size)
+    App:eventSend("egpCircleOutline")
+    App:eventSend(Id)
+    App:eventSend(Pos)
+    App:eventSend(Size)
 }
 
 function egpLine(Id, Pos1:vector2, Pos2:vector2) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpLine")
-    App:sendEvent(Id)
-    App:sendEvent(Pos1)
-    App:sendEvent(Pos2)
+    App:eventSend("egpLine")
+    App:eventSend(Id)
+    App:eventSend(Pos1)
+    App:eventSend(Pos2)
 }
 
 function egpPos(Id, Pos:vector2) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpPos")
-    App:sendEvent(Id)
-    App:sendEvent(Pos)
+    App:eventSend("egpPos")
+    App:eventSend(Id)
+    App:eventSend(Pos)
 }
 
 function egpRemove(Id) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpRemove")
-    App:sendEvent(Id)
+    App:eventSend("egpRemove")
+    App:eventSend(Id)
 }
 
 function egpCopy(Id, Id2) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpCopy")
-    App:sendEvent(Id)
-    App:sendEvent(Id2)
+    App:eventSend("egpCopy")
+    App:eventSend(Id)
+    App:eventSend(Id2)
 }
 
 function egpMove(Id, Id2) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpMove")
-    App:sendEvent(Id)
-    App:sendEvent(Id2)
+    App:eventSend("egpMove")
+    App:eventSend(Id)
+    App:eventSend(Id2)
 }
 
 function egpDrawTopLeft(Enable) {
     local App = varTable("driver-egp")
     
-    App:sendEvent("egpDrawTopLeft")
-    App:sendEvent(Enable)
+    App:eventSend("egpDrawTopLeft")
+    App:eventSend(Enable)
 }
 
 function vector2 egpResolution() {

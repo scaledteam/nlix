@@ -11,14 +11,14 @@ function number simpleKeyboardInit() {
 function simpleKeyboardRequestInput() {
     local App = varTable("simple-keyboard")
     
-    App:sendEvent("get-input")
-    App:sendEvent(ThisProgram)
+    App:eventSend("get-input")
+    App:eventSend(ThisProgram)
 }
 
 function number simpleKeyboardWaitInput() {
-    return waitEvent("get-input")
+    return eventWaitString("get-input")
 }
 
 function string simpleKeyboardGetInput() {
-    return getEventString()
+    return eventGetString()
 }

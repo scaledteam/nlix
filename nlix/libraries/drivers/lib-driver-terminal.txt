@@ -21,25 +21,25 @@ function number terminalInit() {
 function terminalPrint(Text:string) {
     local App = varTable("driver-terminal")
     
-    App:sendEvent("print")
-    App:sendEvent(Text)
+    App:eventSend("print")
+    App:eventSend(Text)
 }
 
 function terminalErase(Count) {
     local App = varTable("driver-terminal")
     
-    App:sendEvent("erase")
-    App:sendEvent(Count)
+    App:eventSend("erase")
+    App:eventSend(Count)
 }
 
 function terminalClear() {
-    varTable("driver-terminal"):sendEvent("clear")
+    varTable("driver-terminal"):eventSend("clear")
 }
 
 
 function terminalPrintFast(Text:string) {
     local App = programFindByName("driver-terminal")
     
-    App:sendEvent("print")
-    App:sendEvent(Text)
+    App:eventSend("print")
+    App:eventSend(Text)
 }

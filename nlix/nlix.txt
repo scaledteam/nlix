@@ -9,7 +9,7 @@
 @persist Programs:table
 
 if (first()) {
-    #include "nlix/system/first"
+    #include "nlix/init/first"
 }
 
 if (tickClk()) {
@@ -18,32 +18,35 @@ if (tickClk()) {
             while (perf(KERNEL_PERF)) {
                 KernelState1++
                 switch (KernelState1) {
-                    # System libraries
-                    case 1, #include "nlix/system/settings"             break
-                    case 2, #include "nlix/libraries/lib-kernel"       break
-                    case 3, #include "nlix/libraries/lib-vars"        break
-                    case 4, #include "nlix/libraries/lib-program"           break
-                    case 5, #include "nlix/libraries/lib-event"         break
-                    case 6, #include "nlix/libraries/lib-file"          break
-                    case 7, #include "nlix/libraries/lib-state"         break
-                    case 8, #include "nlix/libraries/lib-driver"         break
+                    # Kernel libs
+                    case 1, #include "nlix/libraries/kernel/lib-object" break
+                    case 2, #include "nlix/libraries/kernel/lib-program" break
                     
-                    # Drivers libraries
-                    case 10, #include "nlix/libraries/drivers/lib-driver-terminal"   break
-                    case 11, #include "nlix/libraries/drivers/lib-driver-keyboard"  break
-                    case 12, #include "nlix/libraries/drivers/lib-driver-egp"       break
-                    case 13, #include "nlix/libraries/drivers/lib-driver-cursor"    break
-                    case 14, #include "nlix/libraries/drivers/lib-driver-digi"      break
-                    case 15, #include "nlix/libraries/drivers/lib-driver-gl"        break
+                    # Important libs
+                    case 3, #include "nlix/libraries/lib-vars" break
+                    case 4, #include "nlix/libraries/lib-event" break
+                    case 5, #include "nlix/libraries/lib-file" break
+                    case 6, #include "nlix/libraries/lib-state" break
                     
-                    # Other libraries
-                    case 16, #include "nlix/libraries/lib-simple-keyboard"          break
+                    # Driver libs
+                    case  7, #include "nlix/libraries/drivers/lib-driver"            break
+                    case  8, #include "nlix/libraries/drivers/lib-driver-terminal"  break
+                    case  9, #include "nlix/libraries/drivers/lib-driver-keyboard"  break
+                    case 10, #include "nlix/libraries/drivers/lib-driver-egp"       break
+                    case 11, #include "nlix/libraries/drivers/lib-driver-cursor"    break
+                    case 12, #include "nlix/libraries/drivers/lib-driver-digi"      break
+                    case 13, #include "nlix/libraries/drivers/lib-driver-gl"        break
                     
-                    # Apps info
-                    case 17, #include "nlix/system/gtable"                 break
-                    case 18, #include "nlix/system/init"                  break
+                    # Other libs
+                    case 14, #include "nlix/libraries/lib-simple-keyboard" break
                     
-                    # Set "loaded" state if all libraries loaded
+                    # Init
+                    case 15, #include "nlix/init/settings" break
+                    case 16, #include "nlix/init/fonts" break
+                    case 17, #include "nlix/init/gtable" break
+                    case 18, #include "nlix/init/autostart" break
+                    
+                    # Move to execution state
                     case 19, KernelState0++, KernelState1 = 0
                 }
                 if (KernelState0 != 0) {
@@ -59,9 +62,9 @@ if (tickClk()) {
                     KernelState1 = 1
                 }
                 
-                #include "nlix/preexec/kernel"
-                #include "nlix/preexec/vars"
-                #include "nlix/preexec/events"
+                #include "nlix/context/program"
+                #include "nlix/context/vars"
+                #include "nlix/context/events"
                 
                 switch (ThisProgramName) {
                     # System daemons

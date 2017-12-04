@@ -31,7 +31,7 @@ switch (stateGet()) {
         varWrite("exitAllTime", systime() + 2)
         local ThisWorkspacePrograms = varTable("apps")
         for (I = 1, ThisWorkspacePrograms:count()) {
-            ThisWorkspacePrograms[I, table]:sendEvent("exit")
+            ThisWorkspacePrograms[I, table]:eventSend("exit")
         }
         stateNext()
         break

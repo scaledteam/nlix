@@ -75,7 +75,7 @@ switch (stateGet()) {
             stateSet(0)
         }
         
-        if (waitEvent("exit")) {
+        if (eventWaitString("exit")) {
             driverPushDevice()
             programKill()
         }

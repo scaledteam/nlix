@@ -39,9 +39,9 @@ switch (stateGet()) {
         local ResolutionY = varVector2("resolution")[2] / 2
         if (Device:isValid()) {
             for (Tick = 1, KERNEL_OVERLOAD) {
-                if (waitAnyEvent()) {
+                if (eventsExists()) {
                     varWrite("idle", 0)
-                    local Command = getEventString()
+                    local Command = eventGetString()
                     
                     switch (Command) {
                         case "glStart",
@@ -63,28 +63,28 @@ switch (stateGet()) {
                             break
                         
                         case "glFillColor",
-                            Screen:egpColor(1, getEventVector())
+                            Screen:egpColor(1, eventGetVector())
                             break
                         
                         case "glColor",
-                            varWrite("color", getEventVector())
+                            varWrite("color", eventGetVector())
                             break
                         
                         case "glPos",
-                            varWrite("pos", getEventVector())
+                            varWrite("pos", eventGetVector())
                             break
                         
                         case "glAng",
-                            varWrite("matrix", matrix(getEventAngle()))
+                            varWrite("matrix", matrix(eventGetAngle()))
                             break
                         
                         case "glTriangle",
                             local Matrix = varMatrix("matrix")
                             local Pos = varVector("pos")
                             
-                            local Pos1 = Matrix * (getEventVector() - Pos)
-                            local Pos2 = Matrix * (getEventVector() - Pos)
-                            local Pos3 = Matrix * (getEventVector() - Pos)
+                            local Pos1 = Matrix * (eventGetVector() - Pos)
+                            local Pos2 = Matrix * (eventGetVector() - Pos)
+                            local Pos3 = Matrix * (eventGetVector() - Pos)
                             
                             local UsedIds = varArray("usedIds")
                             local Id = int(egpMaxObjects() / 10 * (Pos1 + Pos2 + Pos3)[3] / 3) + 1

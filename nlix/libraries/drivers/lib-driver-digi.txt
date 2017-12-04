@@ -11,9 +11,9 @@ function number digiInit() {
 function digiDrawPixel(Pos:vector2, Color:vector) {
     local App = varTable("driver-digi")
     
-    App:sendEvent("drawPixel")
-    App:sendEvent(Pos)
-    App:sendEvent(Color)
+    App:eventSend("drawPixel")
+    App:eventSend(Pos)
+    App:eventSend(Color)
 }
 
 function vector2 digiResolution() {

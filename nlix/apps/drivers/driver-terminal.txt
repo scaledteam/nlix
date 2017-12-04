@@ -61,10 +61,10 @@ switch (stateGet()) {
     case 1,
         local Device = varTable("device")
         if (Device:isValid()) {
-            if (waitAnyEvent()) {
+            if (eventsExists()) {
                 local ScreenType = Device:type()
                 
-                local Command = getEventString()
+                local Command = eventGetString()
                 switch (Command) {
                     case "clear",
                         switch (ScreenType) {
@@ -97,7 +97,7 @@ switch (stateGet()) {
                         break
                     
                     case "print",
-                        local NewPrint = getEventString()
+                        local NewPrint = eventGetString()
                         local ConsoleText = varString("consoleText") + NewPrint
                         varWrite("consoleText", ConsoleText)
                         
@@ -129,7 +129,7 @@ switch (stateGet()) {
                         break
                     
                     case "erase",
-                        local EraseCount = getEventNumber()
+                        local EraseCount = eventGetNumber()
                         varWrite("consoleText", varString("consoleText"):left(varString("consoleText"):length() - EraseCount))
                         
                         switch (ScreenType) {

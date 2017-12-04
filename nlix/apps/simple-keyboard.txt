@@ -21,8 +21,8 @@ switch (stateGet()) {
     
     # Wait event
     case 2,
-        if (waitEvent("get-input")) {
-            local Sender = getEventTable()
+        if (eventWaitString("get-input")) {
+            local Sender = eventGetTable()
             varWrite("input-sender", Sender)
             
             stateNext()
@@ -103,8 +103,8 @@ switch (stateGet()) {
     # Send ready data
     case 4,
         local Sender = varTable("input-sender")
-        Sender:sendEvent("get-input")
-        Sender:sendEvent(varString("KeyboardBuffer"))
+        Sender:eventSend("get-input")
+        Sender:eventSend(varString("KeyboardBuffer"))
         
         varWrite("KeyboardBuffer", "")
         

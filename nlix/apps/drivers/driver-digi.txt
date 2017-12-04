@@ -84,28 +84,28 @@ switch (stateGet()) {
         local Device = varTable("device")
         if (Device:isValid()) {
             for (I = 1, KERNEL_OVERLOAD) {
-                if (waitAnyEvent()) {
+                if (eventsExists()) {
                     varWrite("idle", 0)
-                    local Command = getEventString()
+                    local Command = eventGetString()
                     
                     switch (Command) {
                         case "drawPixel",
                             switch (Device:type()) {
                                 case "gmod_wire_digitalscreen",
-                                    local Pos = getEventVector2()
-                                    local Color = getEventVector()
+                                    local Pos = eventGetVector2()
+                                    local Color = eventGetVector()
                                     Device["port", wirelink][Pos[1] + Pos[2] * varVector2("resolution")[1]] = rgb2digi(Color, 3)
                                     break
                                 
                                 case "gmod_wire_egp",
-                                    local Pos = getEventVector2()
-                                    local Color = getEventVector()
+                                    local Pos = eventGetVector2()
+                                    local Color = eventGetVector()
                                     Device["port", wirelink]:egpColor(Pos[1] + Pos[2] * varVector2("resolution")[1], Color)
                                     break
                                 
                                 case "gmod_wire_consolescreen",
-                                    local Pos = getEventVector2()
-                                    local Color = getEventVector()
+                                    local Pos = eventGetVector2()
+                                    local Color = eventGetVector()
                                     Device["port", wirelink]:writeString(" ", Pos[1], Pos[2], vec(), Color)
                                     break
                             }
