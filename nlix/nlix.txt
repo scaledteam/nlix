@@ -68,73 +68,73 @@ if (tickClk()) {
                 
                 switch (ThisProgramName) {
                     # System daemons
-                    case "hotplugd",            #include "nlix/apps/hotplugd"                   break
+                    case "hotplugd",            #include "nlix/programs/hotplugd"                   break
                     
                     # Drivers.
-                    case "driver-terminal",     #include "nlix/apps/drivers/driver-terminal"    break
-                    case "driver-keyboard",     #include "nlix/apps/drivers/driver-keyboard"    break
-                    case "driver-egp",          #include "nlix/apps/drivers/driver-egp"       break
-                    case "driver-cursor",       #include "nlix/apps/drivers/driver-cursor"      break
-                    case "driver-digi",         #include "nlix/apps/drivers/driver-digi"        break
-                    case "driver-gl",           #include "nlix/apps/drivers/driver-gl"          break
+                    case "driver-terminal",     #include "nlix/programs/drivers/driver-terminal"    break
+                    case "driver-keyboard",     #include "nlix/programs/drivers/driver-keyboard"    break
+                    case "driver-egp",          #include "nlix/programs/drivers/driver-egp"       break
+                    case "driver-cursor",       #include "nlix/programs/drivers/driver-cursor"      break
+                    case "driver-digi",         #include "nlix/programs/drivers/driver-digi"        break
+                    case "driver-gl",           #include "nlix/programs/drivers/driver-gl"          break
                     
                     # Simplifier tools.
-                    case "simple-keyboard",     #include "nlix/apps/simple-keyboard"            break
+                    case "simple-keyboard",     #include "nlix/programs/simple-keyboard"            break
                     
                     # Shells.
-                    case "sh",                  #include "nlix/apps/sh"                         break
-                    case "rund",                #include "nlix/apps/rund"                       break
+                    case "sh",                  #include "nlix/programs/sh"                         break
+                    case "rund",                #include "nlix/programs/rund"                       break
                     
                     # Quit tools.
-                    case "halt",                #include "nlix/apps/halt"                       break
-                    case "reboot",              #include "nlix/apps/reboot"                     break
-                    case "exit",                #include "nlix/apps/exit"                       break
-                    case "login",               #include "nlix/apps/login"                      break
+                    case "halt",                #include "nlix/programs/halt"                       break
+                    case "reboot",              #include "nlix/programs/reboot"                     break
+                    case "exit",                #include "nlix/programs/exit"                       break
+                    case "login",               #include "nlix/programs/login"                      break
                     
                     # Classic console utilites.
-                    case "clear",               #include "nlix/apps/clear"                      break
-                    case "echo",                #include "nlix/apps/echo"                       break
-                    case "test",                #include "nlix/apps/test"                       break
+                    case "clear",               #include "nlix/programs/clear"                      break
+                    case "echo",                #include "nlix/programs/echo"                       break
+                    case "test",                #include "nlix/programs/test"                       break
                     
                     # Math
-                    case "bc",                  #include "nlix/apps/bc"                         break
+                    case "bc",                  #include "nlix/programs/bc"                         break
                     
                     # Server utils
-                    case "server-uptime",       #include "nlix/apps/server-uptime"              break
-                    case "server-players",      #include "nlix/apps/server-players"             break
-                    case "server-hostname",     #include "nlix/apps/server-hostname"            break
+                    case "server-uptime",       #include "nlix/programs/server-uptime"              break
+                    case "server-players",      #include "nlix/programs/server-players"             break
+                    case "server-hostname",     #include "nlix/programs/server-hostname"            break
                     
                     # Apps control.
-                    case "pkill",               #include "nlix/apps/pkill"                      break
-                    case "kill",                #include "nlix/apps/kill"                       break
-                    case "plist",               #include "nlix/apps/plist"                      break
+                    case "pkill",               #include "nlix/programs/pkill"                      break
+                    case "kill",                #include "nlix/programs/kill"                       break
+                    case "plist",               #include "nlix/programs/plist"                      break
                     
                     # Performande control and tests.
-                    case "perf",                #include "nlix/apps/perf"                       break
-                    case "ops",                 #include "nlix/apps/ops"                        break
-                    case "print-pi",            #include "nlix/apps/print-pi"                   break
-                    case "uptime",              #include "nlix/apps/uptime"                     break
+                    case "perf",                #include "nlix/programs/perf"                       break
+                    case "ops",                 #include "nlix/programs/ops"                        break
+                    case "print-pi",            #include "nlix/programs/print-pi"                   break
+                    case "uptime",              #include "nlix/programs/uptime"                     break
                     
                     # Egp tests.
-                    case "egp-clocks",          #include "nlix/apps/egp-clocks"                 break
-                    case "egp-eyes",            #include "nlix/apps/egp-eyes"                   break
+                    case "egp-clocks",          #include "nlix/programs/egp-clocks"                 break
+                    case "egp-eyes",            #include "nlix/programs/egp-eyes"                   break
                     
                     # Window manager
-                    case "egp-wm",              #include "nlix/apps/egp-wm"                     break
-                    case "egp-wm-shell",        #include "nlix/apps/egp-wm-shell"               break
+                    case "egp-wm",              #include "nlix/programs/egp-wm"                     break
+                    case "egp-wm-shell",        #include "nlix/programs/egp-wm-shell"               break
                     
                     # Workspace management
-                    #case "workspaces-manager",  #include "nlix/apps/workspaces-manager"         break
+                    #case "workspaces-manager",  #include "nlix/programs/workspaces-manager"         break
                     
                     # Digital screen
-                    case "digi-scanner",        #include "nlix/apps/digi-scanner"               break
+                    case "digi-scanner",        #include "nlix/programs/digi-scanner"               break
                     
                     # Egp 3d
-                    case "wustdd",              #include "nlix/apps/wustdd"                     break
+                    case "wustdd",              #include "nlix/programs/wustdd"                     break
                     
                     # Files
-                    case "ls",                  #include "nlix/apps/ls"                         break
-                    case "cat",                 #include "nlix/apps/cat"                        break
+                    case "ls",                  #include "nlix/programs/ls"                         break
+                    case "cat",                 #include "nlix/programs/cat"                        break
                     
                     default,
                         ThisProgram:programKill()
