@@ -4,24 +4,15 @@
 
 @name driver-cursor
 
-switch (ThisAppState) {
-    # Initialize
+switch (stateGet()) {
     case 0,
-        local Device = findDeviceByType("egp-cursor")
-        
-        if (Device != NULL) {
-            Device["busy", number] = 1
+        if (egpInit()) {
+            local Device = varTable("driver-egp"):driverGetDevice()
             varWrite("device", Device)
-            varWrite("need-to-find-user", 1)
-            appNextState()
-        }
-        else {
-            local Device = findDeviceByType("virtual-cursor")
             
-            if (Device != NULL) {
-                Device["busy", number] = 1
-                varWrite("device", Device)
-                appNextState()
+            if (Device:type() == "gmod_wire_egp") {
+                varWrite("need-to-find-user", 1)
+                stateNext()
             }
         }
         break
@@ -34,22 +25,22 @@ switch (ThisAppState) {
         #endif
         
         if (varNumber("need-to-find-user")) {
-            appNextState()
+            stateNext()
         }
         else {
-            appSetState(3)
+            stateSet(3)
         }
         break
     
     case 2,
         if (varNumber("need-to-find-user")) {
             #ifdef findInSphere(vector,number)
-                local ScanPos = appT("device")["port", wirelink]:entity():pos()
+                local ScanPos = varTable("device")["port", wirelink]:entity():pos()
                 findInSphere(ScanPos, 100)
                 findSortByDistance(ScanPos)
                 varWrite("user", find())
             #else
-                local ScanPos = appT("device")["port", wirelink]:entity():pos()
+                local ScanPos = varTable("device")["port", wirelink]:entity():pos()
                 local Player_Distance = 100
                 foreach(I, Player:entity = players()){
                     local Distance = ScanPos:distance(Player:pos())
@@ -61,15 +52,14 @@ switch (ThisAppState) {
             #endif
         }
         
-        appNextState()
+        stateNext()
         break
     
     case 3,
         local Device = varTable("device")
         
-        local DeviceType = Device[TYPE, string]
-        switch (DeviceType) {
-            case "egp-cursor",
+        switch (Device:type()) {
+            case "gmod_wire_egp",
                 varWrite("pos", Device["port", wirelink]:egpCursor(varEntity("user")))
                 varWrite("use", varEntity("user"):keyUse())
                 break
@@ -80,12 +70,12 @@ switch (ThisAppState) {
                 break
         }
         if (varNumber("need-to-find-user")) {
-            appSetState(2)
+            stateSet(2)
         }
         
         if (waitEvent("exit")) {
-            Device["busy", number] = 0
-            appClose()
+            driverPushDevice()
+            programKill()
         }
         break
 }

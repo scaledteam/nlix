@@ -4,12 +4,12 @@
 
 @name kill
 
-local App = Apps[appS("args"):toNumber(), table]
-if (App != NULL) {
-    terminalPrintFast("Try kill \"" + App["name", string] + "\".\n")
-    App:appClose()
+local Program = Programs[varArray("args")[1, string]:toNumber(), table]
+if (Program != NULL) {
+    terminalPrintFast("Try kill \"" + Program["name", string] + "\".\n")
+    Program:programKill()
 }
 else {
-    terminalPrintFast("App don't launched!.\n")
+    terminalPrintFast("Program don't launched!.\n")
 }
-appCloseSelf()
+programKill()

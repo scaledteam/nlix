@@ -4,29 +4,8 @@
 
 @name lib-driver-gl
 
-function number initGl() {
-    if (varExists("driver-gl")) {
-        local App = varTable("driver-gl")
-        if (App:varNumber("ready")) {
-            return 0
-        }
-    }
-    else {
-        local App = findAppByName("driver-gl")
-        if (App == NULL) {
-            return 0
-        }
-        else {
-            varWrite("driver-gl", App)
-            if (App:varNumber("ready")) {
-                return 1
-            }
-            else {
-                return 0
-            }
-        }
-    }
-    
+function number glInit() {
+    return driverInit("driver-gl")
 }
 
 function glTriangle(Pos1:vector, Pos2:vector, Pos3:vector) {

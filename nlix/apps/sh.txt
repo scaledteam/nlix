@@ -4,63 +4,84 @@
 
 @name sh
 
-switch (ThisAppState) {
+switch (stateGet()) {
     case 0,
-        if (initTerminal()) {
-            terminalPrint("Welcome to the Nlix operation system!\n")
-            appNextState()
+        if (terminalInit()) {
+            terminalPrint("Welcome to the Nlix operating system!\n")
+            stateNext()
         }
         break
     
     case 1,
-        if (initKeyboard()) {
-            appNextState()
+        if (keyboardInit()) {
+            stateNext()
         }
         break
     
     case 2,
-        if (initSimpleKeyboard()) {
-            appNextState()
+        if (simpleKeyboardInit()) {
+            stateNext()
         }
         break
     
     case 3,
-        terminalPrint(ThisAppUser + " $ ")
-        requestKeyboardInput()
+        terminalPrint(ThisProgram["user", string] + " $ ")
+        simpleKeyboardRequestInput()
         
-        appNextState()
+        stateNext()
         break
     
     case 4,
-        if (waitKeyboardInput()) {
-            local Command = getKeyboardInput()
+        if (simpleKeyboardWaitInput()) {
+            local Command = simpleKeyboardGetInput()
             if (Command == "") {
-                appSetState(3)
+                stateSet(3)
             }
             else {
-                local App = command(Command)
+                local Program = NULL
+                Command = Command:trim()
                 
-                if (App != NULL) {
-                    varWrite("LaunchedApp", App)
-                    appNextState()
+                local CommandExplode = Command:explode(" ")
+                
+                local I = 1
+                while (I < CommandExplode:count()) {
+                    if (CommandExplode[I, string] == "") {
+                        CommandExplode:remove(I)
+                    }
+                    else {
+                        I++
+                    }
                 }
-                else {
-                    terminalPrint("Error! App \"" + Command + "\" not found.\n")
-                    appSetState(3)
+                
+                local ProgramName = CommandExplode:shiftString()
+                local Program = programStart(ProgramName)
+                if (CommandExplode:count() > 0) {
+                    Program["vars", table] = table()
+                    Program:varWrite("args", CommandExplode)
                 }
+                
+                varWrite("LaunchedApp", Program)
+                stateNext()
             }
         }
         
         break
     
     case 5,
-        if (!varTable("LaunchedApp"):appIsLaunched()) {
-            appSetState(3)
+        if (!varTable("LaunchedApp"):isValid()) {
+            stateSet(3)
         }
         
         local KeyboardKeys = keyboardGetKeys()
-        if (KeyboardKeys[2, number] == 158 & KeyboardKeys[3, number] == 99) {
-            varTable("LaunchedApp"):appClose()
+        if (changed(KeyboardKeys:count())) {
+            if (KeyboardKeys[1, number] == 158) {
+                if (KeyboardKeys[2, number] == 99) {
+                    varTable("LaunchedApp"):sendEvent("exit")
+                }
+                if (KeyboardKeys[2, number] == 122) {
+                    varTable("LaunchedApp"):programKill()
+                }
+            }
         }
         break
 }

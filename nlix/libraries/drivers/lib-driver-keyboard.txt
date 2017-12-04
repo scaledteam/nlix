@@ -4,15 +4,16 @@
 
 @name lib-driver-keyboard
 
-function number initKeyboard() {
-    local App = findAppByName("driver-keyboard")
-    if (App != NULL) {
-        varWrite("driver-keyboard", App)
-        return 1
-    }
-    else {
-        return 0
-    }
+function table createVirtualKeyboard() {
+    local Device = object("virtual-keyboard")
+    
+    Device["keys", array] = array()
+    
+    return Device
+}
+
+function number keyboardInit() {
+    return driverInit("driver-keyboard")
 }
 
 function array keyboardGetKeys() {

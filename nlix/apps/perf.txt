@@ -4,11 +4,11 @@
 
 @name perf
 
-local ArgNumber = appS("args"):toNumber()
+local ArgNumber = varArray("args")[1, string]:toNumber()
 if (ArgNumber != 0) {
-    SysPerf = ArgNumber
+    KERNEL_PERF = ArgNumber
 }
 else {
     terminalPrintFast("Entered value is not a number or 0.\n")
 }
-appCloseSelf()
+programKill()

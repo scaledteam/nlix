@@ -4,57 +4,80 @@
 
 @name driver-keyboard
 
-switch (ThisAppState) {
+switch (stateGet()) {
     # Initialize
     case 0,
         # Init first keyboard
-        local Device = findDeviceByType("keyboard")
-        
-        if (Device != NULL) {
-            Device["busy", number] = 1
-            varWrite("device", Device)
-            varWrite("keys", array())
-            appNextState()
+        if (driverPopDevice("gmod_wire_keyboard")) {
+            stateNext()
         }
-        else {
-            local Device = findDeviceByType("virtual-keyboard")
-            
-            if (Device != NULL) {
-                Device["busy", number] = 1
-                varWrite("device", Device)
-                varWrite("keys", array())
-                appNextState()
-            }
+        elseif (driverPopDevice("virtual-keyboard")) {
+            stateNext()
+        }
+        elseif (driverPopDevice("gmod_wire_textentry")) {
+            varWrite("inputString", "")
+            stateNext()
         }
         
         break
     
-    # Track keys
     case 1,
+        varWrite("keys", array())
+        
+        stateNext()
+        break
+    
+    # Track keys
+    case 2,
         local Device = varTable("device")
         if (Device:isValid()) {
-            DeviceType = Device[TYPE, string]
+            DeviceType = Device:type()
             
             switch (DeviceType) {
-                case "keyboard",
+                case "gmod_wire_keyboard",
                     local Keys = varArray("keys")
-                    for (I = 1, 5) {
-                        Keys[I, number] = Device["port", wirelink][I - 1]
+                    local Count = Device["port", wirelink][0]
+                    for (I = 1, Count) {
+                        Keys[I, number] = Device["port", wirelink][I]
+                    }
+                    Count++
+                    for (I = Count, Keys:count()) {
+                        Keys:remove(Count)
                     }
                     break
                 
                 case "virtual-keyboard",
                     varWrite("keys", Device["keys", array])
                     break
+                
+                case "gmod_wire_textentry",
+                    local Keys = varArray("keys")
+                    local InputString = Device["port", wirelink]["Text", string]
+                    
+                    if (InputString != varString("inputString")) {
+                        varWrite("inputString", InputString)
+                        if (InputString != "") {
+                            InputString += "\n"
+                            local Length = InputString:length()
+                            
+                            for (I = 1, Length) {
+                                Keys[I, number] = toUnicodeByte(InputString[I])
+                            }
+                        }
+                    }
+                    else {
+                        Keys:clear()
+                    }
+                    break
             }
         }
         else {
-            appSetState(0)
+            stateSet(0)
         }
         
         if (waitEvent("exit")) {
-            Device["busy", number] = 0
-            appClose()
+            driverPushDevice()
+            programKill()
         }
         break
 }

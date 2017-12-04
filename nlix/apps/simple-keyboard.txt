@@ -4,18 +4,18 @@
 
 @name simple-keyboard
 
-switch (ThisAppState) {
+switch (stateGet()) {
     case 0,
-        if (initTerminal()) {
-            appNextState()
+        if (terminalInit()) {
+            stateNext()
         }
         break
     
     case 1,
-        if (initKeyboard()) {
+        if (keyboardInit()) {
             varWrite("keyboardOld", array())
             
-            appNextState()
+            stateNext()
         }
         break
     
@@ -25,54 +25,79 @@ switch (ThisAppState) {
             local Sender = getEventTable()
             varWrite("input-sender", Sender)
             
-            appNextState()
+            stateNext()
         }
         break
     
     # Track keyboard
     case 3,
         local Keys = keyboardGetKeys()
-        local KeyboardOldKeys = varArray("keyboardOld")
-        if (Keys[1, number] >= KeyboardOldKeys[1, number]) {
-            for (I = 2, 5) {
-                if ((Keys[I, number] != KeyboardOldKeys[I, number]) & Keys[I, number] ) {
-                    local Key = Keys[I, number]
-                    #print(Key)
-                    
-                    # Enter
-                    if (Key == 10 | Key == 142) {
-                        terminalPrint("\n")
-                        appNextState()
-                    }
-                    # Backspace
-                    elseif (Key == 127) {
-                        if (appN("KeyboardBufferCount") > 0) {
-                            appS("KeyboardBuffer", appS("KeyboardBuffer"):left(appN("KeyboardBufferCount") - 1))
-                            appN("KeyboardBufferCount", appN("KeyboardBufferCount") - 1)
+        local KeysOld = varArray("keyboardOld")
+        
+        local KeysCount = Keys:count()
+        local KeysOldCount = KeysOld:count()
+        
+        if (KeysCount >= KeysOldCount) {
+            for (I = 1, KeysCount) {
+                local Key = Keys[I, number]
+                if (Keys:exists(I)) {
+                    if (Key != KeysOld[I, number]) {
+                        switch (Key) {
+                            # Enter
+                            case 10, case 142,
+                                terminalPrint("\n")
+                                stateNext()
+                                break
                             
-                            terminalErase(1)
+                            # Backspace
+                            case 127,
+                                local KeyboardBuffer = varString("KeyboardBuffer")
+                                if (KeyboardBuffer != "") {
+                                    varWrite("KeyboardBuffer", KeyboardBuffer:left(KeyboardBuffer:length() - 1))
+                                    
+                                    terminalErase(1)
+                                }
+                                break
+                            
+                            # Shift key
+                            case 154, case 155,
+                                break
+                            
+                            # Control key
+                            case 158,
+                                break
+                            
+                            # Normal key
+                            default,
+                                if (inrange(Key, 32, 127)) {
+                                    local Char = toChar(Key)
+                                    
+                                    varWrite("KeyboardBuffer", varString("KeyboardBuffer") + Char)
+                                    
+                                    terminalPrint(Char)
+                                }
                         }
                     }
-                    # Shift key
-                    elseif (Key == 154 | Key == 155) {}
-                    # Control key
-                    elseif (Key == 158) {}
-                    # Normal key
-                    else {
-                        local Char = toUnicodeChar(Key)
-                        
-                        appS("KeyboardBuffer", appS("KeyboardBuffer") + Char)
-                        appN("KeyboardBufferCount", appN("KeyboardBufferCount") + 1)
-                        
-                        terminalPrint(Char)
+                    KeysOld[I, number] = Key
+                }
+                else {
+                    for (J = I, KeysCount) {
+                        KeysOld:remove(I)
                     }
+                    break
                 }
             }
         }
-        
-        for (I = 1, 5) {
-            KeyboardOldKeys[I, number] = Keys[I, number]
+        else {
+            for (I = 1, KeysCount) {
+                KeysOld[I, number] = Keys[I, number]
+            }
+            KeysCount++
+            for (I = KeysCount, KeysOldCount) {
+                KeysOld:remove(KeysCount)
+            }
         }
+        
         break
     
     # Send ready data
@@ -82,8 +107,7 @@ switch (ThisAppState) {
         Sender:sendEvent(varString("KeyboardBuffer"))
         
         varWrite("KeyboardBuffer", "")
-        varWrite("KeyboardBufferCount", 0)
         
-        appSetState(2)
+        stateSet(2)
         break
 }

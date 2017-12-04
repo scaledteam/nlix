@@ -3,16 +3,12 @@
 #
 
 @name first
+@persist KERNEL_TIME_START
 
-@persist Loaded LoadState
-@persist SysPerf
-
-@persist ROOT_USER:string
-@persist TYPE:string
-@persist NULL:table NULL_ARRAY:array
+@inputs [Port1 Port2 Port3 Port4]:wirelink
+@persist PORTS_COUNT
+PORTS_COUNT = 4
 
 runOnTick(1)
-SysPerf = 20
-
-ROOT_USER = "root"
-TYPE = "$type"
+KERNEL_PERF = 20
+KERNEL_TIME_START = systime()

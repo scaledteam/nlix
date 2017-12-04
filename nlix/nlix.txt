@@ -4,130 +4,143 @@
 
 @name nlix
 
+@persist KERNEL_PERF KERNEL_OVERLOAD 
+@persist KernelState0 KernelState1
+@persist Programs:table
+
 if (first()) {
     #include "nlix/system/first"
 }
 
-elseif (!Loaded) {
-    if (tickClk()) {
-        while (perf(SysPerf)) {
-            LoadState++
-            switch (LoadState) {
-                # System libraries
-                case 1, #include "nlix/libraries/lib-workspaces"    break
-                case 2, #include "nlix/libraries/lib-vars"          break
-                case 3, #include "nlix/libraries/lib-vars-2"        break
-                case 4, #include "nlix/libraries/lib-app"           break
-                case 5, #include "nlix/libraries/lib-table-shift"   break
-                case 6, #include "nlix/libraries/lib-event"         break
-                case 7, #include "nlix/libraries/lib-file"          break
-                case 8, #include "nlix/system/settings"             break
-                case 9, #include "nlix/system/init-script"          break
-                
-                # Drivers libraries
-                case 10, #include "nlix/libraries/drivers/lib-driver-terminal"  break
-                case 11, #include "nlix/libraries/drivers/lib-driver-keyboard"  break
-                case 12, #include "nlix/libraries/drivers/lib-driver-egp"       break
-                case 13, #include "nlix/libraries/drivers/lib-driver-cursor"    break
-                case 14, #include "nlix/libraries/drivers/lib-driver-digi"      break
-                case 15, #include "nlix/libraries/drivers/lib-driver-gl"        break
-                
-                # Other libraries
-                case 16, #include "nlix/libraries/lib-simple-keyboard"          break
-                case 17, #include "nlix/libraries/lib-virtual-workspace"        break
-                
-                # Apps info
-                case 18, #include "nlix/system/apps-info" break
-                
-                # Set "loaded" state if all libraries loaded
-                default,
-                    Loaded = 1
+if (tickClk()) {
+    switch (KernelState0) {
+        case 0,
+            while (perf(KERNEL_PERF)) {
+                KernelState1++
+                switch (KernelState1) {
+                    # System libraries
+                    case 1, #include "nlix/system/settings"             break
+                    case 2, #include "nlix/libraries/lib-kernel"       break
+                    case 3, #include "nlix/libraries/lib-vars"        break
+                    case 4, #include "nlix/libraries/lib-program"           break
+                    case 5, #include "nlix/libraries/lib-event"         break
+                    case 6, #include "nlix/libraries/lib-file"          break
+                    case 7, #include "nlix/libraries/lib-state"         break
+                    case 8, #include "nlix/libraries/lib-driver"         break
+                    
+                    # Drivers libraries
+                    case 10, #include "nlix/libraries/drivers/lib-driver-terminal"   break
+                    case 11, #include "nlix/libraries/drivers/lib-driver-keyboard"  break
+                    case 12, #include "nlix/libraries/drivers/lib-driver-egp"       break
+                    case 13, #include "nlix/libraries/drivers/lib-driver-cursor"    break
+                    case 14, #include "nlix/libraries/drivers/lib-driver-digi"      break
+                    case 15, #include "nlix/libraries/drivers/lib-driver-gl"        break
+                    
+                    # Other libraries
+                    case 16, #include "nlix/libraries/lib-simple-keyboard"          break
+                    
+                    # Apps info
+                    case 17, #include "nlix/system/gtable"                 break
+                    case 18, #include "nlix/system/init"                  break
+                    
+                    # Set "loaded" state if all libraries loaded
+                    case 19, KernelState0++, KernelState1 = 0
+                }
+                if (KernelState0 != 0) {
                     break
+                }
             }
-        }
-    }
-}
-else {
-    if (tickClk()) {
-        while (perf(SysPerf)) {
-            appManager()
-            
-            switch (ThisAppName) {
-                # Drivers.
-                case "driver-terminal",     #include "nlix/apps/drivers/driver-terminal"    break
-                case "driver-keyboard",     #include "nlix/apps/drivers/driver-keyboard"    break
-                case "driver-egp",          #include "nlix/apps/drivers/driver-egp"         break
-                case "driver-cursor",       #include "nlix/apps/drivers/driver-cursor"      break
-                case "driver-digi",         #include "nlix/apps/drivers/driver-digi"        break
-                case "driver-gl",           #include "nlix/apps/drivers/driver-gl"          break
+            break
+        
+        case 1,
+            while (perf(KERNEL_PERF)) {
+                KernelState1++
+                if (KernelState1 > Programs:count()) {
+                    KernelState1 = 1
+                }
                 
-                # System daemons
-                case "hotplugd",            #include "nlix/apps/hotplugd"                   break
+                #include "nlix/preexec/kernel"
+                #include "nlix/preexec/vars"
+                #include "nlix/preexec/events"
                 
-                # Simplifier tools.
-                case "simple-keyboard",     #include "nlix/apps/simple-keyboard"            break
-                
-                # Shells.
-                case "sh",                  #include "nlix/apps/sh"                         break
-                case "run-daemon",          #include "nlix/apps/run-daemon"                 break
-                
-                # Quit tools.
-                case "halt",                #include "nlix/apps/halt"                       break
-                case "reboot",              #include "nlix/apps/reboot"                     break
-                case "exit",                #include "nlix/apps/exit"                       break
-                case "login",               #include "nlix/apps/login"                      break
-                
-                # Classic console utilites.
-                case "clear",               #include "nlix/apps/clear"                      break
-                case "echo",                #include "nlix/apps/echo"                       break
-                case "test",                #include "nlix/apps/test"                       break
-                case "dmesg",               #include "nlix/apps/dmesg"                      break
-                
-                # Math
-                case "bc",                  #include "nlix/apps/bc"                         break
-                
-                # Server utils
-                case "server-uptime",       #include "nlix/apps/server-uptime"              break
-                case "server-players",      #include "nlix/apps/server-players"             break
-                case "server-hostname",     #include "nlix/apps/server-hostname"            break
-                
-                # Apps control.
-                case "pkill",               #include "nlix/apps/pkill"                      break
-                case "kill",                #include "nlix/apps/kill"                       break
-                case "plist",               #include "nlix/apps/plist"                      break
-                case "applist",             #include "nlix/apps/applist"                    break
-                
-                # Performande control and tests.
-                case "perf",                #include "nlix/apps/perf"                       break
-                case "ops",                 #include "nlix/apps/ops"                        break
-                case "print-pi",            #include "nlix/apps/print-pi"                   break
-                case "uptime",              #include "nlix/apps/uptime"                     break
-                
-                # Virtual workspace managers
-                case "virtual-workspace",   #include "nlix/apps/virtual-workspace"          break
-                case "egp-terminal",        #include "nlix/apps/egp-terminal"               break
-                
-                # Egp tests.
-                case "egp-clocks",          #include "nlix/apps/egp-clocks"                 break
-                case "egp-eyes",            #include "nlix/apps/egp-eyes"                   break
-                
-                # Window manager
-                case "egp-wm",              #include "nlix/apps/egp-wm"                     break
-                case "egp-wm-shell",        #include "nlix/apps/egp-wm-shell"               break
-                
-                # Workspace management
-                case "workspaces-manager",  #include "nlix/apps/workspaces-manager"         break
-                
-                # Digital screen
-                case "digi-scanner",        #include "nlix/apps/digi-scanner"               break
-                
-                # Egp 3d
-                case "wustdd",              #include "nlix/apps/wustdd"                     break
-                
-                default,
-                    ThisApp:appClose()
-                    break
+                switch (ThisProgramName) {
+                    # System daemons
+                    case "hotplugd",            #include "nlix/apps/hotplugd"                   break
+                    
+                    # Drivers.
+                    case "driver-terminal",     #include "nlix/apps/drivers/driver-terminal"    break
+                    case "driver-keyboard",     #include "nlix/apps/drivers/driver-keyboard"    break
+                    case "driver-egp",          #include "nlix/apps/drivers/driver-egp"       break
+                    case "driver-cursor",       #include "nlix/apps/drivers/driver-cursor"      break
+                    case "driver-digi",         #include "nlix/apps/drivers/driver-digi"        break
+                    case "driver-gl",           #include "nlix/apps/drivers/driver-gl"          break
+                    
+                    # Simplifier tools.
+                    case "simple-keyboard",     #include "nlix/apps/simple-keyboard"            break
+                    
+                    # Shells.
+                    case "sh",                  #include "nlix/apps/sh"                         break
+                    case "rund",                #include "nlix/apps/rund"                       break
+                    
+                    # Quit tools.
+                    case "halt",                #include "nlix/apps/halt"                       break
+                    case "reboot",              #include "nlix/apps/reboot"                     break
+                    case "exit",                #include "nlix/apps/exit"                       break
+                    case "login",               #include "nlix/apps/login"                      break
+                    
+                    # Classic console utilites.
+                    case "clear",               #include "nlix/apps/clear"                      break
+                    case "echo",                #include "nlix/apps/echo"                       break
+                    case "test",                #include "nlix/apps/test"                       break
+                    
+                    # Math
+                    case "bc",                  #include "nlix/apps/bc"                         break
+                    
+                    # Server utils
+                    case "server-uptime",       #include "nlix/apps/server-uptime"              break
+                    case "server-players",      #include "nlix/apps/server-players"             break
+                    case "server-hostname",     #include "nlix/apps/server-hostname"            break
+                    
+                    # Apps control.
+                    case "pkill",               #include "nlix/apps/pkill"                      break
+                    case "kill",                #include "nlix/apps/kill"                       break
+                    case "plist",               #include "nlix/apps/plist"                      break
+                    
+                    # Performande control and tests.
+                    case "perf",                #include "nlix/apps/perf"                       break
+                    case "ops",                 #include "nlix/apps/ops"                        break
+                    case "print-pi",            #include "nlix/apps/print-pi"                   break
+                    case "uptime",              #include "nlix/apps/uptime"                     break
+                    
+                    # Egp tests.
+                    case "egp-clocks",          #include "nlix/apps/egp-clocks"                 break
+                    case "egp-eyes",            #include "nlix/apps/egp-eyes"                   break
+                    
+                    # Window manager
+                    case "egp-wm",              #include "nlix/apps/egp-wm"                     break
+                    case "egp-wm-shell",        #include "nlix/apps/egp-wm-shell"               break
+                    
+                    # Workspace management
+                    #case "workspaces-manager",  #include "nlix/apps/workspaces-manager"         break
+                    
+                    # Digital screen
+                    case "digi-scanner",        #include "nlix/apps/digi-scanner"               break
+                    
+                    # Egp 3d
+                    case "wustdd",              #include "nlix/apps/wustdd"                     break
+                    
+                    # Files
+                    case "ls",                  #include "nlix/apps/ls"                         break
+                    case "cat",                 #include "nlix/apps/cat"                        break
+                    
+                    default,
+                        ThisProgram:programKill()
+                }
             }
-        }
+            break
+        
+        default,
+            KernelState0 = 0
+            KernelState1 = 0
     }
 }

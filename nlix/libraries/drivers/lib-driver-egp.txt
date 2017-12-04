@@ -4,11 +4,30 @@
 
 @name lib-driver-egp
 
-function number initEgp() {
+@persist LIB_DRIVER_EGP_COLOR_WHITE:vector4
+
+LIB_DRIVER_EGP_COLOR_WHITE = vec4(255)
+
+function table createVirtualEgpScreen(Resolution:vector2, MaxObjects) {
+    local Device = object("virtual-egp-screen")
+    Device["idle", number] = 1
     
-    if (varExists("driver-egp")) {
+    Device["resolution", vector2] = Resolution
+    Device["max-objects", number] = MaxObjects
+    
+    Device["output-queue", array] = array()
+    Device["input-queue", array] = array()
+    
+    return Device
+}
+
+function number egpInit() {
+    #[if (varExists("driver-egp")) {
         local App = varTable("driver-egp")
         if (App:varNumber("ready")) {
+            return 1
+        }
+        else {
             return 0
         }
     }
@@ -26,14 +45,23 @@ function number initEgp() {
                 return 0
             }
         }
-    }
-    
+    }]#
+    return driverInit("driver-egp")
 }
 
 function egpBox(Id, Pos:vector2, Size:vector2) {
     local App = varTable("driver-egp")
     
     App:sendEvent("egpBox")
+    App:sendEvent(Id)
+    App:sendEvent(Pos)
+    App:sendEvent(Size)
+}
+
+function egpBoxOutline(Id, Pos:vector2, Size:vector2) {
+    local App = varTable("driver-egp")
+    
+    App:sendEvent("egpBoxOutline")
     App:sendEvent(Id)
     App:sendEvent(Pos)
     App:sendEvent(Size)
@@ -74,10 +102,34 @@ function egpColor(Id, Color:vector) {
     App:sendEvent(Color)
 }
 
-function egpSize(Id, Size) {
+function egpColor4(Id, Color:vector4) {
+    local App = varTable("driver-egp")
+    
+    App:sendEvent("egpColor4")
+    App:sendEvent(Id)
+    App:sendEvent(Color)
+}
+
+function egpAlpha(Id, Alpha) {
+    local App = varTable("driver-egp")
+    
+    App:sendEvent("egpAlpha")
+    App:sendEvent(Id)
+    App:sendEvent(Alpha)
+}
+
+function egpSize(Id, Size:vector2) {
     local App = varTable("driver-egp")
     
     App:sendEvent("egpSize")
+    App:sendEvent(Id)
+    App:sendEvent(Size)
+}
+
+function egpSizeNumber(Id, Size) {
+    local App = varTable("driver-egp")
+    
+    App:sendEvent("egpSizeNumber")
     App:sendEvent(Id)
     App:sendEvent(Size)
 }
@@ -140,6 +192,15 @@ function egpCircleOutline(Id, Pos:vector2, Size:vector2) {
     App:sendEvent(Size)
 }
 
+function egpLine(Id, Pos1:vector2, Pos2:vector2) {
+    local App = varTable("driver-egp")
+    
+    App:sendEvent("egpLine")
+    App:sendEvent(Id)
+    App:sendEvent(Pos1)
+    App:sendEvent(Pos2)
+}
+
 function egpPos(Id, Pos:vector2) {
     local App = varTable("driver-egp")
     
@@ -163,6 +224,21 @@ function egpCopy(Id, Id2) {
     App:sendEvent(Id2)
 }
 
+function egpMove(Id, Id2) {
+    local App = varTable("driver-egp")
+    
+    App:sendEvent("egpMove")
+    App:sendEvent(Id)
+    App:sendEvent(Id2)
+}
+
+function egpDrawTopLeft(Enable) {
+    local App = varTable("driver-egp")
+    
+    App:sendEvent("egpDrawTopLeft")
+    App:sendEvent(Enable)
+}
+
 function vector2 egpResolution() {
     return varTable("driver-egp"):varVector2("resolution")
 }
@@ -176,5 +252,29 @@ function number egpMaxObjects2() {
 }
 
 function number egpParent(Id) {
-    return varTable("driver-egp"):varArray("egpParents")[Id, number]
+    return varTable("driver-egp"):varTable("egpObjects")[Id, table]["parent", number]
+}
+
+function vector egpColor(Id) {
+    return vec(varTable("driver-egp"):varTable("egpObjects")[Id, table]["color", vector4])
+}
+
+function vector4 egpColor4(Id) {
+    return varTable("driver-egp"):varTable("egpObjects")[Id, table]["color", vector4]
+}
+
+function number egpHasObject(Id) {
+    return varTable("driver-egp"):varTable("egpObjects")[Id, table]["exists", number]
+}
+
+function vector2 egpPos(Id) {
+    return varTable("driver-egp"):varTable("egpObjects")[Id, table]["pos", vector2]
+}
+
+function vector2 egpSize(Id) {
+    return varTable("driver-egp"):varTable("egpObjects")[Id, table]["size", vector2]
+}
+
+function string egpType(Id) {
+    return varTable("driver-egp"):varTable("egpObjects")[Id, table]:type()
 }

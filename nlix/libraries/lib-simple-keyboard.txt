@@ -4,28 +4,21 @@
 
 @name lib-simple-keyboard
 
-function number initSimpleKeyboard() {
-    local App = findAppByName("simple-keyboard")
-    if (App != NULL) {
-        varWrite("simple-keyboard", App)
-        return 1
-    }
-    else {
-        return 0
-    }
+function number simpleKeyboardInit() {
+    return driverInit("simple-keyboard")
 }
 
-function requestKeyboardInput() {
+function simpleKeyboardRequestInput() {
     local App = varTable("simple-keyboard")
     
     App:sendEvent("get-input")
-    App:sendEvent(ThisApp)
+    App:sendEvent(ThisProgram)
 }
 
-function number waitKeyboardInput() {
+function number simpleKeyboardWaitInput() {
     return waitEvent("get-input")
 }
 
-function string getKeyboardInput() {
+function string simpleKeyboardGetInput() {
     return getEventString()
 }

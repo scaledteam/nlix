@@ -4,343 +4,778 @@
 
 @name driver-egp
 
-switch (ThisAppState) {
+switch (stateGet()) {
     # Initialize
     case 0,
-        local Device = findDeviceByType("egp-screen")
-        
-        if (Device != NULL) {
-            Device["busy", number] = 1
-            
-            local Screen = Device["port", wirelink]
+        if (driverPopDevice("gmod_wire_egp")) {
+            local Screen = varTable("device")["port", wirelink]
             Screen:egpClear()
             Screen:egpDrawTopLeft(1)
             
             Screen:egpBox(1, vec2(), vec2())
-            varWrite("resolution", Device["resolution", vector2])
-            varWrite("egpMaxObjects", Device["max-objects", number] - 1)
+            varWrite("counter", 1)
+            varWrite("resolution", vec2(512))
+            varWrite("egpMaxObjects", egpMaxObjects() - 1)
             
-            varWrite("device", Device)
-            appNextState()
-        }
-        else {
-            local Device = findDeviceByType("virtual-egp-screen")
-            
-            if (Device != NULL) {
-                Device["busy", number] = 1
-                
-                varWrite("resolution", Device["resolution", vector2])
-                varWrite("egpMaxObjects", Device["max-objects", number])
-                
-                varWrite("device", Device)
-                appNextState()
+            if (!varTable("egpObjects"):exists(1)) {
+                varWrite("egpObjects", table())
             }
+            stateNext()
+        }
+        elseif (driverPopDevice("virtual-egp-screen")) {
+            varWrite("resolution", Device["resolution", vector2])
+            varWrite("egpMaxObjects", Device["max-objects", number])
+            
+            varWrite("egpObjects", table())
+            stateNext()
         }
         break
     
     case 1,
-        varWrite("egpParents", array())
-        
+        local Device = varTable("device")
+        local EgpObjects = varTable("egpObjects")
+        local EgpMaxObjects = varNumber("egpMaxObjects")
+        for (I = 1, KERNEL_OVERLOAD) {
+            local Counter = varNumber("counter")
+            if (Counter <= EgpMaxObjects) {
+                if (!EgpObjects:exists(Counter)) {
+                    if (Device:type() == "gmod_wire_egp") {
+                        local Port = Device["port", wirelink]
+                        Port:egpBox(Counter + 1, vec2(), vec2())
+                        Port:egpParent(Counter + 1, 1)
+                    }
+                    
+                    local Object = table()
+                    Object["type", string] = "box"
+                    Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                    Object["parent", number] = 0
+                    
+                    EgpObjects[Counter, table] = Object
+                }
+                else {
+                    # FIX IT
+                }
+                varWrite("counter", Counter + 1)
+            }
+            else {
+                stateNext()
+                break
+            }
+        }
+        break
+    
+    case 2,
         varWrite("idle", 1)
-        varWrite("ready", 1)
-        appNextState()
+        
+        stateNext()
         break
     
     # Wait events
-    case 2,
+    case 3,
         local Device = varTable("device")
         if (Device:isValid()) {
-            for (I = 1, TICKS_INSIDE) {
-                if (waitAnyEvent()) {
-                    varWrite("idle", 0)
-                    local Command = getEventString()
-                    local Id = getEventNumber()
+            local EgpObjects = varTable("egpObjects")
+            switch (Device:type()) {
+                case "gmod_wire_egp",
+                    local Port = Device["port", wirelink]
                     
-                    switch (Command) {
-                        case "egpBox",
-                            switch (Device[TYPE, string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpBox(Id + 1, getEventVector2(), getEventVector2())
+                    for (I = 1, KERNEL_OVERLOAD) {
+                        if (waitAnyEvent()) {
+                            varWrite("idle", 0)
+                            local Command = getEventString()
+                            local Id = getEventNumber()
+                            local Object = EgpObjects[Id, table]
+                            
+                            switch (Command) {
+                                case "egpBox",
+                                    if (Object["type", string] != "box") {
+                                        Object:clear()
+                                        Object["type", string] = "box"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["pos", vector2] = getEventVector2()
+                                    Object["size", vector2] = getEventVector2()
+                                    
+                                    Port:egpBox(Id + 1, Object["pos", vector2], Object["size", vector2])
                                     break
                                 
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
+                                case "egpBoxOutline",
+                                    if (Object["type", string] != "boxOutline") {
+                                        Object:clear()
+                                        Object["type", string] = "boxOutline"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["pos", vector2] = getEventVector2()
+                                    Object["size", vector2] = getEventVector2()
+                                    
+                                    Port:egpBoxOutline(Id + 1, Object["pos", vector2], Object["size", vector2])
+                                    break
+                                
+                                case "egpSetText",
+                                    Object["text", string] = getEventString()
+                                    
+                                    Port:egpSetText(Id + 1, Object["text", string])
+                                    break
+                                
+                                case "egpText",
+                                    if (Object["type", string] != "text") {
+                                        Object:clear()
+                                        Object["type", string] = "text"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["text", string] = getEventString()
+                                    Object["pos", vector2] = getEventVector2()
+                                    
+                                    Port:egpText(Id + 1, Object["text", string], Object["pos", vector2])
+                                    Port:egpFont(Id + 1, FONT_MONOSPACED)
+                                    break
+                                
+                                case "egpTextLayout",
+                                    if (Object["type", string] != "textLayout") {
+                                        Object:clear()
+                                        Object["type", string] = "textLayout"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["text", string] = getEventString()
+                                    Object["pos", vector2] = getEventVector2()
+                                    Object["size", vector2] = getEventVector2()
+                                    
+                                    Port:egpTextLayout(Id + 1, Object["text", string], Object["pos", vector2], Object["size", vector2])
+                                    Port:egpFont(Id + 1, FONT_MONOSPACED)
+                                    break
+                                
+                                case "egpColor",
+                                    local Color = getEventVector()
+                                    Object["color", vector4] = vec4(Color, Object["color", vector4][4])
+                                    
+                                    Port:egpColor(Id + 1, Color)
+                                    break
+                                
+                                case "egpColor4",
+                                    Object["color", vector4] = getEventVector4()
+                                    
+                                    Port:egpColor(Id + 1, Object["color", vector4])
+                                    break
+                                
+                                case "egpAlpha",
+                                    local Alpha = getEventNumber()
+                                    Object["color", vector4][4] = Alpha
+                                    
+                                    Port:egpAlpha(Id + 1, Alpha)
+                                
+                                case "egpSize",
+                                    Object["size", vector2] = getEventVector2()
+                                    
+                                    Port:egpSize(Id + 1, Object["size", vector2])
+                                    break
+                                
+                                case "egpSizeNumber",
+                                    Object["sizeNumber", number] = getEventNumber()
+                                    
+                                    Port:egpSize(Id + 1, Object["sizeNumber", number])
+                                    break
+                                
+                                case "egpParent",
+                                    Object["parent", number] = getEventNumber()
+                                    
+                                    Port:egpParent(Id + 1, Object["parent", number] + 1)
+                                    break
+                                
+                                case "egpParentToBase",
+                                    Object["parent", number] = 0
+                                    
+                                    Port:egpParent(Id + 1, 1)
+                                    break
+                                
+                                case "egpParentPoint",
+                                    if (Object["type", string] != "box") {
+                                        Object:clear()
+                                        Object["type", string] = "box"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["pos", vector2] = getEventVector2()
+                                    Object:remove("size")
+                                    
+                                    Port:egpBox(Id + 1, Object["pos", vector2], vec2())
+                                    break
+                                
+                                case "egpAlign",
+                                    Object["align", number] = getEventNumber()
+                                    
+                                    Port:egpAlign(Id + 1, Object["align", number])
+                                    break
+                                
+                                case "egpAlign2",
+                                    Object["align", number] = getEventNumber()
+                                    Object["align2", number] = getEventNumber()
+                                    
+                                    Port:egpAlign(Id + 1, Object["align", number], Object["align2", number])
+                                    break
+                                
+                                case "egpCircle",
+                                    if (Object["type", string] != "circle") {
+                                        Object:clear()
+                                        Object["type", string] = "circle"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["pos", vector2] = getEventVector2()
+                                    Object["size", vector2] = getEventVector2()
+                                    
+                                    Port:egpCircle(Id + 1, Object["pos", vector2], Object["size", vector2])
+                                    break
+                                
+                                case "egpCircleOutline",
+                                    if (Object["type", string] != "circleOutline") {
+                                        Object:clear()
+                                        Object["type", string] = "circleOutline"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["pos", vector2] = getEventVector2()
+                                    Object["size", vector2] = getEventVector2()
+                                    
+                                    Port:egpCircleOutline(Id + 1, Object["pos", vector2], Object["size", vector2])
+                                    break
+                                
+                                case "egpLine",
+                                    if (Object["type", string] != "line") {
+                                        Object:clear()
+                                        Object["type", string] = "line"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["pos", vector2] = getEventVector2()
+                                    Object["size", vector2] = getEventVector2()
+                                    
+                                    Port:egpLine(Id + 1, Object["pos", vector2], Object["size", vector2])
+                                    break
+                                
+                                case "egpPos",
+                                    Object["pos", vector2] = getEventVector2()
+                                    
+                                    Port:egpPos(Id + 1, Object["pos", vector2])
+                                    break
+                                
+                                case "egpRemove",
+                                    #Object:remove("pos")
+                                    #Object:remove("size")
+                                    #Object:remove("exists")
+                                    Object:clear()
+                                    Object["type", string] = "box"
+                                    Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                    Object["parent", number] = 0
+                                    
+                                    Port:egpBox(Id + 1, vec2(), vec2())
+                                    if (Object["type", string] == "box") {
+                                        Port:egpColor(Id + 1, LIB_DRIVER_EGP_COLOR_WHITE)
+                                    }
+                                    break
+                                
+                                case "egpCopy",
+                                    local OldId = getEventNumber()
+                                    Object = EgpObjects[Id, table] = EgpObjects[OldId, table]:clone()
+                                    
+                                    Port:egpCopy(Id + 1, OldId + 1)
+                                    break
+                                
+                                case "egpMove",
+                                    local OldId = getEventNumber()
+                                    Object = EgpObjects[Id, table] = EgpObjects[OldId, table]
+                                    
+                                    # Spawning new object
+                                    switch (Object["type", string]) {
+                                        case "box",
+                                            Port:egpBox(Id + 1, Object["pos", vector2], Object["size", vector2])
+                                            break
+                                        
+                                        case "boxOutline",
+                                            Port:egpBoxOutline(Id + 1, Object["pos", vector2], Object["size", vector2])
+                                            break
+                                        
+                                        case "text",
+                                            Port:egpText(Id + 1, Object["text", string], Object["pos", vector2])
+                                            Port:egpFont(Id + 1, FONT_MONOSPACED)
+                                            break
+                                        
+                                        case "textLayout",
+                                            Port:egpTextLayout(Id + 1, Object["text", string], Object["pos", vector2], Object["size", vector2])
+                                            Port:egpFont(Id + 1, FONT_MONOSPACED)
+                                            Port:egpAlign(Id + 1, Object["align", number], Object["align2", number])
+                                            break
+                                            
+                                        case "circle",
+                                            Port:egpCircle(Id + 1, Object["pos", vector2], Object["size", vector2])
+                                            break
+                                        
+                                        case "circleOutline",
+                                            Port:egpCircleOutline(Id + 1, Object["pos", vector2], Object["size", vector2])
+                                            break
+                                        
+                                        case "line",
+                                            Port:egpLine(Id + 1, Object["pos", vector2], Object["size", vector2])
+                                            break
+                                    }
+                                    
+                                    # Universal parmeners
+                                    Object["parent", number] = EgpObjects[OldId, table]["parent", number] + Id - OldId
+                                    Port:egpColor(Id + 1, Object["color", vector4])
+                                    Port:egpParent(Id + 1, Object["parent", number] + 1)
+                                    
+                                    
+                                    if (Object:exists("align2")) {
+                                        Port:egpAlign(Id + 1, Object["align", number], Object["align2", number])
+                                    }
+                                    elseif (Object:exists("align")) {
+                                        Port:egpAlign(Id + 1, Object["align", number])
+                                    }
+                                    
+                                    if (Object:exists("sizeNumber")) {
+                                        Port:egpSize(Id + 1, Object["sizeNumber", number])
+                                    }
+                                    
+                                    # Remove prev object
+                                    Port:egpBox(OldId + 1, vec2(), vec2())
+                                    Port:egpParent(OldId + 1, 1)
+                                    if (EgpObjects[OldId, table]["color", vector4] != LIB_DRIVER_EGP_COLOR_WHITE) {
+                                        Port:egpColor(OldId + 1, LIB_DRIVER_EGP_COLOR_WHITE)
+                                    }
+                                    
+                                    local OldObject = table()
+                                    OldObject["type", string] = "box"
+                                    OldObject["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                    OldObject["parent", number] = 1
+                                    
+                                    EgpObjects[OldId, table] = OldObject
+                                    break
+                                
+                                case "egpDrawTopLeft",
+                                    # "Id" is not id. This is draw parameter
+                                    Port:egpDrawTopLeft(Id)
+                                    break
+                                
+                                case "exit",
+                                    Port:egpClear()
+                                    driverPushDevice()
+                                    programKill()
+                                    break
+                                
+                                default,
+                            }
+                        }
+                        else {
+                            varWrite("idle", 1)
+                        }
+                    }
+                    break
+                
+                case "virtual-egp-screen",
+                    local OutputQueue = Device["output-queue", array]
+                    
+                    for (I = 1, KERNEL_OVERLOAD) {
+                        if (waitAnyEvent()) {
+                            varWrite("idle", 0)
+                            local Command = getEventString()
+                            local Id = getEventNumber()
+                            local Object = EgpObjects[Id, table]
+                            
+                            switch (Command) {
+                                case "egpBox",
+                                    if (Object["type", string] != "box") {
+                                        Object:clear()
+                                        Object["type", string] = "box"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["pos", vector2] = getEventVector2()
+                                    Object["size", vector2] = getEventVector2()
+                                    
                                     OutputQueue:pushString("egpBox")
                                     OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    break
-                            }
-                            break
-                        
-                        case "egpSetText",
-                            switch (Device[TYPE, string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpSetText(Id + 1, getEventString())
+                                    OutputQueue:pushVector2(Object["pos", vector2])
+                                    OutputQueue:pushVector2(Object["size", vector2])
                                     break
                                 
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
+                                case "egpBoxOutline",
+                                    if (Object["type", string] != "boxOutline") {
+                                        Object:clear()
+                                        Object["type", string] = "boxOutline"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["pos", vector2] = getEventVector2()
+                                    Object["size", vector2] = getEventVector2()
+                                    
+                                    OutputQueue:pushString("egpBoxOutline")
+                                    OutputQueue:pushNumber(Id)
+                                    OutputQueue:pushVector2(Object["pos", vector2])
+                                    OutputQueue:pushVector2(Object["size", vector2])
+                                    break
+                                
+                                case "egpSetText",
+                                    Object["text", string] = getEventString()
+                                    
                                     OutputQueue:pushString("egpSetText")
                                     OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushString(getEventString())
-                                    break
-                            }
-                            break
-                        
-                        case "egpText",
-                            switch (Device[TYPE, string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpText(Id + 1, getEventString(), getEventVector2())
-                                    Device["port", wirelink]:egpFont(Id + 1, FONT_MONOSPACED)
+                                    OutputQueue:pushString(Object["text", string])
                                     break
                                 
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
+                                case "egpText",
+                                    if (Object["type", string] != "text") {
+                                        Object:clear()
+                                        Object["type", string] = "text"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["text", string] = getEventString()
+                                    Object["pos", vector2] = getEventVector2()
+                                    
                                     OutputQueue:pushString("egpText")
                                     OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushString(getEventString())
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    break
-                            }
-                            break
-                        
-                        case "egpTextLayout",
-                            switch (Device[TYPE, string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpTextLayout(Id + 1, getEventString(), getEventVector2(), getEventVector2())
-                                    Device["port", wirelink]:egpFont(Id + 1, FONT_MONOSPACED)
+                                    OutputQueue:pushString(Object["text", string])
+                                    OutputQueue:pushVector2(Object["pos", vector2])
                                     break
                                 
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
+                                case "egpTextLayout",
+                                    if (Object["type", string] != "textLayout") {
+                                        Object:clear()
+                                        Object["type", string] = "textLayout"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["text", string] = getEventString()
+                                    Object["pos", vector2] = getEventVector2()
+                                    Object["size", vector2] = getEventVector2()
+                                    
                                     OutputQueue:pushString("egpTextLayout")
                                     OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushString(getEventString())
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    break
-                            }
-                            break
-                        
-                        case "egpColor",
-                            switch (Device[TYPE, string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpColor(Id + 1, getEventVector())
+                                    OutputQueue:pushString(Object["text", string])
+                                    OutputQueue:pushVector2(Object["pos", vector2])
+                                    OutputQueue:pushVector2(Object["size", vector2])
                                     break
                                 
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
+                                case "egpColor",
+                                    local Color = getEventVector()
+                                    Object["color", vector4] = vec4(Color, Object["color", vector4][4])
+                                    
                                     OutputQueue:pushString("egpColor")
                                     OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushVector(getEventVector())
-                                    break
-                            }
-                            break
-                        
-                        case "egpSize",
-                            switch (Device[TYPE, string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpSize(Id + 1, getEventNumber())
+                                    OutputQueue:pushVector(Color)
                                     break
                                 
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
+                                case "egpColor4",
+                                    Object["color", vector4] = getEventVector4()
+                                    
+                                    OutputQueue:pushString("egpColor4")
+                                    OutputQueue:pushNumber(Id)
+                                    OutputQueue:pushVector4(Object["color", vector4])
+                                    break
+                                
+                                case "egpAlpha",
+                                    local Alpha = getEventNumber()
+                                    Object["color", vector4][4] = Alpha
+                                    
+                                    OutputQueue:pushString("egpAlpha")
+                                    OutputQueue:pushNumber(Id)
+                                    OutputQueue:pushNumber(Alpha)
+                                
+                                case "egpSize",
+                                    Object["size", vector2] = getEventVector2()
+                                    
                                     OutputQueue:pushString("egpSize")
                                     OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushNumber(getEventNumber())
-                                    break
-                            }
-                            break
-                        
-                        case "egpParent",
-                            local ParentId = getEventNumber()
-                            local EgpParents = appR("egpParents")
-                            EgpParents[Id, number] = ParentId
-                            switch (Device[TYPE, string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpParent(Id + 1, ParentId + 1)
+                                    OutputQueue:pushVector2(Object["size", vector2])
                                     break
                                 
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
+                                case "egpSizeNumber",
+                                    Object["sizeNumber", number] = getEventNumber()
+                                    
+                                    OutputQueue:pushString("egpSizeNumber")
+                                    OutputQueue:pushNumber(Id)
+                                    OutputQueue:pushNumber(Object["sizeNumber", number])
+                                    break
+                                
+                                case "egpParent",
+                                    Object["parent", number] = getEventNumber()
+                                    
                                     OutputQueue:pushString("egpParent")
                                     OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushNumber(ParentId)
-                                    break
-                            }
-                            break
-                        
-                        case "egpParentToBase",
-                            switch (Device[TYPE, string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpParent(Id + 1, 1)
+                                    OutputQueue:pushNumber(Object["parent", number])
                                     break
                                 
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
+                                case "egpParentToBase",
+                                    Object["parent", number] = 0
+                                    
                                     OutputQueue:pushString("egpParentToBase")
                                     OutputQueue:pushNumber(Id)
                                     break
-                            }
-                            break
-                        
-                        case "egpParentPoint",
-                            switch (Device[TYPE, string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpBox(Id + 1, getEventVector2(), vec2())
-                                    break
                                 
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
+                                case "egpParentPoint",
+                                    if (Object["type", string] != "box") {
+                                        Object:clear()
+                                        Object["type", string] = "box"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["pos", vector2] = getEventVector2()
+                                    Object:remove("size")
+                                    
                                     OutputQueue:pushString("egpParentPoint")
                                     OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    break
-                            }
-                            break
-                        
-                        case "egpAlign",
-                            switch (Device[TYPE, string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpAlign(Id + 1, getEventNumber())
+                                    OutputQueue:pushVector2(Object["pos", vector2])
                                     break
                                 
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
+                                case "egpAlign",
+                                    Object["align", number] = getEventNumber()
+                                    
                                     OutputQueue:pushString("egpAlign")
                                     OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushNumber(getEventNumber())
-                                    break
-                            }
-                            break
-                        
-                        case "egpAlign2",
-                            switch (Device[TYPE, string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpAlign(Id + 1, getEventNumber(), getEventNumber())
+                                    OutputQueue:pushNumber(Object["align", number])
                                     break
                                 
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
-                                    OutputQueue:pushString("egpAlign")
+                                case "egpAlign2",
+                                    Object["align", number] = getEventNumber()
+                                    Object["align2", number] = getEventNumber()
+                                    
+                                    OutputQueue:pushString("egpAlign2")
                                     OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushNumber(getEventNumber())
-                                    OutputQueue:pushNumber(getEventNumber())
-                                    break
-                            }
-                            break
-                        
-                        case "egpCircle",
-                            switch (Device[TYPE, string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpCircle(Id + 1, getEventVector2(), getEventVector2())
+                                    OutputQueue:pushNumber(Object["align", number])
+                                    OutputQueue:pushNumber(Object["align2", number])
                                     break
                                 
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
+                                case "egpCircle",
+                                    if (Object["type", string] != "circle") {
+                                        Object:clear()
+                                        Object["type", string] = "circle"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["pos", vector2] = getEventVector2()
+                                    Object["size", vector2] = getEventVector2()
+                                    
                                     OutputQueue:pushString("egpCircle")
                                     OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    break
-                            }
-                            break
-                        
-                        case "egpCircleOutline",
-                            switch (Device[TYPE, string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpCircleOutline(Id + 1, getEventVector2(), getEventVector2())
+                                    OutputQueue:pushVector2(Object["pos", vector2])
+                                    OutputQueue:pushVector2(Object["size", vector2])
                                     break
                                 
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
+                                case "egpCircleOutline",
+                                    if (Object["type", string] != "circleOutline") {
+                                        Object:clear()
+                                        Object["type", string] = "circleOutline"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["pos", vector2] = getEventVector2()
+                                    Object["size", vector2] = getEventVector2()
+                                    
                                     OutputQueue:pushString("egpCircleOutline")
                                     OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    break
-                            }
-                            break
-                        
-                        case "egpPos",
-                            switch (Device[TYPE, string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpPos(Id + 1, getEventVector2())
+                                    OutputQueue:pushVector2(Object["pos", vector2])
+                                    OutputQueue:pushVector2(Object["size", vector2])
                                     break
                                 
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
+                                case "egpLine",
+                                    if (Object["type", string] != "line") {
+                                        Object:clear()
+                                        Object["type", string] = "line"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["pos", vector2] = getEventVector2()
+                                    Object["size", vector2] = getEventVector2()
+                                    
+                                    OutputQueue:pushString("egpLine")
+                                    OutputQueue:pushNumber(Id)
+                                    OutputQueue:pushVector2(Object["pos", vector2])
+                                    OutputQueue:pushVector2(Object["size", vector2])
+                                    break
+                                
+                                case "egpPos",
+                                    Object["pos", vector2] = getEventVector2()
+                                    
                                     OutputQueue:pushString("egpPos")
                                     OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushVector2(getEventVector2())
-                                    break
-                            }
-                            break
-                        
-                        case "egpRemove",
-                            local EgpParents = appR("egpParents")
-                            EgpParents:remove(Id)
-                            switch (Device[TYPE, string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpRemove(Id + 1)
+                                    OutputQueue:pushVector2(Object["pos", vector2])
                                     break
                                 
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
+                                case "egpRemove",
+                                    Object:clear()
+                                    Object["type", string] = "box"
+                                    Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                    Object["parent", number] = 0
+                                    
                                     OutputQueue:pushString("egpRemove")
                                     OutputQueue:pushNumber(Id)
                                     break
-                            }
-                            break
-                        
-                        case "egpCopy",
-                            switch (Device[TYPE, string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpCopy(Id + 1, getEventNumber())
-                                    break
                                 
-                                case "virtual-egp-screen",
-                                    local OutputQueue = Device["output-queue", array]
+                                case "egpCopy",
+                                    local OldId = getEventNumber()
+                                    Object = EgpObjects[Id, table] = EgpObjects[OldId, table]:clone()
+                                    
                                     OutputQueue:pushString("egpCopy")
                                     OutputQueue:pushNumber(Id)
-                                    OutputQueue:pushNumber(getEventNumber())
-                                    break
-                            }
-                            break
-                        
-                        case "exit",
-                            Device["busy", number] = 0
-                            appClose()
-                            
-                            switch (Device[TYPE, string]) {
-                                case "egp-screen",
-                                    Device["port", wirelink]:egpClear()
+                                    OutputQueue:pushNumber(OldId)
                                     break
                                 
-                                case "virtual-egp-screen",
+                                case "egpMove",
+                                    local OldId = getEventNumber()
+                                    Object = EgpObjects[Id, table] = EgpObjects[OldId, table]
+                                    
+                                    # Spawning new object
+                                    switch (Object["type", string]) {
+                                        case "box",
+                                            OutputQueue:pushString("egpBox")
+                                            OutputQueue:pushNumber(Id)
+                                            OutputQueue:pushVector2(Object["pos", vector2])
+                                            OutputQueue:pushVector2(Object["size", vector2])
+                                            break
+                                        
+                                        case "boxOutline",
+                                            OutputQueue:pushString("egpBoxOutline")
+                                            OutputQueue:pushNumber(Id)
+                                            OutputQueue:pushVector2(Object["pos", vector2])
+                                            OutputQueue:pushVector2(Object["size", vector2])
+                                            break
+                                        
+                                        case "text",
+                                            OutputQueue:pushString("egpText")
+                                            OutputQueue:pushNumber(Id)
+                                            OutputQueue:pushString(Object["text", string])
+                                            OutputQueue:pushVector2(Object["pos", vector2])
+                                            break
+                                        
+                                        case "textLayout",
+                                            OutputQueue:pushString("egpTextLayout")
+                                            OutputQueue:pushNumber(Id)
+                                            OutputQueue:pushString(Object["text", string])
+                                            OutputQueue:pushVector2(Object["pos", vector2])
+                                            OutputQueue:pushVector2(Object["size", vector2])
+                                            break
+                                            
+                                        case "circle",
+                                            OutputQueue:pushString("egpCircle")
+                                            OutputQueue:pushNumber(Id)
+                                            OutputQueue:pushVector2(Object["pos", vector2])
+                                            OutputQueue:pushVector2(Object["size", vector2])
+                                            break
+                                        
+                                        case "circleOutline",
+                                            OutputQueue:pushString("egpCircleOutline")
+                                            OutputQueue:pushNumber(Id)
+                                            OutputQueue:pushVector2(Object["pos", vector2])
+                                            OutputQueue:pushVector2(Object["size", vector2])
+                                            break
+                                        
+                                        case "line",
+                                            OutputQueue:pushString("egpLine")
+                                            OutputQueue:pushNumber(Id)
+                                            OutputQueue:pushVector2(Object["pos", vector2])
+                                            OutputQueue:pushVector2(Object["size", vector2])
+                                            break
+                                    }
+                                    
+                                    # Universal parmeners
+                                    Object["parent", number] = EgpObjects[OldId, table]["parent", number] + Id - OldId
+                                    OutputQueue:pushString("egpColor4")
+                                    OutputQueue:pushNumber(Id)
+                                    OutputQueue:pushVector4(Object["color", vector4])
+                                    
+                                    OutputQueue:pushString("egpParent")
+                                    OutputQueue:pushNumber(Id)
+                                    OutputQueue:pushNumber(Object["parent", number])
+                                    
+                                    
+                                    if (Object:exists("align2")) {
+                                        OutputQueue:pushString("egpAlign2")
+                                        OutputQueue:pushNumber(Id)
+                                        OutputQueue:pushNumber(Object["align", number])
+                                        OutputQueue:pushNumber(Object["align2", number])
+                                    }
+                                    elseif (Object:exists("align")) {
+                                        OutputQueue:pushString("egpAlign")
+                                        OutputQueue:pushNumber(Id)
+                                        OutputQueue:pushNumber(Object["align", number])
+                                    }
+                                    
+                                    if (Object:exists("sizeNumber")) {
+                                        OutputQueue:pushString("egpSizeNumber")
+                                        OutputQueue:pushNumber(Id)
+                                        OutputQueue:pushNumber(Object["sizeNumber", number])
+                                    }
+                                    
+                                    # Remove prev object
+                                    OutputQueue:pushString("egpRemove")
+                                    OutputQueue:pushNumber(OldId)
+                                    
+                                    local OldObject = table()
+                                    OldObject["type", string] = "box"
+                                    OldObject["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                    OldObject["parent", number] = 1
+                                    
+                                    EgpObjects[OldId, table] = OldObject
                                     break
+                                
+                                case "egpDrawTopLeft",
+                                    # "Id" is not id. This is draw parameter
+                                    OutputQueue:pushString("egpDrawTopLeft")
+                                    OutputQueue:pushNumber(Id)
+                                    break
+                                
+                                case "exit",
+                                    driverPushDevice()
+                                    programKill()
+                                    break
+                                
+                                default,
                             }
-                            break
-                    }
-                }
-                else {
-                    local Device = appT("device")
-                    switch (Device[TYPE, string]) {
-                        case "egp-screen",
-                            varWrite("idle", 1)
-                            break
-                        
-                        case "virtual-egp-screen",
+                        }
+                        else {
                             varWrite("idle", Device["idle", number])
-                            break
+                        }
                     }
                     break
-                }
             }
         }
         else {
-            appSetState(0)
+            stateSet(0)
         }
         break
     }

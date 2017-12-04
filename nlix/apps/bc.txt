@@ -4,19 +4,19 @@
 
 @name bc
 
-switch (ThisAppState) {
+switch (stateGet()) {
     # Wait terminal driver
     case 0,
-        if (initTerminal()) {
+        if (terminalInit()) {
             terminalPrint("Calculator shell. Write \"quit\" for exit.\n")
-            appNextState()
+            stateNext()
         }
         break
     
     # Wait keyboard driver
     case 1,
-        if (initSimpleKeyboard()) {
-            appNextState()
+        if (simpleKeyboardInit()) {
+            stateNext()
         }
         break
     
@@ -24,38 +24,38 @@ switch (ThisAppState) {
     case 2,
         terminalPrint("> ")
         varWrite("outputCount", varNumber("outputCount") + 2)
-        requestKeyboardInput()
+        simpleKeyboardRequestInput()
         
-        appNextState()
+        stateNext()
         break
     
     # Get input
     case 3,
-        if (waitKeyboardInput()) {
-            local Input = getKeyboardInput()
+        if (simpleKeyboardWaitInput()) {
+            local Input = simpleKeyboardGetInput()
             varWrite("input", Input)
             varWrite("outputCount", varNumber("outputCount") + Input:length() + 1)
             switch (Input) {
                 case "",
-                    appSetState(2)
+                    stateSet(2)
                     break
                 
                 case "quit",
-                    appCloseSelf()
+                    programKill()
                     break
                 
                 case "exit",
-                    appCloseSelf()
+                    programKill()
                     break
                 
                 case "clear",
                     terminalErase(varNumber("outputCount"))
                     varWrite("outputCount", 0)
-                    appSetState(2)
+                    stateSet(2)
                     break
                 
                 default,
-                    appSetState(4)
+                    stateSet(4)
                     break
             }
         }
@@ -124,6 +124,6 @@ switch (ThisAppState) {
         local Output = InputExplode:concat(" ") + "\n"
         terminalPrint(Output)
         varWrite("outputCount", varNumber("outputCount") + Output:length())
-        appSetState(2)
+        stateSet(2)
         break
 }

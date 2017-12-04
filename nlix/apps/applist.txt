@@ -5,4 +5,4 @@
 @name applist
 
 terminalPrintFast(APPS_INFO:keys():concat(", ") + "\n")
-appCloseSelf()
+appClose()

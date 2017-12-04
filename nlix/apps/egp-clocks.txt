@@ -4,11 +4,11 @@
 
 @name egp-clocks
 
-switch (ThisAppState) {
+switch (stateGet()) {
     # Initialize egp
     case 0,
-        if (initEgp()) {
-            appNextState()
+        if (egpInit()) {
+            stateNext()
         }
         break
     
@@ -20,7 +20,7 @@ switch (ThisAppState) {
         egpParentToBase(2)
         egpColor(2, vec())
         
-        appNextState()
+        stateNext()
         break
     
     case 2,

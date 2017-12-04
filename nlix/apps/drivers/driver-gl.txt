@@ -4,18 +4,15 @@
 
 @name driver-gl
 
-switch (ThisAppState) {
+switch (stateGet()) {
     # Initialize
     case 0,
-        local Device = findDeviceByType("egp-screen")
-        
-        if (Device != NULL) {
-            Device["busy", number] = 1
-            
-            local Screen = Device["port", wirelink]
+        if (driverPopDevice("gmod_wire_egp")) {
+            local Screen = varTable("device")["port", wirelink]
             Screen:egpClear()
             Screen:egpDrawTopLeft(1)
-            Screen:egpBox(1, vec2(), Device["resolution", vector2])
+            Screen:egpBox(1, vec2(), vec2(512))
+            Screen:egpColor(1, vec())
             
             local Id = egpMaxObjects()
             while (Id >= 2) {
@@ -23,22 +20,8 @@ switch (ThisAppState) {
                 Id--
             }
             
-            varWrite("resolution", Device["resolution", vector2])
-            
-            varWrite("device", Device)
-            appNextState()
-        }
-        else {
-            local Device = findDeviceByType("virtual-gl")
-            
-            if (Device != NULL) {
-                Device["busy", number] = 1
-                
-                varWrite("resolution", Device["resolution", vector2])
-                
-                varWrite("device", Device)
-                appNextState()
-            }
+            varWrite("resolution", vec2(512))
+            stateNext()
         }
         break
     
@@ -46,17 +29,16 @@ switch (ThisAppState) {
         varWrite("usedIds", array())
         
         varWrite("idle", 1)
-        varWrite("ready", 1)
-        appNextState()
+        stateNext()
         break
     
     # Wait events
     case 2,
         local Device = varTable("device")
         local Screen = Device["port", wirelink]
-        local ResolutionY = Device["resolution", vector2][2] / 2
+        local ResolutionY = varVector2("resolution")[2] / 2
         if (Device:isValid()) {
-            for (Tick = 1, TICKS_INSIDE) {
+            for (Tick = 1, KERNEL_OVERLOAD) {
                 if (waitAnyEvent()) {
                     varWrite("idle", 0)
                     local Command = getEventString()
@@ -78,6 +60,7 @@ switch (ThisAppState) {
                             
                             UsedIdsOld:clear()
                             varWrite("usedIds", UsedIdsOld)
+                            break
                         
                         case "glFillColor",
                             Screen:egpColor(1, getEventVector())
@@ -123,29 +106,22 @@ switch (ThisAppState) {
                             break
                         
                         case "exit",
-                            Device["busy", number] = 0
                             Screen:egpClear()
-                            appClose()
+                            driverPushDevice()
+                            programKill()
                             break
+                        
+                        default,
                     }
                 }
                 else {
-                    local Device = appT("device")
-                    switch (Device[TYPE, string]) {
-                        case "egp-screen",
-                            varWrite("idle", 1)
-                            break
-                        
-                        case "virtual-gl",
-                            varWrite("idle", Device["idle", number])
-                            break
-                    }
+                    varWrite("idle", 1)
                     break
                 }
             }
         }
         else {
-            appSetState(0)
+            stateSet(0)
         }
         break
     }

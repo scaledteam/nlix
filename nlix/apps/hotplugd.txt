@@ -4,7 +4,7 @@
 
 @name hotplugd
 
-switch (ThisAppState) {
+switch (stateGet()) {
     # Hot plug
     case 0,
         local Counter = varNumber("counter") + 1
@@ -17,12 +17,27 @@ switch (ThisAppState) {
         )
         
         if ((Port != varWirelink("PortOld" + Counter)) & Port) {
-            ThisWorkspace:initPort(Port)
+            # Check if device exists
+            local DeviceExists = 0
+            local DeviceType = Port:entity():type()
+            for (I = 1, ThisWorkspace:count()) {
+                if (ThisWorkspace[I, table]["port", wirelink]:entity():type() == DeviceType & ThisWorkspace[I, table]["port", wirelink] == Port) {
+                    DeviceExists = 1
+                    break
+                }
+            }
+            
+            if (!DeviceExists) {
+                local Device = object(DeviceType)
+                Device["port", wirelink] = Port
+                
+                ThisWorkspace:pushTable(Device)
+            }
         }
         varWrite("PortOld" + Counter, Port)
         
         if (Counter >= PORTS_COUNT) {
-            appNextState()
+            stateNext()
             varWrite("counter", 0)
         }
         else {
@@ -42,7 +57,7 @@ switch (ThisAppState) {
         }
         
         if (Counter >= ThisWorkspace["devices", table]:count()) {
-            appPrevState()
+            statePrev()
             varWrite("counter", 0)
         }
         else {

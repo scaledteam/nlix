@@ -4,15 +4,18 @@
 
 @name lib-driver-terminal
 
-function number initTerminal() {
-    local App = findAppByName("driver-terminal")
-    if (App != NULL) {
-        varWrite("driver-terminal", App)
-        return 1
-    }
-    else {
-        return 0
-    }
+function table createVirtualTerminal() {
+    local Device = object("virtual-terminal")
+    
+    Device["new-output", string] = ""
+    Device["new-erase", number] = 0
+    Device["clear", number] = 0
+    
+    return Device
+}
+
+function number terminalInit() {
+    return driverInit("driver-terminal")
 }
 
 function terminalPrint(Text:string) {
@@ -35,13 +38,8 @@ function terminalClear() {
 
 
 function terminalPrintFast(Text:string) {
-    local App = findAppByName("driver-terminal")
+    local App = programFindByName("driver-terminal")
     
     App:sendEvent("print")
     App:sendEvent(Text)
 }
-
-function terminalClearFast() {
-    findAppByName("driver-terminal"):sendEvent("clear")
-}
-

@@ -1,110 +1,87 @@
 #
-# This E2 made by scaled
+# Created by scaled
 #
 
 @name driver-terminal
 
-switch (ThisAppState) {
+switch (stateGet()) {
     # Initialize
     case 0,
-        # Init first screen
-        #appS("consoleText", "Welcome to the Nlix operation system!\n")
-        
-        local Device = findDeviceByType("console-screen")
-        
-        if (Device != NULL) {
-            Device["busy", number] = 1
+        if (driverPopDevice("gmod_wire_consolescreen")) {
+            Device = varTable("device")
             local Screen = Device["port", wirelink]
             Screen[2041] = 1
-            Screen:writeString(appS("consoleText"), 0, 0)
+            Screen:writeString(varString("consoleText"), 0, 0)
             
-            appT("device", Device)
-            appNextState()
+            stateNext()
         }
-        else {
-            local Device = findDeviceByType("egp-screen")
+        
+        elseif (driverPopDevice("gmod_wire_egp")) {
+            Device = varTable("device")
+            local Screen = Device["port", wirelink]
+            Screen:egpClear()
+            Screen:egpDrawTopLeft(1)
             
-            if (Device != NULL) {
-                Device["busy", number] = 1
-                local Screen = Device["port", wirelink]
-                Screen:egpClear()
-                Screen:egpDrawTopLeft(1)
-                
-                Screen:egpTextLayout(1, appS("consoleText"), vec2(), Device["resolution", vector2])
-                Screen:egpFont(1, FONT_MONOSPACED)
-                
-                appT("device", Device)
-                appNextState()
-            }
-            else {
-                local Device = findDeviceByType("virtual-terminal")
-                
-                if (Device != NULL) {
-                    Device["busy", number] = 1
-                    Device["new-output", string] = appS("consoleText")
-                    
-                    appT("device", Device)
-                    appNextState()
-                }
-                else {
-                    local Device = findDeviceByType("virtual-egp-screen")
-                    
-                    if (Device != NULL) {
-                        Device["busy", number] = 1
-                        
-                        local OutputQueue = Device["output-queue", array]
-                        
-                        OutputQueue:pushString("egpBox")
-                        OutputQueue:pushNumber(1)
-                        OutputQueue:pushVector2(vec2())
-                        OutputQueue:pushVector2(Device["resolution", vector2])
-                        
-                        OutputQueue:pushString("egpParentToBase")
-                        OutputQueue:pushNumber(1)
-                        
-                        OutputQueue:pushString("egpColor")
-                        OutputQueue:pushNumber(1)
-                        OutputQueue:pushVector(vec())
-                        
-                        OutputQueue:pushString("egpTextLayout")
-                        OutputQueue:pushNumber(2)
-                        OutputQueue:pushString(appS("consoleText"))
-                        OutputQueue:pushVector2(vec2())
-                        OutputQueue:pushVector2(Device["resolution", vector2])
-                        
-                        OutputQueue:pushString("egpParentToBase")
-                        OutputQueue:pushNumber(2)
-                        
-                        appT("device", Device)
-                        appNextState()
-                    }
-                }
-            }
+            Screen:egpTextLayout(1, varString("consoleText"), vec2(), vec2(512))
+            Screen:egpFont(1, FONT_MONOSPACED)
+            
+            stateNext()
+        }
+        
+        elseif (driverPopDevice("gmod_wire_textscreen")) {
+            Device = varTable("device")
+            Device["port", wirelink]["String", string] = varString("consoleText")
+            
+            stateNext()
+        }
+        
+        elseif (driverPopDevice("virtual-terminal")) {
+            Device = varTable("device")
+            Device["new-output", string] = varString("consoleText")
+            
+            stateNext()
+        }
+        
+        elseif (driverPopDevice("virtual-egp-screen")) {
+            Device = varTable("device")
+            Device["output-queue", array] = Device["output-queue", array]:add(array(
+                "egpBox", 1, vec2(), Device["resolution", vector2],
+                "egpParentToBase", 1,
+                "egpColor", 1, vec(),
+                "egpTextLayout", 2, varString("consoleText"), vec2(), Device["resolution", vector2],
+                "egpParentToBase", 2
+            ))
+            
+            stateNext()
         }
         
         break
     
     # Wait events
     case 1,
-        local Device = appT("device")
+        local Device = varTable("device")
         if (Device:isValid()) {
             if (waitAnyEvent()) {
-                local ScreenType = Device[TYPE, string]
+                local ScreenType = Device:type()
                 
                 local Command = getEventString()
                 switch (Command) {
                     case "clear",
                         switch (ScreenType) {
-                            case "egp-screen",
+                            case "gmod_wire_egp",
                                 Device["port", wirelink]:egpSetText(1, "")
                                 break
                             
-                            case "console-screen",
+                            case "gmod_wire_consolescreen",
                                 Device["port", wirelink][2041] = 1
                                 break
                             
+                            case "gmod_wire_textscreen",
+                                Device["port", wirelink]["String", string] = ""
+                                break
+                            
                             case "virtual-terminal",
-                                Device["new-erase", number] = appS("consoleText"):length()
+                                Device["new-erase", number] = varString("consoleText"):length()
                                 break
                             
                             case "virtual-egp-screen",
@@ -116,20 +93,25 @@ switch (ThisAppState) {
                                 break
                         }
                         
-                        appS("consoleText", "")
+                        varWrite("consoleText", "")
                         break
                     
                     case "print",
                         local NewPrint = getEventString()
-                        appS("consoleText", appS("consoleText") + NewPrint)
+                        local ConsoleText = varString("consoleText") + NewPrint
+                        varWrite("consoleText", ConsoleText)
                         
                         switch (ScreenType) {
-                            case "egp-screen",
-                                Device["port", wirelink]:egpSetText(1, appS("consoleText"))
+                            case "gmod_wire_egp",
+                                Device["port", wirelink]:egpSetText(1, ConsoleText)
                                 break
                             
-                            case "console-screen",
-                                Device["port", wirelink]:writeString(appS("consoleText"), 0, 0)
+                            case "gmod_wire_consolescreen",
+                                Device["port", wirelink]:writeString(ConsoleText, 0, 0)
+                                break
+                            
+                            case "gmod_wire_textscreen",
+                                Device["port", wirelink]["String", string] = ConsoleText
                                 break
                             
                             case "virtual-terminal",
@@ -141,23 +123,27 @@ switch (ThisAppState) {
                                 
                                 OutputQueue:pushString("egpSetText")
                                 OutputQueue:pushNumber(2)
-                                OutputQueue:pushString(appS("consoleText"))
+                                OutputQueue:pushString(ConsoleText)
                                 break
                         }
                         break
                     
                     case "erase",
                         local EraseCount = getEventNumber()
-                        appS("consoleText", appS("consoleText"):left(appS("consoleText"):length() - EraseCount))
+                        varWrite("consoleText", varString("consoleText"):left(varString("consoleText"):length() - EraseCount))
                         
                         switch (ScreenType) {
-                            case "egp-screen",
-                                Device["port", wirelink]:egpSetText(1, appS("consoleText"))
+                            case "gmod_wire_egp",
+                                Device["port", wirelink]:egpSetText(1, varString("consoleText"))
                                 break
                             
-                            case "console-screen",
+                            case "gmod_wire_consolescreen",
                                 Device["port", wirelink][2041] = 1
-                                Device["port", wirelink]:writeString(appS("consoleText"), 0, 0)
+                                Device["port", wirelink]:writeString(varString("consoleText"), 0, 0)
+                                break
+                            
+                            case "gmod_wire_textscreen",
+                                Device["port", wirelink]["String", string] = varString("consoleText")
                                 break
                             
                             case "virtual-terminal",
@@ -169,26 +155,26 @@ switch (ThisAppState) {
                                 
                                 OutputQueue:pushString("egpSetText")
                                 OutputQueue:pushNumber(2)
-                                OutputQueue:pushString(appS("consoleText"))
+                                OutputQueue:pushString(varString("consoleText"))
                                 break
                         }
                         break
                     
                     case "exit",
-                        Device["busy", number] = 0
-                        appClose()
+                        driverPushDevice()
+                        programKill()
                         
                         switch (ScreenType) {
-                            case "egp-screen",
+                            case "gmod_wire_egp",
                                 Device["port", wirelink]:egpClear()
                                 break
                             
-                            case "console-screen",
+                            case "gmod_wire_consolescreen",
                                 Device["port", wirelink][2041] = 1
                                 break
                             
                             case "virtual-terminal",
-                                Device["new-erase", number] = appS("consoleText"):length()
+                                Device["new-erase", number] = varString("consoleText"):length()
                                 break
                             
                             case "virtual-egp-screen",
@@ -200,13 +186,17 @@ switch (ThisAppState) {
                                 OutputQueue:pushString("egpRemove")
                                 OutputQueue:pushNumber(2)
                                 break
+                            
+                            case "gmod_wire_textscreen",
+                                Device["port", wirelink]["String", string] = ""
+                                break
                         }
                         break
                 }
             }
         }
         else {
-            appSetState(0)
+            stateSet(0)
         }
         break
 }

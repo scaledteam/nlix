@@ -4,11 +4,12 @@
 
 @name halt
 
-if (ThisAppUser == ROOT_USER) {
-    clearAll()
+if (ThisProgram["user", string] == KERNEL_ROOT_USER) {
+    gtableClear()
+    programsClear()
     runOnTick(0)
 }
 else {
     terminalPrintFast("You don't have permission for this action\n")
-    appClose()
+    programKill()
 }

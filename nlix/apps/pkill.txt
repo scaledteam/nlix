@@ -4,18 +4,12 @@
 
 @name pkill
 
-local AppName = appS("args")
-if (appExists(AppName)) {
-    local App = findAppByName(AppName)
-    if (App != NULL) {
-        terminalPrintFast("Try kill \"" + App["name", string] + "\".\n")
-        App:appClose()
-    }
-    else {
-        terminalPrintFast("App don't launched!\n")
-    }
+local Program = programFindByName(varArray("args")[1, string])
+if (Program != NULL) {
+    terminalPrintFast("Try kill \"" + Program["name", string] + "\".\n")
+    Program:programKill()
 }
 else {
-    terminalPrintFast("Error! Wrong app name!\n")
+    terminalPrintFast("Program don't launched!\n")
 }
-appCloseSelf()
+programKill()

@@ -4,51 +4,47 @@
 
 @name egp-wm-shell
 
-switch (ThisAppState) {
+switch (stateGet()) {
     # Wait console driver
     case 0,
-        if (initTerminal()) {
-            appNextState()
+        if (terminalInit()) {
+            stateNext()
         }
         break
     
     # Wait keyboard driver
     case 1,
-        if (initSimpleKeyboard()) {
-            appNextState()
+        if (simpleKeyboardInit()) {
+            stateNext()
         }
         break
     
     # Wait callback device
     case 2,
-        local Device = findDeviceByType("egp-wm-callback")
-        
-        if (Device != NULL) {
-            appT("callback-device", Device)
-            appNextState()
+        if (driverPopDevice("egp-wm-callback")) {
+            stateNext()
         }
         break
     
     # Main state
     case 3,
         terminalPrint("wm-sh: $ ")
-        requestKeyboardInput()
+        simpleKeyboardRequestInput()
         
-        appNextState()
+        stateNext()
         break
     
     # Get input
     case 4,
-        if (waitKeyboardInput()) {
-            local Input = getKeyboardInput()
+        if (simpleKeyboardWaitInput()) {
+            local Input = simpleKeyboardGetInput()
             local Commands = Input:trim():explode(" ")
             
-            local CallbackDevice = appT("callback-device")
+            local CallbackDevice = varTable("device")
             foreach (I, Command:string = Commands) {
                 CallbackDevice["queue", array]:pushString(Command)
             }
-            appSetState(3)
+            stateSet(3)
         }
-        
         break
 }

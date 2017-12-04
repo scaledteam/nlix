@@ -4,4 +4,4 @@
 
 @name test
 
-appCloseSelf()
+programKill()

@@ -4,15 +4,17 @@
 
 @name lib-driver-cursor
 
-function number initCursor() {
-    local App = findAppByName("driver-cursor")
-    if (App != NULL) {
-        varWrite("driver-cursor", App)
-        return 1
-    }
-    else {
-        return 0
-    }
+function table createVirtualCursor() {
+    local Device = object("virtual-cursor")
+    
+    Device["pos", vector2] = vec2()
+    Device["use", number] = 0
+    
+    return Device
+}
+
+function number cursorInit() {
+    return driverInit("driver-cursor")
 }
 
 function vector2 cursorGetPos() {

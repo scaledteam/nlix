@@ -5,8 +5,9 @@
 @name lib-event
 
 function number waitEvent(EventName:string) {
-    if (ThisApp["events", table][1, string] == EventName) {
-        ThisApp["events", table]:shiftString()
+    
+    if (ThisProgramEvents:count() > 0 & ThisProgramEvents[ThisProgramEvents:count(), string] == EventName) {
+        ThisProgramEvents:popString()
         return 1
     }
     else {
@@ -15,14 +16,14 @@ function number waitEvent(EventName:string) {
 }
 
 function number waitAnyEvent() {
-    return ThisApp["events", table]:count() > 0
+    return ThisProgramEvents:count() > 0
 }
 
 function number table:waitAnyEvent() {
     return This["events", table]:count() > 0
 }
 
-function table:sendEvent(Data:number)   { This["events", table]:pushNumber(Data) }
+#[function table:sendEvent(Data:number)   { This["events", table]:pushNumber(Data) }
 function table:sendEvent(Data:string)   { This["events", table]:pushString(Data) }
 function table:sendEvent(Data:vector)   { This["events", table]:pushVector(Data) }
 function table:sendEvent(Data:vector2)  { This["events", table]:pushVector2(Data) }
@@ -30,10 +31,27 @@ function table:sendEvent(Data:vector4)  { This["events", table]:pushVector4(Data
 function table:sendEvent(Data:table)    { This["events", table]:pushTable(Data) }
 function table:sendEvent(Data:angle)    { This["events", table]:pushAngle(Data) }
 
-function number     getEventNumber()    { return ThisApp["events", table]:shiftNumber() }
-function string     getEventString()    { return ThisApp["events", table]:shiftString() }
-function vector     getEventVector()    { return ThisApp["events", table]:shiftVector() }
-function vector2    getEventVector2()   { return ThisApp["events", table]:shiftVector2() }
-function vector4    getEventVector4()   { return ThisApp["events", table]:shiftVector4() }
-function table      getEventTable()     { return ThisApp["events", table]:shiftTable() }
-function angle      getEventAngle()     { return ThisApp["events", table]:shiftAngle() }
+function number     getEventNumber()    { return ThisProgramEvents:shiftNumber() }
+function string     getEventString()    { return ThisProgramEvents:shiftString() }
+function vector     getEventVector()    { return ThisProgramEvents:shiftVector() }
+function vector2    getEventVector2()   { return ThisProgramEvents:shiftVector2() }
+function vector4    getEventVector4()   { return ThisProgramEvents:shiftVector4() }
+function table      getEventTable()     { return ThisProgramEvents:shiftTable() }
+function angle      getEventAngle()     { return ThisProgramEvents:shiftAngle() }]#
+
+function table:sendEvent(Data:number)   { This["events", table]:unshiftNumber(Data) }
+function table:sendEvent(Data:string)   { This["events", table]:unshiftString(Data) }
+function table:sendEvent(Data:vector)   { This["events", table]:unshiftVector(Data) }
+function table:sendEvent(Data:vector2)  { This["events", table]:unshiftVector2(Data) }
+function table:sendEvent(Data:vector4)  { This["events", table]:unshiftVector4(Data) }
+function table:sendEvent(Data:table)    { This["events", table]:unshiftTable(Data) }
+function table:sendEvent(Data:angle)    { This["events", table]:unshiftAngle(Data) }
+
+function number     getEventNumber()    { return ThisProgramEvents:popNumber() }
+function string     getEventString()    { return ThisProgramEvents:popString() }
+function vector     getEventVector()    { return ThisProgramEvents:popVector() }
+function vector2    getEventVector2()   { return ThisProgramEvents:popVector2() }
+function vector4    getEventVector4()   { return ThisProgramEvents:popVector4() }
+function table      getEventTable()     { return ThisProgramEvents:popTable() }
+function angle      getEventAngle()     { return ThisProgramEvents:popAngle() }
+

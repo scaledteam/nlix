@@ -5,4 +5,4 @@
 @name server-hostname
 
 terminalPrintFast(hostname() + "\n")
-appCloseSelf()
+programKill()

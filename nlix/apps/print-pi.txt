@@ -4,46 +4,53 @@
 
 @name print-pi
 
-switch (ThisAppState) {
+switch (stateGet()) {
     case 0,
-        if (initTerminal()) {
-            appNextState()
+        if (terminalInit()) {
+            stateNext()
         }
         break
     
     case 1,
-        appN("iterations", 300)
-        appN("print-step", 10)
-        appN("last-print-step", 0)
+        local ArgNumber = varArray("args")[1, string]:toNumber()
+        if (ArgNumber) {
+            varWrite("iterations", ArgNumber)
+            varWrite("print-step", ArgNumber / 30)
+        }
+        else {
+            varWrite("iterations", 300)
+            varWrite("print-step", 10)
+        }
+        varWrite("last-print-step", 0)
         
-        appN("start-time", systime())
+        varWrite("start-time", systime())
         terminalPrint("Computing started...\n")
         terminalPrint("--------------|50%-----------|100%\n")
-        appNextState()
+        stateNext()
         break
     
     case 2,
-        for (I = 1, TICKS_INSIDE) {
-            appN("counter", appN("counter") + 1)
-            local N = appN("counter")
+        for (I = 1, KERNEL_OVERLOAD) {
+            varWrite("counter", varNumber("counter") + 1)
+            local N = varNumber("counter")
             
-            appN("result", appN("result") + 4 * ((-1) ^ (N - 1)) / (2 * N - 1))
+            varWrite("result", varNumber("result") + 4 * ((-1) ^ (N - 1)) / (2 * N - 1))
             
-            if (N > appN("last-print-step")) {
+            if (N > varNumber("last-print-step")) {
                 terminalPrint(".")
-                appN("last-print-step", appN("last-print-step") + appN("print-step")) 
+                varWrite("last-print-step", varNumber("last-print-step") + varNumber("print-step")) 
             }
             
-            if (N > appN("iterations")) {
+            if (N > varNumber("iterations")) {
                 terminalPrint("\n")
-                appNextState()
+                stateNext()
                 break
             }
         }
         break
     
     case 3,
-        terminalPrint("Number pi = " + appN("result") + ". Time remaining: " + (int((systime() - appN("start-time")) * 1000) / 1000) + "\n")
-        appCloseSelf()
+        terminalPrint("Number pi = " + varNumber("result") + ". Time remaining: " + (int((systime() - varNumber("start-time")) * 1000) / 1000) + "\n")
+        programKill()
         break
 }

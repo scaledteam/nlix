@@ -1,8 +1,0 @@
-#
-# This E2 made by scaled
-#
-
-@name dmesg
-
-terminalPrintFast(Dmesg)
-appCloseSelf()

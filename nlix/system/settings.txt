@@ -3,20 +3,13 @@
 #
 
 @name settings
-@persist RESET
-@persist [AUTOSTART AUTOSTART_TERMINAL AUTOSTART_EGP AUTOSTART_GL]:array
+@persist [AUTOSTART AUTOSTART_TERMINAL AUTOSTART_EGP]:array
 @persist FONT_MONOSPACED:string
-@persist TICKS_INSIDE
 
-@inputs [Port1 Port2 Port3 Port4]:wirelink
-@persist PORTS_COUNT
-PORTS_COUNT = 4
-
-SysPerf = 80
+KERNEL_PERF = 50
+KERNEL_OVERLOAD = 5
 
 FONT_MONOSPACED = "Courier New"
-
-TICKS_INSIDE = 10
 
 AUTOSTART_TERMINAL = array(
     "driver-terminal",
@@ -32,14 +25,4 @@ AUTOSTART_EGP = array(
     "egp-wm"
 )
 
-AUTOSTART_GL = array(
-    "driver-gl",
-    "driver-cursor",
-    "driver-keyboard",
-    "wustdd"
-)
-
 AUTOSTART = AUTOSTART_TERMINAL
-
-RESET = 0
-

@@ -4,13 +4,13 @@
 
 @name digi-scanner
 
-switch (ThisAppState) {
+switch (stateGet()) {
     case 0,
-        if (initDigi()) {
+        if (digiInit()) {
             varWrite("PIXELS_COUNT", digiResolution()[1] * digiResolution()[2])
             varWrite("color", vec(255))
             
-            appNextState()
+            stateNext()
         }
         break
     
@@ -19,13 +19,14 @@ switch (ThisAppState) {
             local Color = varVector("color")
             local Counter = varNumber("counter")
             local DIGI_RESOLUTION = digiResolution()
+            local DIGI_OFFSET = shift(DIGI_RESOLUTION) / 2
             local RANGER_DISTANCE = 2000
             
-            for (I = 1, TICKS_INSIDE) {
+            for (I = 1, KERNEL_OVERLOAD) {
                 local X = Counter % DIGI_RESOLUTION[1]
                 local Y = int(Counter / DIGI_RESOLUTION[1])
                 
-                local Direction = digiEntity():toWorldAxis(vec(vec2(Y, X) - DIGI_RESOLUTION / 2, -DIGI_RESOLUTION[2]))
+                local Direction = digiEntity():toWorldAxis(vec(vec2(Y, X) - DIGI_OFFSET, -DIGI_RESOLUTION[2]))
                 local RangerMain = rangerOffset(RANGER_DISTANCE, digiEntity():toWorld(vec(0, 0, -10)), Direction)
                 local Brightness = 0
                 if (RangerMain:hit()) {
@@ -35,7 +36,7 @@ switch (ThisAppState) {
                 digiDrawPixel(vec2(X, Y), Color * Brightness)
                 
                 if (Counter >= varNumber("PIXELS_COUNT")) {
-                    appClose()
+                    programKill()
                     break
                 }
                 else {

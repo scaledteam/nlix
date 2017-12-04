@@ -4,28 +4,28 @@
 
 @name wustdd
 
-switch (ThisAppState) {
+switch (stateGet()) {
     # Initialize egp
     case 0,
-        if (initGl()) {
-            appNextState()
+        if (glInit()) {
+            stateNext()
         }
         break
     
     case 1,
         varWrite("MAP", array())
-        varWrite("MAP_POLYGONS", 100)
+        varWrite("MAP_POLYGONS", 20)
         glColor(vec(50, 200, 50))
         glFillColor(vec(50, 50, 60))
         
         glPos(vec(0, -0.5, -2))
         glAng(ang(0, 0, 15))
         
-        appNextState()
+        stateNext()
         break
     
     case 2,
-        for (I = 1, TICKS_INSIDE) {
+        for (I = 1, KERNEL_OVERLOAD) {
             local Counter = varNumber("counter") + 1
             
             #Generate map
@@ -46,7 +46,7 @@ switch (ThisAppState) {
             if (Counter >= Max_Iterations) {
                 varWrite("counter", 0)
                 
-                appNextState()
+                stateNext()
                 break
             }
             else {
@@ -58,14 +58,14 @@ switch (ThisAppState) {
     case 3,
         if (glReady()) {
             glStart()
-            appNextState()
+            stateNext()
         }
         break
     
     case 4,
-        glAng(ang(10 * sin(45 * systime()), 0, 15))
+        glAng(ang(15 * sin(45 * systime()), 0, 15 + 15 * cos(45 * systime())))
         
-        for (I = 1, TICKS_INSIDE) {
+        for (I = 1, KERNEL_OVERLOAD) {
             local Counter = varNumber("counter") + 1
             
             local MAP = varArray("MAP")
@@ -75,7 +75,7 @@ switch (ThisAppState) {
             if (Counter >= MAP:count()) {
                 varWrite("counter", 0)
                 
-                appPrevState()
+                statePrev()
                 break
             }
             else {

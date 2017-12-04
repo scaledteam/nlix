@@ -4,5 +4,7 @@
 
 @name clear
 
-terminalClearFast()
-appCloseSelf()
+if (terminalInit()) {
+    terminalClear()
+    programKill()
+}

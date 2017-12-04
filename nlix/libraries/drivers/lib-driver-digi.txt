@@ -4,15 +4,8 @@
 
 @name lib-driver-digi
 
-function number initDigi() {
-    local App = findAppByName("driver-digi")
-    if (App != NULL) {
-        varWrite("driver-digi", App)
-        return 1
-    }
-    else {
-        return 0
-    }
+function number digiInit() {
+    return driverInit("driver-digi")
 }
 
 function digiDrawPixel(Pos:vector2, Color:vector) {
