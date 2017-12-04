@@ -1,0 +1,130 @@
+#
+# This E2 made by scaled
+#
+
+@name driver-digi
+
+switch (stateGet()) {
+    # Initialize
+    case 0,
+        if (driverPopDevice("gmod_wire_digitalscreen")) {
+            local Resolution = vec2(64)
+            local Port = varTable("device")["port", wirelink]
+            Port[1048574] = 0
+            Port[1048569] = 3
+            Port[1048575] = 1
+            Port[1048573] = Resolution[1]
+            Port[1048572] = Resolution[2]
+            
+            varWrite("entity", Port:entity())
+            varWrite("resolution", Resolution)
+            stateSet(2)
+        }
+        elseif (driverPopDevice("gmod_wire_egp")) {
+            local Port = varTable("device")["port", wirelink]
+            Port:egpClear()
+            Port:egpDrawTopLeft(1)
+            
+            local Resolution = int(sqrt(egpMaxObjects()))
+            #[local Size = Device["resolution", vector2] / Resolution
+            local I = 0
+            for (Y = 0, Resolution - 1) {
+                for (X = 0, Resolution - 1) {
+                    I++
+                    Screen:egpBox(I, vec2(X, Y) * Size, Size)
+                    Screen:egpColor(I, vec())
+                }
+            }]#
+            
+            varWrite("resolution", vec2(Resolution))
+            
+            varWrite("entity", Port:entity())
+            stateSet(1)
+        }
+        elseif (driverPopDevice("gmod_wire_consolescreen")) {
+            local Port = varTable("device")["port", wirelink]
+            Port[2041] = 1
+            
+            varWrite("device", Device)
+            varWrite("entity", Port:entity())
+            varWrite("resolution", vec2(30, 18))
+            stateSet(2)
+        }
+        break
+    
+    case 1,
+        local Device = varTable("device")
+        local Screen = Device["port", wirelink]
+        local Resolution = varVector2("resolution")[1]
+        local Size = floor(Device["resolution", vector2] / Resolution)
+        for (I = 1, KERNEL_OVERLOAD) {
+            local Counter = varNumber("counter")
+            
+            Screen:egpBox(Counter + 1, vec2(Counter % Resolution, int(Counter / Resolution)) * Size, Size)
+            Screen:egpColor(Counter + 1, vec())
+            
+            if (Counter >= Resolution ^ 2) {
+                stateNext()
+                break
+            }
+            else {
+                varWrite("counter", Counter + 1)
+            }
+        }
+        break
+    
+    case 2,
+        varWrite("idle", 1)
+        
+        stateNext()
+        break
+    
+    # Wait events
+    case 3,
+        local Device = varTable("device")
+        if (Device:isValid()) {
+            for (I = 1, KERNEL_OVERLOAD) {
+                if (eventsExists()) {
+                    varWrite("idle", 0)
+                    local Command = eventGetString()
+                    
+                    switch (Command) {
+                        case "drawPixel",
+                            switch (Device:type()) {
+                                case "gmod_wire_digitalscreen",
+                                    local Pos = eventGetVector2()
+                                    local Color = eventGetVector()
+                                    Device["port", wirelink][Pos[1] + Pos[2] * varVector2("resolution")[1]] = rgb2digi(Color, 3)
+                                    break
+                                
+                                case "gmod_wire_egp",
+                                    local Pos = eventGetVector2()
+                                    local Color = eventGetVector()
+                                    Device["port", wirelink]:egpColor(Pos[1] + Pos[2] * varVector2("resolution")[1], Color)
+                                    break
+                                
+                                case "gmod_wire_consolescreen",
+                                    local Pos = eventGetVector2()
+                                    local Color = eventGetVector()
+                                    Device["port", wirelink]:writeString(" ", Pos[1], Pos[2], vec(), Color)
+                                    break
+                            }
+                            break
+                        
+                        case "exit",
+                            driverPushDevice()
+                            programKill()
+                            break
+                    }
+                }
+                else {
+                    varWrite("idle", 1)
+                    break
+                }
+            }
+        }
+        else {
+            stateSet(0)
+        }
+        break
+}

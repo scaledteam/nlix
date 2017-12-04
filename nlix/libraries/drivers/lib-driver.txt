@@ -1,0 +1,36 @@
+#
+# Created by scaled
+#
+
+@name lib-driver
+
+function number driverInit(DriverName:string) {
+    local App = programFindByName(DriverName)
+    if (App != NULL & App:exists("events")) {
+        varWrite(DriverName, App)
+        return 1
+    }
+    else {
+        return 0
+    }
+}
+
+function table table:driverGetDevice() {
+    return This:varTable("device")
+}
+
+function number driverPopDevice(DeviceType:string) {
+    for (I = 1, ThisWorkspace:count()) {
+        local Device = ThisWorkspace[I, table]
+        if (Device:type() == DeviceType) {
+            ThisWorkspace:remove(I)
+            varWrite("device", Device)
+            return 1
+        }
+    }
+    return 0
+}
+
+function driverPushDevice() {
+    ThisWorkspace:pushTable(varTable("device"))
+}

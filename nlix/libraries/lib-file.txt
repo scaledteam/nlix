@@ -1,0 +1,133 @@
+#
+# Created by scaled
+#
+
+@name lib-file
+@persist Files:table [FileLoad FileLoadType]:string
+@persist FileList:array FileListType:string
+@persist FileLoadReady FileListReady
+
+Files = object("table")
+Files["testfile", string] = "123"
+
+local Folder = object("table")
+Folder["testfile2", string] = "1234"
+Files["dir", table] = Folder
+
+Folder = object("dir")
+Folder["path", string] = ""
+Files["rdir", table] = Folder
+
+Folder = object("dir")
+Folder["path", string] = "/test"
+Files["rdir2", table] = Folder
+
+FileLoadReady = 1
+FileListReady = 1
+
+function number table:afileLoad(Name:string) {
+    FileLoadType = This:type()
+    switch (FileLoadType) {
+        case "table",
+            FileLoad = This[Name, string]
+            return 1
+        
+        case "file",
+            fileLoad(This["path", string] + Name)
+            FileLoadReady = 0
+            return 1
+        
+        default,
+            return 0
+    }
+}
+
+function number afileReady() {
+    switch (FileLoadType) {
+        case "table",
+            return 1
+        
+        case "file",
+            FileLoadReady = fileLoaded()
+            return FileLoadReady
+        
+        default,
+            return 0
+    }
+}
+
+function string afileRead() {
+    switch (FileLoadType) {
+        case "table",
+            return FileLoad
+        
+        case "file",
+            return fileRead()
+        
+        default,
+            return ""
+    }
+}
+
+function afileListLoad(Path:string) {
+    local Folder = Files
+    
+    local PathExplode = Path:explode("/")
+    for (I = 1, PathExplode:count()) {
+        local Type = Folder:type()
+        if (Type == "table") {
+            local NextFolder = PathExplode:shiftString()
+            if (NextFolder != "") {
+                Folder = Folder[NextFolder, table]
+            }
+        }
+        elseif (Type == "dir") {
+            fileList(Folder["path", string] + "/" + PathExplode:concat("/") + "/*")
+            print(Folder["path", string] + "/" + PathExplode:concat("/") + "/*")
+            break
+        }
+    }
+    Path = PathExplode:concat("/")
+    
+    FileListType = Folder:type()
+    switch (FileListType) {
+        case "table",
+            FileList = Folder:keys()
+            break
+        
+        case "dir",
+            fileList(Folder["path", string] + Path)
+            break
+    }
+}
+
+function number afileListReady() {
+    switch (FileListType) {
+        case "table",
+            return 1
+        
+        case "dir",
+            FileListReady = fileLoadedList()
+            return FileListReady
+        
+        default,
+            return 0
+    }
+}
+
+function array afileListRead() {
+    switch (FileListType) {
+        case "table",
+            return FileList
+        
+        case "dir",
+            return fileReadList()
+        
+        default,
+            return array()
+    }
+}
+
+function afileWrite() {
+    
+}

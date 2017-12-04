@@ -1,0 +1,87 @@
+#
+# This E2 made by scaled
+#
+
+@name sh
+
+switch (stateGet()) {
+    case 0,
+        if (terminalInit()) {
+            terminalPrint("Welcome to the Nlix operating system!\n")
+            stateNext()
+        }
+        break
+    
+    case 1,
+        if (keyboardInit()) {
+            stateNext()
+        }
+        break
+    
+    case 2,
+        if (simpleKeyboardInit()) {
+            stateNext()
+        }
+        break
+    
+    case 3,
+        terminalPrint(ThisProgram["user", string] + " $ ")
+        simpleKeyboardRequestInput()
+        
+        stateNext()
+        break
+    
+    case 4,
+        if (simpleKeyboardWaitInput()) {
+            local Command = simpleKeyboardGetInput()
+            if (Command == "") {
+                stateSet(3)
+            }
+            else {
+                local Program = NULL
+                Command = Command:trim()
+                
+                local CommandExplode = Command:explode(" ")
+                
+                local I = 1
+                while (I < CommandExplode:count()) {
+                    if (CommandExplode[I, string] == "") {
+                        CommandExplode:remove(I)
+                    }
+                    else {
+                        I++
+                    }
+                }
+                
+                local ProgramName = CommandExplode:shiftString()
+                local Program = programStart(ProgramName)
+                if (CommandExplode:count() > 0) {
+                    Program["vars", table] = table()
+                    Program:varWrite("args", CommandExplode)
+                }
+                
+                varWrite("LaunchedApp", Program)
+                stateNext()
+            }
+        }
+        
+        break
+    
+    case 5,
+        if (!varTable("LaunchedApp"):isValid()) {
+            stateSet(3)
+        }
+        
+        local KeyboardKeys = keyboardGetKeys()
+        if (changed(KeyboardKeys:count())) {
+            if (KeyboardKeys[1, number] == 158) {
+                if (KeyboardKeys[2, number] == 99) {
+                    varTable("LaunchedApp"):eventSend("exit")
+                }
+                if (KeyboardKeys[2, number] == 122) {
+                    varTable("LaunchedApp"):programKill()
+                }
+            }
+        }
+        break
+}

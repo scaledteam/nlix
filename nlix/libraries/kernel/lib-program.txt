@@ -1,0 +1,68 @@
+#
+# Created by scaled
+#
+
+@name lib-program
+@persist KERNEL_ROOT_USER:string
+@persist [ThisProgram ThisWorkspace]:table
+
+KERNEL_ROOT_USER = "root"
+
+function table table:programStart(Name:string) {
+    local Program = object("program")
+    Program["name", string] = Name
+    if (ThisProgram:exists("user")) {
+        Program["user", string] = ThisProgram["user", string]
+    }
+    else {
+        Program["user", string] = KERNEL_ROOT_USER
+    }
+    Program["workspace", table] = This
+    Programs:pushTable(Program)
+    return Program
+}
+
+function table programStart(Name:string) {
+    return ThisWorkspace:programStart(Name)
+}
+
+function table:programKill() {
+    for (I = 1, Programs:count()) {
+        if (Programs[I, table] == This) {
+            Programs:remove(I)
+        }
+    }
+    This:clear()
+}
+
+function programKill() {
+    ThisProgram:programKill()
+}
+
+function programsClear() {
+    for (I = 1, Programs:count()) {
+        local Program = Programs[I, table]
+        
+        local ProgramTableTypes = Program:typeidsArray()
+        foreach (J, Type:string = ProgramTableTypes) {
+            if (Type == "t") {
+                Program[J, table]:clear()
+            }
+            elseif (Type == "r") {
+                Program[J, array]:clear()
+            }
+        }
+        Program:clear()
+    }
+    Programs:clear()
+}
+
+function table programFindByName(Name:string) {
+    for (I = 1, Programs:count()) {
+        local Program = Programs[I, table]
+        if (Program["name", string] == Name & Program["workspace", table] == ThisWorkspace) {
+            return Program
+        }
+    }
+    return NULL
+}

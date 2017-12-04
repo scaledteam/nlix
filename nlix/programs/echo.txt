@@ -1,0 +1,12 @@
+#
+# This E2 made by scaled
+#
+
+@name echo
+
+local Output = ""
+foreach (I, Arg:string = varArray("args")) {
+    Output += Arg + "\n"
+}
+terminalPrintFast(Output)
+programKill()

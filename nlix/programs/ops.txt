@@ -1,0 +1,8 @@
+#
+# This E2 made by scaled
+#
+
+@name ops
+
+terminalPrintFast(ops() + "\n")
+programKill()

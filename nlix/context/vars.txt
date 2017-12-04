@@ -1,0 +1,12 @@
+#
+# Created by scaled
+#
+
+@name vars
+
+if (!ThisProgram:exists("vars")) {
+    ThisProgram["vars", table] = table()
+}
+
+ThisProgramVars = ThisProgram["vars", table]
+

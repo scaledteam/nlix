@@ -1,0 +1,10 @@
+#
+# This E2 made by scaled
+#
+
+@name clear
+
+if (terminalInit()) {
+    terminalClear()
+    programKill()
+}

@@ -1,0 +1,21 @@
+#
+# This E2 made by scaled
+#
+
+@name gtable
+
+local Gtable = gTable("nlix")
+if (Gtable["version", number] == 1.0) {
+    Programs = Gtable["programs", table]
+    KERNEL_TIME_START = Gtable["KERNEL_TIME_START", number]
+}
+else {
+    Gtable["programs", table] = Programs
+    Gtable["version", number] = 1.0
+    Gtable["KERNEL_TIME_START", number] = KERNEL_TIME_START
+}
+
+function gtableClear() {
+    local Gtable = gTable("nlix")
+    Gtable:clear()
+}

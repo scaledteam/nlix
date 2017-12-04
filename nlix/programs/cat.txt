@@ -1,0 +1,8 @@
+#
+# Created by scaled
+#
+
+@name cat
+
+terminalPrintFast(varArray("args")[1, string] + "\n")
+programKill()

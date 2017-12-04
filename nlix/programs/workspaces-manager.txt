@@ -1,0 +1,140 @@
+#
+# This E2 made by scaled
+#
+
+@name workspaces-manager
+
+switch (stateGet()) {
+    # Wait terminal driver
+    case 0,
+        if (terminalInit()) {
+            terminalPrint("Workspaces manager. Write \"quit\" for exit.\n")
+            stateNext()
+        }
+        break
+    
+    # Wait keyboard driver
+    case 1,
+        if (simpleKeyboardInit()) {
+            stateNext()
+        }
+        break
+    
+    # Main state
+    case 2,
+        terminalPrint("> ")
+        varWrite("outputCount", varNumber("outputCount") + 2)
+        simpleKeyboardRequestInput()
+        
+        stateNext()
+        break
+    
+    # Get input
+    case 3,
+        if (simpleKeyboardWaitInput()) {
+            local Input = simpleKeyboardGetInput()
+            varWrite("input", Input)
+            varWrite("outputCount", varNumber("outputCount") + Input:length() + 1)
+            local InputExplode = Input:explode(" ")
+            local Command = InputExplode[1, string]
+            switch (Command) {
+                case "",
+                    stateSet(2)
+                    break
+                
+                case "ws-term",
+                    local Workspace = createWorkspace(AUTOSTART_TERMINAL)
+                    Workspace:addDevice(findFreeDeviceByType("console-screen"))
+                    Workspace:addDevice(findFreeDeviceByType("egp-screen"))
+                    Workspace:addDevice(findFreeDeviceByType("text-screen"))
+                    Workspace:addDevice(findFreeDeviceByType("keyboard"))
+                    Workspace:startWorkspace()
+                    stateSet(2)
+                    break
+                
+                case "ws-egp",
+                    local WorkspaceWithDevices = NULL
+                    for (I = 1, Apps:count()) {
+                        local App = Apps[I, table]
+                        if (App["name", string] == "hotplugd") {
+                            WorkspaceWithDevices = App["workspace", table]
+                        }
+                    }
+                    local Workspace = createWorkspace(AUTOSTART_EGP)
+                    Workspace:addDevice(WorkspaceWithDevices:findFreeDeviceByType("egp-screen"))
+                    Workspace:addDevice(WorkspaceWithDevices:findFreeDeviceByType("cursor"))
+                    Workspace:addDevice(WorkspaceWithDevices:findFreeDeviceByType("keyboard"))
+                    Workspace:startWorkspace()
+                    stateSet(2)
+                    break
+                
+                case "dev-list",
+                    local Message = ""
+                    for (I = 1, ThisWorkspace["devices", table]:count()) {
+                        local Device = ThisWorkspace["devices", table][I, table]
+                        Message += I + ", " + (Device["busy", number] ? "busy" : "free") + ", " + Device[TYPE, string] + "\n"
+                    }
+                    terminalPrint(Message)
+                    varWrite("outputCount", varNumber("outputCount") + Message:length())
+                    stateSet(2)
+                    break
+                
+                case "dev-del",
+                    local Id = InputExplode[2, string]:toNumber()
+                    ThisWorkspace["devices", table][Id, table]:clear()
+                    ThisWorkspace["devices", table]:remove(Id)
+                    stateSet(2)
+                    break
+                
+                case "quit",
+                    appClose()
+                    break
+                
+                case "exit",
+                    appClose()
+                    break
+                
+                case "dev-free",
+                    local Device = ThisWorkspace[InputExplode[2, string]:toNumber(), table]
+                    Device["busy", number] = 0
+                    stateSet(2)
+                    break
+                
+                case "dev-busy",
+                    local Device = ThisWorkspace[InputExplode[2, string]:toNumber(), table]
+                    Device["busy", number] = 1
+                    stateSet(2)
+                    break
+                
+                case "clear",
+                    terminalErase(varNumber("outputCount"))
+                    varWrite("outputCount", 0)
+                    stateSet(2)
+                    break
+                
+                case "help",
+                    local Message = "ws-term\n" +
+                        "ws-egp\n" +
+                        "dev-list\n" +
+                        "dev-del\n" +
+                        "quit\n" + 
+                        "exit\n" +
+                        "clear\n" + 
+                        "help\n" + 
+                        "dev-free\n" + 
+                        "dev-busy\n"
+                    terminalPrint(Message)
+                    varWrite("outputCount", varNumber("outputCount") + Message:length())
+                    stateSet(2)
+                    break
+                
+                default,
+                    local Message = "Wrong command\n"
+                    terminalPrint(Message)
+                    varWrite("outputCount", varNumber("outputCount") + Message:length())
+                    stateSet(2)
+                    break
+            }
+        }
+        break
+}

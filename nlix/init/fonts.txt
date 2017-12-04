@@ -1,0 +1,8 @@
+#
+# Created by scaled
+#
+
+@name fonts
+@persist FONT_MONOSPACED:string
+
+FONT_MONOSPACED = "Courier New"

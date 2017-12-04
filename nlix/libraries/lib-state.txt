@@ -1,0 +1,25 @@
+#
+# This E2 made by scaled
+#
+
+@name lib-state
+
+function number stateGet() {
+    return ThisProgramVars["state", number]
+}
+
+function stateSet(State) {
+    ThisProgramVars["state", number] = State
+}
+
+function stateNext() {
+    ThisProgramVars["state", number] = ThisProgramVars["state", number] + 1
+}
+
+function statePrev() {
+    ThisProgramVars["state", number] = ThisProgramVars["state", number] - 1
+}
+
+function stateShift(State) {
+    ThisProgramVars["state", number] = ThisProgramVars["state", number] + State
+}

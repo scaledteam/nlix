@@ -1,0 +1,51 @@
+#
+# This E2 made by scaled
+#
+
+@name exit
+
+switch (stateGet()) {
+    case 0,
+        if (programFindByName("hotplugd") != NULL & varArray("args")[1, string] != "--force") {
+            terminalPrintFast("You can lost hotplug function after exit. Use --force if you really want it.\n")
+            programKill()
+        }
+        else {
+            stateNext()
+        }
+        break
+    
+    case 1,
+        local ThisWorkspacePrograms = table()
+        for (I = 1, Programs:count()) {
+            local Program = Programs[I, table]
+            if (Program["workspace", table] == ThisWorkspace) {
+                ThisWorkspacePrograms:pushTable(Program)
+            }
+        }
+        varWrite("apps", ThisWorkspacePrograms)
+        stateNext()
+        break
+    
+    case 2,
+        varWrite("exitAllTime", systime() + 2)
+        local ThisWorkspacePrograms = varTable("apps")
+        for (I = 1, ThisWorkspacePrograms:count()) {
+            ThisWorkspacePrograms[I, table]:eventSend("exit")
+        }
+        stateNext()
+        break
+    
+    case 3,
+        if (systime() >= varNumber("exitAllTime")) {
+            local ThisWorkspacePrograms = varTable("apps")
+            for (I = 1, ThisWorkspacePrograms:count()) {
+                local Program = ThisWorkspacePrograms[I, table]
+                if (Program:isValid()) {
+                    Program:programKill()
+                }
+            }
+            ThisWorkspace:clear()
+        }
+        break
+}

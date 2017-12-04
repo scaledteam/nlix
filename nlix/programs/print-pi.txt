@@ -1,0 +1,56 @@
+#
+# This E2 made by scaled
+#
+
+@name print-pi
+
+switch (stateGet()) {
+    case 0,
+        if (terminalInit()) {
+            stateNext()
+        }
+        break
+    
+    case 1,
+        local ArgNumber = varArray("args")[1, string]:toNumber()
+        if (ArgNumber) {
+            varWrite("iterations", ArgNumber)
+            varWrite("print-step", ArgNumber / 30)
+        }
+        else {
+            varWrite("iterations", 300)
+            varWrite("print-step", 10)
+        }
+        varWrite("last-print-step", 0)
+        
+        varWrite("start-time", systime())
+        terminalPrint("Computing started...\n")
+        terminalPrint("--------------|50%-----------|100%\n")
+        stateNext()
+        break
+    
+    case 2,
+        for (I = 1, KERNEL_OVERLOAD) {
+            varWrite("counter", varNumber("counter") + 1)
+            local N = varNumber("counter")
+            
+            varWrite("result", varNumber("result") + 4 * ((-1) ^ (N - 1)) / (2 * N - 1))
+            
+            if (N > varNumber("last-print-step")) {
+                terminalPrint(".")
+                varWrite("last-print-step", varNumber("last-print-step") + varNumber("print-step")) 
+            }
+            
+            if (N > varNumber("iterations")) {
+                terminalPrint("\n")
+                stateNext()
+                break
+            }
+        }
+        break
+    
+    case 3,
+        terminalPrint("Number pi = " + varNumber("result") + ". Time remaining: " + (int((systime() - varNumber("start-time")) * 1000) / 1000) + "\n")
+        programKill()
+        break
+}

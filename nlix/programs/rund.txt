@@ -1,0 +1,10 @@
+#
+# Created by scaled
+#
+
+@name rund
+
+local AppName = varArray("args")[1, string]
+programStart(AppName)
+
+programKill()

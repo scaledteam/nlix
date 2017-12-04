@@ -1,0 +1,14 @@
+#
+# This E2 made by scaled
+#
+
+@name perf
+
+local ArgNumber = varArray("args")[1, string]:toNumber()
+if (ArgNumber != 0) {
+    KERNEL_PERF = ArgNumber
+}
+else {
+    terminalPrintFast("Entered value is not a number or 0.\n")
+}
+programKill()

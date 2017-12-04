@@ -1,0 +1,81 @@
+#
+# This E2 made by scaled
+#
+
+@name driver-cursor
+
+switch (stateGet()) {
+    case 0,
+        if (egpInit()) {
+            local Device = varTable("driver-egp"):driverGetDevice()
+            varWrite("device", Device)
+            
+            if (Device:type() == "gmod_wire_egp") {
+                varWrite("need-to-find-user", 1)
+                stateNext()
+            }
+        }
+        break
+    
+    case 1,
+        #ifdef findInSphere(vector,number)
+            if (varNumber("need-to-find-user")) {
+                findIncludeClass("player")
+            }
+        #endif
+        
+        if (varNumber("need-to-find-user")) {
+            stateNext()
+        }
+        else {
+            stateSet(3)
+        }
+        break
+    
+    case 2,
+        if (varNumber("need-to-find-user")) {
+            #ifdef findInSphere(vector,number)
+                local ScanPos = varTable("device")["port", wirelink]:entity():pos()
+                findInSphere(ScanPos, 100)
+                findSortByDistance(ScanPos)
+                varWrite("user", find())
+            #else
+                local ScanPos = varTable("device")["port", wirelink]:entity():pos()
+                local Player_Distance = 100
+                foreach(I, Player:entity = players()){
+                    local Distance = ScanPos:distance(Player:pos())
+                    if (Distance < Player_Distance){
+                        Player_Distance = Distance
+                        varWrite("user", Player)
+                    }
+                }
+            #endif
+        }
+        
+        stateNext()
+        break
+    
+    case 3,
+        local Device = varTable("device")
+        
+        switch (Device:type()) {
+            case "gmod_wire_egp",
+                varWrite("pos", Device["port", wirelink]:egpCursor(varEntity("user")))
+                varWrite("use", varEntity("user"):keyUse())
+                break
+            
+            case "virtual-cursor",
+                varWrite("pos", Device["pos", vector2])
+                varWrite("use", Device["use", number])
+                break
+        }
+        if (varNumber("need-to-find-user")) {
+            stateSet(2)
+        }
+        
+        if (eventWaitString("exit")) {
+            driverPushDevice()
+            programKill()
+        }
+        break
+}

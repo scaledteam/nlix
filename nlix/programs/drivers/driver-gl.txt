@@ -1,0 +1,127 @@
+#
+# Created by scaled
+#
+
+@name driver-gl
+
+switch (stateGet()) {
+    # Initialize
+    case 0,
+        if (driverPopDevice("gmod_wire_egp")) {
+            local Screen = varTable("device")["port", wirelink]
+            Screen:egpClear()
+            Screen:egpDrawTopLeft(1)
+            Screen:egpBox(1, vec2(), vec2(512))
+            Screen:egpColor(1, vec())
+            
+            local Id = egpMaxObjects()
+            while (Id >= 2) {
+                Screen:egpTriangle(Id, vec2(), vec2(), vec2())
+                Id--
+            }
+            
+            varWrite("resolution", vec2(512))
+            stateNext()
+        }
+        break
+    
+    case 1,
+        varWrite("usedIds", array())
+        
+        varWrite("idle", 1)
+        stateNext()
+        break
+    
+    # Wait events
+    case 2,
+        local Device = varTable("device")
+        local Screen = Device["port", wirelink]
+        local ResolutionY = varVector2("resolution")[2] / 2
+        if (Device:isValid()) {
+            for (Tick = 1, KERNEL_OVERLOAD) {
+                if (eventsExists()) {
+                    varWrite("idle", 0)
+                    local Command = eventGetString()
+                    
+                    switch (Command) {
+                        case "glStart",
+                            local Id = egpMaxObjects()
+                            
+                            local UsedIds = varArray("usedIds")
+                            local UsedIdsOld = varArray("usedIdsOld")
+                            while (Id >= 2) {
+                                if (!UsedIds:exists(Id) & UsedIdsOld:exists(Id)) {
+                                    Screen:egpTriangle(Id, vec2(), vec2(), vec2())
+                                    UsedIds:remove(Id)
+                                }
+                                Id--
+                            }
+                            varWrite("usedIdsOld", UsedIds)
+                            
+                            UsedIdsOld:clear()
+                            varWrite("usedIds", UsedIdsOld)
+                            break
+                        
+                        case "glFillColor",
+                            Screen:egpColor(1, eventGetVector())
+                            break
+                        
+                        case "glColor",
+                            varWrite("color", eventGetVector())
+                            break
+                        
+                        case "glPos",
+                            varWrite("pos", eventGetVector())
+                            break
+                        
+                        case "glAng",
+                            varWrite("matrix", matrix(eventGetAngle()))
+                            break
+                        
+                        case "glTriangle",
+                            local Matrix = varMatrix("matrix")
+                            local Pos = varVector("pos")
+                            
+                            local Pos1 = Matrix * (eventGetVector() - Pos)
+                            local Pos2 = Matrix * (eventGetVector() - Pos)
+                            local Pos3 = Matrix * (eventGetVector() - Pos)
+                            
+                            local UsedIds = varArray("usedIds")
+                            local Id = int(egpMaxObjects() / 10 * (Pos1 + Pos2 + Pos3)[3] / 3) + 1
+                            
+                            while (UsedIds:exists(Id)) {
+                                Id++
+                            }
+                            UsedIds[Id, number] = 1
+                            
+                            if (Pos1[3] > 0 & Pos2[3] > 0 & Pos3[3] > 0) {
+                                Screen:egpTriangle(Id,
+                                    ResolutionY * Pos1:dehomogenized(),
+                                    ResolutionY * Pos2:dehomogenized(),
+                                    ResolutionY * Pos3:dehomogenized()
+                                )
+                                Screen:egpColor(Id, varVector("color"))
+                                Screen:egpParent(Id, 1)
+                            }
+                            break
+                        
+                        case "exit",
+                            Screen:egpClear()
+                            driverPushDevice()
+                            programKill()
+                            break
+                        
+                        default,
+                    }
+                }
+                else {
+                    varWrite("idle", 1)
+                    break
+                }
+            }
+        }
+        else {
+            stateSet(0)
+        }
+        break
+    }

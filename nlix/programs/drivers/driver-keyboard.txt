@@ -1,0 +1,83 @@
+#
+# This E2 made by scaled
+#
+
+@name driver-keyboard
+
+switch (stateGet()) {
+    # Initialize
+    case 0,
+        # Init first keyboard
+        if (driverPopDevice("gmod_wire_keyboard")) {
+            stateNext()
+        }
+        elseif (driverPopDevice("virtual-keyboard")) {
+            stateNext()
+        }
+        elseif (driverPopDevice("gmod_wire_textentry")) {
+            varWrite("inputString", "")
+            stateNext()
+        }
+        
+        break
+    
+    case 1,
+        varWrite("keys", array())
+        
+        stateNext()
+        break
+    
+    # Track keys
+    case 2,
+        local Device = varTable("device")
+        if (Device:isValid()) {
+            DeviceType = Device:type()
+            
+            switch (DeviceType) {
+                case "gmod_wire_keyboard",
+                    local Keys = varArray("keys")
+                    local Count = Device["port", wirelink][0]
+                    for (I = 1, Count) {
+                        Keys[I, number] = Device["port", wirelink][I]
+                    }
+                    Count++
+                    for (I = Count, Keys:count()) {
+                        Keys:remove(Count)
+                    }
+                    break
+                
+                case "virtual-keyboard",
+                    varWrite("keys", Device["keys", array])
+                    break
+                
+                case "gmod_wire_textentry",
+                    local Keys = varArray("keys")
+                    local InputString = Device["port", wirelink]["Text", string]
+                    
+                    if (InputString != varString("inputString")) {
+                        varWrite("inputString", InputString)
+                        if (InputString != "") {
+                            InputString += "\n"
+                            local Length = InputString:length()
+                            
+                            for (I = 1, Length) {
+                                Keys[I, number] = toUnicodeByte(InputString[I])
+                            }
+                        }
+                    }
+                    else {
+                        Keys:clear()
+                    }
+                    break
+            }
+        }
+        else {
+            stateSet(0)
+        }
+        
+        if (eventWaitString("exit")) {
+            driverPushDevice()
+            programKill()
+        }
+        break
+}

@@ -1,0 +1,129 @@
+#
+# This E2 made by scaled
+#
+
+@name bc
+
+switch (stateGet()) {
+    # Wait terminal driver
+    case 0,
+        if (terminalInit()) {
+            terminalPrint("Calculator shell. Write \"quit\" for exit.\n")
+            stateNext()
+        }
+        break
+    
+    # Wait keyboard driver
+    case 1,
+        if (simpleKeyboardInit()) {
+            stateNext()
+        }
+        break
+    
+    # Main state
+    case 2,
+        terminalPrint("> ")
+        varWrite("outputCount", varNumber("outputCount") + 2)
+        simpleKeyboardRequestInput()
+        
+        stateNext()
+        break
+    
+    # Get input
+    case 3,
+        if (simpleKeyboardWaitInput()) {
+            local Input = simpleKeyboardGetInput()
+            varWrite("input", Input)
+            varWrite("outputCount", varNumber("outputCount") + Input:length() + 1)
+            switch (Input) {
+                case "",
+                    stateSet(2)
+                    break
+                
+                case "quit",
+                    programKill()
+                    break
+                
+                case "exit",
+                    programKill()
+                    break
+                
+                case "clear",
+                    terminalErase(varNumber("outputCount"))
+                    varWrite("outputCount", 0)
+                    stateSet(2)
+                    break
+                
+                default,
+                    stateSet(4)
+                    break
+            }
+        }
+        break
+    
+    # Compute
+    case 4,
+        local Input = varString("input")
+        
+        local InputExplode = array()
+        local LastDivider = 0
+        
+        local InputActions = array()
+        
+        local Result = 0
+        
+        # Separate numbers
+        for (I = 1, Input:length()) {
+            local Char = Input[I]
+            if (Char == "+" | Char == "-" | Char == "*" | Char == "/") {
+                InputExplode:pushNumber(Input:sub(LastDivider + 1, I - 1):toNumber())
+                LastDivider = I
+                
+                InputActions:pushString(Char)
+            }
+        }
+        InputExplode:pushNumber(Input:sub(LastDivider + 1):toNumber())
+        
+        # Replace actions on numbers
+        ## *, /
+        local I = 1
+        while (I <= InputActions:count()) {
+            if (InputActions[I, string] == "*") {
+                InputExplode[I, number] = InputExplode[I, number] * InputExplode[I + 1, number]
+                InputActions:remove(I)
+                InputExplode:remove(I + 1)
+            }
+            elseif (InputActions[I, string] == "/") {
+                InputExplode[I, number] = InputExplode[I, number] / InputExplode[I + 1, number]
+                InputActions:remove(I)
+                InputExplode:remove(I + 1)
+            }
+            else {
+                I++
+            }
+        }
+        
+        ## +, -
+        I = 1
+        while (I <= InputActions:count()) {
+            if (InputActions[I, string] == "+") {
+                InputExplode[I, number] = InputExplode[I, number] + InputExplode[I + 1, number]
+                InputActions:remove(I)
+                InputExplode:remove(I + 1)
+            }
+            elseif (InputActions[I, string] == "-") {
+                InputExplode[I, number] = InputExplode[I, number] - InputExplode[I + 1, number]
+                InputActions:remove(I)
+                InputExplode:remove(I + 1)
+            }
+            else {
+                I++
+            }
+        }
+        
+        local Output = InputExplode:concat(" ") + "\n"
+        terminalPrint(Output)
+        varWrite("outputCount", varNumber("outputCount") + Output:length())
+        stateSet(2)
+        break
+}

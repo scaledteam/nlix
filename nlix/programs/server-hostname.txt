@@ -1,0 +1,8 @@
+#
+# This E2 made by scaled
+#
+
+@name server-hostname
+
+terminalPrintFast(hostname() + "\n")
+programKill()

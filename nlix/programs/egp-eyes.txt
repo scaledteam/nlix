@@ -1,0 +1,80 @@
+#
+# This E2 made by scaled
+#
+
+@name egp-eyes
+
+switch (stateGet()) {
+    case 0,
+        if (egpInit()) {
+            stateNext()
+        }
+        break
+    
+    case 1,
+        if (cursorInit()) {
+            stateNext()
+        }
+        break
+    
+    case 2,
+        egpBox(1, vec2(), egpResolution())
+        egpParentToBase(1)
+        
+        egpCircleOutline(2, egpResolution() * vec2(0.25, 0.5), egpResolution() * vec2(0.5, 1) / 2)
+        egpParentToBase(2)
+        egpColor(2, vec())
+        
+        egpCircleOutline(3, egpResolution() * vec2(0.75, 0.5), egpResolution() * vec2(0.5, 1) / 2)
+        egpParentToBase(3)
+        egpColor(3, vec())
+        
+        egpCircle(4, egpResolution() * vec2(0.25, 0.5), egpResolution() * vec2(0.5, 1) / 20)
+        egpParentToBase(4)
+        egpColor(4, vec())
+        
+        egpCircle(5, egpResolution() * vec2(0.75, 0.5), egpResolution() * vec2(0.5, 1) / 20)
+        egpParentToBase(5)
+        egpColor(5, vec())
+        
+        stateNext()
+        break
+    
+    case 3,
+        if (egpIsIdle()) {
+            local CursorPos = cursorGetPos()
+            if (varVector2("cursorPosOld") != CursorPos) {
+                if (CursorPos == vec2(-1)) {
+                    egpPos(4, egpResolution() * vec2(0.25, 0.5))
+                    egpPos(5, egpResolution() * vec2(0.75, 0.5))
+                }
+                else {
+                    local RadiusX = egpResolution()[1] / 2
+                    local RadiusY = egpResolution()[2]
+                    local Aspect = RadiusY / RadiusX
+                    
+                    local Offset1 = egpResolution() * vec2(0.25, 0.5)
+                    local Offset2 = egpResolution() * vec2(0.75, 0.5)
+                    
+                    local Direction1 = CursorPos - Offset1
+                    local Direction2 = CursorPos - Offset2
+                    
+                    local Eye1Pos = Direction1 / sqrt(Direction1[1] ^ 2 + (Direction1[2] / Aspect) ^ 2) * RadiusX / 2
+                    local Eye2Pos = Direction2 / sqrt(Direction2[1] ^ 2 + (Direction2[2] / Aspect) ^ 2) * RadiusX / 2
+                    
+                    if (Eye1Pos:length() > Direction1:length()) {
+                        Eye1Pos = Direction1
+                    }
+                    if (Eye2Pos:length() > Direction2:length()) {
+                        Eye2Pos = Direction2
+                    }
+                    
+                    egpPos(4, Eye1Pos + Offset1)
+                    egpPos(5, Eye2Pos + Offset2)
+                    
+                    varWrite("cursorPosOld", CursorPos)
+                }
+            }
+        }
+        break
+}

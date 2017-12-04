@@ -1,0 +1,9 @@
+#
+# This E2 made by scaled
+#
+
+@name uptime
+
+local Uptime = systime() - KERNEL_TIME_START
+terminalPrintFast(int(Uptime / 60 / 60 / 24) % 30 + " days, " + int(Uptime / 60 / 60) % 24 + ":" + int(Uptime / 60) % 60 + ":" + int(Uptime) % 60 + "\n")
+programKill()

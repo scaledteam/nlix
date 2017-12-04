@@ -1,0 +1,8 @@
+#
+# This E2 made by scaled
+#
+
+@name kernel-error
+
+terminalPrintFast(KERNEL_ERROR)
+appClose()

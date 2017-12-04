@@ -1,0 +1,8 @@
+#
+# This E2 made by scaled
+#
+
+@name server-uptime
+
+terminalPrintFast(int(systime() / 60 / 60 / 24) % 30 + " days, " + int(systime() / 60 / 60) % 24 + ":" + int(systime() / 60) % 60 + ":" + int(systime()) % 60 + "\n")
+programKill()
