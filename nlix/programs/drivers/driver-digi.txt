@@ -56,7 +56,7 @@ switch (stateGet()) {
         local Device = varTable("device")
         local Screen = Device["port", wirelink]
         local Resolution = varVector2("resolution")[1]
-        local Size = floor(Device["resolution", vector2] / Resolution)
+        local Size = floor(vec2(512) / Resolution)
         for (I = 1, KERNEL_OVERLOAD) {
             local Counter = varNumber("counter")
             

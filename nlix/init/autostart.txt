@@ -3,27 +3,25 @@
 #
 
 @name autostart
-@persist [AUTOSTART_TERMINAL AUTOSTART_EGP]:array
 
-AUTOSTART_TERMINAL = array(
+local AUTOSTART = array(
+    "hotplugd",
     "driver-terminal",
     "driver-keyboard",
     "simple-keyboard",
     "sh"
 )
 
-AUTOSTART_EGP = array(
+#[local AUTOSTART = array(
+    "hotplugd",
     "driver-egp",
     "driver-cursor",
     "driver-keyboard",
     "egp-wm"
-)
-
-local AUTOSTART = AUTOSTART_TERMINAL
+)]#
 
 if (Programs:count() == 0) {
     local Workspace = table()
-    Workspace:programStart("hotplugd")
     
     foreach (I, ProgramName:string = AUTOSTART) {
         Workspace:programStart(ProgramName)

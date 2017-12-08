@@ -3,11 +3,12 @@
 #
 
 @name lib-event
-@persist ThisProgramEvents:table
+
+PROGRAM_TABLES:pushString("events")
 
 function number eventWaitString(EventName:string) {
-    if (ThisProgramEvents:count() > 0 & ThisProgramEvents[ThisProgramEvents:count(), string] == EventName) {
-        ThisProgramEvents:popString()
+    if (ThisProgram["events", table]:count() > 0 & ThisProgram["events", table][ThisProgram["events", table]:count(), string] == EventName) {
+        ThisProgram["events", table]:popString()
         return 1
     }
     else {
@@ -16,7 +17,7 @@ function number eventWaitString(EventName:string) {
 }
 
 function number eventsExists() {
-    return ThisProgramEvents:count() > 0
+    return ThisProgram["events", table]:count() > 0
 }
 
 function number table:eventsExists() {
@@ -46,25 +47,25 @@ function table:eventSend(Data:ranger)      { This["events", table]:unshiftRanger
 function table:eventSend(Data:effect)      { This["events", table]:unshiftEffect(Data) }
 #endif
 
-function angle      eventGetAngle()     { return ThisProgramEvents:popAngle() }
-function array      eventGetArray()     { return ThisProgramEvents:popArray() }
-function bone       eventGetBone()      { return ThisProgramEvents:popBone() }
-function complex    eventGetComplex()   { return ThisProgramEvents:popComplex() }
-function entity     eventGetEntity()    { return ThisProgramEvents:popEntity() }
-function matrix     eventGetMatrix()    { return ThisProgramEvents:popMatrix() }
-function matrix2    eventGetMatrix2()   { return ThisProgramEvents:popMatrix2() }
-function matrix4    eventGetMatrix4()   { return ThisProgramEvents:popMatrix4() }
-function number     eventGetNumber()    { return ThisProgramEvents:popNumber() }
-function quaternion eventGetQuaternion(){ return ThisProgramEvents:popQuaternion() }
-function string     eventGetString()    { return ThisProgramEvents:popString() }
-function table      eventGetTable()     { return ThisProgramEvents:popTable() }
-function vector     eventGetVector()    { return ThisProgramEvents:popVector() }
-function vector2    eventGetVector2()   { return ThisProgramEvents:popVector2() }
-function vector4    eventGetVector4()   { return ThisProgramEvents:popVector4() }
-function wirelink   eventGetWirelink()  { return ThisProgramEvents:popWirelink() }
+function angle      eventGetAngle()     { return ThisProgram["events", table]:popAngle() }
+function array      eventGetArray()     { return ThisProgram["events", table]:popArray() }
+function bone       eventGetBone()      { return ThisProgram["events", table]:popBone() }
+function complex    eventGetComplex()   { return ThisProgram["events", table]:popComplex() }
+function entity     eventGetEntity()    { return ThisProgram["events", table]:popEntity() }
+function matrix     eventGetMatrix()    { return ThisProgram["events", table]:popMatrix() }
+function matrix2    eventGetMatrix2()   { return ThisProgram["events", table]:popMatrix2() }
+function matrix4    eventGetMatrix4()   { return ThisProgram["events", table]:popMatrix4() }
+function number     eventGetNumber()    { return ThisProgram["events", table]:popNumber() }
+function quaternion eventGetQuaternion(){ return ThisProgram["events", table]:popQuaternion() }
+function string     eventGetString()    { return ThisProgram["events", table]:popString() }
+function table      eventGetTable()     { return ThisProgram["events", table]:popTable() }
+function vector     eventGetVector()    { return ThisProgram["events", table]:popVector() }
+function vector2    eventGetVector2()   { return ThisProgram["events", table]:popVector2() }
+function vector4    eventGetVector4()   { return ThisProgram["events", table]:popVector4() }
+function wirelink   eventGetWirelink()  { return ThisProgram["events", table]:popWirelink() }
 #ifdef ranger()
-function ranger     eventGetRanger()    { return ThisProgramEvents:popRanger() }
+function ranger     eventGetRanger()    { return ThisProgram["events", table]:popRanger() }
 #endif
 #ifdef effect()
-function effect     eventGetEffect()    { return ThisProgramEvents:popEffect() }
+function effect     eventGetEffect()    { return ThisProgram["events", table]:popEffect() }
 #endif

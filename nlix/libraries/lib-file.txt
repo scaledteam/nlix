@@ -83,7 +83,7 @@ function afileListLoad(Path:string) {
         }
         elseif (Type == "dir") {
             fileList(Folder["path", string] + "/" + PathExplode:concat("/") + "/*")
-            print(Folder["path", string] + "/" + PathExplode:concat("/") + "/*")
+            #print(Folder["path", string] + "/" + PathExplode:concat("/") + "/*")
             break
         }
     }

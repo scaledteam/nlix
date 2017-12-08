@@ -2,8 +2,9 @@
 # This E2 made by scaled
 #
 
-@name lib-vars-2
-@persist ThisProgramVars:table
+@name lib-vars
+
+PROGRAM_TABLES:pushString("vars")
 
 function angle      table:varAngle(VarName:string)     { return This["vars", table][VarName, angle] }
 function array      table:varArray(VarName:string)     { return This["vars", table][VarName, array] }
@@ -51,54 +52,54 @@ function table:varWrite(VarName:string, Write:ranger)      { This["vars", table]
 function table:varWrite(VarName:string, Write:effect)      { This["vars", table][VarName, effect] = Write }
 #endif
 
-function angle      varAngle(VarName:string)     { return ThisProgramVars[VarName, angle] }
-function array      varArray(VarName:string)     { return ThisProgramVars[VarName, array] }
-function bone       varBone(VarName:string)      { return ThisProgramVars[VarName, bone] }
-function complex    varComplex(VarName:string)   { return ThisProgramVars[VarName, complex] }
-function entity     varEntity(VarName:string)    { return ThisProgramVars[VarName, entity] }
-function matrix     varMatrix(VarName:string)    { return ThisProgramVars[VarName, matrix] }
-function matrix2    varMatrix2(VarName:string)   { return ThisProgramVars[VarName, matrix2] }
-function matrix4    varMatrix4(VarName:string)   { return ThisProgramVars[VarName, matrix4] }
-function number     varNumber(VarName:string)    { return ThisProgramVars[VarName, number] }
-function quaternion varQuaternion(VarName:string){ return ThisProgramVars[VarName, quaternion] }
-function string     varString(VarName:string)    { return ThisProgramVars[VarName, string] }
-function table      varTable(VarName:string)     { return ThisProgramVars[VarName, table] }
-function vector     varVector(VarName:string)    { return ThisProgramVars[VarName, vector] }
-function vector2    varVector2(VarName:string)   { return ThisProgramVars[VarName, vector2] }
-function vector4    varVector4(VarName:string)   { return ThisProgramVars[VarName, vector4] }
-function wirelink   varWirelink(VarName:string)  { return ThisProgramVars[VarName, wirelink] }
+function angle      varAngle(VarName:string)     { return ThisProgram["vars", table][VarName, angle] }
+function array      varArray(VarName:string)     { return ThisProgram["vars", table][VarName, array] }
+function bone       varBone(VarName:string)      { return ThisProgram["vars", table][VarName, bone] }
+function complex    varComplex(VarName:string)   { return ThisProgram["vars", table][VarName, complex] }
+function entity     varEntity(VarName:string)    { return ThisProgram["vars", table][VarName, entity] }
+function matrix     varMatrix(VarName:string)    { return ThisProgram["vars", table][VarName, matrix] }
+function matrix2    varMatrix2(VarName:string)   { return ThisProgram["vars", table][VarName, matrix2] }
+function matrix4    varMatrix4(VarName:string)   { return ThisProgram["vars", table][VarName, matrix4] }
+function number     varNumber(VarName:string)    { return ThisProgram["vars", table][VarName, number] }
+function quaternion varQuaternion(VarName:string){ return ThisProgram["vars", table][VarName, quaternion] }
+function string     varString(VarName:string)    { return ThisProgram["vars", table][VarName, string] }
+function table      varTable(VarName:string)     { return ThisProgram["vars", table][VarName, table] }
+function vector     varVector(VarName:string)    { return ThisProgram["vars", table][VarName, vector] }
+function vector2    varVector2(VarName:string)   { return ThisProgram["vars", table][VarName, vector2] }
+function vector4    varVector4(VarName:string)   { return ThisProgram["vars", table][VarName, vector4] }
+function wirelink   varWirelink(VarName:string)  { return ThisProgram["vars", table][VarName, wirelink] }
 #ifdef ranger()
-function ranger     varRanger(VarName:string)    { return ThisProgramVars[VarName, ranger] }
+function ranger     varRanger(VarName:string)    { return ThisProgram["vars", table][VarName, ranger] }
 #endif
 #ifdef effect()
-function effect     varEffect(VarName:string)    { return ThisProgramVars[VarName, effect] }
+function effect     varEffect(VarName:string)    { return ThisProgram["vars", table][VarName, effect] }
 #endif
 
-function varWrite(VarName:string, Write:angle)       { ThisProgramVars[VarName, angle] = Write }
-function varWrite(VarName:string, Write:array)       { ThisProgramVars[VarName, array] = Write }
-function varWrite(VarName:string, Write:bone)        { ThisProgramVars[VarName, bone] = Write }
-function varWrite(VarName:string, Write:complex)     { ThisProgramVars[VarName, complex] = Write }
-function varWrite(VarName:string, Write:entity)      { ThisProgramVars[VarName, entity] = Write }
-function varWrite(VarName:string, Write:matrix)      { ThisProgramVars[VarName, matrix] = Write }
-function varWrite(VarName:string, Write:matrix2)     { ThisProgramVars[VarName, matrix2] = Write }
-function varWrite(VarName:string, Write:matrix4)     { ThisProgramVars[VarName, matrix4] = Write }
-function varWrite(VarName:string, Write:number)      { ThisProgramVars[VarName, number] = Write }
-function varWrite(VarName:string, Write:quaternion)  { ThisProgramVars[VarName, quaternion] = Write }
-function varWrite(VarName:string, Write:string)      { ThisProgramVars[VarName, string] = Write }
-function varWrite(VarName:string, Write:table)       { ThisProgramVars[VarName, table] = Write }
-function varWrite(VarName:string, Write:vector)      { ThisProgramVars[VarName, vector] = Write }
-function varWrite(VarName:string, Write:vector2)     { ThisProgramVars[VarName, vector2] = Write }
-function varWrite(VarName:string, Write:vector4)     { ThisProgramVars[VarName, vector4] = Write }
-function varWrite(VarName:string, Write:wirelink)    { ThisProgramVars[VarName, wirelink] = Write }
+function varWrite(VarName:string, Write:angle)       { ThisProgram["vars", table][VarName, angle] = Write }
+function varWrite(VarName:string, Write:array)       { ThisProgram["vars", table][VarName, array] = Write }
+function varWrite(VarName:string, Write:bone)        { ThisProgram["vars", table][VarName, bone] = Write }
+function varWrite(VarName:string, Write:complex)     { ThisProgram["vars", table][VarName, complex] = Write }
+function varWrite(VarName:string, Write:entity)      { ThisProgram["vars", table][VarName, entity] = Write }
+function varWrite(VarName:string, Write:matrix)      { ThisProgram["vars", table][VarName, matrix] = Write }
+function varWrite(VarName:string, Write:matrix2)     { ThisProgram["vars", table][VarName, matrix2] = Write }
+function varWrite(VarName:string, Write:matrix4)     { ThisProgram["vars", table][VarName, matrix4] = Write }
+function varWrite(VarName:string, Write:number)      { ThisProgram["vars", table][VarName, number] = Write }
+function varWrite(VarName:string, Write:quaternion)  { ThisProgram["vars", table][VarName, quaternion] = Write }
+function varWrite(VarName:string, Write:string)      { ThisProgram["vars", table][VarName, string] = Write }
+function varWrite(VarName:string, Write:table)       { ThisProgram["vars", table][VarName, table] = Write }
+function varWrite(VarName:string, Write:vector)      { ThisProgram["vars", table][VarName, vector] = Write }
+function varWrite(VarName:string, Write:vector2)     { ThisProgram["vars", table][VarName, vector2] = Write }
+function varWrite(VarName:string, Write:vector4)     { ThisProgram["vars", table][VarName, vector4] = Write }
+function varWrite(VarName:string, Write:wirelink)    { ThisProgram["vars", table][VarName, wirelink] = Write }
 #ifdef ranger()
-function varWrite(VarName:string, Write:ranger)      { ThisProgramVars[VarName, ranger] = Write }
+function varWrite(VarName:string, Write:ranger)      { ThisProgram["vars", table][VarName, ranger] = Write }
 #endif
 #ifdef effect()
-function varWrite(VarName:string, Write:effect)      { ThisProgramVars[VarName, effect] = Write }
+function varWrite(VarName:string, Write:effect)      { ThisProgram["vars", table][VarName, effect] = Write }
 #endif
 
-function varRemove(VarName:string) { ThisProgramVars:remove(VarName) }
+function varRemove(VarName:string) { ThisProgram["vars", table]:remove(VarName) }
 function table:varRemove(VarName:string) { This["vars", table]:remove(VarName) }
 
-function number varExists(VarName:string) { return ThisProgramVars:exists(VarName) }
+function number varExists(VarName:string) { return ThisProgram["vars", table]:exists(VarName) }
 function number table:varExists(VarName:string) { return This["vars", table]:exists(VarName) }

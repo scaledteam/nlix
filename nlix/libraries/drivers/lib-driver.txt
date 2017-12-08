@@ -6,7 +6,7 @@
 
 function number driverInit(DriverName:string) {
     local App = programFindByName(DriverName)
-    if (App != NULL & App:exists("events")) {
+    if (App != NULL) {
         varWrite(DriverName, App)
         return 1
     }
@@ -19,7 +19,7 @@ function table table:driverGetDevice() {
     return This:varTable("device")
 }
 
-function number driverPopDevice(DeviceType:string) {
+#[function number driverPopDevice(DeviceType:string) {
     for (I = 1, ThisWorkspace:count()) {
         local Device = ThisWorkspace[I, table]
         if (Device:type() == DeviceType) {
@@ -33,4 +33,16 @@ function number driverPopDevice(DeviceType:string) {
 
 function driverPushDevice() {
     ThisWorkspace:pushTable(varTable("device"))
+}]#
+
+function number driverPopDevice(DeviceType:string) {
+    if (ThisProgram["devices", table]:count() == 0 & devicePop(DeviceType)) {
+        varWrite("device", deviceGet())
+        return 1
+    }
+    return 0
+}
+
+function driverPushDevice() {
+    devicePush()
 }

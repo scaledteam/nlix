@@ -23,31 +23,32 @@ if (tickClk()) {
                     case 2, #include "nlix/libraries/kernel/lib-program" break
                     
                     # Important libs
-                    case 3, #include "nlix/libraries/lib-vars" break
-                    case 4, #include "nlix/libraries/lib-event" break
-                    case 5, #include "nlix/libraries/lib-file" break
+                    case 3, #include "nlix/libraries/lib-devices" break
+                    case 4, #include "nlix/libraries/lib-vars" break
+                    case 5, #include "nlix/libraries/lib-event" break
                     case 6, #include "nlix/libraries/lib-state" break
+                    #case 7, #include "nlix/libraries/lib-file" break
                     
                     # Driver libs
-                    case  7, #include "nlix/libraries/drivers/lib-driver"            break
-                    case  8, #include "nlix/libraries/drivers/lib-driver-terminal"  break
-                    case  9, #include "nlix/libraries/drivers/lib-driver-keyboard"  break
-                    case 10, #include "nlix/libraries/drivers/lib-driver-egp"       break
-                    case 11, #include "nlix/libraries/drivers/lib-driver-cursor"    break
-                    case 12, #include "nlix/libraries/drivers/lib-driver-digi"      break
-                    case 13, #include "nlix/libraries/drivers/lib-driver-gl"        break
+                    case  8, #include "nlix/libraries/drivers/lib-driver"            break
+                    case  9, #include "nlix/libraries/drivers/lib-driver-terminal"  break
+                    case 10, #include "nlix/libraries/drivers/lib-driver-keyboard"  break
+                    case 11, #include "nlix/libraries/drivers/lib-driver-egp"       break
+                    case 12, #include "nlix/libraries/drivers/lib-driver-cursor"    break
+                    #case 13, #include "nlix/libraries/drivers/lib-driver-digi"      break
+                    #case 14, #include "nlix/libraries/drivers/lib-driver-gl"        break
                     
                     # Other libs
-                    case 14, #include "nlix/libraries/lib-simple-keyboard" break
+                    case 15, #include "nlix/libraries/lib-simple-keyboard" break
                     
                     # Init
-                    case 15, #include "nlix/init/settings" break
-                    case 16, #include "nlix/init/fonts" break
-                    case 17, #include "nlix/init/gtable" break
-                    case 18, #include "nlix/init/autostart" break
+                    case 16, #include "nlix/init/settings" break
+                    case 17, #include "nlix/init/fonts" break
+                    #case 18, #include "nlix/init/gtable" break
+                    case 19, #include "nlix/init/autostart" break
                     
                     # Move to execution state
-                    case 19, KernelState0++, KernelState1 = 0
+                    case 20, KernelState0++, KernelState1 = 0
                 }
                 if (KernelState0 != 0) {
                     break
@@ -62,10 +63,9 @@ if (tickClk()) {
                     KernelState1 = 1
                 }
                 
-                #include "nlix/context/program"
-                #include "nlix/context/vars"
-                #include "nlix/context/events"
+                ThisProgram = Programs[KernelState1, table]
                 
+                local ThisProgramName = ThisProgram["name", string]
                 switch (ThisProgramName) {
                     # System daemons
                     case "hotplugd",            #include "nlix/programs/hotplugd"                   break
@@ -75,8 +75,8 @@ if (tickClk()) {
                     case "driver-keyboard",     #include "nlix/programs/drivers/driver-keyboard"    break
                     case "driver-egp",          #include "nlix/programs/drivers/driver-egp"       break
                     case "driver-cursor",       #include "nlix/programs/drivers/driver-cursor"      break
-                    case "driver-digi",         #include "nlix/programs/drivers/driver-digi"        break
-                    case "driver-gl",           #include "nlix/programs/drivers/driver-gl"          break
+                    #case "driver-digi",         #include "nlix/programs/drivers/driver-digi"        break
+                    #case "driver-gl",           #include "nlix/programs/drivers/driver-gl"          break
                     
                     # Simplifier tools.
                     case "simple-keyboard",     #include "nlix/programs/simple-keyboard"            break
@@ -86,8 +86,8 @@ if (tickClk()) {
                     case "rund",                #include "nlix/programs/rund"                       break
                     
                     # Quit tools.
-                    case "halt",                #include "nlix/programs/halt"                       break
-                    case "reboot",              #include "nlix/programs/reboot"                     break
+                    #case "halt",                #include "nlix/programs/halt"                       break
+                    #case "reboot",              #include "nlix/programs/reboot"                     break
                     case "exit",                #include "nlix/programs/exit"                       break
                     case "login",               #include "nlix/programs/login"                      break
                     
@@ -124,17 +124,17 @@ if (tickClk()) {
                     case "egp-wm-shell",        #include "nlix/programs/egp-wm-shell"               break
                     
                     # Workspace management
-                    #case "workspaces-manager",  #include "nlix/programs/workspaces-manager"         break
+                    case "workspaces-manager",  #include "nlix/programs/workspaces-manager"         break
                     
                     # Digital screen
-                    case "digi-scanner",        #include "nlix/programs/digi-scanner"               break
+                    #case "digi-scanner",        #include "nlix/programs/digi-scanner"               break
                     
                     # Egp 3d
-                    case "wustdd",              #include "nlix/programs/wustdd"                     break
+                    #case "wustdd",              #include "nlix/programs/wustdd"                     break
                     
                     # Files
-                    case "ls",                  #include "nlix/programs/ls"                         break
-                    case "cat",                 #include "nlix/programs/cat"                        break
+                    #case "ls",                  #include "nlix/programs/ls"                         break
+                    #case "cat",                 #include "nlix/programs/cat"                        break
                     
                     default,
                         ThisProgram:programKill()

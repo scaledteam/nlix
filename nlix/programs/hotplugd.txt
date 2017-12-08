@@ -20,8 +20,8 @@ switch (stateGet()) {
             # Check if device exists
             local DeviceExists = 0
             local DeviceType = Port:entity():type()
-            for (I = 1, ThisWorkspace:count()) {
-                if (ThisWorkspace[I, table]["port", wirelink]:entity():type() == DeviceType & ThisWorkspace[I, table]["port", wirelink] == Port) {
+            for (I = 1, ThisProgram["workspace", table]:count()) {
+                if (ThisProgram["workspace", table][I, table]["port", wirelink]:entity():type() == DeviceType & ThisProgram["workspace", table][I, table]["port", wirelink] == Port) {
                     DeviceExists = 1
                     break
                 }
@@ -31,7 +31,7 @@ switch (stateGet()) {
                 local Device = object(DeviceType)
                 Device["port", wirelink] = Port
                 
-                ThisWorkspace:pushTable(Device)
+                ThisProgram["workspace", table]:pushTable(Device)
             }
         }
         varWrite("PortOld" + Counter, Port)
@@ -49,14 +49,14 @@ switch (stateGet()) {
     case 1,
         local Counter = varNumber("counter") + 1
         
-        local Device = ThisWorkspace["devices", table][Counter, table]
+        local Device = ThisProgram["workspace", table]["devices", table][Counter, table]
         if (!Device["type", string]:find("virtual") & !Device["port", wirelink]:entity():isValid()) {
             Device:clear()
-            ThisWorkspace["devices", table]:remove(Counter)
+            ThisProgram["workspace", table]["devices", table]:remove(Counter)
             Counter--
         }
         
-        if (Counter >= ThisWorkspace["devices", table]:count()) {
+        if (Counter >= ThisProgram["workspace", table]["devices", table]:count()) {
             statePrev()
             varWrite("counter", 0)
         }

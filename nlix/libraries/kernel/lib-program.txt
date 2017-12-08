@@ -4,12 +4,18 @@
 
 @name lib-program
 @persist KERNEL_ROOT_USER:string
-@persist [ThisProgram ThisWorkspace]:table
+@persist PROGRAM_TABLES:array
+@persist ThisProgram:table
 
 KERNEL_ROOT_USER = "root"
 
 function table table:programStart(Name:string) {
     local Program = object("program")
+    
+    foreach (I, TableName:string = PROGRAM_TABLES) {
+        Program[TableName, table] = table()
+    }
+    
     Program["name", string] = Name
     if (ThisProgram:exists("user")) {
         Program["user", string] = ThisProgram["user", string]
@@ -23,16 +29,23 @@ function table table:programStart(Name:string) {
 }
 
 function table programStart(Name:string) {
-    return ThisWorkspace:programStart(Name)
+    return ThisProgram["workspace", table]:programStart(Name)
 }
 
 function table:programKill() {
     for (I = 1, Programs:count()) {
         if (Programs[I, table] == This) {
+            local Program = Programs[I, table]
+            
+            foreach (I, TableName:string = PROGRAM_TABLES) {
+                Program[TableName, table] = table()
+            }
+            Program:clear()
+            
             Programs:remove(I)
+            break
         }
     }
-    This:clear()
 }
 
 function programKill() {
@@ -58,6 +71,7 @@ function programsClear() {
 }
 
 function table programFindByName(Name:string) {
+    local ThisWorkspace = ThisProgram["workspace", table]
     for (I = 1, Programs:count()) {
         local Program = Programs[I, table]
         if (Program["name", string] == Name & Program["workspace", table] == ThisWorkspace) {
@@ -66,3 +80,4 @@ function table programFindByName(Name:string) {
     }
     return NULL
 }
+

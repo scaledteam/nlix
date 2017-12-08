@@ -1,0 +1,56 @@
+#
+# Created by scaled
+#
+
+@name lib-devices
+
+PROGRAM_TABLES:pushString("devices")
+
+function table table:deviceGet()    { return This["devices", table][1, table] }
+function table table:deviceGet(Id)  { return This["devices", table][Id, table] }
+
+function table deviceGet()          { return ThisProgram["devices", table][1, table] }
+function table deviceGet(Id)        { return ThisProgram["devices", table][Id, table] }
+
+function number devicePop(DeviceType:string) {
+    for (I = 1, ThisProgram["workspace", table]:count()) {
+        local Device = ThisProgram["workspace", table][I, table]
+        if (Device:type() == DeviceType & !Device["program", table]:isValid()) {
+            Device["program", table] = ThisProgram
+            ThisProgram["devices", table]:pushTable(Device)
+            return 1
+        }
+    }
+    return 0
+}
+
+function number devicePopAll(DeviceType:string) {
+    local Count = 0
+    for (I = 1, ThisProgram["workspace", table]:count()) {
+        local Device = ThisProgram["workspace", table][I, table]
+        if (Device:type() == DeviceType & !Device["program", table]:isValid()) {
+            Device["program", table] = ThisProgram
+            ThisProgram["devices", table]:pushTable(Device)
+            Count++
+        }
+    }
+    return Count
+}
+
+function devicePush() {
+    ThisProgram["devices", table][1, table]:remove("program")
+    ThisProgram["devices", table]:remove(1)
+}
+
+function devicePush(Id) {
+    ThisProgram["devices", table][Id, table]:remove("program")
+    ThisProgram["devices", table]:remove(Id)
+}
+
+function devicePushAll() {
+    local ThisProgramDevices = ThisProgram["devices", table]
+    for (I = 1, ThisProgramDevices:count()) {
+        ThisProgramDevices[I, table]:remove("program")
+    }
+    ThisProgramDevices:clear()
+}

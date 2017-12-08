@@ -43,16 +43,36 @@ switch (stateGet()) {
                     break
                 
                 case "ws-term",
-                    local Workspace = createWorkspace(AUTOSTART_TERMINAL)
-                    Workspace:addDevice(findFreeDeviceByType("console-screen"))
-                    Workspace:addDevice(findFreeDeviceByType("egp-screen"))
-                    Workspace:addDevice(findFreeDeviceByType("text-screen"))
-                    Workspace:addDevice(findFreeDeviceByType("keyboard"))
-                    Workspace:startWorkspace()
+                    if (devicePop("gmod_wire_textscreen") | devicePop("gmod_wire_consolescreen") | devicePop("gmod_wire_egp")) { }
+                    if (devicePop("gmod_wire_keyboard") | devicePop("gmod_wire_textentry")) { }
+                    
+                    local ThisProgramDevices = ThisProgram["devices", table]
+                    if (ThisProgramDevices:count() == 2) {
+                        local Workspace = table()
+                        while (ThisProgramDevices:count() > 0) {
+                            local Device = ThisProgramDevices:popTable()
+                            Device:remove("program")
+                            Workspace:unshiftTable(Device)
+                        }
+                        
+                        local Autostart = array(
+                            "driver-terminal",
+                            "driver-keyboard",
+                            "simple-keyboard",
+                            "sh"
+                        )
+                        foreach (I, ProgramName:string = Autostart) {
+                            Workspace:programStart(ProgramName)
+                        }
+                    }
+                    else {
+                        devicePushAll()
+                    }
+                    
                     stateSet(2)
                     break
                 
-                case "ws-egp",
+                #[case "ws-egp",
                     local WorkspaceWithDevices = NULL
                     for (I = 1, Apps:count()) {
                         local App = Apps[I, table]
@@ -66,13 +86,13 @@ switch (stateGet()) {
                     Workspace:addDevice(WorkspaceWithDevices:findFreeDeviceByType("keyboard"))
                     Workspace:startWorkspace()
                     stateSet(2)
-                    break
+                    break]#
                 
                 case "dev-list",
                     local Message = ""
-                    for (I = 1, ThisWorkspace["devices", table]:count()) {
-                        local Device = ThisWorkspace["devices", table][I, table]
-                        Message += I + ", " + (Device["busy", number] ? "busy" : "free") + ", " + Device[TYPE, string] + "\n"
+                    for (I = 1, ThisProgram["workspace", table]:count()) {
+                        local Device = ThisProgram["workspace", table][I, table]
+                        Message += I + ", " + (Device:exists("program") ? "busy" : "free") + ", " + Device:type() + "\n"
                     }
                     terminalPrint(Message)
                     varWrite("outputCount", varNumber("outputCount") + Message:length())
@@ -81,29 +101,17 @@ switch (stateGet()) {
                 
                 case "dev-del",
                     local Id = InputExplode[2, string]:toNumber()
-                    ThisWorkspace["devices", table][Id, table]:clear()
-                    ThisWorkspace["devices", table]:remove(Id)
+                    ThisProgram["workspace", table][Id, table]:clear()
+                    ThisProgram["workspace", table]:remove(Id)
                     stateSet(2)
                     break
                 
                 case "quit",
-                    appClose()
+                    programKill()
                     break
                 
                 case "exit",
-                    appClose()
-                    break
-                
-                case "dev-free",
-                    local Device = ThisWorkspace[InputExplode[2, string]:toNumber(), table]
-                    Device["busy", number] = 0
-                    stateSet(2)
-                    break
-                
-                case "dev-busy",
-                    local Device = ThisWorkspace[InputExplode[2, string]:toNumber(), table]
-                    Device["busy", number] = 1
-                    stateSet(2)
+                    programKill()
                     break
                 
                 case "clear",
@@ -120,9 +128,7 @@ switch (stateGet()) {
                         "quit\n" + 
                         "exit\n" +
                         "clear\n" + 
-                        "help\n" + 
-                        "dev-free\n" + 
-                        "dev-busy\n"
+                        "help\n"
                     terminalPrint(Message)
                     varWrite("outputCount", varNumber("outputCount") + Message:length())
                     stateSet(2)

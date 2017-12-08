@@ -19,7 +19,7 @@ switch (stateGet()) {
         local ThisWorkspacePrograms = table()
         for (I = 1, Programs:count()) {
             local Program = Programs[I, table]
-            if (Program["workspace", table] == ThisWorkspace) {
+            if (Program["workspace", table] == ThisProgram["workspace", table]) {
                 ThisWorkspacePrograms:pushTable(Program)
             }
         }
@@ -45,7 +45,7 @@ switch (stateGet()) {
                     Program:programKill()
                 }
             }
-            ThisWorkspace:clear()
+            ThisProgram["workspace", table]:clear()
         }
         break
 }
