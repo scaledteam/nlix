@@ -117,6 +117,18 @@ switch (stateGet()) {
                             egpLine(Id, EgpQueue:shiftVector2(), EgpQueue:shiftVector2())
                             break
                         
+                        case "egpLineStrip",
+                            local Count = EgpQueue:shiftNumber()
+                            
+                            local Poses = array()
+                            
+                            for (I = 1, Count) {
+                                Poses:pushVector2(EgpQueue:shiftVector2())
+                            }
+                            break
+                            egpLineStrip(Id, Poses)
+                            break
+                        
                         case "egpColor",
                             egpColor(Id, EgpQueue:shiftVector())
                             break

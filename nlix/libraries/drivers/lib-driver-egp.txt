@@ -201,6 +201,14 @@ function egpLine(Id, Pos1:vector2, Pos2:vector2) {
     App:eventSend(Pos2)
 }
 
+function egpLineStrip(Id, Poses:array) {
+    local App = varTable("driver-egp")
+    
+    App:eventSend("egpLineStrip")
+    App:eventSend(Id)
+    App:eventSend(Poses)
+}
+
 function egpPos(Id, Pos:vector2) {
     local App = varTable("driver-egp")
     
@@ -276,5 +284,5 @@ function vector2 egpSize(Id) {
 }
 
 function string egpType(Id) {
-    return varTable("driver-egp"):varTable("egpObjects")[Id, table]:type()
+    return varTable("driver-egp"):varTable("egpObjects")[Id, table]["type", string]
 }

@@ -6,12 +6,25 @@
 
 switch (stateGet()) {
     case 0,
+        local Device = NULL
         if (egpInit()) {
-            local Device = varTable("driver-egp"):driverGetDevice()
-            varWrite("device", Device)
+            Device = varTable("driver-egp"):driverGetDevice()
             
             if (Device:type() == "gmod_wire_egp") {
-                varWrite("need-to-find-user", 1)
+                varWrite("device", Device)
+                
+                if (Device:type() == "gmod_wire_egp") {
+                    varWrite("need-to-find-user", 1)
+                    stateNext()
+                }
+            }
+            else {
+                Device = NULL
+            }
+        }
+        
+        if (Device == NULL) {
+            if (driverPopDevice("virtual-cursor")) {
                 stateNext()
             }
         }

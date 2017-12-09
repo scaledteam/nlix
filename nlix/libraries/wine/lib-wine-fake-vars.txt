@@ -1,0 +1,27 @@
+#
+# Created by scaled
+#
+
+@name lib-wine-fake-vars
+@persist ROM:gtable
+@persist Update:string
+@persist User:entity
+@persist API_Version
+@persist Sys_Name:string Sys_Version
+@persist Sys_Text_Enable_Changed
+@persist Device:wirelink Device_Connected
+
+# Fix it
+Sys_Name = "Nlix"
+Sys_Version = 0.1
+
+Device = Port4
+
+Threads_Max = 2
+
+User = owner()
+
+ROM["System", table] = table()
+ROM["System", table]["Theme", vector] = vec(50, 200, 50)
+
+API_Version = 5

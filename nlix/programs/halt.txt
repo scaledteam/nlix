@@ -6,7 +6,7 @@
 
 if (ThisProgram["user", string] == KERNEL_ROOT_USER) {
     gtableClear()
-    programsClear()
+    programKillAll()
     runOnTick(0)
 }
 else {

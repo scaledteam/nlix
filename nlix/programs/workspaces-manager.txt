@@ -92,7 +92,7 @@ switch (stateGet()) {
                     local Message = ""
                     for (I = 1, ThisProgram["workspace", table]:count()) {
                         local Device = ThisProgram["workspace", table][I, table]
-                        Message += I + ", " + (Device:exists("program") ? "busy" : "free") + ", " + Device:type() + "\n"
+                        Message += I + ", " + (Device["program", table]:isValid() ? "busy" : "free") + ", " + Device:type() + "\n"
                     }
                     terminalPrint(Message)
                     varWrite("outputCount", varNumber("outputCount") + Message:length())

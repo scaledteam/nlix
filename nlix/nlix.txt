@@ -6,7 +6,7 @@
 
 @persist KERNEL_PERF KERNEL_OVERLOAD 
 @persist KernelState0 KernelState1
-@persist Programs:table
+@persist Programs:table ThisProgram:table ThisProgramName:string
 
 if (first()) {
     #include "nlix/init/first"
@@ -27,7 +27,7 @@ if (tickClk()) {
                     case 4, #include "nlix/libraries/lib-vars" break
                     case 5, #include "nlix/libraries/lib-event" break
                     case 6, #include "nlix/libraries/lib-state" break
-                    #case 7, #include "nlix/libraries/lib-file" break
+                    case 7, #include "nlix/libraries/lib-file" break
                     
                     # Driver libs
                     case  8, #include "nlix/libraries/drivers/lib-driver"            break
@@ -35,20 +35,35 @@ if (tickClk()) {
                     case 10, #include "nlix/libraries/drivers/lib-driver-keyboard"  break
                     case 11, #include "nlix/libraries/drivers/lib-driver-egp"       break
                     case 12, #include "nlix/libraries/drivers/lib-driver-cursor"    break
-                    #case 13, #include "nlix/libraries/drivers/lib-driver-digi"      break
-                    #case 14, #include "nlix/libraries/drivers/lib-driver-gl"        break
+                    case 13, #include "nlix/libraries/drivers/lib-driver-digi"      break
+                    case 14, #include "nlix/libraries/drivers/lib-driver-gl"        break
                     
                     # Other libs
                     case 15, #include "nlix/libraries/lib-simple-keyboard" break
                     
+                    # Wine libs
+                    #[case 16, #include "nlix/libraries/wine/lib-wine-vars" break
+                    case 17, #include "nlix/libraries/wine/lib-wine-fake-vars" break
+                    case 18, #include "nlix/libraries/wine/lib-wine-egp" break
+                    case 19, #include "nlix/libraries/wine/lib-wine-app" break
+                    
+                    case 22, #include "Windows/System/API/ROM" break
+                    case 23, #include "Windows/System/API/EGP/Object" break
+                    case 24, #include "Windows/System/API/EGP/TextField" break
+                    case 25, #include "Windows/System/API/EGP/Button" break
+                    case 26, #include "Windows/System/API/EGP/Slider" break
+                    case 27, #include "Windows/System/API/EGP/Menu" break
+                    case 28, #include "Windows/System/API/EGP/ArrayField" break
+                    case 29, #include "Windows/System/API/UserFunctions" break]#
+                    
                     # Init
-                    case 16, #include "nlix/init/settings" break
-                    case 17, #include "nlix/init/fonts" break
-                    #case 18, #include "nlix/init/gtable" break
-                    case 19, #include "nlix/init/autostart" break
+                    case 30, #include "nlix/init/settings" break
+                    case 31, #include "nlix/init/fonts" break
+                    case 32, #include "nlix/init/gtable" break
+                    case 33, #include "nlix/init/autostart" break
                     
                     # Move to execution state
-                    case 20, KernelState0++, KernelState1 = 0
+                    case 34, KernelState0++, KernelState1 = 0
                 }
                 if (KernelState0 != 0) {
                     break
@@ -65,7 +80,7 @@ if (tickClk()) {
                 
                 ThisProgram = Programs[KernelState1, table]
                 
-                local ThisProgramName = ThisProgram["name", string]
+                ThisProgramName = ThisProgram["name", string]
                 switch (ThisProgramName) {
                     # System daemons
                     case "hotplugd",            #include "nlix/programs/hotplugd"                   break
@@ -75,8 +90,8 @@ if (tickClk()) {
                     case "driver-keyboard",     #include "nlix/programs/drivers/driver-keyboard"    break
                     case "driver-egp",          #include "nlix/programs/drivers/driver-egp"       break
                     case "driver-cursor",       #include "nlix/programs/drivers/driver-cursor"      break
-                    #case "driver-digi",         #include "nlix/programs/drivers/driver-digi"        break
-                    #case "driver-gl",           #include "nlix/programs/drivers/driver-gl"          break
+                    case "driver-digi",         #include "nlix/programs/drivers/driver-digi"        break
+                    case "driver-gl",           #include "nlix/programs/drivers/driver-gl"          break
                     
                     # Simplifier tools.
                     case "simple-keyboard",     #include "nlix/programs/simple-keyboard"            break
@@ -86,8 +101,8 @@ if (tickClk()) {
                     case "rund",                #include "nlix/programs/rund"                       break
                     
                     # Quit tools.
-                    #case "halt",                #include "nlix/programs/halt"                       break
-                    #case "reboot",              #include "nlix/programs/reboot"                     break
+                    case "halt",                #include "nlix/programs/halt"                       break
+                    case "reboot",              #include "nlix/programs/reboot"                     break
                     case "exit",                #include "nlix/programs/exit"                       break
                     case "login",               #include "nlix/programs/login"                      break
                     
@@ -127,14 +142,47 @@ if (tickClk()) {
                     case "workspaces-manager",  #include "nlix/programs/workspaces-manager"         break
                     
                     # Digital screen
-                    #case "digi-scanner",        #include "nlix/programs/digi-scanner"               break
+                    case "digi-scanner",        #include "nlix/programs/digi-scanner"               break
                     
                     # Egp 3d
-                    #case "wustdd",              #include "nlix/programs/wustdd"                     break
+                    case "wustdd",              #include "nlix/programs/wustdd"                     break
                     
                     # Files
-                    #case "ls",                  #include "nlix/programs/ls"                         break
-                    #case "cat",                 #include "nlix/programs/cat"                        break
+                    case "ls",                  #include "nlix/programs/ls"                         break
+                    case "cat",                 #include "nlix/programs/cat"                        break
+                    
+                    # Apps from windows 10.4
+                    #[case "AppDialog",           #include "Windows/Apps/AppDialog"                   break
+                    case "Settings",            #include "Windows/Apps/Settings"                    break
+                    case "TaskM",               #include "Windows/Apps/TaskM"                       break
+                    
+                    case "3Dengine",            #include "Windows/Apps/3Dengine"                    break
+                    case "Hluoix3D",            #include "Windows/Apps/Hluoix3D"                    break
+                    case "LineEdit",            #include "Windows/Apps/LineEdit"                    break
+                    
+                    case "Illusion",            #include "Windows/Apps/Illusion"                    break
+                    case "LoadAnim",            #include "Windows/Apps/LoadAnim"                    break
+                    
+                    case "Radar",               #include "Windows/Apps/Radar"                       break
+                    case "OscilloScp",          #include "Windows/Apps/OscilloScp"                  break
+                    case "ArrayM",              #include "Windows/Apps/ArrayM"                      break
+                    case "E2Editor",            #include "Windows/Apps/E2Editor"                    break
+                    
+                    case "Clicker",             #include "Windows/Apps/Clicker"                     break
+                    case "TicTacToe",           #include "Windows/Apps/TicTacToe"                   break
+                    case "PlayerRace",          #include "Windows/Apps/PlayerRace"                  break
+                    
+                    case "YourApp",             #include "Windows/Apps/YourApp"                     break
+                    case "HttpTest",            #include "Windows/Apps/HttpTest"                    break
+                    
+                    case "Diagrams",            #include "Windows/Apps/Diagrams"                    break
+                    case "Calculator",          #include "Windows/Apps/Calculator"                  break
+                    case "Chat",                #include "Windows/Apps/Chat"                        break
+                    case "Infometer",           #include "Windows/Apps/Infometer"                   break
+                    
+                    case "APITest",             #include "Windows/Apps/APITest"                     break
+                    case "PerfTest",            #include "Windows/Apps/PerfTest"                    break
+                    case "TableCMD",            #include "Windows/Apps/TableCMD"                    break]#
                     
                     default,
                         ThisProgram:programKill()

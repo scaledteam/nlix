@@ -45,7 +45,6 @@ switch (stateGet()) {
             local Port = varTable("device")["port", wirelink]
             Port[2041] = 1
             
-            varWrite("device", Device)
             varWrite("entity", Port:entity())
             varWrite("resolution", vec2(30, 18))
             stateSet(2)

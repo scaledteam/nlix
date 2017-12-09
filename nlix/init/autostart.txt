@@ -4,6 +4,7 @@
 
 @name autostart
 
+# Terminal
 local AUTOSTART = array(
     "hotplugd",
     "driver-terminal",
@@ -12,6 +13,7 @@ local AUTOSTART = array(
     "sh"
 )
 
+# Egp
 #[local AUTOSTART = array(
     "hotplugd",
     "driver-egp",

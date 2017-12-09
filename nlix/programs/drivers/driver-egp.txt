@@ -8,11 +8,11 @@ switch (stateGet()) {
     # Initialize
     case 0,
         if (driverPopDevice("gmod_wire_egp")) {
-            local Screen = varTable("device")["port", wirelink]
-            Screen:egpClear()
-            Screen:egpDrawTopLeft(1)
+            local Port = varTable("device")["port", wirelink]
+            Port:egpClear()
+            Port:egpDrawTopLeft(1)
             
-            Screen:egpBox(1, vec2(), vec2())
+            Port:egpBox(1, vec2(), vec2())
             varWrite("counter", 1)
             varWrite("resolution", vec2(512))
             varWrite("egpMaxObjects", egpMaxObjects() - 1)
@@ -23,6 +23,7 @@ switch (stateGet()) {
             stateNext()
         }
         elseif (driverPopDevice("virtual-egp-screen")) {
+            local Device = varTable("device")
             varWrite("resolution", Device["resolution", vector2])
             varWrite("egpMaxObjects", Device["max-objects", number])
             
@@ -270,6 +271,20 @@ switch (stateGet()) {
                                     Object["size", vector2] = eventGetVector2()
                                     
                                     Port:egpLine(Id + 1, Object["pos", vector2], Object["size", vector2])
+                                    break
+                                
+                                case "egpLineStrip",
+                                    if (Object["type", string] != "lineStrip") {
+                                        Object:clear()
+                                        Object["type", string] = "lineStrip"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["poses", array] = eventGetArray()
+                                    
+                                    Port:egpLineStrip(Id + 1, Object["poses", array])
                                     break
                                 
                                 case "egpPos",
@@ -626,6 +641,29 @@ switch (stateGet()) {
                                     OutputQueue:pushNumber(Id)
                                     OutputQueue:pushVector2(Object["pos", vector2])
                                     OutputQueue:pushVector2(Object["size", vector2])
+                                    break
+                                
+                                case "egpLineStrip",
+                                    if (Object["type", string] != "lineStrip") {
+                                        Object:clear()
+                                        Object["type", string] = "lineStrip"
+                                        Object["color", vector4] = LIB_DRIVER_EGP_COLOR_WHITE
+                                        Object["parent", number] = 1
+                                    }
+                                    Object["exists", number] = 1
+                                    
+                                    Object["poses", array] = eventGetArray()
+                                    
+                                    OutputQueue:pushString("egpLineStrip")
+                                    OutputQueue:pushNumber(Id)
+                                    
+                                    local Count = Object["poses", array]:count()
+                                    
+                                    OutputQueue:pushNumber(Count)
+                                    
+                                    for (I = 1, Count) {
+                                        OutputQueue:pushVector2(Object["poses", array][I, vector2])
+                                    }
                                     break
                                 
                                 case "egpPos",

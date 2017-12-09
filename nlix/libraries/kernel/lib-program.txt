@@ -5,7 +5,6 @@
 @name lib-program
 @persist KERNEL_ROOT_USER:string
 @persist PROGRAM_TABLES:array
-@persist ThisProgram:table
 
 KERNEL_ROOT_USER = "root"
 
@@ -52,7 +51,18 @@ function programKill() {
     ThisProgram:programKill()
 }
 
-function programsClear() {
+function table programFindByName(Name:string) {
+    local ThisWorkspace = ThisProgram["workspace", table]
+    for (I = 1, Programs:count()) {
+        local Program = Programs[I, table]
+        if (Program["name", string] == Name & Program["workspace", table] == ThisWorkspace) {
+            return Program
+        }
+    }
+    return NULL
+}
+
+function programKillAll() {
     for (I = 1, Programs:count()) {
         local Program = Programs[I, table]
         
@@ -69,15 +79,3 @@ function programsClear() {
     }
     Programs:clear()
 }
-
-function table programFindByName(Name:string) {
-    local ThisWorkspace = ThisProgram["workspace", table]
-    for (I = 1, Programs:count()) {
-        local Program = Programs[I, table]
-        if (Program["name", string] == Name & Program["workspace", table] == ThisWorkspace) {
-            return Program
-        }
-    }
-    return NULL
-}
-

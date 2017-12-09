@@ -1,0 +1,230 @@
+#
+# Created by scaled
+#
+
+@name lib-wine-app
+# App vars
+@persist App:table
+@persist App_This:string App_This_Table:table
+@persist App_Mouse App_Click App_Size_Default:vector2
+@persist App_Resize:string
+@persist App_Pos:table App_List:table
+@persist App_Dialog:string
+@persist App_Timer
+@persist App_This_Active
+
+# Egp id management
+@persist EGPID_App:table
+
+# Input
+@persist Keyboard
+@persist Sys_Text:string Sys_Text_Timer
+
+EGPID_App["Free", array] = array()
+
+App_Size_Default = vec2(300, 150)
+
+App_This_Active = 1
+
+# Windows functions
+## Activity
+function string activityManager(VarName:string, EGPIDStart, EGPIDEnd){
+    if (!Screen:egpHasObject(egp(EGPIDStart))) {
+        appN(VarName + "Update", 1)
+        appS(VarName + "Changed", appS(VarName))
+    }
+    
+    elseif (appS(VarName + "Changed") != "" & appS(VarName + "Changed") != appS(VarName)) {
+        for (I = egp(EGPIDStart), egp(EGPIDEnd)) {
+            Screen:egpRemove(I)
+        }
+        appN(VarName + "Update", 1)
+        appS(VarName + "Changed", appS(VarName))
+        return ""
+    }
+    
+    return appS(VarName)
+}
+
+function string activityManager(EGPIDStart,EGPIDEnd){
+    return activityManager("Activity",EGPIDStart,EGPIDEnd)
+}
+
+function string activityManager(EGPIDStart){
+    return activityManager("Activity", EGPIDStart, EGPID_App[App_This, vector2]:y())
+}
+
+function number activityGraphics(VarName:string){
+    if (appN(VarName + "Update")) {
+        appN(VarName + "Update", 0)
+        return 1
+    }
+    return 0
+}
+
+function number activityGraphics(){
+    return activityGraphics("Activity")
+}
+
+function number activityCreate(VarName:string){
+    if (!appN(VarName + "Create" + appS(VarName))) {
+        appN(VarName + "Create" + appS(VarName), 1)
+        return 1
+    }
+    return 0
+}
+
+function number activityCreate(){
+    return activityCreate("Activity")
+}
+
+function string sysText(){
+    if (Keyboard & Keyboard != 154) {
+        Sys_Text_Timer++
+    }
+    else{
+        Sys_Text_Timer = 0
+    }
+    if ((changed(Keyboard) | Sys_Text_Timer > 5) & Keyboard != 13 & Keyboard != 154 & !inrange(Keyboard, 19, 20)){
+        local Length = Sys_Text:length()
+        if (Keyboard != 127) {
+            Sys_Text = Sys_Text:sub(1, Length - Sys_Text_Line) + toChar(Keyboard) + Sys_Text:sub(Length - Sys_Text_Line + 1, Length)
+        } elseif (Sys_Text_Line != Length) {
+            Sys_Text = Sys_Text:sub(1, Length - Sys_Text_Line - 1) + Sys_Text:sub(Length - Sys_Text_Line + 1, Length)
+        }
+    }
+    return Sys_Text
+}
+
+# Wine functions
+function number appGraphics(Size:vector2, Color:vector) {
+    if (!varNumber("appGraphics")) {
+        varWrite("appGraphics", 1)
+        varWrite("appSize", Size)
+        
+        egpBox(EGP, vec2(), Size)
+        egpParentToBase(EGP)
+        egpColor(EGP, Color)
+        return 1
+    }
+    else {
+        return 0
+    }
+}
+
+function number appSize(Number, SizeMin:vector2, SizeStandart:vector2) {
+    if (!varExists("appResize")) {
+        varWrite("appResize", 1)
+        varWrite("appSize", egpResolution())
+        varWrite("Size", egpResolution())
+        
+        egpBox(EGP, vec2(), egpResolution())
+        return 1
+    }
+    #[if (varExists("Size")) {
+        varWrite("Size", varVector2("appSize"))
+    }]#
+    return 0
+}
+
+function number appSize(Number, SizeMin:vector2, SizeStandart:vector2, SizeMax:vector) {
+    return appSize(Number, SizeMin, SizeStandart)
+}
+
+function number appCreate() {
+    if (!varNumber("appCreate")) {
+        varWrite("appCreate", 1)
+        return 1
+    }
+    else {
+        return 0
+    }
+}
+
+function wineInit() {
+    if (!varExists("driver-egp")) {
+        egpInit()
+    }
+    if (!varExists("driver-cursor")) {
+        cursorInit()
+    }
+    if (!varExists("driver-keyboard")) {
+        keyboardInit()
+    }
+}
+
+function wineSetVars() {
+    App_This = ThisProgramName
+    App_This_Table = ThisProgram["vars", table]
+    
+    #[if (changed(Apps:count())) {
+        #App:clear()
+        for (I = 1, Apps:count()) {
+            local AppI = Apps[I, table]
+            if (AppI["workspace", table] == ThisWorkspace) {
+                App[AppI["name", string], table] = AppI["data", table]
+            }
+        }
+    }]#
+    
+    Sys_CursorPos = cursorGetPos() - varVector2("appSize") / 2
+    App_Mouse = cursorGetUse()
+    App_Click = changed(App_Mouse) & !App_Mouse
+    
+    Keyboard = keyboardGetKeys()[1, number]
+    
+    EGPID_App["Free", array][1, vector2] = vec2(EGP, egpMaxObjects2())
+    App_Timer++
+}
+
+function number app(Name:string) {
+    wineInit()
+    
+    if (egpIsIdle()) {
+        wineSetVars()
+        return 1
+    }
+    else {
+        return 0
+    }
+}
+
+function number appThread(Name:string) {
+    return app(Name)
+}
+
+function appEgpMemory(EGPID_Count) {
+    EGPID_App[App_This, vector2] = vec2(EGP, EGPID_Count)
+}
+
+function appIntent(App_Name:string, Table:table){
+    local Program = programStart(App_Name)
+    if(!App[App_Name,table]){
+        Program["vars", table] = Table:clone()
+    }else{
+        Program["vars", table] = Program["vars", table]:merge(Table)
+    }
+}
+
+# Fix it
+function number appTimer(Number) {
+    return 1
+}
+
+function appCall(AppName:string) { }
+
+# Fix it
+function number appDialog(Name:string, Type:string, Size, Text:string){
+    if (App_Dialog == Name) {
+        print(Name, Type, Size, Text)
+        App_Dialog = ""
+        return 1
+    }
+    return 0
+}
+
+function number appCloseTry(Number) {
+    return eventWaitString("exit")
+}
+
+function appChat() { }
