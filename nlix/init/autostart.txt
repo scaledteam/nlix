@@ -29,3 +29,11 @@ if (Programs:count() == 0) {
         Workspace:programStart(ProgramName)
     }
 }
+
+
+# Digi
+#[local Workspace = table()
+Workspace:pushTable(Port1:toDevice())
+
+Workspace:programStart("driver-digi")
+Workspace:programStart("digi-scanner")]#

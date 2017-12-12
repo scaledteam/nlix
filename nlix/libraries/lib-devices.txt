@@ -4,6 +4,10 @@
 
 @name lib-devices
 
+@inputs [Port1 Port2 Port3 Port4]:wirelink
+@persist PORTS_COUNT
+PORTS_COUNT = 4
+
 PROGRAM_TABLES:pushString("devices")
 
 function table table:deviceGet()    { return This["devices", table][1, table] }
@@ -53,4 +57,11 @@ function devicePushAll() {
         ThisProgramDevices[I, table]:remove("program")
     }
     ThisProgramDevices:clear()
+}
+
+function table wirelink:toDevice() {
+    local Device = object(This:entity():type())
+    Device["port", wirelink] = This
+    
+    return Device
 }

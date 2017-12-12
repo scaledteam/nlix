@@ -197,7 +197,19 @@ function number table:egpHasObject(Id) {
 }
 
 function vector2 table:egpPos(Id) {
-    return egpPos(Id)
+    if (Id == EGP) {
+        return vec2()
+    }
+    else {
+        local Type = egpType(Id)
+        switch (Type) {
+            case "box", case "boxOutline",
+                return egpPos(Id) + egpSize(Id) / 2
+            
+            default,
+                return egpPos(Id)
+        }
+    }
 }
 
 function vector2 table:egpSize(Id) {
@@ -222,8 +234,8 @@ function number egpTextSizeX(Number) {
 }
 
 function number egpInrange(EGPID) {
-    local Pos = Screen:egpPos(EGPID)
-    local Size = Screen:egpSize(EGPID)
+    local Pos = egpPos(EGPID)
+    local Size = egpSize(EGPID)
     return inrange(Sys_CursorPos, Pos, Pos + Size)
 }
 
@@ -236,7 +248,7 @@ function vector2 egpChoiceHelper(Pos:vector2, Step) {
 }
 
 function vector2 appChoiceHelper(Pos:vector2, Step) {
-    return floor((Sys_CursorPos - Pos - Screen:egpPos(EGP)) / Step)
+    return floor((Sys_CursorPos - Pos) / Step)
 }
 
 function vector2 egpChoiceHelper(Pos:vector2, Step:vector2) {
@@ -244,7 +256,7 @@ function vector2 egpChoiceHelper(Pos:vector2, Step:vector2) {
 }
 
 function vector2 appChoiceHelper(Pos:vector2, Step:vector2) {
-    return floor((Sys_CursorPos - Pos - Screen:egpPos(EGP)) / Step)
+    return floor((Sys_CursorPos - Pos) / Step)
 }
 
 function array  array:shortArray(Size){

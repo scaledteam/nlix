@@ -42,7 +42,7 @@ if (tickClk()) {
                     case 15, #include "nlix/libraries/lib-simple-keyboard" break
                     
                     # Wine libs
-                    #[case 16, #include "nlix/libraries/wine/lib-wine-vars" break
+                    case 16, #include "nlix/libraries/wine/lib-wine-vars" break
                     case 17, #include "nlix/libraries/wine/lib-wine-fake-vars" break
                     case 18, #include "nlix/libraries/wine/lib-wine-egp" break
                     case 19, #include "nlix/libraries/wine/lib-wine-app" break
@@ -54,12 +54,12 @@ if (tickClk()) {
                     case 26, #include "Windows/System/API/EGP/Slider" break
                     case 27, #include "Windows/System/API/EGP/Menu" break
                     case 28, #include "Windows/System/API/EGP/ArrayField" break
-                    case 29, #include "Windows/System/API/UserFunctions" break]#
+                    case 29, #include "Windows/System/API/UserFunctions" break
                     
                     # Init
                     case 30, #include "nlix/init/settings" break
                     case 31, #include "nlix/init/fonts" break
-                    case 32, #include "nlix/init/gtable" break
+                    #case 32, #include "nlix/init/gtable" break
                     case 33, #include "nlix/init/autostart" break
                     
                     # Move to execution state
@@ -80,7 +80,7 @@ if (tickClk()) {
                 
                 ThisProgram = Programs[KernelState1, table]
                 
-                ThisProgramName = ThisProgram["name", string]
+                ThisProgramName = ThisProgram:type()
                 switch (ThisProgramName) {
                     # System daemons
                     case "hotplugd",            #include "nlix/programs/hotplugd"                   break
@@ -101,10 +101,9 @@ if (tickClk()) {
                     case "rund",                #include "nlix/programs/rund"                       break
                     
                     # Quit tools.
-                    case "halt",                #include "nlix/programs/halt"                       break
-                    case "reboot",              #include "nlix/programs/reboot"                     break
+                    #case "halt",                #include "nlix/programs/halt"                       break
+                    #case "reboot",              #include "nlix/programs/reboot"                     break
                     case "exit",                #include "nlix/programs/exit"                       break
-                    case "login",               #include "nlix/programs/login"                      break
                     
                     # Classic console utilites.
                     case "clear",               #include "nlix/programs/clear"                      break
@@ -152,7 +151,7 @@ if (tickClk()) {
                     case "cat",                 #include "nlix/programs/cat"                        break
                     
                     # Apps from windows 10.4
-                    #[case "AppDialog",           #include "Windows/Apps/AppDialog"                   break
+                    case "AppDialog",           #include "Windows/Apps/AppDialog"                   break
                     case "Settings",            #include "Windows/Apps/Settings"                    break
                     case "TaskM",               #include "Windows/Apps/TaskM"                       break
                     
@@ -182,7 +181,7 @@ if (tickClk()) {
                     
                     case "APITest",             #include "Windows/Apps/APITest"                     break
                     case "PerfTest",            #include "Windows/Apps/PerfTest"                    break
-                    case "TableCMD",            #include "Windows/Apps/TableCMD"                    break]#
+                    case "TableCMD",            #include "Windows/Apps/TableCMD"                    break
                     
                     default,
                         ThisProgram:programKill()

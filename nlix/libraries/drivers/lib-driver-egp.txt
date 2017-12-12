@@ -22,30 +22,6 @@ function table createVirtualEgpScreen(Resolution:vector2, MaxObjects) {
 }
 
 function number egpInit() {
-    #[if (varExists("driver-egp")) {
-        local App = varTable("driver-egp")
-        if (App:varNumber("ready")) {
-            return 1
-        }
-        else {
-            return 0
-        }
-    }
-    else {
-        local App = findAppByName("driver-egp")
-        if (App == NULL) {
-            return 0
-        }
-        else {
-            varWrite("driver-egp", App)
-            if (App:varNumber("ready")) {
-                return 1
-            }
-            else {
-                return 0
-            }
-        }
-    }]#
     return driverInit("driver-egp")
 }
 
@@ -238,13 +214,6 @@ function egpMove(Id, Id2) {
     App:eventSend("egpMove")
     App:eventSend(Id)
     App:eventSend(Id2)
-}
-
-function egpDrawTopLeft(Enable) {
-    local App = varTable("driver-egp")
-    
-    App:eventSend("egpDrawTopLeft")
-    App:eventSend(Enable)
 }
 
 function vector2 egpResolution() {

@@ -1,9 +1,0 @@
-#
-# This E2 made by scaled
-#
-
-@name login
-
-local App = programFindByName("sh")
-App["user", string] = varArray("args")[1, string]
-programKill()

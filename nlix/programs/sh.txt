@@ -25,7 +25,8 @@ switch (stateGet()) {
         break
     
     case 3,
-        terminalPrint(ThisProgram["user", string] + " $ ")
+        #terminalPrint(ThisProgram["user", string] + " $ ")
+        terminalPrint("sh $ ")
         simpleKeyboardRequestInput()
         
         stateNext()

@@ -172,20 +172,28 @@ function wineSetVars() {
     App_Click = changed(App_Mouse) & !App_Mouse
     
     Keyboard = keyboardGetKeys()[1, number]
+    if (Keyboard == 10) {
+        Keyboard = 13
+    }
     
     EGPID_App["Free", array][1, vector2] = vec2(EGP, egpMaxObjects2())
     App_Timer++
 }
 
 function number app(Name:string) {
-    wineInit()
-    
-    if (egpIsIdle()) {
-        wineSetVars()
-        return 1
+    if (ThisProgramName == Name) {
+        wineInit()
+        
+        if (egpIsIdle()) {
+	        wineSetVars()
+	        return 1
+        }
+        else {
+	        return 0
+        }
     }
     else {
-        return 0
+	    return 0
     }
 }
 

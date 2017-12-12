@@ -23,7 +23,6 @@ switch (stateGet()) {
         elseif (driverPopDevice("gmod_wire_egp")) {
             local Port = varTable("device")["port", wirelink]
             Port:egpClear()
-            Port:egpDrawTopLeft(1)
             
             local Resolution = int(sqrt(egpMaxObjects()))
             #[local Size = Device["resolution", vector2] / Resolution
@@ -52,15 +51,14 @@ switch (stateGet()) {
         break
     
     case 1,
-        local Device = varTable("device")
-        local Screen = Device["port", wirelink]
+        local Port = varTable("device")["port", wirelink]
         local Resolution = varVector2("resolution")[1]
         local Size = floor(vec2(512) / Resolution)
         for (I = 1, KERNEL_OVERLOAD) {
             local Counter = varNumber("counter")
             
-            Screen:egpBox(Counter + 1, vec2(Counter % Resolution, int(Counter / Resolution)) * Size, Size)
-            Screen:egpColor(Counter + 1, vec())
+            Port:egpBox(Counter + 1, vec2(Counter % Resolution, int(Counter / Resolution)) * Size, Size)
+            Port:egpColor(Counter + 1, vec())
             
             if (Counter >= Resolution ^ 2) {
                 stateNext()

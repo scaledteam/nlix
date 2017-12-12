@@ -385,11 +385,6 @@ switch (stateGet()) {
                                     EgpObjects[OldId, table] = OldObject
                                     break
                                 
-                                case "egpDrawTopLeft",
-                                    # "Id" is not id. This is draw parameter
-                                    Port:egpDrawTopLeft(Id)
-                                    break
-                                
                                 case "exit",
                                     Port:egpClear()
                                     driverPushDevice()
@@ -789,12 +784,6 @@ switch (stateGet()) {
                                     OldObject["parent", number] = 1
                                     
                                     EgpObjects[OldId, table] = OldObject
-                                    break
-                                
-                                case "egpDrawTopLeft",
-                                    # "Id" is not id. This is draw parameter
-                                    OutputQueue:pushString("egpDrawTopLeft")
-                                    OutputQueue:pushNumber(Id)
                                     break
                                 
                                 case "exit",

@@ -6,7 +6,7 @@
 
 local Program = programFindByName(varArray("args")[1, string])
 if (Program != NULL) {
-    terminalPrintFast("Try kill \"" + Program["name", string] + "\".\n")
+    terminalPrintFast("Try kill \"" + Program:type() + "\".\n")
     Program:programKill()
 }
 else {

@@ -28,10 +28,7 @@ switch (stateGet()) {
             }
             
             if (!DeviceExists) {
-                local Device = object(DeviceType)
-                Device["port", wirelink] = Port
-                
-                ThisProgram["workspace", table]:pushTable(Device)
+                ThisProgram["workspace", table]:pushTable(Port:toDevice())
             }
         }
         varWrite("PortOld" + Counter, Port)
@@ -49,14 +46,14 @@ switch (stateGet()) {
     case 1,
         local Counter = varNumber("counter") + 1
         
-        local Device = ThisProgram["workspace", table]["devices", table][Counter, table]
-        if (!Device["type", string]:find("virtual") & !Device["port", wirelink]:entity():isValid()) {
+        local Device = ThisProgram["workspace", table][Counter, table]
+        if (Device:exists("port") & !Device["port", wirelink]:entity():isValid()) {
             Device:clear()
             ThisProgram["workspace", table]["devices", table]:remove(Counter)
             Counter--
         }
         
-        if (Counter >= ThisProgram["workspace", table]["devices", table]:count()) {
+        if (Counter >= ThisProgram["workspace", table]:count()) {
             statePrev()
             varWrite("counter", 0)
         }

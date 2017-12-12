@@ -5,13 +5,12 @@
 @name lib-object
 
 @persist NULL:table
-@persist [OBJECT_TYPE_KEY OBJECT_VALID_KEY]:string
+@persist OBJECT_TYPE_KEY:string
 
 OBJECT_TYPE_KEY = "$type"
-OBJECT_VALID_KEY = "$valid"
 
 function number table:isValid() {
-    return This:exists(OBJECT_VALID_KEY)
+    return This:count() != 0
 }
 
 function string table:type() {
@@ -20,7 +19,6 @@ function string table:type() {
 
 function table object(Type:string) {
     local Object = table()
-    Object[OBJECT_VALID_KEY, number] = 1
     Object[OBJECT_TYPE_KEY, string] = Type
     return Object
 }

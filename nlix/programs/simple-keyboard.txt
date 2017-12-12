@@ -44,7 +44,7 @@ switch (stateGet()) {
                     if (Key != KeysOld[I, number]) {
                         switch (Key) {
                             # Enter
-                            case 10, case 142,
+                            case 10, case 13, case 142,
                                 terminalPrint("\n")
                                 stateNext()
                                 break

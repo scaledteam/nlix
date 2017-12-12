@@ -6,7 +6,7 @@
 
 local List = ""
 for (I = 1, Programs:count()) {
-    List += I + ", " + Programs[I, table]["user", string] + ", " + Programs[I, table]["workspace", table]:id():replace("table: ", "") + ", " + Programs[I, table]["name", string] + "\n"
+    List += I + ", " + Programs[I, table]["workspace", table]:id():replace("table: ", "") + ", " + Programs[I, table]:type() + "\n"
 }
 terminalPrintFast(List)
 programKill()
