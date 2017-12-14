@@ -49,7 +49,7 @@ switch (stateGet()) {
         local Device = ThisProgram["workspace", table][Counter, table]
         if (Device:exists("port") & !Device["port", wirelink]:entity():isValid()) {
             Device:clear()
-            ThisProgram["workspace", table]["devices", table]:remove(Counter)
+            ThisProgram["workspace", table]:remove(Counter)
             Counter--
         }
         

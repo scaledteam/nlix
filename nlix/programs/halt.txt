@@ -4,12 +4,13 @@
 
 @name halt
 
-if (ThisProgram["user", string] == KERNEL_ROOT_USER) {
+#if (ThisProgram["user", string] == KERNEL_ROOT_USER) {
     gtableClear()
     programKillAll()
     runOnTick(0)
-}
+#[}
 else {
     terminalPrintFast("You don't have permission for this action\n")
     programKill()
 }
+]#

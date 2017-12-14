@@ -15,9 +15,9 @@ switch (stateGet()) {
             Port:egpBox(1, vec2(), vec2())
             varWrite("counter", 1)
             varWrite("resolution", vec2(512))
-            varWrite("egpMaxObjects", egpMaxObjects() - 1)
+            varWrite("egpMaxObjects", min(egpMaxObjects(), 300) - 1)
             
-            if (!varTable("egpObjects"):exists(1)) {
+            if (!varTable("egpObjects"):isValid()) {
                 varWrite("egpObjects", table())
             }
             stateNext()

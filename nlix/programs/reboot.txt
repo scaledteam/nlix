@@ -4,7 +4,7 @@
 
 @name reboot
 
-if (ThisProgram["user", string] == KERNEL_ROOT_USER) {
+#[if (ThisProgram["user", string] == KERNEL_ROOT_USER) {
     gtableClear()
     programKillAll()
     reset()
@@ -13,3 +13,4 @@ else {
     terminalPrintFast("You don't have permission for this action\n")
     programKill()
 }
+]#

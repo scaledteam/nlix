@@ -121,6 +121,7 @@ switch (stateGet()) {
             }
         }
         else {
+            driverPushDevice()
             stateSet(0)
         }
         break
