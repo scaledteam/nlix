@@ -26,22 +26,22 @@ function appR(VarName:string, Write:array)    {ThisProgram["vars", table][VarNam
 function appT(VarName:string, Write:table)    {ThisProgram["vars", table][VarName, table] = Write}
 
 # Global
-function number   glbN(AppName:string, VarName:string){return programFindByName(AppName)["data", table][VarName, number]}
-function string   glbS(AppName:string, VarName:string){return programFindByName(AppName)["data", table][VarName, string]}
-function vector   glbV(AppName:string, VarName:string){return programFindByName(AppName)["data", table][VarName, vector]}
-function vector2 glbV2(AppName:string, VarName:string){return programFindByName(AppName)["data", table][VarName, vector2]}
-function vector4 glbV4(AppName:string, VarName:string){return programFindByName(AppName)["data", table][VarName, vector4]}
-function array    glbR(AppName:string, VarName:string){return programFindByName(AppName)["data", table][VarName, array]}
-function table    glbT(AppName:string, VarName:string){return programFindByName(AppName)["data", table][VarName, table]}
-function entity   glbE(AppName:string, VarName:string){return programFindByName(AppName)["data", table][VarName, entity]}
-function angle    glbA(AppName:string, VarName:string){return programFindByName(AppName)["data", table][VarName, angle]}
+function number   glbN(AppName:string, VarName:string){return programFindByName(AppName)["vars", table][VarName, number]}
+function string   glbS(AppName:string, VarName:string){return programFindByName(AppName)["vars", table][VarName, string]}
+function vector   glbV(AppName:string, VarName:string){return programFindByName(AppName)["vars", table][VarName, vector]}
+function vector2 glbV2(AppName:string, VarName:string){return programFindByName(AppName)["vars", table][VarName, vector2]}
+function vector4 glbV4(AppName:string, VarName:string){return programFindByName(AppName)["vars", table][VarName, vector4]}
+function array    glbR(AppName:string, VarName:string){return programFindByName(AppName)["vars", table][VarName, array]}
+function table    glbT(AppName:string, VarName:string){return programFindByName(AppName)["vars", table][VarName, table]}
+function entity   glbE(AppName:string, VarName:string){return programFindByName(AppName)["vars", table][VarName, entity]}
+function angle    glbA(AppName:string, VarName:string){return programFindByName(AppName)["vars", table][VarName, angle]}
 
-function glbN(AppName:string, VarName:string, Write)          {local App = programFindByName(AppName) App["data", table][VarName, number] = Write}
-function glbS(AppName:string, VarName:string, Write:string)   {local App = programFindByName(AppName) App["data", table][VarName, string] = Write}
-function glbV(AppName:string, VarName:string, Write:vector)   {local App = programFindByName(AppName) App["data", table][VarName, vector] = Write}
-function glbV2(AppName:string, VarName:string, Write:vector2) {local App = programFindByName(AppName) App["data", table][VarName, vector2] = Write}
-function glbV4(AppName:string, VarName:string, Write:vector4) {local App = programFindByName(AppName) App["data", table][VarName, vector4] = Write}
-function glbE(AppName:string, VarName:string, Write:entity)   {local App = programFindByName(AppName) App["data", table][VarName, entity] = Write}
-function glbA(AppName:string, VarName:string, Write:angle)    {local App = programFindByName(AppName) App["data", table][VarName, angle] = Write}
-function glbR(AppName:string, VarName:string, Write:array)    {local App = programFindByName(AppName) App["data", table][VarName, array] = Write}
-function glbT(AppName:string, VarName:string, Write:table)    {local App = programFindByName(AppName) App["data", table][VarName, table] = Write}
+function glbN(AppName:string, VarName:string, Write)          {local App = programFindByName(AppName) App["vars", table][VarName, number] = Write}
+function glbS(AppName:string, VarName:string, Write:string)   {local App = programFindByName(AppName) App["vars", table][VarName, string] = Write}
+function glbV(AppName:string, VarName:string, Write:vector)   {local App = programFindByName(AppName) App["vars", table][VarName, vector] = Write}
+function glbV2(AppName:string, VarName:string, Write:vector2) {local App = programFindByName(AppName) App["vars", table][VarName, vector2] = Write}
+function glbV4(AppName:string, VarName:string, Write:vector4) {local App = programFindByName(AppName) App["vars", table][VarName, vector4] = Write}
+function glbE(AppName:string, VarName:string, Write:entity)   {local App = programFindByName(AppName) App["vars", table][VarName, entity] = Write}
+function glbA(AppName:string, VarName:string, Write:angle)    {local App = programFindByName(AppName) App["vars", table][VarName, angle] = Write}
+function glbR(AppName:string, VarName:string, Write:array)    {local App = programFindByName(AppName) App["vars", table][VarName, array] = Write}
+function glbT(AppName:string, VarName:string, Write:table)    {local App = programFindByName(AppName) App["vars", table][VarName, table] = Write}

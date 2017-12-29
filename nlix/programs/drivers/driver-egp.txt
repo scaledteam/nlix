@@ -7,10 +7,13 @@
 switch (stateGet()) {
     # Initialize
     case 0,
+        eventInit()
+        
         if (driverPopDevice("gmod_wire_egp")) {
             local Port = varTable("device")["port", wirelink]
             Port:egpClear()
             Port:egpDrawTopLeft(1)
+            Port:egpResolution(vec2(), vec2(512))
             
             Port:egpBox(1, vec2(), vec2())
             varWrite("counter", 1)
@@ -81,7 +84,7 @@ switch (stateGet()) {
                     local Port = Device["port", wirelink]
                     
                     for (I = 1, KERNEL_OVERLOAD) {
-                        if (eventsExists()) {
+                        if (eventExists()) {
                             varWrite("idle", 0)
                             local Command = eventGetString()
                             local Id = eventGetNumber()
@@ -404,7 +407,7 @@ switch (stateGet()) {
                     local OutputQueue = Device["output-queue", array]
                     
                     for (I = 1, KERNEL_OVERLOAD) {
-                        if (eventsExists()) {
+                        if (eventExists()) {
                             varWrite("idle", 0)
                             local Command = eventGetString()
                             local Id = eventGetNumber()

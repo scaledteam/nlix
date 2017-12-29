@@ -57,7 +57,6 @@ switch (stateGet()) {
                 local ProgramName = CommandExplode:shiftString()
                 local Program = programStart(ProgramName)
                 if (CommandExplode:count() > 0) {
-                    Program["vars", table] = table()
                     Program:varWrite("args", CommandExplode)
                 }
                 
@@ -77,10 +76,10 @@ switch (stateGet()) {
         if (changed(KeyboardKeys:count())) {
             if (KeyboardKeys[1, number] == 158) {
                 if (KeyboardKeys[2, number] == 99) {
-                    varTable("LaunchedApp"):eventSend("exit")
+                    varTable("LaunchedApp"):programKill()
                 }
                 if (KeyboardKeys[2, number] == 122) {
-                    varTable("LaunchedApp"):programKill()
+                    varTable("LaunchedApp"):eventSend("exit")
                 }
             }
         }

@@ -14,7 +14,13 @@ switch (stateGet()) {
     
     case 1,
         varWrite("MAP", array())
-        varWrite("MAP_POLYGONS", 20)
+        local ArgNumber = varArray("args")[1, string]:toNumber()
+        if (ArgNumber != 0) {
+            varWrite("MAP_POLYGONS", ArgNumber)
+        }
+        else {
+            varWrite("MAP_POLYGONS", 50)
+        }
         glColor(vec(50, 200, 50))
         glFillColor(vec(50, 50, 60))
         
@@ -57,19 +63,19 @@ switch (stateGet()) {
     
     case 3,
         if (glReady()) {
+            glAng(ang(15 * sin(45 * systime()), 0, 15 + 15 * cos(45 * systime())))
             glStart()
             stateNext()
         }
         break
     
     case 4,
-        glAng(ang(15 * sin(45 * systime()), 0, 15 + 15 * cos(45 * systime())))
-        
         for (I = 1, KERNEL_OVERLOAD) {
             local Counter = varNumber("counter") + 1
             
             local MAP = varArray("MAP")
-            glColor(vec(50, 200, 50) * (cosr(pi() * Counter) + 2) / 3)
+            #glColor(vec(50, 200, 50) * (cosr(pi() * Counter) + 2) / 3)
+            glColor(vec(50, 200, 50) * (1 + Counter % 2) / 2)
             glTriangle(MAP[Counter, matrix]:row(1), MAP[Counter, matrix]:row(2), MAP[Counter, matrix]:row(3))
             
             if (Counter >= MAP:count()) {

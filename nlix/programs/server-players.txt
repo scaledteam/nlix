@@ -4,9 +4,11 @@
 
 @name server-players
 
-local Output = ""
-foreach (I, Player:entity = players()) {
-    Output += Player:id() + " " + Player:name() + "\n"
+if (terminalInit()) {
+    local Output = ""
+    foreach (I, Player:entity = players()) {
+        Output += Player:id() + " " + Player:name() + "\n"
+    }
+    terminalPrint(Output)
+    programKill()
 }
-terminalPrintFast(Output)
-programKill()

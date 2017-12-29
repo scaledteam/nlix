@@ -5,14 +5,24 @@
 @name lib-driver
 
 function number driverInit(DriverName:string) {
-    local App = programFindByName(DriverName)
-    if (App != NULL) {
-        varWrite(DriverName, App)
+    #[local Program = programFindByName(DriverName)
+    if (Program != NULL) {
+        varWrite(DriverName, Program)
         return 1
     }
     else {
         return 0
+    }]#
+    if (searchIsReady()) {
+        searchStartForOne(Programs, DriverName)
     }
+    if (searchInfinityLoopForOne()) {
+        if (searchGetTempResult()["workspace", table] == ThisProgram["workspace", table]) {
+            varWrite(DriverName, searchGetResult())
+            return 1
+        }
+    }
+    return 0
 }
 
 function table table:driverGetDevice() {
@@ -46,3 +56,22 @@ function number driverPopDevice(DeviceType:string) {
 function driverPushDevice() {
     devicePush()
 }
+
+#[function number driverPopDevice(DeviceType:string) {
+    if (searchIsReady(DeviceType)) {
+        searchStartForOne(DeviceType, ThisProgram["workspace", table], DeviceType)
+    }
+    if (searchInfinityLoopForOne(DeviceType)) {
+        if (!searchGetTempResult(DeviceType)["program", table]:isValid()) {
+            local Device = searchGetResult(DeviceType)
+            Device["program", table] = ThisProgram
+            
+            if (!ThisProgram:exists("devices")) {
+                ThisProgram["devices", table] = table()
+            }
+            ThisProgram["devices", table]:pushTable(Device)
+            return 1
+        }
+    }
+    return 0
+}]#

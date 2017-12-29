@@ -23,3 +23,24 @@ function statePrev() {
 function stateShift(Shift) {
     varWrite("state", varNumber("state") + Shift)
 }
+
+
+#[function number stateGet() {
+    return ThisProgram["state", number]
+}
+
+function stateSet(State) {
+    ThisProgram["state", number] = State
+}
+
+function stateNext() {
+    ThisProgram["state", number] = ThisProgram["state", number] + 1
+}
+
+function statePrev() {
+    ThisProgram["state", number] = ThisProgram["state", number] - 1
+}
+
+function stateShift(Shift) {
+    ThisProgram["state", number] = ThisProgram["state", number] + Shift
+}]#

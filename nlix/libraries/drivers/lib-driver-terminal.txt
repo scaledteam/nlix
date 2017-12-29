@@ -37,9 +37,9 @@ function terminalClear() {
 }
 
 
-function terminalPrintFast(Text:string) {
+#[function terminalPrintFast(Text:string) {
     local App = programFindByName("driver-terminal")
     
     App:eventSend("print")
     App:eventSend(Text)
-}
+}]#

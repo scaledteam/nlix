@@ -22,3 +22,7 @@ function table object(Type:string) {
     Object[OBJECT_TYPE_KEY, string] = Type
     return Object
 }
+
+function table:setType(Type:string) {
+    This[OBJECT_TYPE_KEY, string] = Type
+}

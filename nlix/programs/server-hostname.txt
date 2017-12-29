@@ -4,5 +4,7 @@
 
 @name server-hostname
 
-terminalPrintFast(hostname() + "\n")
-programKill()
+if (terminalInit()) {
+    terminalPrint(hostname() + "\n")
+    programKill()
+}

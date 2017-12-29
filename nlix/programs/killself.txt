@@ -1,0 +1,12 @@
+#
+# Created by scaled
+#
+
+@name killself
+
+#[foreach (I, TableName:string = PROGRAM_TABLES) {
+    ThisProgram[TableName, table]:clear()
+}]#
+ThisProgram:clear()
+
+Programs:remove(ThisProgramId)

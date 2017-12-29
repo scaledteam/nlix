@@ -4,9 +4,11 @@
 
 @name echo
 
-local Output = ""
-foreach (I, Arg:string = varArray("args")) {
-    Output += Arg + "\n"
+if (terminalInit()) {
+    local Output = ""
+    foreach (I, Arg:string = varArray("args")) {
+        Output += Arg + "\n"
+    }
+    terminalPrint(Output)
+    programKill()
 }
-terminalPrintFast(Output)
-programKill()

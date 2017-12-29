@@ -8,8 +8,6 @@
 @persist PORTS_COUNT
 PORTS_COUNT = 4
 
-PROGRAM_TABLES:pushString("devices")
-
 function table table:deviceGet()    { return This["devices", table][1, table] }
 function table table:deviceGet(Id)  { return This["devices", table][Id, table] }
 
@@ -21,6 +19,10 @@ function number devicePop(DeviceType:string) {
         local Device = ThisProgram["workspace", table][I, table]
         if (Device:type() == DeviceType & !Device["program", table]:isValid()) {
             Device["program", table] = ThisProgram
+            
+            if (!ThisProgram:exists("devices")) {
+                ThisProgram["devices", table] = table()
+            }
             ThisProgram["devices", table]:pushTable(Device)
             return 1
         }

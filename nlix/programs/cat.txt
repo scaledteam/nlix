@@ -4,5 +4,7 @@
 
 @name cat
 
-terminalPrintFast(varArray("args")[1, string] + "\n")
-programKill()
+if (terminalInit()) {
+    terminalPrint(varArray("args")[1, string] + "\n")
+    programKill()
+}

@@ -6,7 +6,7 @@
 
 @persist KERNEL_PERF KERNEL_OVERLOAD 
 @persist KernelState0 KernelState1
-@persist Programs:table ThisProgram:table ThisProgramName:string
+@persist Programs:table ThisProgram:table ThisProgramName:string ThisProgramId
 
 if (first()) {
     #include "nlix/init/first"
@@ -23,29 +23,32 @@ if (tickClk()) {
                     case 2, #include "nlix/libraries/kernel/lib-program" break
                     
                     # Important libs
-                    case 3, #include "nlix/libraries/lib-devices" break
-                    case 4, #include "nlix/libraries/lib-vars" break
-                    case 5, #include "nlix/libraries/lib-event" break
-                    case 6, #include "nlix/libraries/lib-state" break
-                    case 7, #include "nlix/libraries/lib-file" break
+                    #case 3, #include "nlix/libraries/lib-vars" break
+                    case 3, #include "nlix/libraries/lib-vars-2" break
+                    case 4, #include "nlix/libraries/lib-search" break
+                    case 5, #include "nlix/libraries/lib-devices" break
+                    case 6, #include "nlix/libraries/lib-event" break
+                    case 7, #include "nlix/libraries/lib-state" break
+                    case 8, #include "nlix/libraries/lib-file" break
                     
                     # Driver libs
-                    case  8, #include "nlix/libraries/drivers/lib-driver"            break
-                    case  9, #include "nlix/libraries/drivers/lib-driver-terminal"  break
-                    case 10, #include "nlix/libraries/drivers/lib-driver-keyboard"  break
-                    case 11, #include "nlix/libraries/drivers/lib-driver-egp"       break
-                    case 12, #include "nlix/libraries/drivers/lib-driver-cursor"    break
-                    case 13, #include "nlix/libraries/drivers/lib-driver-digi"      break
-                    case 14, #include "nlix/libraries/drivers/lib-driver-gl"        break
+                    case  9, #include "nlix/libraries/drivers/lib-driver"            break
+                    case 10, #include "nlix/libraries/drivers/lib-driver-terminal"  break
+                    case 11, #include "nlix/libraries/drivers/lib-driver-keyboard"  break
+                    case 12, #include "nlix/libraries/drivers/lib-driver-egp"       break
+                    case 13, #include "nlix/libraries/drivers/lib-driver-cursor"    break
+                    case 14, #include "nlix/libraries/drivers/lib-driver-digi"      break
+                    case 15, #include "nlix/libraries/drivers/lib-driver-gl"        break
                     
                     # Other libs
-                    case 15, #include "nlix/libraries/lib-simple-keyboard" break
+                    case 16, #include "nlix/libraries/lib-simple-keyboard" break
                     
                     # Wine libs
-                    #[case 16, #include "nlix/libraries/wine/lib-wine-vars" break
-                    case 17, #include "nlix/libraries/wine/lib-wine-fake-vars" break
-                    case 18, #include "nlix/libraries/wine/lib-wine-egp" break
-                    case 19, #include "nlix/libraries/wine/lib-wine-app" break
+                    #[#case 17, #include "nlix/libraries/wine/lib-wine-vars" break
+                    case 17, #include "nlix/libraries/wine/lib-wine-vars-2" break
+                    case 18, #include "nlix/libraries/wine/lib-wine-fake-vars" break
+                    case 19, #include "nlix/libraries/wine/lib-wine-egp" break
+                    case 20, #include "nlix/libraries/wine/lib-wine-app" break
                     
                     case 22, #include "Windows/System/API/ROM" break
                     case 23, #include "Windows/System/API/EGP/Object" break
@@ -73,15 +76,18 @@ if (tickClk()) {
         
         case 1,
             while (perf(KERNEL_PERF)) {
-                KernelState1++
-                if (KernelState1 > Programs:count()) {
-                    KernelState1 = 1
+                ThisProgramId++
+                if (ThisProgramId > Programs:count()) {
+                    ThisProgramId = 1
                 }
                 
-                ThisProgram = Programs[KernelState1, table]
+                ThisProgram = Programs[ThisProgramId, table]
                 
                 ThisProgramName = ThisProgram:type()
                 switch (ThisProgramName) {
+                    # Process kill function
+                    case "killself",            #include "nlix/programs/killself"                   break
+                    
                     # System daemons
                     case "hotplugd",            #include "nlix/programs/hotplugd"                   break
                     
@@ -184,7 +190,7 @@ if (tickClk()) {
                     case "TableCMD",            #include "Windows/Apps/TableCMD"                    break]#
                     
                     default,
-                        ThisProgram:programKill()
+                        #ThisProgram:programKill()
                 }
             }
             break

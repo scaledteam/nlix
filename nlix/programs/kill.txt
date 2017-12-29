@@ -6,10 +6,14 @@
 
 local Program = Programs[varArray("args")[1, string]:toNumber(), table]
 if (Program != NULL) {
-    terminalPrintFast("Try kill \"" + Program["name", string] + "\".\n")
+    if (terminalInit()) {
+        terminalPrint("Try kill \"" + Program:type() + "\".\n")
+    }
     Program:programKill()
 }
 else {
-    terminalPrintFast("Program don't launched!.\n")
+    if (terminalInit()) {
+        terminalPrint("Program don't launched!.\n")
+    }
 }
 programKill()

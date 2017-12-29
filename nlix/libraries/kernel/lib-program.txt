@@ -3,14 +3,13 @@
 #
 
 @name lib-program
-@persist PROGRAM_TABLES:array
 
 function table table:programStart(Name:string) {
     local Program = object(Name)
     
-    foreach (I, TableName:string = PROGRAM_TABLES) {
+    #[foreach (I, TableName:string = PROGRAM_TABLES) {
         Program[TableName, table] = table()
-    }
+    }]#
     
     #[if (ThisProgram:exists("user")) {
         Program["user", string] = ThisProgram["user", string]
@@ -29,19 +28,20 @@ function table programStart(Name:string) {
 }
 
 function table:programKill() {
-    for (I = 1, Programs:count()) {
+    This:setType("killself")
+    #[for (I = 1, Programs:count()) {
         if (Programs[I, table] == This) {
             local Program = Programs[I, table]
             
             foreach (I, TableName:string = PROGRAM_TABLES) {
-                Program[TableName, table] = table()
+                Program[TableName, table]:clear()
             }
             Program:clear()
             
             Programs:remove(I)
             break
         }
-    }
+    }]#
 }
 
 function programKill() {

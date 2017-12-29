@@ -7,11 +7,23 @@
 switch (stateGet()) {
     # Initialize
     case 0,
-        if (driverPopDevice("gmod_wire_consolescreen")) {
+        eventInit()
+        
+        if (driverPopDevice("gmod_wire_textscreen")) {
+            local Port = varTable("device")["port", wirelink]
+            Port["String", string] = varString("consoleText")
+            
+            varWrite("resolution", vec2(39, 21))
+            
+            stateNext()
+        }
+        
+        elseif (driverPopDevice("gmod_wire_consolescreen")) {
             local Port = varTable("device")["port", wirelink]
             Port[2041] = 1
             Port:writeString(varString("consoleText"), 0, 0)
             
+            varWrite("resolution", vec2(30, 18))
             stateNext()
         }
         
@@ -23,12 +35,7 @@ switch (stateGet()) {
             Port:egpTextLayout(1, varString("consoleText"), vec2(), vec2(512))
             Port:egpFont(1, FONT_MONOSPACED)
             
-            stateNext()
-        }
-        
-        elseif (driverPopDevice("gmod_wire_textscreen")) {
-            local Port = varTable("device")["port", wirelink]
-            Port["String", string] = varString("consoleText")
+            varWrite("resolution", vec2(56, 28))
             
             stateNext()
         }
@@ -36,6 +43,8 @@ switch (stateGet()) {
         elseif (driverPopDevice("virtual-terminal")) {
             local Device = varTable("device")
             Device["new-output", string] = varString("consoleText")
+            
+            varWrite("resolution", Device["resolution", vector2])
             
             stateNext()
         }
@@ -50,6 +59,8 @@ switch (stateGet()) {
                 "egpParentToBase", 2
             ))
             
+            varWrite("resolution", Device["resolution", vector2] / vec2(512) * vec2(56, 28))
+            
             stateNext()
         }
         
@@ -59,7 +70,7 @@ switch (stateGet()) {
     case 1,
         local Device = varTable("device")
         if (Device:isValid()) {
-            if (eventsExists()) {
+            if (eventExists()) {
                 local ScreenType = Device:type()
                 
                 local Command = eventGetString()
@@ -92,25 +103,42 @@ switch (stateGet()) {
                         }
                         
                         varWrite("consoleText", "")
+                        varArray("ConsoleTextArray"):clear()
                         break
                     
                     case "print",
                         local NewPrint = eventGetString()
-                        local ConsoleText = varString("consoleText") + NewPrint
-                        varWrite("consoleText", ConsoleText)
+                        #[local ConsoleText = varString("consoleText") + NewPrint
+                        varWrite("consoleText", ConsoleText)]#
                         
-                        #[local Width = 10
-                        local ConsoleText = varString("consoleText")
-                        local ThisLineCount = ConsoleText:length() % Width
-                        local ThisLine = ConsoleText:sub(ConsoleText:length() - ThisLineCount, ConsoleText:length()) + NewPrint
+                        local Width = varVector2("resolution")[1]
+                        local Height = varVector2("resolution")[2]
                         
-                        local ThisLineArray = array()
-                        for (I = 1, int(ThisLine:length() / Width)) {
-                            ThisLineArray[I, string] = ThisLine:sub(1, I * Width)
+                        if (!varExists("ConsoleTextArray")) {
+                            varWrite("ConsoleTextArray", array())
                         }
                         
-                        ConsoleText += ConsoleText:sub(1, ConsoleText:length() - ThisLineCount) + ThisLineArray:concat("\n")
-                        varWrite("consoleText", ConsoleText)]#
+                        local ConsoleTextArray = varArray("ConsoleTextArray")
+                        local LastString = ConsoleTextArray:count()
+                        
+                        local NewText = ConsoleTextArray:popString() + NewPrint
+                        local LineOffset = -1
+                        local NewTextLength = NewText:length()
+                        local NewTextExplode = NewText:explode("\n")
+                        
+                        foreach (I, NewText2:string = NewTextExplode) {
+                            for (I = 0, NewText2:length() / Width) {
+                                ConsoleTextArray:pushString(NewText2:sub(I * Width, (I + 1) * Width))
+                                LineOffset++
+                            }
+                        }
+                        
+                        while (ConsoleTextArray:count() > Height) {
+                            ConsoleTextArray:shift()
+                        }
+                        
+                        local ConsoleText = ConsoleTextArray:concat("\n")
+                        varWrite("consoleText", ConsoleText)
                         
                         switch (ScreenType) {
                             case "gmod_wire_egp",
@@ -118,6 +146,9 @@ switch (stateGet()) {
                                 break
                             
                             case "gmod_wire_consolescreen",
+                                if (LineOffset != 0) {
+                                    Device["port", wirelink][2041] = 1
+                                }
                                 Device["port", wirelink]:writeString(ConsoleText, 0, 0)
                                 break
                             
@@ -141,7 +172,26 @@ switch (stateGet()) {
                     
                     case "erase",
                         local EraseCount = eventGetNumber()
+                        
                         varWrite("consoleText", varString("consoleText"):left(varString("consoleText"):length() - EraseCount))
+                        
+                        local ConsoleTextArray = varArray("ConsoleTextArray")
+                        
+                        while (EraseCount > 0) {
+                            local String = ConsoleTextArray:popString()
+                            local StringCount = String:length()
+                            
+                            if (StringCount == 0) {
+                                break
+                            }
+                            elseif (EraseCount < StringCount) {
+                                ConsoleTextArray:pushString(String:left(StringCount - EraseCount))
+                                break
+                            }
+                            else {
+                                EraseCount -= StringCount
+                            }
+                        }
                         
                         switch (ScreenType) {
                             case "gmod_wire_egp",

@@ -4,16 +4,18 @@
 
 @name ls
 
-switch (stateGet()) {
-    case 0,
-        afileListLoad(varArray("args")[1, string])
-        stateNext()
-        break
-    
-    case 1,
-        if (afileListReady()) {
-            terminalPrintFast(afileListRead():concat("\n") + "\n")
-            programKill()
-        }
-        break
+if (terminalInit()) {
+    switch (stateGet()) {
+        case 0,
+            afileListLoad(varArray("args")[1, string])
+            stateNext()
+            break
+        
+        case 1,
+            if (afileListReady()) {
+                terminalPrint(afileListRead():concat("\n") + "\n")
+                programKill()
+            }
+            break
+    }
 }

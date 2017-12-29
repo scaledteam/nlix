@@ -7,6 +7,8 @@
 switch (stateGet()) {
     # Initialize
     case 0,
+        eventInit()
+        
         if (driverPopDevice("gmod_wire_digitalscreen")) {
             local Resolution = vec2(64)
             local Port = varTable("device")["port", wirelink]
@@ -23,6 +25,8 @@ switch (stateGet()) {
         elseif (driverPopDevice("gmod_wire_egp")) {
             local Port = varTable("device")["port", wirelink]
             Port:egpClear()
+            Port:egpDrawTopLeft(1)
+            Port:egpResolution(vec2(), vec2(512))
             
             local Resolution = int(sqrt(egpMaxObjects()))
             #[local Size = Device["resolution", vector2] / Resolution
@@ -81,7 +85,7 @@ switch (stateGet()) {
         local Device = varTable("device")
         if (Device:isValid()) {
             for (I = 1, KERNEL_OVERLOAD) {
-                if (eventsExists()) {
+                if (eventExists()) {
                     varWrite("idle", 0)
                     local Command = eventGetString()
                     

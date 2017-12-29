@@ -1,0 +1,229 @@
+#
+# Created by scaled
+#
+
+@name lib-search
+
+# One search
+function searchStartForOne(Table:table, Type:string) {
+    varWrite("searchTable", Table)
+    varWrite("searchType", Type)
+}
+
+function number searchLoopForOne() {
+    local Type = varString("searchType")
+    local Counter = varNumber("searchCounter")
+    local Table = varTable("searchTable")
+    for (I = 1, KERNEL_OVERLOAD) {
+        Counter++
+        
+        if (Counter > Table:count()) {
+            varWrite("searchResult", NULL)
+        }
+        
+        local SubTable = Table[Counter, table]
+        if (SubTable:type() == Type) {
+            varWrite("searchResult", SubTable)
+            varWrite("searchCounter", Counter)
+            return 1
+        }
+    }
+    varWrite("searchCounter", Counter)
+    return 0
+}
+
+function number searchInfinityLoopForOne() {
+    local Type = varString("searchType")
+    local Counter = varNumber("searchCounter")
+    local Table = varTable("searchTable")
+    for (I = 1, KERNEL_OVERLOAD) {
+        Counter++
+        
+        if (Counter > Table:count()) {
+            Counter = 0
+        }
+        
+        local SubTable = Table[Counter, table]
+        if (SubTable:type() == Type) {
+            varWrite("searchResult", SubTable)
+            varWrite("searchCounter", Counter)
+            return 1
+        }
+    }
+    varWrite("searchCounter", Counter)
+    return 0
+}
+
+
+function searchStartForMany(Table:table, Type:string) {
+    varWrite("searchTable", Table)
+    varWrite("searchType", Type)
+    varWrite("searchResult", table())
+}
+
+function number searchLoopForMany() {
+    local Type = varString("searchType")
+    local Counter = varNumber("searchCounter")
+    local Table = varTable("searchTable")
+    for (I = 1, KERNEL_OVERLOAD) {
+        Counter++
+        
+        if (Counter > Table:count()) {
+            if (varTable("searchResult"):count() == 0) {
+                varWrite("searchResult", NULL)
+            }
+            varWrite("searchCounter", Counter)
+            return 1
+        }
+        
+        local SubTable = Table[Counter, table]
+        if (SubTable:type() == Type) {
+            varTable("searchResult"):pushTable(SubTable)
+        }
+    }
+    varWrite("searchCounter", Counter)
+    return 0
+}
+
+
+function table searchGetResult() {
+    varRemove("searchTable")
+    varRemove("searchType")
+    local Result = varTable("searchResult")
+    varRemove("searchResult")
+    return Result
+}
+
+function table searchGetTempResult() {
+    return varTable("searchResult")
+}
+
+function number searchIsReady() {
+    return !varExists("searchTable")
+}
+
+
+# Many searches
+function searchStartForOne(Id:string, Table:table, TargetType:string) {
+    if (!varExists("searches")) {
+        varWrite("searches", table())
+    }
+    
+    local Search = table()
+    Search["table", table] = Table
+    Search["targetType", string] = TargetType
+    
+    local Searches = varTable("searches")
+    Searches[Id, table] = Search
+}
+
+function number searchLoopForOne(Id:string) {
+    local Search = varTable("searches")[Id, table]
+    
+    local TargetType = Search["targetType", string]
+    local Counter = Search["counter", number]
+    local Table = Search["table", table]
+    
+    for (I = 1, KERNEL_OVERLOAD) {
+        Counter++
+        
+        if (Counter > Table:count()) {
+            Search["result", table] = NULL
+            return 1
+        }
+        
+        local SubTable = Table[Counter, table]
+        if (SubTable:type() == TargetType) {
+            Search["result", table] = SubTable
+            Search["counter", number] = Counter
+            return 1
+        }
+    }
+    Search["counter", number] = Counter
+    return 0
+}
+
+function number searchInfinityLoopForOne(Id:string) {
+    local Search = varTable("searches")[Id, table]
+    
+    local TargetType = Search["targetType", string]
+    local Counter = Search["counter", number]
+    local Table = Search["table", table]
+    
+    for (I = 1, KERNEL_OVERLOAD) {
+        Counter++
+        
+        if (Counter > Table:count()) {
+            Counter = 0
+            continue
+        }
+        
+        local SubTable = Table[Counter, table]
+        if (SubTable:type() == TargetType) {
+            Search["result", table] = SubTable
+            Search["counter", number] = Counter
+            return 1
+        }
+    }
+    Search["counter", number] = Counter
+    return 0
+}
+
+
+function searchStartForMany(Id:string, Table:table, TargetType:string) {
+    if (!varExists("searches")) {
+        varWrite("searches", table())
+    }
+    
+    local Search = table()
+    Search["table", table] = Table
+    Search["targetType", string] = TargetType
+    Search["result", table] = table()
+    
+    local Searches = varTable("searches")
+    Searches[Id, table] = Search
+}
+
+function number searchLoopForMany(Id:string) {
+    local Search = varTable("searches")[Id, table]
+    
+    local TargetType = Search["targetType", string]
+    local Counter = Search["counter", number]
+    local Table = Search["table", table]
+    
+    for (I = 1, KERNEL_OVERLOAD) {
+        Counter++
+        
+        if (Counter > Table:count()) {
+            return 1
+        }
+        
+        local SubTable = Table[Counter, table]
+        if (SubTable:type() == TargetType) {
+            Search["result", table]:pushTable(SubTable)
+            Search["counter", number] = Counter
+            return 1
+        }
+    }
+    Search["counter", number] = Counter
+    return 0
+}
+
+
+function table searchGetResult(Id:string) {
+    local Search = varTable("searches")[Id, table]
+    local Result = Search["result", table]
+    Search:clear()
+    
+    varTable("searches"):remove(Id)
+    
+    return Result
+}
+
+function table searchGetTempResult(Id:string) {
+    return varTable("searches")[Id, table]["result", table]
+}
+
+function number searchIsReady(Id:string) {
+    return !varTable("searches"):exists(Id)
+}

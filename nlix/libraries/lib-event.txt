@@ -4,7 +4,9 @@
 
 @name lib-event
 
-PROGRAM_TABLES:pushString("events")
+function eventInit() {
+    ThisProgram["events", table] = table()
+}
 
 function number eventWaitString(EventName:string) {
     if (ThisProgram["events", table]:count() > 0 & ThisProgram["events", table][ThisProgram["events", table]:count(), string] == EventName) {
@@ -16,11 +18,11 @@ function number eventWaitString(EventName:string) {
     }
 }
 
-function number eventsExists() {
+function number eventExists() {
     return ThisProgram["events", table]:count() > 0
 }
 
-function number table:eventsExists() {
+function number table:eventExists() {
     return This["events", table]:count() > 0
 }
 

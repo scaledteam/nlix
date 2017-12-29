@@ -9,6 +9,8 @@ if (ArgNumber != 0) {
     KERNEL_PERF = ArgNumber
 }
 else {
-    terminalPrintFast("Entered value is not a number or 0.\n")
+    if (terminalInit()) {
+        terminalPrint("Entered value is not a number or 0.\n")
+    }
 }
 programKill()

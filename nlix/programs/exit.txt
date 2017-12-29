@@ -7,7 +7,9 @@
 switch (stateGet()) {
     case 0,
         if (programFindByName("hotplugd") != NULL & varArray("args")[1, string] != "--force") {
-            terminalPrintFast("You can lost hotplug function after exit. Use --force if you really want it.\n")
+            if (terminalInit()) {
+                terminalPrint("You can lost hotplug function after exit. Use --force if you really want it.\n")
+            }
             programKill()
         }
         else {

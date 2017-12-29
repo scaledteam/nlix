@@ -4,5 +4,7 @@
 
 @name ops
 
-terminalPrintFast(ops() + "\n")
-programKill()
+if (terminalInit()) {
+    terminalPrint(ops() + "\n")
+    programKill()
+}

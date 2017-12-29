@@ -7,6 +7,8 @@
 switch (stateGet()) {
     # Initialize
     case 0,
+        eventInit()
+        
         # Init first keyboard
         if (driverPopDevice("gmod_wire_keyboard")) {
             stateNext()

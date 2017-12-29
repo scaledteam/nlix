@@ -7,19 +7,23 @@
 switch (stateGet()) {
     # Initialize
     case 0,
+        eventInit()
+        
         if (driverPopDevice("gmod_wire_egp")) {
-            local Screen = varTable("device")["port", wirelink]
-            Screen:egpClear()
-            Screen:egpBox(1, vec2(), vec2(512))
-            Screen:egpColor(1, vec())
+            local Port = varTable("device")["port", wirelink]
+            Port:egpClear()
+            Port:egpDrawTopLeft(1)
+            Port:egpResolution(vec2(-256), vec2(256))
             
-            local Id = egpMaxObjects()
+            Port:egpBox(1, vec2(-256), vec2(512))
+            Port:egpColor(1, vec())
+            
+            local Id = min(egpMaxObjects(), 300)
             while (Id >= 2) {
-                Screen:egpTriangle(Id, vec2(), vec2(), vec2())
+                Port:egpLine(Id, vec2(), vec2())
                 Id--
             }
             
-            varWrite("resolution", vec2(512))
             stateNext()
         }
         break
@@ -34,23 +38,22 @@ switch (stateGet()) {
     # Wait events
     case 2,
         local Device = varTable("device")
-        local Screen = Device["port", wirelink]
-        local ResolutionY = varVector2("resolution")[2] / 2
+        local Port = Device["port", wirelink]
         if (Device:isValid()) {
-            for (Tick = 1, KERNEL_OVERLOAD) {
-                if (eventsExists()) {
+            for (I = 1, KERNEL_OVERLOAD) {
+                if (eventExists()) {
                     varWrite("idle", 0)
                     local Command = eventGetString()
                     
                     switch (Command) {
                         case "glStart",
-                            local Id = egpMaxObjects()
+                            local Id = min(egpMaxObjects(), 300)
                             
                             local UsedIds = varArray("usedIds")
                             local UsedIdsOld = varArray("usedIdsOld")
                             while (Id >= 2) {
                                 if (!UsedIds:exists(Id) & UsedIdsOld:exists(Id)) {
-                                    Screen:egpTriangle(Id, vec2(), vec2(), vec2())
+                                    Port:egpLine(Id, vec2(), vec2())
                                     UsedIds:remove(Id)
                                 }
                                 Id--
@@ -62,7 +65,7 @@ switch (stateGet()) {
                             break
                         
                         case "glFillColor",
-                            Screen:egpColor(1, eventGetVector())
+                            Port:egpColor(1, eventGetVector())
                             break
                         
                         case "glColor",
@@ -86,7 +89,7 @@ switch (stateGet()) {
                             local Pos3 = Matrix * (eventGetVector() - Pos)
                             
                             local UsedIds = varArray("usedIds")
-                            local Id = int(egpMaxObjects() / 10 * (Pos1 + Pos2 + Pos3)[3] / 3) + 1
+                            local Id = int(min(egpMaxObjects(), 300) / 10 * (Pos1 + Pos2 + Pos3)[3] / 3) + 1
                             
                             while (UsedIds:exists(Id)) {
                                 Id++
@@ -94,18 +97,17 @@ switch (stateGet()) {
                             UsedIds[Id, number] = 1
                             
                             if (Pos1[3] > 0 & Pos2[3] > 0 & Pos3[3] > 0) {
-                                Screen:egpTriangle(Id,
-                                    ResolutionY * Pos1:dehomogenized(),
-                                    ResolutionY * Pos2:dehomogenized(),
-                                    ResolutionY * Pos3:dehomogenized()
+                                Port:egpTriangle(Id,
+                                    256 * Pos1:dehomogenized(),
+                                    256 * Pos2:dehomogenized(),
+                                    256 * Pos3:dehomogenized()
                                 )
-                                Screen:egpColor(Id, varVector("color"))
-                                Screen:egpParent(Id, 1)
+                                Port:egpColor(Id, varVector("color"))
                             }
                             break
                         
                         case "exit",
-                            Screen:egpClear()
+                            Port:egpClear()
                             driverPushDevice()
                             programKill()
                             break

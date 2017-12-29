@@ -6,6 +6,8 @@
 
 switch (stateGet()) {
     case 0,
+        eventInit()
+        
         local Device = NULL
         if (egpInit()) {
             Device = varTable("driver-egp"):driverGetDevice()

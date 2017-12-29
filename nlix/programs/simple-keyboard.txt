@@ -15,6 +15,7 @@ switch (stateGet()) {
         if (keyboardInit()) {
             varWrite("keyboardOld", array())
             
+            eventInit()
             stateNext()
         }
         break

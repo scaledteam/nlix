@@ -5,6 +5,7 @@
 @name lib-simple-keyboard
 
 function number simpleKeyboardInit() {
+    eventInit()
     return driverInit("simple-keyboard")
 }
 

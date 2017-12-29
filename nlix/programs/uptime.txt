@@ -4,6 +4,8 @@
 
 @name uptime
 
-local Uptime = systime() - KERNEL_TIME_START
-terminalPrintFast(int(Uptime / 60 / 60 / 24) % 30 + " days, " + int(Uptime / 60 / 60) % 24 + ":" + int(Uptime / 60) % 60 + ":" + int(Uptime) % 60 + "\n")
-programKill()
+if (terminalInit()) {
+    local Uptime = systime() - KERNEL_TIME_START
+    terminalPrint(int(Uptime / 60 / 60 / 24) % 30 + " days, " + int(Uptime / 60 / 60) % 24 + ":" + int(Uptime / 60) % 60 + ":" + int(Uptime) % 60 + "\n")
+    programKill()
+}

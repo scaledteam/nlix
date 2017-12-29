@@ -4,12 +4,46 @@
 
 @name pkill
 
-local Program = programFindByName(varArray("args")[1, string])
+#[local Program = programFindByName(varArray("args")[1, string])
 if (Program != NULL) {
-    terminalPrintFast("Try kill \"" + Program:type() + "\".\n")
+    if (terminalInit()) {
+        terminalPrint("Try kill \"" + Program:type() + "\".\n")
+    }
     Program:programKill()
 }
 else {
-    terminalPrintFast("Program don't launched!\n")
+    if (terminalInit()) {
+        terminalPrint("Program don't launched!\n")
+    }
 }
-programKill()
+programKill()]#
+
+
+switch (stateGet()) {
+    case 0,
+        searchStartForOne(Programs, varArray("args")[1, string])
+        stateNext()
+        break
+    
+    case 1,
+        if (searchLoopForOne()) {
+            stateNext()
+        }
+        break
+    
+    case 2,
+        local Program = searchGetResult()
+        if (Program != NULL) {
+            if (terminalInit()) {
+                terminalPrint("Try kill \"" + Program:type() + "\".\n")
+            }
+            Program:programKill()
+        }
+        else {
+            if (terminalInit()) {
+                terminalPrint("Program don't launched!\n")
+            }
+        }
+        programKill()
+        break
+}
