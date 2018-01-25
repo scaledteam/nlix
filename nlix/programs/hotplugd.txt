@@ -7,6 +7,10 @@
 switch (stateGet()) {
     # Hot plug
     case 0,
+        if (!ThisEnvironment:exists("devices")) {
+            ThisEnvironment["devices", table] = table()
+        }
+        
         local Counter = varNumber("counter") + 1
         
         local Port = select(Counter,
@@ -20,21 +24,25 @@ switch (stateGet()) {
             # Check if device exists
             local DeviceExists = 0
             local DeviceType = Port:entity():type()
-            for (I = 1, ThisProgram["workspace", table]:count()) {
-                if (ThisProgram["workspace", table][I, table]["port", wirelink]:entity():type() == DeviceType & ThisProgram["workspace", table][I, table]["port", wirelink] == Port) {
+            local Devices = ThisEnvironment["devices", table]
+            
+            for (I = 1, Devices:count()) {
+                if (Devices[I, table]["port", wirelink]:entity():type() == DeviceType & Devices[I, table]["port", wirelink] == Port) {
                     DeviceExists = 1
                     break
                 }
             }
             
             if (!DeviceExists) {
-                ThisProgram["workspace", table]:pushTable(Port:toDevice())
+                Devices:pushTable(Port:toDevice())
             }
         }
         varWrite("PortOld" + Counter, Port)
         
         if (Counter >= PORTS_COUNT) {
-            stateNext()
+            if (ThisEnvironment["devices", table]:count() > 0) {
+                stateNext()
+            }
             varWrite("counter", 0)
         }
         else {
@@ -45,15 +53,16 @@ switch (stateGet()) {
     # Hot unplug
     case 1,
         local Counter = varNumber("counter") + 1
+        local Devices = ThisEnvironment["devices", table]
         
-        local Device = ThisProgram["workspace", table][Counter, table]
+        local Device = Devices[Counter, table]
         if (Device:exists("port") & !Device["port", wirelink]:entity():isValid()) {
             Device:clear()
-            ThisProgram["workspace", table]:remove(Counter)
+            Devices:remove(Counter)
             Counter--
         }
         
-        if (Counter >= ThisProgram["workspace", table]:count()) {
+        if (Counter >= Devices:count()) {
             statePrev()
             varWrite("counter", 0)
         }

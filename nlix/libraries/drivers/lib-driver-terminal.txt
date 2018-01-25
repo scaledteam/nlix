@@ -15,7 +15,7 @@ function table createVirtualTerminal() {
 }
 
 function number terminalInit() {
-    return driverInit("driver-terminal")
+    return driverInitForProgram("driver-terminal")
 }
 
 function terminalPrint(Text:string) {

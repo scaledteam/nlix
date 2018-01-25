@@ -8,7 +8,11 @@ switch (stateGet()) {
     # Initialize
     case 0,
         eventInit()
-        
+        driverInit()
+        stateNext()
+        break
+    
+    case 1,
         if (driverPopDevice("gmod_wire_egp")) {
             local Port = varTable("device")["port", wirelink]
             Port:egpClear()
@@ -28,7 +32,7 @@ switch (stateGet()) {
         }
         break
     
-    case 1,
+    case 2,
         varWrite("usedIds", array())
         
         varWrite("idle", 1)
@@ -36,7 +40,7 @@ switch (stateGet()) {
         break
     
     # Wait events
-    case 2,
+    case 3,
         local Device = varTable("device")
         local Port = Device["port", wirelink]
         if (Device:isValid()) {
@@ -123,7 +127,7 @@ switch (stateGet()) {
         }
         else {
             driverPushDevice()
-            stateSet(0)
+            stateSet(1)
         }
         break
     }

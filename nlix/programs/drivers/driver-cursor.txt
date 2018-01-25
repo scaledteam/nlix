@@ -7,7 +7,11 @@
 switch (stateGet()) {
     case 0,
         eventInit()
-        
+        driverInit()
+        stateNext()
+        break
+    
+    case 1,
         local Device = NULL
         if (egpInit()) {
             Device = varTable("driver-egp"):driverGetDevice()
@@ -32,7 +36,7 @@ switch (stateGet()) {
         }
         break
     
-    case 1,
+    case 2,
         #ifdef findInSphere(vector,number)
             if (varNumber("need-to-find-user")) {
                 findIncludeClass("player")
@@ -43,11 +47,11 @@ switch (stateGet()) {
             stateNext()
         }
         else {
-            stateSet(3)
+            stateSet(4)
         }
         break
     
-    case 2,
+    case 3,
         if (varNumber("need-to-find-user")) {
             #ifdef findInSphere(vector,number)
                 local ScanPos = varTable("device")["port", wirelink]:entity():pos()
@@ -70,7 +74,7 @@ switch (stateGet()) {
         stateNext()
         break
     
-    case 3,
+    case 4,
         local Device = varTable("device")
         
         switch (Device:type()) {
@@ -85,7 +89,7 @@ switch (stateGet()) {
                 break
         }
         if (varNumber("need-to-find-user")) {
-            stateSet(2)
+            stateSet(3)
         }
         
         if (eventWaitString("exit")) {

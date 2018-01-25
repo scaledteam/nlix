@@ -7,41 +7,17 @@
 function table table:programStart(Name:string) {
     local Program = object(Name)
     
-    #[foreach (I, TableName:string = PROGRAM_TABLES) {
-        Program[TableName, table] = table()
-    }]#
-    
-    #[if (ThisProgram:exists("user")) {
-        Program["user", string] = ThisProgram["user", string]
-    }
-    else {
-        Program["user", string] = KERNEL_ROOT_USER
-    }]#
-    
-    Program["workspace", table] = This
+    Program["environment", table] = This
     Programs:pushTable(Program)
     return Program
 }
 
 function table programStart(Name:string) {
-    return ThisProgram["workspace", table]:programStart(Name)
+    return ThisEnvironment:programStart(Name)
 }
 
 function table:programKill() {
     This:setType("killself")
-    #[for (I = 1, Programs:count()) {
-        if (Programs[I, table] == This) {
-            local Program = Programs[I, table]
-            
-            foreach (I, TableName:string = PROGRAM_TABLES) {
-                Program[TableName, table]:clear()
-            }
-            Program:clear()
-            
-            Programs:remove(I)
-            break
-        }
-    }]#
 }
 
 function programKill() {
@@ -49,10 +25,9 @@ function programKill() {
 }
 
 function table programFindByName(Name:string) {
-    local ThisWorkspace = ThisProgram["workspace", table]
     for (I = 1, Programs:count()) {
         local Program = Programs[I, table]
-        if (Program:type() == Name & Program["workspace", table] == ThisWorkspace) {
+        if (Program:type() == Name & Program["environment", table] == ThisEnvironment) {
             return Program
         }
     }

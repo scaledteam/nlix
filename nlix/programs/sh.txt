@@ -25,6 +25,13 @@ switch (stateGet()) {
         break
     
     case 3,
+        if (!ThisEnvironment:exists("startTime")) {
+            ThisEnvironment["startTime", number] = systime()
+        }
+        stateNext()
+        break
+    
+    case 4,
         #terminalPrint(ThisProgram["user", string] + " $ ")
         terminalPrint("sh $ ")
         simpleKeyboardRequestInput()
@@ -32,11 +39,11 @@ switch (stateGet()) {
         stateNext()
         break
     
-    case 4,
+    case 5,
         if (simpleKeyboardWaitInput()) {
             local Command = simpleKeyboardGetInput()
             if (Command == "") {
-                stateSet(3)
+                statePrev()
             }
             else {
                 local Program = NULL
@@ -67,9 +74,9 @@ switch (stateGet()) {
         
         break
     
-    case 5,
+    case 6,
         if (!varTable("LaunchedApp"):isValid()) {
-            stateSet(3)
+            stateShift(-2)
         }
         
         local KeyboardKeys = keyboardGetKeys()

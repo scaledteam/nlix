@@ -8,7 +8,11 @@ switch (stateGet()) {
     # Initialize
     case 0,
         eventInit()
-        
+        driverInit()
+        stateNext()
+        break
+    
+    case 1,
         if (driverPopDevice("gmod_wire_textscreen")) {
             local Port = varTable("device")["port", wirelink]
             Port["String", string] = varString("consoleText")
@@ -67,7 +71,7 @@ switch (stateGet()) {
         break
     
     # Wait events
-    case 1,
+    case 2,
         local Device = varTable("device")
         if (Device:isValid()) {
             if (eventExists()) {
@@ -258,7 +262,7 @@ switch (stateGet()) {
         }
         else {
             driverPushDevice()
-            stateSet(0)
+            stateSet(1)
         }
         break
 }

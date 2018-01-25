@@ -3,131 +3,155 @@
 #
 
 @name lib-file
-@persist Files:table [FileLoad FileLoadType]:string
-@persist FileList:array FileListType:string
-@persist FileLoadReady FileListReady
+@persist Files:table 
+@persist FileLoad:string FileLoadReady FileLoadType:string
+@persist FileList:array FileListReady FileListType:string
+@persist FILE_NO_LIST:array
 
-Files = object("table")
-Files["testfile", string] = "123"
+Files = object("fakedir")
 
-local Folder = object("table")
-Folder["testfile2", string] = "1234"
-Files["dir", table] = Folder
+Files["testfile", table] = object("fakefile")
+Files["testfile", table]["data", string] = "The magic word."
 
-Folder = object("dir")
-Folder["path", string] = ""
-Files["rdir", table] = Folder
+Files["dir", table] = object("fakedir")
+Files["dir", table]["testfile2", string] = "1234"
+Files["dir", table]["testdir", table] = object("fakedir")
+Files["dir", table]["testdir", table]["1", table] = object("fakedir")
+Files["dir", table]["testdir", table]["2", table] = object("fakedir")
+Files["dir", table]["testdir", table]["3", table] = object("fakefile")
+Files["dir", table]["testdir", table]["3", table]["data", string] = "Magic word 2."
 
-Folder = object("dir")
-Folder["path", string] = "/test"
-Files["rdir2", table] = Folder
+Files["rdir", table] = object("realdir")
+Files["rdir", table]["path", string] = ""
 
-FileLoadReady = 1
-FileListReady = 1
+Files["rdir2", table] = object("realdir")
+Files["rdir2", table]["path", string] = "test"
 
-function number table:afileLoad(Name:string) {
-    FileLoadType = This:type()
-    switch (FileLoadType) {
-        case "table",
-            FileLoad = This[Name, string]
-            return 1
+function table:afileListQuery(Path:string) {
+    local PathExp = Path:explode("/")
+    
+    local Object = This[PathExp[1, string], table]
+    local PathEnd = PathExp:concat("/", 2)
+    
+    FileListType = Object:type()
+    switch (FileListType) {
+        case "fakedir",
+            if (PathEnd == "") {
+                FileList = Object:keys()
+                FileListReady = 1
+            }
+            else {
+                Object:afileListQuery(PathEnd)
+            }
+            break
         
-        case "file",
-            fileLoad(This["path", string] + Name)
-            FileLoadReady = 0
-            return 1
+        case "realdir",
+            fileList(Object["path", string] + "/" + PathEnd)
+            break
+        
+        default,
+    }
+}
+
+function afileListQuery(Path:string) {
+    Files:afileListQuery(Path)
+}
+
+function number afileListIsReady() {
+    switch (FileListType) {
+        case "realdir",
+            return fileLoadedList()
+        
+        case "fakedir",
+            if (FileListReady) {
+                FileListReady = 0
+                return 1
+            }
+            else {
+                return 0
+            }
         
         default,
             return 0
     }
 }
 
-function number afileReady() {
-    switch (FileLoadType) {
-        case "table",
-            return 1
+function array afileListGetList() {
+    switch (FileListType) {
+        case "realdir",
+            return fileReadList()
         
-        case "file",
-            FileLoadReady = fileLoaded()
-            return FileLoadReady
+        case "fakedir",
+            return FileList
+        
+        default,
+            return FILE_NO_LIST
+    }
+}
+
+function table:afileLoadQuery(Path:string) {
+    local PathExp = Path:explode("/")
+    
+    local Object = This[PathExp[1, string], table]
+    local PathEnd = PathExp:concat("/", 2)
+    
+    FileLoadType = Object:type()
+    switch (FileLoadType) {
+        case "fakedir",
+            Object:afileLoadQuery(PathEnd)
+            break
+        
+        case "fakefile",
+            FileLoad = Object["data", string]
+            FileLoadReady = 1
+            break
+        
+        case "realdir",
+            fileLoad(Object["path", string] + "/" + PathEnd)
+            print("dir", Object["path", string] + "/" + PathEnd)
+            break
+        
+        case "realfile",
+            fileLoad(Object["path", string] + "/" + PathEnd)
+            print("file", Object["path", string] + "/" + PathEnd)
+            break
+        
+        default,
+    }
+}
+
+function afileLoadQuery(Path:string) {
+    Files:afileLoadQuery(Path)
+}
+
+function number afileLoadIsReady() {
+    switch (FileLoadType) {
+        case "realdir",
+            return fileLoaded()
+        
+        case "fakefile",
+            if (FileLoadReady) {
+                FileLoadReady = 0
+                return 1
+            }
+            else {
+                return 0
+            }
         
         default,
             return 0
     }
 }
 
-function string afileRead() {
+function string afileLoadGetData() {
     switch (FileLoadType) {
-        case "table",
+        case "fakefile",
             return FileLoad
-        
-        case "file",
+            
+        case "realdir",
             return fileRead()
         
         default,
             return ""
     }
-}
-
-function afileListLoad(Path:string) {
-    local Folder = Files
-    
-    local PathExplode = Path:explode("/")
-    for (I = 1, PathExplode:count()) {
-        local Type = Folder:type()
-        if (Type == "table") {
-            local NextFolder = PathExplode:shiftString()
-            if (NextFolder != "") {
-                Folder = Folder[NextFolder, table]
-            }
-        }
-        elseif (Type == "dir") {
-            fileList(Folder["path", string] + "/" + PathExplode:concat("/") + "/*")
-            #print(Folder["path", string] + "/" + PathExplode:concat("/") + "/*")
-            break
-        }
-    }
-    Path = PathExplode:concat("/")
-    
-    FileListType = Folder:type()
-    switch (FileListType) {
-        case "table",
-            FileList = Folder:keys()
-            break
-        
-        case "dir",
-            fileList(Folder["path", string] + Path)
-            break
-    }
-}
-
-function number afileListReady() {
-    switch (FileListType) {
-        case "table",
-            return 1
-        
-        case "dir",
-            FileListReady = fileLoadedList()
-            return FileListReady
-        
-        default,
-            return 0
-    }
-}
-
-function array afileListRead() {
-    switch (FileListType) {
-        case "table",
-            return FileList
-        
-        case "dir",
-            return fileReadList()
-        
-        default,
-            return array()
-    }
-}
-
-function afileWrite() {
-    
 }

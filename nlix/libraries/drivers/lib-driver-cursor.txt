@@ -14,7 +14,7 @@ function table createVirtualCursor() {
 }
 
 function number cursorInit() {
-    return driverInit("driver-cursor")
+    return driverInitForProgram("driver-cursor")
 }
 
 function vector2 cursorGetPos() {

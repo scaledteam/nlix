@@ -1,0 +1,18 @@
+#
+# Created by scaled
+#
+
+@name port
+
+@inputs SyncIn:table
+@outputs SyncOut:table
+
+if (SyncIn:count() > 0) {
+    Programs = SyncOut = SyncIn
+}
+elseif (SyncIn == SyncOut) {
+    Programs = SyncOut
+}
+else {
+    KernelState1--
+}

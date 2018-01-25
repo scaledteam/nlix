@@ -1,0 +1,29 @@
+#
+# Created by scaled
+#
+
+@name lib-program-finder
+
+function programFinderWrite() {
+    if (!ThisEnvironment:exists("programFinder")) {
+        ThisEnvironment["programFinder", table] = table()
+    }
+    
+    ThisEnvironment["programFinder", table][ThisProgramName, table] = ThisProgram
+}
+
+function table programFinderRead(ProgramName:string) {
+    if (ThisEnvironment["programFinder", table]:exists(ProgramName)) {
+        local Program = ThisEnvironment["programFinder", table][ProgramName, table]
+        if (Program:isValid()) {
+            return Program
+        }
+        else {
+            ThisEnvironment["programFinder", table]:remove(ProgramName)
+            return NULL
+        }
+    }
+    else {
+        return NULL
+    }
+}

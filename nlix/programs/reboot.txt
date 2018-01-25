@@ -4,6 +4,5 @@
 
 @name reboot
 
-gtableClear()
 programKillAll()
 reset()

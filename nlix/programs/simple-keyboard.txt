@@ -6,12 +6,17 @@
 
 switch (stateGet()) {
     case 0,
+        driverInit()
+        stateNext()
+        break
+    
+    case 1,
         if (terminalInit()) {
             stateNext()
         }
         break
     
-    case 1,
+    case 2,
         if (keyboardInit()) {
             varWrite("keyboardOld", array())
             
@@ -21,7 +26,7 @@ switch (stateGet()) {
         break
     
     # Wait event
-    case 2,
+    case 3,
         if (eventWaitString("get-input")) {
             local Sender = eventGetTable()
             varWrite("input-sender", Sender)
@@ -31,7 +36,7 @@ switch (stateGet()) {
         break
     
     # Track keyboard
-    case 3,
+    case 4,
         local Keys = keyboardGetKeys()
         local KeysOld = varArray("keyboardOld")
         
@@ -102,13 +107,13 @@ switch (stateGet()) {
         break
     
     # Send ready data
-    case 4,
+    case 5,
         local Sender = varTable("input-sender")
         Sender:eventSend("get-input")
         Sender:eventSend(varString("KeyboardBuffer"))
         
         varWrite("KeyboardBuffer", "")
         
-        stateSet(2)
+        stateSet(3)
         break
 }

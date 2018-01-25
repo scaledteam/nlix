@@ -4,7 +4,7 @@
 
 @name lib-state
 
-function number stateGet() {
+#[function number stateGet() {
     return varNumber("state")
 }
 
@@ -22,10 +22,10 @@ function statePrev() {
 
 function stateShift(Shift) {
     varWrite("state", varNumber("state") + Shift)
-}
+}]#
 
 
-#[function number stateGet() {
+function number stateGet() {
     return ThisProgram["state", number]
 }
 
@@ -43,4 +43,4 @@ function statePrev() {
 
 function stateShift(Shift) {
     ThisProgram["state", number] = ThisProgram["state", number] + Shift
-}]#
+}

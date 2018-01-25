@@ -1,0 +1,16 @@
+#
+# Created by scaled
+#
+
+@name overload
+
+local ArgNumber = varArray("args")[1, string]:toNumber()
+if (ArgNumber != 0) {
+    KERNEL_OVERLOAD = ArgNumber
+}
+else {
+    if (terminalInit()) {
+        terminalPrint("Entered value is not a number or 0.\n")
+    }
+}
+programKill()

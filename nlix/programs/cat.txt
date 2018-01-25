@@ -5,6 +5,17 @@
 @name cat
 
 if (terminalInit()) {
-    terminalPrint(varArray("args")[1, string] + "\n")
-    programKill()
+    switch (stateGet()) {
+        case 0,
+            afileLoadQuery(varArray("args")[1, string])
+            stateNext()
+            break
+        
+        case 1,
+            if (afileLoadIsReady()) {
+                terminalPrint(afileLoadGetData() + "\n")
+                programKill()
+            }
+            break
+    }
 }

@@ -8,6 +8,10 @@
 @persist PORTS_COUNT
 PORTS_COUNT = 4
 
+function number table:deviceIsBusy() {
+    return This["program", table]:isValid()
+}
+
 function table table:deviceGet()    { return This["devices", table][1, table] }
 function table table:deviceGet(Id)  { return This["devices", table][Id, table] }
 
@@ -15,9 +19,9 @@ function table deviceGet()          { return ThisProgram["devices", table][1, ta
 function table deviceGet(Id)        { return ThisProgram["devices", table][Id, table] }
 
 function number devicePop(DeviceType:string) {
-    for (I = 1, ThisProgram["workspace", table]:count()) {
-        local Device = ThisProgram["workspace", table][I, table]
-        if (Device:type() == DeviceType & !Device["program", table]:isValid()) {
+    for (I = 1, ThisEnvironment["devices", table]:count()) {
+        local Device = ThisEnvironment["devices", table][I, table]
+        if (Device:type() == DeviceType & !Device:deviceIsBusy()) {
             Device["program", table] = ThisProgram
             
             if (!ThisProgram:exists("devices")) {
@@ -32,9 +36,9 @@ function number devicePop(DeviceType:string) {
 
 function number devicePopAll(DeviceType:string) {
     local Count = 0
-    for (I = 1, ThisProgram["workspace", table]:count()) {
-        local Device = ThisProgram["workspace", table][I, table]
-        if (Device:type() == DeviceType & !Device["program", table]:isValid()) {
+    for (I = 1, ThisEnvironment["devices", table]:count()) {
+        local Device = ThisEnvironment["devices", table][I, table]
+        if (Device:type() == DeviceType & !Device:deviceIsBusy()) {
             Device["program", table] = ThisProgram
             ThisProgram["devices", table]:pushTable(Device)
             Count++

@@ -6,7 +6,7 @@
 
 function number simpleKeyboardInit() {
     eventInit()
-    return driverInit("simple-keyboard")
+    return driverInitForProgram("simple-keyboard")
 }
 
 function simpleKeyboardRequestInput() {

@@ -18,36 +18,36 @@ switch (stateGet()) {
         break
     
     case 1,
-        local ThisWorkspacePrograms = table()
+        local ThisEnvironmentPrograms = table()
         for (I = 1, Programs:count()) {
             local Program = Programs[I, table]
-            if (Program["workspace", table] == ThisProgram["workspace", table]) {
-                ThisWorkspacePrograms:pushTable(Program)
+            if (Program["environment", table] == ThisEnvironment) {
+                ThisEnvironmentPrograms:pushTable(Program)
             }
         }
-        varWrite("apps", ThisWorkspacePrograms)
+        varWrite("apps", ThisEnvironmentPrograms)
         stateNext()
         break
     
     case 2,
         varWrite("exitAllTime", systime() + 2)
-        local ThisWorkspacePrograms = varTable("apps")
-        for (I = 1, ThisWorkspacePrograms:count()) {
-            ThisWorkspacePrograms[I, table]:eventSend("exit")
+        local ThisEnvironmentPrograms = varTable("apps")
+        for (I = 1, ThisEnvironmentPrograms:count()) {
+            ThisEnvironmentPrograms[I, table]:eventSend("exit")
         }
         stateNext()
         break
     
     case 3,
         if (systime() >= varNumber("exitAllTime")) {
-            local ThisWorkspacePrograms = varTable("apps")
-            for (I = 1, ThisWorkspacePrograms:count()) {
-                local Program = ThisWorkspacePrograms[I, table]
+            local ThisEnvironmentPrograms = varTable("apps")
+            for (I = 1, ThisEnvironmentPrograms:count()) {
+                local Program = ThisEnvironmentPrograms[I, table]
                 if (Program:isValid()) {
                     Program:programKill()
                 }
             }
-            ThisProgram["workspace", table]:clear()
+            ThisEnvironment:clear()
         }
         break
 }

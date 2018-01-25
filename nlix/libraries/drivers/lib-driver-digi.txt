@@ -5,7 +5,7 @@
 @name lib-driver-digi
 
 function number digiInit() {
-    return driverInit("driver-digi")
+    return driverInitForProgram("driver-digi")
 }
 
 function digiDrawPixel(Pos:vector2, Color:vector) {

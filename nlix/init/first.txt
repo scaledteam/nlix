@@ -3,9 +3,7 @@
 #
 
 @name first
-@persist KERNEL_TIME_START
 
 runOnTick(1)
 KERNEL_PERF = 20
 KERNEL_OVERLOAD = 1
-KERNEL_TIME_START = systime()

@@ -48,11 +48,13 @@ switch (stateGet()) {
                     
                     local ThisProgramDevices = ThisProgram["devices", table]
                     if (ThisProgramDevices:count() == 2) {
-                        local Workspace = table()
+                        local Environment = table()
+                        Environment["devices", table] = table()
+                        
                         while (ThisProgramDevices:count() > 0) {
                             local Device = ThisProgramDevices:popTable()
                             Device:remove("program")
-                            Workspace:unshiftTable(Device)
+                            Environment["devices", table]:pushTable(Device)
                         }
                         
                         local Autostart = array(
@@ -62,7 +64,7 @@ switch (stateGet()) {
                             "sh"
                         )
                         foreach (I, ProgramName:string = Autostart) {
-                            Workspace:programStart(ProgramName)
+                            Environment:programStart(ProgramName)
                         }
                     }
                     else {
@@ -89,10 +91,11 @@ switch (stateGet()) {
                     break]#
                 
                 case "dev-list",
+                    local Devices = ThisEnvironment["devices", table]
                     local Message = ""
-                    for (I = 1, ThisProgram["workspace", table]:count()) {
-                        local Device = ThisProgram["workspace", table][I, table]
-                        Message += I + ", " + (Device["program", table]:isValid() ? "busy" : "free") + ", " + Device:type() + "\n"
+                    for (I = 1, Devices:count()) {
+                        local Device = Devices[I, table]
+                        Message += I + ", " + (Device:deviceIsBusy() ? "busy" : "free") + ", " + Device:type() + "\n"
                     }
                     terminalPrint(Message)
                     varWrite("outputCount", varNumber("outputCount") + Message:length())
@@ -100,9 +103,10 @@ switch (stateGet()) {
                     break
                 
                 case "dev-del",
+                    local Devices = ThisEnvironment["devices", table]
                     local Id = InputExplode[2, string]:toNumber()
-                    ThisProgram["workspace", table][Id, table]:clear()
-                    ThisProgram["workspace", table]:remove(Id)
+                    Devices[Id, table]:clear()
+                    Devices:remove(Id)
                     stateSet(2)
                     break
                 

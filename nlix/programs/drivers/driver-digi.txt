@@ -8,7 +8,11 @@ switch (stateGet()) {
     # Initialize
     case 0,
         eventInit()
-        
+        driverInit()
+        stateNext()
+        break
+    
+    case 1,
         if (driverPopDevice("gmod_wire_digitalscreen")) {
             local Resolution = vec2(64)
             local Port = varTable("device")["port", wirelink]
@@ -20,7 +24,7 @@ switch (stateGet()) {
             
             varWrite("entity", Port:entity())
             varWrite("resolution", Resolution)
-            stateSet(2)
+            stateSet(3)
         }
         elseif (driverPopDevice("gmod_wire_egp")) {
             local Port = varTable("device")["port", wirelink]
@@ -42,7 +46,7 @@ switch (stateGet()) {
             varWrite("resolution", vec2(Resolution))
             
             varWrite("entity", Port:entity())
-            stateSet(1)
+            stateSet(2)
         }
         elseif (driverPopDevice("gmod_wire_consolescreen")) {
             local Port = varTable("device")["port", wirelink]
@@ -50,11 +54,11 @@ switch (stateGet()) {
             
             varWrite("entity", Port:entity())
             varWrite("resolution", vec2(30, 18))
-            stateSet(2)
+            stateSet(3)
         }
         break
     
-    case 1,
+    case 2,
         local Port = varTable("device")["port", wirelink]
         local Resolution = varVector2("resolution")[1]
         local Size = floor(vec2(512) / Resolution)
@@ -74,14 +78,14 @@ switch (stateGet()) {
         }
         break
     
-    case 2,
+    case 3,
         varWrite("idle", 1)
         
         stateNext()
         break
     
     # Wait events
-    case 3,
+    case 4,
         local Device = varTable("device")
         if (Device:isValid()) {
             for (I = 1, KERNEL_OVERLOAD) {
@@ -101,7 +105,7 @@ switch (stateGet()) {
                                 case "gmod_wire_egp",
                                     local Pos = eventGetVector2()
                                     local Color = eventGetVector()
-                                    Device["port", wirelink]:egpColor(Pos[1] + Pos[2] * varVector2("resolution")[1], Color)
+                                    Device["port", wirelink]:egpColor(Pos[1] + Pos[2] * varVector2("resolution")[1] + 1, Color)
                                     break
                                 
                                 case "gmod_wire_consolescreen",
@@ -126,7 +130,7 @@ switch (stateGet()) {
         }
         else {
             driverPushDevice()
-            stateSet(0)
+            stateSet(1)
         }
         break
 }

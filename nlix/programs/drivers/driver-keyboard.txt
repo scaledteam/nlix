@@ -5,11 +5,13 @@
 @name driver-keyboard
 
 switch (stateGet()) {
-    # Initialize
     case 0,
         eventInit()
-        
-        # Init first keyboard
+        driverInit()
+        stateNext()
+        break
+    
+    case 1,
         if (driverPopDevice("gmod_wire_keyboard")) {
             stateNext()
         }
@@ -20,17 +22,16 @@ switch (stateGet()) {
             varWrite("inputString", "")
             stateNext()
         }
-        
         break
     
-    case 1,
+    case 2,
         varWrite("keys", array())
         
         stateNext()
         break
     
     # Track keys
-    case 2,
+    case 3,
         local Device = varTable("device")
         if (Device:isValid()) {
             DeviceType = Device:type()
@@ -75,7 +76,7 @@ switch (stateGet()) {
         }
         else {
             driverPushDevice()
-            stateSet(0)
+            stateSet(1)
         }
         
         if (eventWaitString("exit")) {

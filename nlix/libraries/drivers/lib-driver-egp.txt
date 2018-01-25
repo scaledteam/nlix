@@ -22,7 +22,7 @@ function table createVirtualEgpScreen(Resolution:vector2, MaxObjects) {
 }
 
 function number egpInit() {
-    return driverInit("driver-egp")
+    return driverInitForProgram("driver-egp")
 }
 
 function egpBox(Id, Pos:vector2, Size:vector2) {

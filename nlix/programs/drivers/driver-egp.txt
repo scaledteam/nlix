@@ -8,7 +8,11 @@ switch (stateGet()) {
     # Initialize
     case 0,
         eventInit()
-        
+        driverInit()
+        stateNext()
+        break
+    
+    case 1,
         if (driverPopDevice("gmod_wire_egp")) {
             local Port = varTable("device")["port", wirelink]
             Port:egpClear()
@@ -35,7 +39,7 @@ switch (stateGet()) {
         }
         break
     
-    case 1,
+    case 2,
         local Device = varTable("device")
         local EgpObjects = varTable("egpObjects")
         local EgpMaxObjects = varNumber("egpMaxObjects")
@@ -68,14 +72,14 @@ switch (stateGet()) {
         }
         break
     
-    case 2,
+    case 3,
         varWrite("idle", 1)
         
         stateNext()
         break
     
     # Wait events
-    case 3,
+    case 4,
         local Device = varTable("device")
         if (Device:isValid()) {
             local EgpObjects = varTable("egpObjects")
@@ -805,7 +809,7 @@ switch (stateGet()) {
             }
         }
         else {
-            stateSet(0)
+            stateSet(1)
         }
         break
     }
