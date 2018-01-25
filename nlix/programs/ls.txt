@@ -5,10 +5,10 @@
 @name ls
 
 if (terminalInit()) {
-    switch (stateGet()) {
+    switch (P["state", number]) {
         case 0,
-            afileListQuery(varArray("args")[1, string])
-            stateNext()
+            afileListQuery(P["args", array][1, string])
+            P["state", number] = 1
             break
         
         case 1,

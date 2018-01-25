@@ -4,30 +4,30 @@
 
 @name driver-digi
 
-switch (stateGet()) {
+switch (P["state", number]) {
     # Initialize
     case 0,
         eventInit()
         driverInit()
-        stateNext()
+        P["state", number] = 1
         break
     
     case 1,
         if (driverPopDevice("gmod_wire_digitalscreen")) {
             local Resolution = vec2(64)
-            local Port = varTable("device")["port", wirelink]
+            local Port = P["device", table]["port", wirelink]
             Port[1048574] = 0
             Port[1048569] = 3
             Port[1048575] = 1
             Port[1048573] = Resolution[1]
             Port[1048572] = Resolution[2]
             
-            varWrite("entity", Port:entity())
-            varWrite("resolution", Resolution)
-            stateSet(3)
+            P["entity", entity] = Port:entity()
+            P["resolution", vector2] = Resolution
+            P["state", number] = 3
         }
         elseif (driverPopDevice("gmod_wire_egp")) {
-            local Port = varTable("device")["port", wirelink]
+            local Port = P["device", table]["port", wirelink]
             Port:egpClear()
             Port:egpDrawTopLeft(1)
             Port:egpResolution(vec2(), vec2(512))
@@ -43,23 +43,23 @@ switch (stateGet()) {
                 }
             }]#
             
-            varWrite("resolution", vec2(Resolution))
+            P["resolution", vector2] = vec2(Resolution)
             
-            varWrite("entity", Port:entity())
-            stateSet(2)
+            P["entity", entity] = Port:entity()
+            P["state", number] = 2
         }
         elseif (driverPopDevice("gmod_wire_consolescreen")) {
-            local Port = varTable("device")["port", wirelink]
+            local Port = P["device", table]["port", wirelink]
             Port[2041] = 1
             
-            varWrite("entity", Port:entity())
-            varWrite("resolution", vec2(30, 18))
-            stateSet(3)
+            P["entity", entity] = Port:entity()
+            P["resolution", vector2] = vec2(30, 18)
+            P["state", number] = 3
         }
         break
     
     case 2,
-        local Port = varTable("device")["port", wirelink]
+        local Port = P["device", table]["port", wirelink]
         local Resolution = varVector2("resolution")[1]
         local Size = floor(vec2(512) / Resolution)
         for (I = 1, KERNEL_OVERLOAD) {
@@ -69,28 +69,28 @@ switch (stateGet()) {
             Port:egpColor(Counter + 1, vec())
             
             if (Counter >= Resolution ^ 2) {
-                stateNext()
+                P["state", number] = 3
                 break
             }
             else {
-                varWrite("counter", Counter + 1)
+                P["counter", number] = Counter + 1
             }
         }
         break
     
     case 3,
-        varWrite("idle", 1)
+        P["idle", number] = 1
         
-        stateNext()
+        P["state", number] = 4
         break
     
     # Wait events
     case 4,
-        local Device = varTable("device")
+        local Device = P["device", table]
         if (Device:isValid()) {
             for (I = 1, KERNEL_OVERLOAD) {
                 if (eventExists()) {
-                    varWrite("idle", 0)
+                    P["idle", number] = 0
                     local Command = eventGetString()
                     
                     switch (Command) {
@@ -123,14 +123,14 @@ switch (stateGet()) {
                     }
                 }
                 else {
-                    varWrite("idle", 1)
+                    P["idle", number] = 1
                     break
                 }
             }
         }
         else {
             driverPushDevice()
-            stateSet(1)
+            P["state", number] = 1
         }
         break
 }

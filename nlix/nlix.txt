@@ -7,6 +7,7 @@
 @persist KERNEL_PERF KERNEL_OVERLOAD 
 @persist KernelState0 KernelState1
 @persist [Programs ThisProgram ThisEnvironment]:table ThisProgramName:string ThisProgramId
+@persist [P E]:table
 
 if (first()) {
     #include "nlix/init/first"
@@ -23,8 +24,8 @@ if (tickClk()) {
                     case 2, #include "nlix/libraries/kernel/lib-program" break
                     
                     # Important libs
-                    case 3, #include "nlix/libraries/lib-vars" break
-                    case 4, #include "nlix/libraries/lib-search" break
+                    #case 3, #include "nlix/libraries/lib-vars" break
+                    #case 4, #include "nlix/libraries/lib-search" break
                     case 5, #include "nlix/libraries/lib-devices" break
                     case 6, #include "nlix/libraries/lib-event" break
                     case 7, #include "nlix/libraries/lib-state" break
@@ -81,8 +82,8 @@ if (tickClk()) {
                     ThisProgramId = 1
                 }
                 
-                ThisProgram = Programs[ThisProgramId, table]
-                ThisEnvironment = ThisProgram["environment", table]
+                P = ThisProgram = Programs[ThisProgramId, table]
+                E = ThisEnvironment = ThisProgram["environment", table]
                 
                 ThisProgramName = ThisProgram:type()
                 switch (ThisProgramName) {
@@ -145,7 +146,7 @@ if (tickClk()) {
                     case "egp-wm-shell",        #include "nlix/programs/egp-wm-shell"               break
                     
                     # Workspace management
-                    case "environmentctl",      #include "nlix/programs/workspaces-manager"         break
+                    case "environmentctl",      #include "nlix/programs/environmentctl"             break
                     
                     # Digital screen
                     case "digi-scanner",        #include "nlix/programs/digi-scanner"               break

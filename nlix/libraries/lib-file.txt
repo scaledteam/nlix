@@ -106,14 +106,8 @@ function table:afileLoadQuery(Path:string) {
             FileLoadReady = 1
             break
         
-        case "realdir",
+        case "realdir", case "realfile",
             fileLoad(Object["path", string] + "/" + PathEnd)
-            print("dir", Object["path", string] + "/" + PathEnd)
-            break
-        
-        case "realfile",
-            fileLoad(Object["path", string] + "/" + PathEnd)
-            print("file", Object["path", string] + "/" + PathEnd)
             break
         
         default,
@@ -126,7 +120,7 @@ function afileLoadQuery(Path:string) {
 
 function number afileLoadIsReady() {
     switch (FileLoadType) {
-        case "realdir",
+        case "realdir", case "realfile",
             return fileLoaded()
         
         case "fakefile",

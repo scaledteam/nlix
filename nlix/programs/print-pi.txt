@@ -4,53 +4,53 @@
 
 @name print-pi
 
-switch (stateGet()) {
+switch (P["state", number]) {
     case 0,
         if (terminalInit()) {
-            stateNext()
+            P["state", number] = 1
         }
         break
     
     case 1,
-        local ArgNumber = varArray("args")[1, string]:toNumber()
+        local ArgNumber = P["args", array][1, string]:toNumber()
         if (ArgNumber) {
-            varWrite("iterations", ArgNumber)
-            varWrite("print-step", ArgNumber / 30)
+            P["iterations", number] = ArgNumber
+            P["print-step", number] = ArgNumber / 30
         }
         else {
-            varWrite("iterations", 300)
-            varWrite("print-step", 10)
+            P["iterations", number] = 300
+            P["print-step", number] = 10
         }
-        varWrite("last-print-step", 0)
+        P["last-print-step", number] = 0
         
-        varWrite("start-time", systime())
+        P["start-time", number] = systime()
         terminalPrint("Computing started...\n")
         terminalPrint("--------------|50%-----------|100%\n")
-        stateNext()
+        P["state", number] = 2
         break
     
     case 2,
         for (I = 1, KERNEL_OVERLOAD) {
-            varWrite("counter", varNumber("counter") + 1)
-            local N = varNumber("counter")
+            local N = P["counter", number] = P["counter", number] + 1
             
-            varWrite("result", varNumber("result") + 4 * ((-1) ^ (N - 1)) / (2 * N - 1))
+            P["result", number] = P["result", number] + 4 * ((-1) ^ (N - 1)) / (2 * N - 1)
             
-            if (N > varNumber("last-print-step")) {
+            if (N > P["last-print-step", number]) {
                 terminalPrint(".")
-                varWrite("last-print-step", varNumber("last-print-step") + varNumber("print-step")) 
+                P["last-print-step", number] = P["last-print-step", number] + P["print-step", number]
             }
             
-            if (N > varNumber("iterations")) {
+            if (N > P["iterations", number]) {
                 terminalPrint("\n")
-                stateNext()
+                P["state", number] = 3
                 break
             }
         }
         break
     
     case 3,
-        terminalPrint("Number pi = " + varNumber("result") + ". Time remaining: " + (int((systime() - varNumber("start-time")) * 1000) / 1000) + "\n")
+        terminalPrint("Number pi = " + P["result", number] + ". Time remaining: " + (int((systime() - P["start-time", number]) * 1000) / 1000) + "\n")
         programKill()
         break
 }
+

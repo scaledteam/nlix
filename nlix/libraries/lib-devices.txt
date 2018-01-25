@@ -15,19 +15,19 @@ function number table:deviceIsBusy() {
 function table table:deviceGet()    { return This["devices", table][1, table] }
 function table table:deviceGet(Id)  { return This["devices", table][Id, table] }
 
-function table deviceGet()          { return ThisProgram["devices", table][1, table] }
-function table deviceGet(Id)        { return ThisProgram["devices", table][Id, table] }
+function table deviceGet()          { return P["devices", table][1, table] }
+function table deviceGet(Id)        { return P["devices", table][Id, table] }
 
 function number devicePop(DeviceType:string) {
-    for (I = 1, ThisEnvironment["devices", table]:count()) {
-        local Device = ThisEnvironment["devices", table][I, table]
+    for (I = 1, E["devices", table]:count()) {
+        local Device = E["devices", table][I, table]
         if (Device:type() == DeviceType & !Device:deviceIsBusy()) {
-            Device["program", table] = ThisProgram
+            Device["program", table] = P
             
-            if (!ThisProgram:exists("devices")) {
-                ThisProgram["devices", table] = table()
+            if (!P:exists("devices")) {
+                P["devices", table] = table()
             }
-            ThisProgram["devices", table]:pushTable(Device)
+            P["devices", table]:pushTable(Device)
             return 1
         }
     }
@@ -36,11 +36,11 @@ function number devicePop(DeviceType:string) {
 
 function number devicePopAll(DeviceType:string) {
     local Count = 0
-    for (I = 1, ThisEnvironment["devices", table]:count()) {
-        local Device = ThisEnvironment["devices", table][I, table]
+    for (I = 1, E["devices", table]:count()) {
+        local Device = E["devices", table][I, table]
         if (Device:type() == DeviceType & !Device:deviceIsBusy()) {
-            Device["program", table] = ThisProgram
-            ThisProgram["devices", table]:pushTable(Device)
+            Device["program", table] = P
+            P["devices", table]:pushTable(Device)
             Count++
         }
     }
@@ -48,21 +48,21 @@ function number devicePopAll(DeviceType:string) {
 }
 
 function devicePush() {
-    ThisProgram["devices", table][1, table]:remove("program")
-    ThisProgram["devices", table]:remove(1)
+    P["devices", table][1, table]:remove("program")
+    P["devices", table]:remove(1)
 }
 
 function devicePush(Id) {
-    ThisProgram["devices", table][Id, table]:remove("program")
-    ThisProgram["devices", table]:remove(Id)
+    P["devices", table][Id, table]:remove("program")
+    P["devices", table]:remove(Id)
 }
 
 function devicePushAll() {
-    local ThisProgramDevices = ThisProgram["devices", table]
-    for (I = 1, ThisProgramDevices:count()) {
-        ThisProgramDevices[I, table]:remove("program")
+    local PDevices = P["devices", table]
+    for (I = 1, PDevices:count()) {
+        PDevices[I, table]:remove("program")
     }
-    ThisProgramDevices:clear()
+    PDevices:clear()
 }
 
 function table wirelink:toDevice() {

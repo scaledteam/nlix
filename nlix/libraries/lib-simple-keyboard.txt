@@ -10,10 +10,8 @@ function number simpleKeyboardInit() {
 }
 
 function simpleKeyboardRequestInput() {
-    local App = varTable("simple-keyboard")
-    
-    App:eventSend("get-input")
-    App:eventSend(ThisProgram)
+    P["simple-keyboard", table]:eventSend("get-input")
+    P["simple-keyboard", table]:eventSend(ThisProgram)
 }
 
 function number simpleKeyboardWaitInput() {

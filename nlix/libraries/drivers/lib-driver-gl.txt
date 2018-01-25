@@ -9,47 +9,39 @@ function number glInit() {
 }
 
 function glTriangle(Pos1:vector, Pos2:vector, Pos3:vector) {
-    local App = varTable("driver-gl")
+    local Program = P["driver-gl", table]
     
-    App:eventSend("glTriangle")
-    App:eventSend(Pos1)
-    App:eventSend(Pos2)
-    App:eventSend(Pos3)
+    Program:eventSend("glTriangle")
+    Program:eventSend(Pos1)
+    Program:eventSend(Pos2)
+    Program:eventSend(Pos3)
 }
 
 function number glReady() {
-    return varTable("driver-gl"):varNumber("idle")
+    return P["driver-gl", table]["idle", number]
 }
 
 function glStart() {
-    varTable("driver-gl"):eventSend("glStart")
+    P["driver-gl", table]:eventSend("glStart")
 }
 
 function glColor(Color:vector) {
-    local App = varTable("driver-gl")
-    
-    App:eventSend("glColor")
-    App:eventSend(Color)
+    P["driver-gl", table]:eventSend("glColor")
+    P["driver-gl", table]:eventSend(Color)
 }
 
 function glFillColor(Color:vector) {
-    local App = varTable("driver-gl")
-    
-    App:eventSend("glFillColor")
-    App:eventSend(Color)
+    P["driver-gl", table]:eventSend("glFillColor")
+    P["driver-gl", table]:eventSend(Color)
 }
 
 function glPos(Pos:vector) {
-    local App = varTable("driver-gl")
-    
-    App:eventSend("glPos")
-    App:eventSend(Pos)
+    P["driver-gl", table]:eventSend("glPos")
+    P["driver-gl", table]:eventSend(Pos)
 }
 
 
 function glAng(Angle:angle) {
-    local App = varTable("driver-gl")
-    
-    App:eventSend("glAng")
-    App:eventSend(Angle)
+    P["driver-gl", table]:eventSend("glAng")
+    P["driver-gl", table]:eventSend(Angle)
 }

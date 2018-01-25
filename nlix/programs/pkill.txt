@@ -19,15 +19,15 @@ else {
 programKill()]#
 
 
-switch (stateGet()) {
+switch (P["state", number]) {
     case 0,
-        searchStartForOne(Programs, varArray("args")[1, string])
-        stateNext()
+        searchStartForOne(Programs, P["args", array][1, string])
+        P["state", number] = 1
         break
     
     case 1,
         if (searchLoopForOne()) {
-            stateNext()
+            P["state", number] = 2
         }
         break
     

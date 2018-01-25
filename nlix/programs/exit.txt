@@ -4,50 +4,50 @@
 
 @name exit
 
-switch (stateGet()) {
+switch (P["state", number]) {
     case 0,
-        if (programFindByName("hotplugd") != NULL & varArray("args")[1, string] != "--force") {
+        if (programFindByName("hotplugd") != NULL & P["args", array][1, string] != "--force") {
             if (terminalInit()) {
                 terminalPrint("You can lost hotplug function after exit. Use --force if you really want it.\n")
             }
             programKill()
         }
         else {
-            stateNext()
+            P["state", number] = 1
         }
         break
     
     case 1,
-        local ThisEnvironmentPrograms = table()
+        local Programs = table()
         for (I = 1, Programs:count()) {
             local Program = Programs[I, table]
-            if (Program["environment", table] == ThisEnvironment) {
-                ThisEnvironmentPrograms:pushTable(Program)
+            if (Program["environment", table] == E) {
+                Programs:pushTable(Program)
             }
         }
-        varWrite("apps", ThisEnvironmentPrograms)
-        stateNext()
+        P["programs", table] = Programs
+        P["state", number] = 2
         break
     
     case 2,
-        varWrite("exitAllTime", systime() + 2)
-        local ThisEnvironmentPrograms = varTable("apps")
-        for (I = 1, ThisEnvironmentPrograms:count()) {
-            ThisEnvironmentPrograms[I, table]:eventSend("exit")
+        P["exitAllTime", number] = systime() + 2
+        local Programs = P["programs", table]
+        for (I = 1, Programs:count()) {
+            Programs[I, table]:eventSend("exit")
         }
-        stateNext()
+        P["state", number] = 3
         break
     
     case 3,
-        if (systime() >= varNumber("exitAllTime")) {
-            local ThisEnvironmentPrograms = varTable("apps")
-            for (I = 1, ThisEnvironmentPrograms:count()) {
-                local Program = ThisEnvironmentPrograms[I, table]
+        if (systime() >= P["exitAllTime", number]) {
+            local Programs = P["programs", table]
+            for (I = 1, Programs:count()) {
+                local Program = Programs[I, table]
                 if (Program:isValid()) {
                     Program:programKill()
                 }
             }
-            ThisEnvironment:clear()
+            E:clear()
         }
         break
 }

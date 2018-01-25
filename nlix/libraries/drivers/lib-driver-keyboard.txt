@@ -17,5 +17,5 @@ function number keyboardInit() {
 }
 
 function array keyboardGetKeys() {
-    return varTable("driver-keyboard"):varArray("keys")
+    return P["driver-keyboard", table]["keys", array]
 }

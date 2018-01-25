@@ -4,47 +4,47 @@
 
 @name driver-egp
 
-switch (stateGet()) {
+switch (P["state", number]) {
     # Initialize
     case 0,
         eventInit()
         driverInit()
-        stateNext()
+        P["state", number] = 1
         break
     
     case 1,
         if (driverPopDevice("gmod_wire_egp")) {
-            local Port = varTable("device")["port", wirelink]
+            local Port = P["device", table]["port", wirelink]
             Port:egpClear()
             Port:egpDrawTopLeft(1)
             Port:egpResolution(vec2(), vec2(512))
             
             Port:egpBox(1, vec2(), vec2())
-            varWrite("counter", 1)
-            varWrite("resolution", vec2(512))
-            varWrite("egpMaxObjects", min(egpMaxObjects(), 300) - 1)
+            P["counter", number] = 1
+            P["resolution", vector2] = vec2(512)
+            P["egpMaxObjects", number] = min(egpMaxObjects(), 300) - 1
             
-            if (!varTable("egpObjects"):isValid()) {
-                varWrite("egpObjects", table())
+            if (!P["egpObjects", table]:isValid()) {
+                P["egpObjects", table] = table()
             }
-            stateNext()
+            P["state", number] = 2
         }
         elseif (driverPopDevice("virtual-egp-screen")) {
-            local Device = varTable("device")
-            varWrite("resolution", Device["resolution", vector2])
-            varWrite("egpMaxObjects", Device["max-objects", number])
+            local Device = P["device", table]
+            P["resolution", vector2] = Device["resolution", vector2]
+            P["egpMaxObjects", number] = Device["max-objects", number]
             
-            varWrite("egpObjects", table())
-            stateNext()
+            P["egpObjects", table] = table()
+            P["state", number] = 2
         }
         break
     
     case 2,
-        local Device = varTable("device")
-        local EgpObjects = varTable("egpObjects")
-        local EgpMaxObjects = varNumber("egpMaxObjects")
+        local Device = P["device", table]
+        local EgpObjects = P["egpObjects", table]
+        local EgpMaxObjects = Device["egpMaxObjects", number]
         for (I = 1, KERNEL_OVERLOAD) {
-            local Counter = varNumber("counter")
+            local Counter = P["counter", number]
             if (Counter <= EgpMaxObjects) {
                 if (!EgpObjects:exists(Counter)) {
                     if (Device:type() == "gmod_wire_egp") {
@@ -63,33 +63,33 @@ switch (stateGet()) {
                 else {
                     # FIX IT
                 }
-                varWrite("counter", Counter + 1)
+                P["counter", number] = Counter + 1
             }
             else {
-                stateNext()
+                P["state", number] = 3
                 break
             }
         }
         break
     
     case 3,
-        varWrite("idle", 1)
+        P["idle", number] = 1
         
-        stateNext()
+        P["state", number] = 4
         break
     
     # Wait events
     case 4,
-        local Device = varTable("device")
+        local Device = P["device", table]
         if (Device:isValid()) {
-            local EgpObjects = varTable("egpObjects")
+            local EgpObjects = P["egpObjects", table]
             switch (Device:type()) {
                 case "gmod_wire_egp",
                     local Port = Device["port", wirelink]
                     
                     for (I = 1, KERNEL_OVERLOAD) {
                         if (eventExists()) {
-                            varWrite("idle", 0)
+                            P["idle", number] = 0
                             local Command = eventGetString()
                             local Id = eventGetNumber()
                             local Object = EgpObjects[Id, table]
@@ -402,7 +402,7 @@ switch (stateGet()) {
                             }
                         }
                         else {
-                            varWrite("idle", 1)
+                            P["idle", number] = 1
                         }
                     }
                     break
@@ -412,7 +412,7 @@ switch (stateGet()) {
                     
                     for (I = 1, KERNEL_OVERLOAD) {
                         if (eventExists()) {
-                            varWrite("idle", 0)
+                            P["idle", number] = 0
                             local Command = eventGetString()
                             local Id = eventGetNumber()
                             local Object = EgpObjects[Id, table]
@@ -802,14 +802,14 @@ switch (stateGet()) {
                             }
                         }
                         else {
-                            varWrite("idle", Device["idle", number])
+                            P["idle", number] = Device["idle", number]
                         }
                     }
                     break
             }
         }
         else {
-            stateSet(1)
+            P["state", number] = 1
         }
         break
     }

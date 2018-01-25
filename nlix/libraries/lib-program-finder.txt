@@ -5,21 +5,21 @@
 @name lib-program-finder
 
 function programFinderWrite() {
-    if (!ThisEnvironment:exists("programFinder")) {
-        ThisEnvironment["programFinder", table] = table()
+    if (!E:exists("programFinder")) {
+        E["programFinder", table] = table()
     }
     
-    ThisEnvironment["programFinder", table][ThisProgramName, table] = ThisProgram
+    E["programFinder", table][ThisProgramName, table] = P
 }
 
 function table programFinderRead(ProgramName:string) {
-    if (ThisEnvironment["programFinder", table]:exists(ProgramName)) {
-        local Program = ThisEnvironment["programFinder", table][ProgramName, table]
+    if (E["programFinder", table]:exists(ProgramName)) {
+        local Program = E["programFinder", table][ProgramName, table]
         if (Program:isValid()) {
             return Program
         }
         else {
-            ThisEnvironment["programFinder", table]:remove(ProgramName)
+            E["programFinder", table]:remove(ProgramName)
             return NULL
         }
     }

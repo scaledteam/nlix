@@ -4,24 +4,24 @@
 
 @name driver-cursor
 
-switch (stateGet()) {
+switch (P["state", number]) {
     case 0,
         eventInit()
         driverInit()
-        stateNext()
+        P["state", number] = 1
         break
     
     case 1,
         local Device = NULL
         if (egpInit()) {
-            Device = varTable("driver-egp"):driverGetDevice()
+            Device = P["driver-egp", table]:driverGetDevice()
             
             if (Device:type() == "gmod_wire_egp") {
-                varWrite("device", Device)
+                P["device", table] = Device
                 
                 if (Device:type() == "gmod_wire_egp") {
-                    varWrite("need-to-find-user", 1)
-                    stateNext()
+                    P["need-to-find-user", number] = 1
+                    P["state", number] = 2
                 }
             }
             else {
@@ -31,65 +31,65 @@ switch (stateGet()) {
         
         if (Device == NULL) {
             if (driverPopDevice("virtual-cursor")) {
-                stateNext()
+                P["state", number] = 2
             }
         }
         break
     
     case 2,
         #ifdef findInSphere(vector,number)
-            if (varNumber("need-to-find-user")) {
+            if (P["need-to-find-user", number]) {
                 findIncludeClass("player")
             }
         #endif
         
-        if (varNumber("need-to-find-user")) {
-            stateNext()
+        if (P["need-to-find-user", number]) {
+            P["state", number] = 3
         }
         else {
-            stateSet(4)
+            P["state", number] = 4
         }
         break
     
     case 3,
-        if (varNumber("need-to-find-user")) {
+        if (P["need-to-find-user", number]) {
             #ifdef findInSphere(vector,number)
-                local ScanPos = varTable("device")["port", wirelink]:entity():pos()
+                local ScanPos = P["device", table]["port", wirelink]:entity():pos()
                 findInSphere(ScanPos, 100)
                 findSortByDistance(ScanPos)
-                varWrite("user", find())
+                P["user", entity] = find()
             #else
-                local ScanPos = varTable("device")["port", wirelink]:entity():pos()
+                local ScanPos = P["device", table]["port", wirelink]:entity():pos()
                 local Player_Distance = 100
                 foreach(I, Player:entity = players()){
                     local Distance = ScanPos:distance(Player:pos())
                     if (Distance < Player_Distance){
                         Player_Distance = Distance
-                        varWrite("user", Player)
+                        P["user", Player)
                     }
                 }
             #endif
         }
         
-        stateNext()
+        P["state", number] = 4
         break
     
     case 4,
-        local Device = varTable("device")
+        local Device = P["device", table]
         
         switch (Device:type()) {
             case "gmod_wire_egp",
-                varWrite("pos", Device["port", wirelink]:egpCursor(varEntity("user")))
-                varWrite("use", varEntity("user"):keyUse())
+                P["pos", vector2] = Device["port", wirelink]:egpCursor(P["user", entity])
+                P["use", number] = P["user", entity]:keyUse()
                 break
             
             case "virtual-cursor",
-                varWrite("pos", Device["pos", vector2])
-                varWrite("use", Device["use", number])
+                P["pos", vector2] = Device["pos", vector2]
+                P["use", number] = Device["use", number]
                 break
         }
-        if (varNumber("need-to-find-user")) {
-            stateSet(3)
+        if (P["need-to-find-user", number]) {
+            P["state", number] = 3
         }
         
         if (eventWaitString("exit")) {

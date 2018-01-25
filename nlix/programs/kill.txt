@@ -4,7 +4,7 @@
 
 @name kill
 
-local Program = Programs[varArray("args")[1, string]:toNumber(), table]
+local Program = Programs[P["args", array][1, string]:toNumber(), table]
 if (Program != NULL) {
     if (terminalInit()) {
         terminalPrint("Try kill \"" + Program:type() + "\".\n")

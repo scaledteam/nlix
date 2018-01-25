@@ -4,41 +4,40 @@
 
 @name simple-keyboard
 
-switch (stateGet()) {
+switch (P["state", number]) {
     case 0,
         driverInit()
-        stateNext()
+        P["state", number] = 1
         break
     
     case 1,
         if (terminalInit()) {
-            stateNext()
+            P["state", number] = 2
         }
         break
     
     case 2,
         if (keyboardInit()) {
-            varWrite("keyboardOld", array())
+            P["keyboardOld", array] = array()
             
             eventInit()
-            stateNext()
+            P["state", number] = 3
         }
         break
     
     # Wait event
     case 3,
         if (eventWaitString("get-input")) {
-            local Sender = eventGetTable()
-            varWrite("input-sender", Sender)
+            P["input-sender", table] = eventGetTable()
             
-            stateNext()
+            P["state", number] = 4
         }
         break
     
     # Track keyboard
     case 4,
         local Keys = keyboardGetKeys()
-        local KeysOld = varArray("keyboardOld")
+        local KeysOld = P["keyboardOld", array]
         
         local KeysCount = Keys:count()
         local KeysOldCount = KeysOld:count()
@@ -52,14 +51,14 @@ switch (stateGet()) {
                             # Enter
                             case 10, case 13, case 142,
                                 terminalPrint("\n")
-                                stateNext()
+                                P["state", number] = 5
                                 break
                             
                             # Backspace
                             case 127,
-                                local KeyboardBuffer = varString("KeyboardBuffer")
+                                local KeyboardBuffer = P["KeyboardBuffer", string]
                                 if (KeyboardBuffer != "") {
-                                    varWrite("KeyboardBuffer", KeyboardBuffer:left(KeyboardBuffer:length() - 1))
+                                    P["KeyboardBuffer", string] = KeyboardBuffer:left(KeyboardBuffer:length() - 1)
                                     
                                     terminalErase(1)
                                 }
@@ -78,7 +77,7 @@ switch (stateGet()) {
                                 if (inrange(Key, 32, 127)) {
                                     local Char = toChar(Key)
                                     
-                                    varWrite("KeyboardBuffer", varString("KeyboardBuffer") + Char)
+                                    P["KeyboardBuffer", string] = P["KeyboardBuffer", string] + Char
                                     
                                     terminalPrint(Char)
                                 }
@@ -108,12 +107,11 @@ switch (stateGet()) {
     
     # Send ready data
     case 5,
-        local Sender = varTable("input-sender")
-        Sender:eventSend("get-input")
-        Sender:eventSend(varString("KeyboardBuffer"))
+        P["input-sender", table]:eventSend("get-input")
+        P["input-sender", table]:eventSend(P["KeyboardBuffer", string])
         
-        varWrite("KeyboardBuffer", "")
+        P["KeyboardBuffer", string] = ""
         
-        stateSet(3)
+        P["state", number] = 3
         break
 }

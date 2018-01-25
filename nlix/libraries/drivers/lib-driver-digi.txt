@@ -9,21 +9,21 @@ function number digiInit() {
 }
 
 function digiDrawPixel(Pos:vector2, Color:vector) {
-    local App = varTable("driver-digi")
+    local Program = P["driver-digi", table]
     
-    App:eventSend("drawPixel")
-    App:eventSend(Pos)
-    App:eventSend(Color)
+    Program:eventSend("drawPixel")
+    Program:eventSend(Pos)
+    Program:eventSend(Color)
 }
 
 function vector2 digiResolution() {
-    return varTable("driver-digi"):varVector2("resolution")
+    return P["driver-digi", table]["resolution", vector2]
 }
 
 function entity digiEntity() {
-    return varTable("driver-digi"):varEntity("entity")
+    return P["driver-digi", table]["entity", entity]
 }
 
 function number digiReady() {
-    return varTable("driver-digi"):varNumber("idle")
+    return P["driver-digi", table]["idle", number]
 }

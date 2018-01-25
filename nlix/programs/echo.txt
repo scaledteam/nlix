@@ -6,7 +6,7 @@
 
 if (terminalInit()) {
     local Output = ""
-    foreach (I, Arg:string = varArray("args")) {
+    foreach (I, Arg:string = P["args", array]) {
         Output += Arg + "\n"
     }
     terminalPrint(Output)

@@ -26,232 +26,232 @@ function number egpInit() {
 }
 
 function egpBox(Id, Pos:vector2, Size:vector2) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpBox")
-    App:eventSend(Id)
-    App:eventSend(Pos)
-    App:eventSend(Size)
+    Program:eventSend("egpBox")
+    Program:eventSend(Id)
+    Program:eventSend(Pos)
+    Program:eventSend(Size)
 }
 
 function egpBoxOutline(Id, Pos:vector2, Size:vector2) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpBoxOutline")
-    App:eventSend(Id)
-    App:eventSend(Pos)
-    App:eventSend(Size)
+    Program:eventSend("egpBoxOutline")
+    Program:eventSend(Id)
+    Program:eventSend(Pos)
+    Program:eventSend(Size)
 }
 
 function egpText(Id, Text:string, Pos:vector2) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpText")
-    App:eventSend(Id)
-    App:eventSend(Text)
-    App:eventSend(Pos)
+    Program:eventSend("egpText")
+    Program:eventSend(Id)
+    Program:eventSend(Text)
+    Program:eventSend(Pos)
 }
 
 function egpTextLayout(Id, Text:string, Pos:vector2, Size:vector2) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpTextLayout")
-    App:eventSend(Id)
-    App:eventSend(Text)
-    App:eventSend(Pos)
-    App:eventSend(Size)
+    Program:eventSend("egpTextLayout")
+    Program:eventSend(Id)
+    Program:eventSend(Text)
+    Program:eventSend(Pos)
+    Program:eventSend(Size)
 }
 
 function egpSetText(Id, Text:string) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpSetText")
-    App:eventSend(Id)
-    App:eventSend(Text)
+    Program:eventSend("egpSetText")
+    Program:eventSend(Id)
+    Program:eventSend(Text)
 }
 
 function egpColor(Id, Color:vector) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpColor")
-    App:eventSend(Id)
-    App:eventSend(Color)
+    Program:eventSend("egpColor")
+    Program:eventSend(Id)
+    Program:eventSend(Color)
 }
 
 function egpColor4(Id, Color:vector4) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpColor4")
-    App:eventSend(Id)
-    App:eventSend(Color)
+    Program:eventSend("egpColor4")
+    Program:eventSend(Id)
+    Program:eventSend(Color)
 }
 
 function egpAlpha(Id, Alpha) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpAlpha")
-    App:eventSend(Id)
-    App:eventSend(Alpha)
+    Program:eventSend("egpAlpha")
+    Program:eventSend(Id)
+    Program:eventSend(Alpha)
 }
 
 function egpSize(Id, Size:vector2) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpSize")
-    App:eventSend(Id)
-    App:eventSend(Size)
+    Program:eventSend("egpSize")
+    Program:eventSend(Id)
+    Program:eventSend(Size)
 }
 
 function egpSizeNumber(Id, Size) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpSizeNumber")
-    App:eventSend(Id)
-    App:eventSend(Size)
+    Program:eventSend("egpSizeNumber")
+    Program:eventSend(Id)
+    Program:eventSend(Size)
 }
 
 function egpParent(Id, Id2) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpParent")
-    App:eventSend(Id)
-    App:eventSend(Id2)
+    Program:eventSend("egpParent")
+    Program:eventSend(Id)
+    Program:eventSend(Id2)
 }
 
 function egpParentPoint(Id, Pos:vector2) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpParentPoint")
-    App:eventSend(Id)
-    App:eventSend(Pos)
+    Program:eventSend("egpParentPoint")
+    Program:eventSend(Id)
+    Program:eventSend(Pos)
 }
 
 function egpParentToBase(Id) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpParentToBase")
-    App:eventSend(Id)
+    Program:eventSend("egpParentToBase")
+    Program:eventSend(Id)
 }
 
 function egpAlign(Id, Align) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpAlign")
-    App:eventSend(Id)
-    App:eventSend(Align)
+    Program:eventSend("egpAlign")
+    Program:eventSend(Id)
+    Program:eventSend(Align)
 }
 
 function egpAlign2(Id, Align, Align2) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpAlign2")
-    App:eventSend(Id)
-    App:eventSend(Align)
-    App:eventSend(Align2)
+    Program:eventSend("egpAlign2")
+    Program:eventSend(Id)
+    Program:eventSend(Align)
+    Program:eventSend(Align2)
 }
 
 function egpCircle(Id, Pos:vector2, Size:vector2) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpCircle")
-    App:eventSend(Id)
-    App:eventSend(Pos)
-    App:eventSend(Size)
+    Program:eventSend("egpCircle")
+    Program:eventSend(Id)
+    Program:eventSend(Pos)
+    Program:eventSend(Size)
 }
 
 function egpCircleOutline(Id, Pos:vector2, Size:vector2) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpCircleOutline")
-    App:eventSend(Id)
-    App:eventSend(Pos)
-    App:eventSend(Size)
+    Program:eventSend("egpCircleOutline")
+    Program:eventSend(Id)
+    Program:eventSend(Pos)
+    Program:eventSend(Size)
 }
 
 function egpLine(Id, Pos1:vector2, Pos2:vector2) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpLine")
-    App:eventSend(Id)
-    App:eventSend(Pos1)
-    App:eventSend(Pos2)
+    Program:eventSend("egpLine")
+    Program:eventSend(Id)
+    Program:eventSend(Pos1)
+    Program:eventSend(Pos2)
 }
 
 function egpLineStrip(Id, Poses:array) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpLineStrip")
-    App:eventSend(Id)
-    App:eventSend(Poses)
+    Program:eventSend("egpLineStrip")
+    Program:eventSend(Id)
+    Program:eventSend(Poses)
 }
 
 function egpPos(Id, Pos:vector2) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpPos")
-    App:eventSend(Id)
-    App:eventSend(Pos)
+    Program:eventSend("egpPos")
+    Program:eventSend(Id)
+    Program:eventSend(Pos)
 }
 
 function egpRemove(Id) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpRemove")
-    App:eventSend(Id)
+    Program:eventSend("egpRemove")
+    Program:eventSend(Id)
 }
 
 function egpCopy(Id, Id2) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpCopy")
-    App:eventSend(Id)
-    App:eventSend(Id2)
+    Program:eventSend("egpCopy")
+    Program:eventSend(Id)
+    Program:eventSend(Id2)
 }
 
 function egpMove(Id, Id2) {
-    local App = varTable("driver-egp")
+    local Program = P["driver-egp", table]
     
-    App:eventSend("egpMove")
-    App:eventSend(Id)
-    App:eventSend(Id2)
+    Program:eventSend("egpMove")
+    Program:eventSend(Id)
+    Program:eventSend(Id2)
 }
 
 function vector2 egpResolution() {
-    return varTable("driver-egp"):varVector2("resolution")
+    return P["driver-egp", table]["resolution", vector2]
 }
 
 function number egpIsIdle() {
-    return varTable("driver-egp"):varNumber("idle")
+    return P["driver-egp", table]["idle", number]
 }
 
 function number egpMaxObjects2() {
-    return varTable("driver-egp"):varNumber("egpMaxObjects")
+    return P["driver-egp", table]["egpMaxObjects", number]
 }
 
 function number egpParent(Id) {
-    return varTable("driver-egp"):varTable("egpObjects")[Id, table]["parent", number]
+    return P["driver-egp", table]["egpObjects", table][Id, table]["parent", number]
 }
 
 function vector egpColor(Id) {
-    return vec(varTable("driver-egp"):varTable("egpObjects")[Id, table]["color", vector4])
+    return vec(P["driver-egp", table]["egpObjects", table][Id, table]["color", vector4])
 }
 
 function vector4 egpColor4(Id) {
-    return varTable("driver-egp"):varTable("egpObjects")[Id, table]["color", vector4]
+    return P["driver-egp", table]["egpObjects", table][Id, table]["color", vector4]
 }
 
 function number egpHasObject(Id) {
-    return varTable("driver-egp"):varTable("egpObjects")[Id, table]["exists", number]
+    return P["driver-egp", table]["egpObjects", table][Id, table]["exists", number]
 }
 
 function vector2 egpPos(Id) {
-    return varTable("driver-egp"):varTable("egpObjects")[Id, table]["pos", vector2]
+    return P["driver-egp", table]["egpObjects", table][Id, table]["pos", vector2]
 }
 
 function vector2 egpSize(Id) {
-    return varTable("driver-egp"):varTable("egpObjects")[Id, table]["size", vector2]
+    return P["driver-egp", table]["egpObjects", table][Id, table]["size", vector2]
 }
 
 function string egpType(Id) {
-    return varTable("driver-egp"):varTable("egpObjects")[Id, table]["type", string]
+    return P["driver-egp", table]["egpObjects", table][Id, table]["type", string]
 }

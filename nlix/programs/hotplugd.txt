@@ -4,14 +4,14 @@
 
 @name hotplugd
 
-switch (stateGet()) {
+switch (P["state", number]) {
     # Hot plug
     case 0,
-        if (!ThisEnvironment:exists("devices")) {
-            ThisEnvironment["devices", table] = table()
+        if (!E:exists("devices")) {
+            E["devices", table] = table()
         }
         
-        local Counter = varNumber("counter") + 1
+        local Counter = P["counter", number] + 1
         
         local Port = select(Counter,
             Port1,
@@ -20,11 +20,11 @@ switch (stateGet()) {
             Port4
         )
         
-        if ((Port != varWirelink("PortOld" + Counter)) & Port) {
+        if ((Port != P["PortOld" + Counter, wirelink]) & Port) {
             # Check if device exists
             local DeviceExists = 0
             local DeviceType = Port:entity():type()
-            local Devices = ThisEnvironment["devices", table]
+            local Devices = E["devices", table]
             
             for (I = 1, Devices:count()) {
                 if (Devices[I, table]["port", wirelink]:entity():type() == DeviceType & Devices[I, table]["port", wirelink] == Port) {
@@ -37,23 +37,23 @@ switch (stateGet()) {
                 Devices:pushTable(Port:toDevice())
             }
         }
-        varWrite("PortOld" + Counter, Port)
+        P["PortOld" + Counter, wirelink] = Port
         
         if (Counter >= PORTS_COUNT) {
-            if (ThisEnvironment["devices", table]:count() > 0) {
-                stateNext()
+            if (E["devices", table]:count() > 0) {
+                P["state", number] = 1
             }
-            varWrite("counter", 0)
+            P["counter", number] = 0
         }
         else {
-            varWrite("counter", Counter)
+            P["counter", number] = Counter
         }
         break
     
     # Hot unplug
     case 1,
-        local Counter = varNumber("counter") + 1
-        local Devices = ThisEnvironment["devices", table]
+        local Counter = P["counter", number] + 1
+        local Devices = E["devices", table]
         
         local Device = Devices[Counter, table]
         if (Device:exists("port") & !Device["port", wirelink]:entity():isValid()) {
@@ -63,11 +63,12 @@ switch (stateGet()) {
         }
         
         if (Counter >= Devices:count()) {
-            statePrev()
-            varWrite("counter", 0)
+            P["state", number] = 0
+            P["counter", number] = 0
         }
         else {
-            varWrite("counter", Counter)
+            P["counter", number] = Counter
         }
         break
 }
+

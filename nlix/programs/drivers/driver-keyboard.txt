@@ -4,41 +4,41 @@
 
 @name driver-keyboard
 
-switch (stateGet()) {
+switch (P["state", number]) {
     case 0,
         eventInit()
         driverInit()
-        stateNext()
+        P["state", number] = 1
         break
     
     case 1,
         if (driverPopDevice("gmod_wire_keyboard")) {
-            stateNext()
+            P["state", number] = 2
         }
         elseif (driverPopDevice("virtual-keyboard")) {
-            stateNext()
+            P["state", number] = 2
         }
         elseif (driverPopDevice("gmod_wire_textentry")) {
-            varWrite("inputString", "")
-            stateNext()
+            P["inputString", string] = ""
+            P["state", number] = 2
         }
         break
     
     case 2,
-        varWrite("keys", array())
+        P["keys", array] = array()
         
-        stateNext()
+        P["state", number] = 3
         break
     
     # Track keys
     case 3,
-        local Device = varTable("device")
+        local Device = P["device", table]
         if (Device:isValid()) {
             DeviceType = Device:type()
             
             switch (DeviceType) {
                 case "gmod_wire_keyboard",
-                    local Keys = varArray("keys")
+                    local Keys = P["keys", array]
                     local Count = Device["port", wirelink][0]
                     for (I = 1, Count) {
                         Keys[I, number] = Device["port", wirelink][I]
@@ -50,15 +50,15 @@ switch (stateGet()) {
                     break
                 
                 case "virtual-keyboard",
-                    varWrite("keys", Device["keys", array])
+                    P["keys", array] = Device["keys", array]
                     break
                 
                 case "gmod_wire_textentry",
-                    local Keys = varArray("keys")
+                    local Keys = P["keys", array]
                     local InputString = Device["port", wirelink]["Text", string]
                     
-                    if (InputString != varString("inputString")) {
-                        varWrite("inputString", InputString)
+                    if (InputString != P["inputString", string]) {
+                        P["inputString", string] = InputString
                         if (InputString != "") {
                             InputString += "\n"
                             local Length = InputString:length()
@@ -76,7 +76,7 @@ switch (stateGet()) {
         }
         else {
             driverPushDevice()
-            stateSet(1)
+            P["state", number] = 1
         }
         
         if (eventWaitString("exit")) {
