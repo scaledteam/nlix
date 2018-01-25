@@ -4,20 +4,20 @@
 
 @name digi-scanner
 
-switch (stateGet()) {
+switch (P["state", number]) {
     case 0,
         if (digiInit()) {
-            varWrite("PIXELS_COUNT", digiResolution()[1] * digiResolution()[2])
-            varWrite("color", vec(255))
+            P["PIXELS_COUNT", number] = digiResolution()[1] * digiResolution()[2]
+            P["color", vector] = vec(255)
             
-            stateNext()
+            P["state", number] = 1
         }
         break
     
     case 1,
         #if (digiIsIdle()) {
-            local Color = varVector("color")
-            local Counter = varNumber("counter")
+            local Color = P["color", vector]
+            local Counter = P["counter", number]
             local DIGI_RESOLUTION = digiResolution()
             local DIGI_OFFSET = shift(DIGI_RESOLUTION) / 2
             local RANGER_DISTANCE = 2000
@@ -35,7 +35,7 @@ switch (stateGet()) {
                 
                 digiDrawPixel(vec2(X, Y), Color * Brightness)
                 
-                if (Counter >= varNumber("PIXELS_COUNT")) {
+                if (Counter >= P["PIXELS_COUNT", number]) {
                     programKill()
                     break
                 }
@@ -43,7 +43,7 @@ switch (stateGet()) {
                     Counter++
                 }
             }
-            varWrite("counter", Counter)
+            P["counter", number] = Counter
         #}
         break
 }

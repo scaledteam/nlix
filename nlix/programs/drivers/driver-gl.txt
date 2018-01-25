@@ -4,17 +4,17 @@
 
 @name driver-gl
 
-switch (stateGet()) {
+switch (P["state", number]) {
     # Initialize
     case 0,
         eventInit()
         driverInit()
-        stateNext()
+        P["state", number] = 1
         break
     
     case 1,
         if (driverPopDevice("gmod_wire_egp")) {
-            local Port = varTable("device")["port", wirelink]
+            local Port = P["device", table]["port", wirelink]
             Port:egpClear()
             Port:egpDrawTopLeft(1)
             Port:egpResolution(vec2(-256), vec2(256))
@@ -28,33 +28,33 @@ switch (stateGet()) {
                 Id--
             }
             
-            stateNext()
+            P["state", number] = 2
         }
         break
     
     case 2,
-        varWrite("usedIds", array())
+        P["usedIds", array] = array()
         
-        varWrite("idle", 1)
-        stateNext()
+        P["idle", number] = 1
+        P["state", number] = 3
         break
     
     # Wait events
     case 3,
-        local Device = varTable("device")
+        local Device = P["device", table]
         local Port = Device["port", wirelink]
         if (Device:isValid()) {
             for (I = 1, KERNEL_OVERLOAD) {
                 if (eventExists()) {
-                    varWrite("idle", 0)
+                    P["idle", number] = 0
                     local Command = eventGetString()
                     
                     switch (Command) {
                         case "glStart",
                             local Id = min(egpMaxObjects(), 300)
                             
-                            local UsedIds = varArray("usedIds")
-                            local UsedIdsOld = varArray("usedIdsOld")
+                            local UsedIds = P["usedIds", array]
+                            local UsedIdsOld = P["usedIdsOld", array]
                             while (Id >= 2) {
                                 if (!UsedIds:exists(Id) & UsedIdsOld:exists(Id)) {
                                     Port:egpLine(Id, vec2(), vec2())
@@ -62,10 +62,10 @@ switch (stateGet()) {
                                 }
                                 Id--
                             }
-                            varWrite("usedIdsOld", UsedIds)
+                            P["usedIdsOld", array] = UsedIds
                             
                             UsedIdsOld:clear()
-                            varWrite("usedIds", UsedIdsOld)
+                            P["usedIds", array] = UsedIdsOld
                             break
                         
                         case "glFillColor",
@@ -73,26 +73,26 @@ switch (stateGet()) {
                             break
                         
                         case "glColor",
-                            varWrite("color", eventGetVector())
+                            P["color", vector] = eventGetVector()
                             break
                         
                         case "glPos",
-                            varWrite("pos", eventGetVector())
+                            P["pos", vector] = eventGetVector()
                             break
                         
                         case "glAng",
-                            varWrite("matrix", matrix(eventGetAngle()))
+                            P["matrix", matrix] = matrix(eventGetAngle())
                             break
                         
                         case "glTriangle",
-                            local Matrix = varMatrix("matrix")
-                            local Pos = varVector("pos")
+                            local Matrix = P["matrix", matrix]
+                            local Pos = P["pos", vector]
                             
                             local Pos1 = Matrix * (eventGetVector() - Pos)
                             local Pos2 = Matrix * (eventGetVector() - Pos)
                             local Pos3 = Matrix * (eventGetVector() - Pos)
                             
-                            local UsedIds = varArray("usedIds")
+                            local UsedIds = P["usedIds", array]
                             local Id = int(min(egpMaxObjects(), 300) / 10 * (Pos1 + Pos2 + Pos3)[3] / 3) + 1
                             
                             while (UsedIds:exists(Id)) {
@@ -106,7 +106,7 @@ switch (stateGet()) {
                                     256 * Pos2:dehomogenized(),
                                     256 * Pos3:dehomogenized()
                                 )
-                                Port:egpColor(Id, varVector("color"))
+                                Port:egpColor(Id, P["color", vector])
                             }
                             break
                         
@@ -120,14 +120,14 @@ switch (stateGet()) {
                     }
                 }
                 else {
-                    varWrite("idle", 1)
+                    P["idle", number] = 1
                     break
                 }
             }
         }
         else {
             driverPushDevice()
-            stateSet(1)
+            P["state", number] = 1
         }
         break
     }

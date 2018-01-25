@@ -4,58 +4,46 @@
 
 @name bc
 
-switch (stateGet()) {
+switch (P["state", number]) {
     # Wait terminal driver
     case 0,
         if (terminalInit()) {
             terminalPrint("Calculator shell. Write \"quit\" for exit.\n")
-            stateNext()
+            P["state", number] = 1
         }
         break
     
     # Wait keyboard driver
     case 1,
         if (simpleKeyboardInit()) {
-            stateNext()
+            P["state", number] = 2
         }
         break
     
     # Main state
     case 2,
         terminalPrint("> ")
-        varWrite("outputCount", varNumber("outputCount") + 2)
         simpleKeyboardRequestInput()
         
-        stateNext()
+        P["state", number] = 3
         break
     
     # Get input
     case 3,
         if (simpleKeyboardWaitInput()) {
             local Input = simpleKeyboardGetInput()
-            varWrite("input", Input)
-            varWrite("outputCount", varNumber("outputCount") + Input:length() + 1)
+            P["input", string] = Input
             switch (Input) {
                 case "",
-                    stateSet(2)
+                    P["state", number] = 2
                     break
                 
-                case "quit",
+                case "quit", case "exit",
                     programKill()
-                    break
-                
-                case "exit",
-                    programKill()
-                    break
-                
-                case "clear",
-                    terminalErase(varNumber("outputCount"))
-                    varWrite("outputCount", 0)
-                    stateSet(2)
                     break
                 
                 default,
-                    stateSet(4)
+                    P["state", number] = 4
                     break
             }
         }
@@ -63,7 +51,7 @@ switch (stateGet()) {
     
     # Compute
     case 4,
-        local Input = varString("input")
+        local Input = P["input", string]
         
         local InputExplode = array()
         local LastDivider = 0
@@ -123,7 +111,6 @@ switch (stateGet()) {
         
         local Output = InputExplode:concat(" ") + "\n"
         terminalPrint(Output)
-        varWrite("outputCount", varNumber("outputCount") + Output:length())
-        stateSet(2)
+        P["state", number] = 2
         break
 }

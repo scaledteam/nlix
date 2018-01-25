@@ -60,10 +60,10 @@ switch (P["state", number]) {
     
     case 2,
         local Port = P["device", table]["port", wirelink]
-        local Resolution = varVector2("resolution")[1]
+        local Resolution = P["resolution", vector2][1]
         local Size = floor(vec2(512) / Resolution)
         for (I = 1, KERNEL_OVERLOAD) {
-            local Counter = varNumber("counter")
+            local Counter = P["counter", number]
             
             Port:egpBox(Counter + 1, vec2(Counter % Resolution, int(Counter / Resolution)) * Size, Size)
             Port:egpColor(Counter + 1, vec())
@@ -99,13 +99,13 @@ switch (P["state", number]) {
                                 case "gmod_wire_digitalscreen",
                                     local Pos = eventGetVector2()
                                     local Color = eventGetVector()
-                                    Device["port", wirelink][Pos[1] + Pos[2] * varVector2("resolution")[1]] = rgb2digi(Color, 3)
+                                    Device["port", wirelink][Pos[1] + Pos[2] * P["resolution", vector2][1]] = rgb2digi(Color, 3)
                                     break
                                 
                                 case "gmod_wire_egp",
                                     local Pos = eventGetVector2()
                                     local Color = eventGetVector()
-                                    Device["port", wirelink]:egpColor(Pos[1] + Pos[2] * varVector2("resolution")[1] + 1, Color)
+                                    Device["port", wirelink]:egpColor(Pos[1] + Pos[2] * P["resolution", vector2][1] + 1, Color)
                                     break
                                 
                                 case "gmod_wire_consolescreen",

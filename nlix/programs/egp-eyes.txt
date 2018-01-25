@@ -4,16 +4,16 @@
 
 @name egp-eyes
 
-switch (stateGet()) {
+switch (P["state", number]) {
     case 0,
         if (egpInit()) {
-            stateNext()
+            P["state", number] = 1
         }
         break
     
     case 1,
         if (cursorInit()) {
-            stateNext()
+            P["state", number] = 2
         }
         break
     
@@ -37,13 +37,13 @@ switch (stateGet()) {
         egpParentToBase(5)
         egpColor(5, vec())
         
-        stateNext()
+        P["state", number] = 3
         break
     
     case 3,
         if (egpIsIdle()) {
             local CursorPos = cursorGetPos()
-            if (varVector2("cursorPosOld") != CursorPos) {
+            if (P["cursorPosOld", vector2] != CursorPos) {
                 if (CursorPos == vec2(-1)) {
                     egpPos(4, egpResolution() * vec2(0.25, 0.5))
                     egpPos(5, egpResolution() * vec2(0.75, 0.5))
@@ -72,7 +72,7 @@ switch (stateGet()) {
                     egpPos(4, Eye1Pos + Offset1)
                     egpPos(5, Eye2Pos + Offset2)
                     
-                    varWrite("cursorPosOld", CursorPos)
+                    P["cursorPosOld", vector2] = CursorPos
                 }
             }
         }

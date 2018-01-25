@@ -4,22 +4,22 @@
 
 @name wustdd
 
-switch (stateGet()) {
+switch (P["state", number]) {
     # Initialize egp
     case 0,
         if (glInit()) {
-            stateNext()
+            P["state", number] = 1
         }
         break
     
     case 1,
-        varWrite("MAP", array())
-        local ArgNumber = varArray("args")[1, string]:toNumber()
+        P["MAP", array] = array()
+        local ArgNumber = P["args", array][1, string]:toNumber()
         if (ArgNumber != 0) {
-            varWrite("MAP_POLYGONS", ArgNumber)
+            P["MAP_POLYGONS", number] = ArgNumber
         }
         else {
-            varWrite("MAP_POLYGONS", 50)
+            P["MAP_POLYGONS", number] = 50
         }
         glColor(vec(50, 200, 50))
         glFillColor(vec(50, 50, 60))
@@ -27,36 +27,36 @@ switch (stateGet()) {
         glPos(vec(0, -0.5, -2))
         glAng(ang(0, 0, 15))
         
-        stateNext()
+        P["state", number] = 2
         break
     
     case 2,
         for (I = 1, KERNEL_OVERLOAD) {
-            local Counter = varNumber("counter") + 1
+            local Counter = P["counter", number] + 1
             
             #Generate map
-            local Max_Iterations = int(varNumber("MAP_POLYGONS") / 2)
+            local Max_Iterations = int(P["MAP_POLYGONS", number] / 2)
             local Angle_Step = 360 / Max_Iterations
             local Angle = Counter / Max_Iterations * 360
-            varArray("MAP"):insertMatrix(2 * Counter - 1, matrix(
+            P["MAP", array]:insertMatrix(2 * Counter - 1, matrix(
                 sin(Angle), 0, cos(Angle),
                 sin(Angle), 1, cos(Angle),
                 sin(Angle + Angle_Step), 0, cos(Angle + Angle_Step)
             ))
-            varArray("MAP"):insertMatrix(2 * Counter, matrix(
+            P["MAP", array]:insertMatrix(2 * Counter, matrix(
                 sin(Angle), 1, cos(Angle),
                 sin(Angle + Angle_Step), 1, cos(Angle + Angle_Step),
                 sin(Angle + Angle_Step), 0, cos(Angle + Angle_Step)
             ))
             
             if (Counter >= Max_Iterations) {
-                varWrite("counter", 0)
+                P["counter", number] = 0
                 
-                stateNext()
+                P["state", number] = 3
                 break
             }
             else {
-                varWrite("counter", Counter)
+                P["counter", number] = Counter
             }
         }
         break
@@ -65,27 +65,27 @@ switch (stateGet()) {
         if (glReady()) {
             glAng(ang(15 * sin(45 * systime()), 0, 15 + 15 * cos(45 * systime())))
             glStart()
-            stateNext()
+            P["state", number] = 4
         }
         break
     
     case 4,
         for (I = 1, KERNEL_OVERLOAD) {
-            local Counter = varNumber("counter") + 1
+            local Counter = P["counter", number] + 1
             
-            local MAP = varArray("MAP")
+            local MAP = P["MAP", array]
             #glColor(vec(50, 200, 50) * (cosr(pi() * Counter) + 2) / 3)
             glColor(vec(50, 200, 50) * (1 + Counter % 2) / 2)
             glTriangle(MAP[Counter, matrix]:row(1), MAP[Counter, matrix]:row(2), MAP[Counter, matrix]:row(3))
             
             if (Counter >= MAP:count()) {
-                varWrite("counter", 0)
+                P["counter", number] = 0
                 
-                statePrev()
+                P["state", number] = 3
                 break
             }
             else {
-                varWrite("counter", Counter)
+                P["counter", number] = Counter
             }
         }
         break
