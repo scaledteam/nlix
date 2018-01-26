@@ -37,7 +37,7 @@ switch (P["state", number]) {
             Port:egpDrawTopLeft(1)
             
             Port:egpTextLayout(1, P["consoleText", string], vec2(), vec2(512))
-            Port:egpFont(1, FONT_MONOSPACED)
+            Port:egpFont(1, "Courier New")
             
             P["resolution", vector2] = vec2(56, 28)
             

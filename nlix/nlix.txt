@@ -35,10 +35,10 @@ if (tickClk()) {
                     case 10, #include "nlix/libraries/drivers/lib-driver"            break
                     case 11, #include "nlix/libraries/drivers/lib-driver-terminal"  break
                     case 12, #include "nlix/libraries/drivers/lib-driver-keyboard"  break
-                    case 13, #include "nlix/libraries/drivers/lib-driver-egp"       break
+                    #[case 13, #include "nlix/libraries/drivers/lib-driver-egp"       break
                     case 14, #include "nlix/libraries/drivers/lib-driver-cursor"    break
                     case 15, #include "nlix/libraries/drivers/lib-driver-digi"      break
-                    case 16, #include "nlix/libraries/drivers/lib-driver-gl"        break
+                    case 16, #include "nlix/libraries/drivers/lib-driver-gl"        break]#
                     
                     # Other libs
                     case 17, #include "nlix/libraries/lib-simple-keyboard" break
@@ -60,8 +60,6 @@ if (tickClk()) {
                     case 30, #include "Windows/System/API/UserFunctions" break]#
                     
                     # Init
-                    case 31, #include "nlix/init/settings" break
-                    case 32, #include "nlix/init/fonts" break
                     #case 33, #include "nlix/init/sync/gtable" break
                     #case 33, #include "nlix/init/sync/port" break
                     case 34, #include "nlix/init/autostart" break
@@ -96,10 +94,10 @@ if (tickClk()) {
                     # Drivers.
                     case "driver-terminal",     #include "nlix/programs/drivers/driver-terminal"    break
                     case "driver-keyboard",     #include "nlix/programs/drivers/driver-keyboard"    break
-                    case "driver-egp",          #include "nlix/programs/drivers/driver-egp"       break
+                    #[case "driver-egp",          #include "nlix/programs/drivers/driver-egp"         break
                     case "driver-cursor",       #include "nlix/programs/drivers/driver-cursor"      break
                     case "driver-digi",         #include "nlix/programs/drivers/driver-digi"        break
-                    case "driver-gl",           #include "nlix/programs/drivers/driver-gl"          break
+                    case "driver-gl",           #include "nlix/programs/drivers/driver-gl"          break]#
                     
                     # Simplifier tools.
                     case "simple-keyboard",     #include "nlix/programs/simple-keyboard"            break
@@ -138,7 +136,7 @@ if (tickClk()) {
                     case "uptime",              #include "nlix/programs/uptime"                     break
                     
                     # Egp tests.
-                    case "egp-clocks",          #include "nlix/programs/egp-clocks"                 break
+                    #[case "egp-clocks",          #include "nlix/programs/egp-clocks"                 break
                     case "egp-eyes",            #include "nlix/programs/egp-eyes"                   break
                     
                     # Window manager
@@ -156,7 +154,7 @@ if (tickClk()) {
                     
                     # Files
                     case "ls",                  #include "nlix/programs/ls"                         break
-                    case "cat",                 #include "nlix/programs/cat"                        break
+                    case "cat",                 #include "nlix/programs/cat"                        break]#
                     
                     # Apps from windows 10.4
                     #[case "AppDialog",           #include "Windows/Apps/AppDialog"                   break

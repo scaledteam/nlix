@@ -1,8 +1,0 @@
-#
-# Created by scaled
-#
-
-@name settings
-
-KERNEL_PERF = 50
-KERNEL_OVERLOAD = 5

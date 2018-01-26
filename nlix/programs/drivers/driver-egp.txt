@@ -144,7 +144,7 @@ switch (P["state", number]) {
                                     Object["pos", vector2] = eventGetVector2()
                                     
                                     Port:egpText(Id + 1, Object["text", string], Object["pos", vector2])
-                                    Port:egpFont(Id + 1, FONT_MONOSPACED)
+                                    Port:egpFont(Id + 1, "Courier New")
                                     break
                                 
                                 case "egpTextLayout",
@@ -161,7 +161,7 @@ switch (P["state", number]) {
                                     Object["size", vector2] = eventGetVector2()
                                     
                                     Port:egpTextLayout(Id + 1, Object["text", string], Object["pos", vector2], Object["size", vector2])
-                                    Port:egpFont(Id + 1, FONT_MONOSPACED)
+                                    Port:egpFont(Id + 1, "Courier New")
                                     break
                                 
                                 case "egpColor",
@@ -338,12 +338,12 @@ switch (P["state", number]) {
                                         
                                         case "text",
                                             Port:egpText(Id + 1, Object["text", string], Object["pos", vector2])
-                                            Port:egpFont(Id + 1, FONT_MONOSPACED)
+                                            Port:egpFont(Id + 1, "Courier New")
                                             break
                                         
                                         case "textLayout",
                                             Port:egpTextLayout(Id + 1, Object["text", string], Object["pos", vector2], Object["size", vector2])
-                                            Port:egpFont(Id + 1, FONT_MONOSPACED)
+                                            Port:egpFont(Id + 1, "Courier New")
                                             Port:egpAlign(Id + 1, Object["align", number], Object["align2", number])
                                             break
                                             

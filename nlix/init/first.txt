@@ -5,5 +5,5 @@
 @name first
 
 runOnTick(1)
-KERNEL_PERF = 20
-KERNEL_OVERLOAD = 1
+KERNEL_PERF = 30
+KERNEL_OVERLOAD = 5
