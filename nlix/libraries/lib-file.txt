@@ -8,30 +8,16 @@
 @persist FileList:array FileListReady FileListType:string
 @persist FILE_NO_LIST:array
 
-Files = object("fakedir")
-
-Files["testfile", table] = object("fakefile")
-Files["testfile", table]["data", string] = "The magic word."
-
-Files["dir", table] = object("fakedir")
-Files["dir", table]["testfile2", string] = "1234"
-Files["dir", table]["testdir", table] = object("fakedir")
-Files["dir", table]["testdir", table]["1", table] = object("fakedir")
-Files["dir", table]["testdir", table]["2", table] = object("fakedir")
-Files["dir", table]["testdir", table]["3", table] = object("fakefile")
-Files["dir", table]["testdir", table]["3", table]["data", string] = "Magic word 2."
-
-Files["rdir", table] = object("realdir")
-Files["rdir", table]["path", string] = ""
-
-Files["rdir2", table] = object("realdir")
-Files["rdir2", table]["path", string] = "test"
-
+# File list
 function table:afileListQuery(Path:string) {
     local PathExp = Path:explode("/")
     
     local Object = This[PathExp[1, string], table]
     local PathEnd = PathExp:concat("/", 2)
+    
+    if (PathExp[1, string] == "") {
+        Object = This
+    }
     
     FileListType = Object:type()
     switch (FileListType) {
@@ -46,7 +32,7 @@ function table:afileListQuery(Path:string) {
             break
         
         case "realdir",
-            fileList(Object["path", string] + "/" + PathEnd)
+            fileList(Object["path", string] + "/" + PathEnd + "/*")
             break
         
         default,
@@ -89,6 +75,7 @@ function array afileListGetList() {
     }
 }
 
+# File load
 function table:afileLoadQuery(Path:string) {
     local PathExp = Path:explode("/")
     
@@ -142,10 +129,44 @@ function string afileLoadGetData() {
         case "fakefile",
             return FileLoad
             
-        case "realdir",
+        case "realdir", case "realfile",
             return fileRead()
         
         default,
             return ""
     }
+}
+
+function table:afileWrite(Path:string, Data:string) {
+    local PathExp = Path:explode("/")
+    
+    local Object = This[PathExp[1, string], table]
+    local PathEnd = PathExp:concat("/", 2)
+    
+    Type = Object:type()
+    switch (Type) {
+        case "fakedir",
+            Object:afileWrite(PathEnd, Data)
+            break
+        
+        case "fakefile",
+            Object["data", string] = Data
+            break
+        
+        case "realdir", case "realfile",
+            fileWrite(Object["path", string] + "/" + PathEnd, Data)
+            break
+        
+        case "",
+            Object = object("fakefile")
+            Object["data", string] = Data
+            This[PathExp[1, string], table] = Object
+            break
+        
+        default,
+    }
+}
+
+function afileWrite(Path:string, Data:string) {
+    Files:afileWrite(Path, Data)
 }

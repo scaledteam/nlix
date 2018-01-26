@@ -17,7 +17,7 @@ switch (P["state", number]) {
             local Port = P["device", table]["port", wirelink]
             Port["String", string] = P["consoleText", string]
             
-            P["resolution", vector2] = vec2(39, 21)
+            P["resolution", vector2] = vec2(40, 21)
             
             P["state", number] = 2
         }
@@ -130,7 +130,7 @@ switch (P["state", number]) {
                         
                         foreach (I, NewText2:string = NewTextExplode) {
                             for (I = 0, NewText2:length() / Width) {
-                                ConsoleTextArray:pushString(NewText2:sub(I * Width, (I + 1) * Width))
+                                ConsoleTextArray:pushString(NewText2:sub(I * Width, (I + 1) * Width - 1))
                                 LineOffset++
                             }
                         }
@@ -175,8 +175,6 @@ switch (P["state", number]) {
                     case "erase",
                         local EraseCount = eventGetNumber()
                         
-                        P["consoleText", string] = P["consoleText", string]:left(P["consoleText", string]:length() - EraseCount)
-                        
                         local ConsoleTextArray = P["ConsoleTextArray", array]
                         
                         while (EraseCount > 0) {
@@ -188,10 +186,16 @@ switch (P["state", number]) {
                             }
                             elseif (EraseCount < StringCount) {
                                 ConsoleTextArray:pushString(String:left(StringCount - EraseCount))
+                                P["consoleText", string] = P["consoleText", string]:left(P["consoleText", string]:length() - EraseCount)
+                                break
+                            }
+                            elseif (EraseCount == StringCount) {
+                                P["consoleText", string] = P["consoleText", string]:left(P["consoleText", string]:length() - EraseCount - 1)
                                 break
                             }
                             else {
                                 EraseCount -= StringCount
+                                P["consoleText", string] = P["consoleText", string]:left(P["consoleText", string]:length() - StringCount - 1)
                             }
                         }
                         

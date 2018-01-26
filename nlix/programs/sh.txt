@@ -27,13 +27,14 @@ switch (P["state", number]) {
     case 3,
         if (!E:exists("startTime")) {
             E["startTime", number] = systime()
+            E["path", string] = "/"
         }
         P["state", number] = 4
         break
     
     case 4,
         #terminalPrint(ThisProgram["user", string] + " $ ")
-        terminalPrint("sh $ ")
+        terminalPrint("sh:" + E["path", string] + " $ ")
         simpleKeyboardRequestInput()
         
         P["state", number] = 5

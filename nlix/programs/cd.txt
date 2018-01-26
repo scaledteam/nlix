@@ -1,0 +1,15 @@
+#
+# Created by scaled
+#
+
+@name cd
+
+local Arg = P["args", array][1, string]
+
+if (Arg[Arg:length()] != "/") {
+    Arg += "/"
+}
+
+E["path", string] = Arg
+
+programKill()

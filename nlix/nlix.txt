@@ -58,9 +58,10 @@ if (tickClk()) {
                     case 30, #include "Windows/System/API/UserFunctions" break]#
                     
                     # Init
-                    #case 33, #include "nlix/init/sync/gtable" break
-                    #case 33, #include "nlix/init/sync/port" break
-                    case 34, #include "nlix/init/autostart" break
+                    #case 32, #include "nlix/init/sync/gtable" break
+                    #case 32, #include "nlix/init/sync/port" break
+                    case 33, #include "nlix/init/autostart" break
+                    case 34, #include "nlix/init/files" break
                     
                     # Move to execution state
                     case 35, KernelState0++, KernelState1 = 0
@@ -153,6 +154,13 @@ if (tickClk()) {
                     # Files
                     case "ls",                  #include "nlix/programs/ls"                         break
                     case "cat",                 #include "nlix/programs/cat"                        break
+                    case "touch",               #include "nlix/programs/touch"                      break
+                    case "cd",                  #include "nlix/programs/cd"                         break
+                    
+                    # http
+                    #ifdef httpRequest(string)
+                    case "wget",                #include "nlix/programs/wget"                       break
+                    #endif
                     
                     # Apps from windows 10.4
                     #[case "AppDialog",           #include "Windows/Apps/AppDialog"                   break

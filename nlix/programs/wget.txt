@@ -2,7 +2,7 @@
 # Created by scaled
 #
 
-@name cat
+@name wget
 
 switch (P["state", number]) {
     case 0,
@@ -12,13 +12,14 @@ switch (P["state", number]) {
         break
     
     case 1,
-        afileLoadQuery(E["path", string] + P["args", array][1, string])
+        httpRequest(P["args", array][1, string])
         P["state", number] = 2
         break
     
     case 2,
-        if (afileLoadIsReady()) {
-            terminalPrint(afileLoadGetData() + "\n")
+        if (httpCanRequest()) {
+            #terminalPrint(httpData())
+            afileWrite(E["path", string] + "webpage.txt", httpData())
             programKill()
         }
         break

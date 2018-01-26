@@ -4,18 +4,22 @@
 
 @name ls
 
-if (terminalInit()) {
-    switch (P["state", number]) {
-        case 0,
-            afileListQuery(P["args", array][1, string])
+switch (P["state", number]) {
+    case 0,
+        if (terminalInit()) {
             P["state", number] = 1
-            break
-        
-        case 1,
-            if (afileListIsReady()) {
-                terminalPrint(afileListGetList():concat("\n") + "\n")
-                programKill()
-            }
-            break
-    }
+        }
+        break
+    
+    case 1,
+        afileListQuery(E["path", string] + P["args", array][1, string])
+        P["state", number] = 2
+        break
+    
+    case 2,
+        if (afileListIsReady()) {
+            terminalPrint((afileListGetList():concat("\n") + "\n"):replace(OBJECT_TYPE_KEY + "\n", ""))
+            programKill()
+        }
+        break
 }
