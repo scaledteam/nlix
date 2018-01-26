@@ -6,36 +6,36 @@
 
 # One search
 function searchStartForOne(Table:table, Type:string) {
-    varWrite("searchTable", Table)
-    varWrite("searchType", Type)
+    P["searchTable", table] = Table
+    P["searchType", string] = Type
 }
 
 function number searchLoopForOne() {
-    local Type = varString("searchType")
-    local Counter = varNumber("searchCounter")
-    local Table = varTable("searchTable")
+    local Type = P["searchType", string]
+    local Counter = P["searchCounter", number]
+    local Table = P["searchTable", table]
     for (I = 1, KERNEL_OVERLOAD) {
         Counter++
         
         if (Counter > Table:count()) {
-            varWrite("searchResult", NULL)
+            P["searchResult", table] = NULL
         }
         
         local SubTable = Table[Counter, table]
         if (SubTable:type() == Type) {
-            varWrite("searchResult", SubTable)
-            varWrite("searchCounter", Counter)
+            P["searchResult", table] = SubTable
+            P["searchCounter", number] = Counter
             return 1
         }
     }
-    varWrite("searchCounter", Counter)
+    P["searchCounter", number] = Counter
     return 0
 }
 
 function number searchInfinityLoopForOne() {
-    local Type = varString("searchType")
-    local Counter = varNumber("searchCounter")
-    local Table = varTable("searchTable")
+    local Type = P["searchType", string]
+    local Counter = P["searchCounter", number]
+    local Table = P["searchTable", table]
     for (I = 1, KERNEL_OVERLOAD) {
         Counter++
         
@@ -45,80 +45,80 @@ function number searchInfinityLoopForOne() {
         
         local SubTable = Table[Counter, table]
         if (SubTable:type() == Type) {
-            varWrite("searchResult", SubTable)
-            varWrite("searchCounter", Counter)
+            P["searchResult", table] = SubTable
+            P["searchCounter", number] = Counter
             return 1
         }
     }
-    varWrite("searchCounter", Counter)
+    P["searchCounter", number] = Counter
     return 0
 }
 
 
 function searchStartForMany(Table:table, Type:string) {
-    varWrite("searchTable", Table)
-    varWrite("searchType", Type)
-    varWrite("searchResult", table())
+    P["searchTable", table] = Table
+    P["searchType", string] = Type
+    P["searchResult", table] = table()
 }
 
 function number searchLoopForMany() {
-    local Type = varString("searchType")
-    local Counter = varNumber("searchCounter")
-    local Table = varTable("searchTable")
+    local Type = P["searchType", string]
+    local Counter = P["searchCounter", number]
+    local Table = P["searchTable", table]
     for (I = 1, KERNEL_OVERLOAD) {
         Counter++
         
         if (Counter > Table:count()) {
-            if (varTable("searchResult"):count() == 0) {
-                varWrite("searchResult", NULL)
+            if (P["searchResult", table]:count() == 0) {
+                P["searchResult", table] = NULL
             }
-            varWrite("searchCounter", Counter)
+            P["searchCounter", number] = Counter
             return 1
         }
         
         local SubTable = Table[Counter, table]
         if (SubTable:type() == Type) {
-            varTable("searchResult"):pushTable(SubTable)
+            P["searchResult", table]:pushTable(SubTable)
         }
     }
-    varWrite("searchCounter", Counter)
+    P["searchCounter", number] = Counter
     return 0
 }
 
 
 function table searchGetResult() {
-    varRemove("searchTable")
-    varRemove("searchType")
-    local Result = varTable("searchResult")
-    varRemove("searchResult")
+    P:remove("searchTable")
+    P:remove("searchType")
+    local Result = P["searchResult", table]
+    P:remove("searchResult")
     return Result
 }
 
 function table searchGetTempResult() {
-    return varTable("searchResult")
+    return P["searchResult", table]
 }
 
 function number searchIsReady() {
-    return !varExists("searchTable")
+    return !P:exists("searchTable")
 }
 
 
 # Many searches
 function searchStartForOne(Id:string, Table:table, TargetType:string) {
-    if (!varExists("searches")) {
-        varWrite("searches", table())
+    if (!P:exists("searches")) {
+        P["searches", table] = table()
     }
     
     local Search = table()
     Search["table", table] = Table
     Search["targetType", string] = TargetType
     
-    local Searches = varTable("searches")
+    local Searches = P["searches", table]
     Searches[Id, table] = Search
 }
 
 function number searchLoopForOne(Id:string) {
-    local Search = varTable("searches")[Id, table]
+    local Search = P["searches", table][Id, table]
     
     local TargetType = Search["targetType", string]
     local Counter = Search["counter", number]
@@ -144,7 +144,7 @@ function number searchLoopForOne(Id:string) {
 }
 
 function number searchInfinityLoopForOne(Id:string) {
-    local Search = varTable("searches")[Id, table]
+    local Search = P["searches", table][Id, table]
     
     local TargetType = Search["targetType", string]
     local Counter = Search["counter", number]
@@ -171,8 +171,8 @@ function number searchInfinityLoopForOne(Id:string) {
 
 
 function searchStartForMany(Id:string, Table:table, TargetType:string) {
-    if (!varExists("searches")) {
-        varWrite("searches", table())
+    if (!P:exists("searches")) {
+        P["searches", table] = table()
     }
     
     local Search = table()
@@ -180,12 +180,12 @@ function searchStartForMany(Id:string, Table:table, TargetType:string) {
     Search["targetType", string] = TargetType
     Search["result", table] = table()
     
-    local Searches = varTable("searches")
+    local Searches = P["searches", table]
     Searches[Id, table] = Search
 }
 
 function number searchLoopForMany(Id:string) {
-    local Search = varTable("searches")[Id, table]
+    local Search = P["searches", table][Id, table]
     
     local TargetType = Search["targetType", string]
     local Counter = Search["counter", number]
@@ -211,19 +211,19 @@ function number searchLoopForMany(Id:string) {
 
 
 function table searchGetResult(Id:string) {
-    local Search = varTable("searches")[Id, table]
+    local Search = P["searches", table][Id, table]
     local Result = Search["result", table]
     Search:clear()
     
-    varTable("searches"):remove(Id)
+    P["searches", table]:remove(Id)
     
     return Result
 }
 
 function table searchGetTempResult(Id:string) {
-    return varTable("searches")[Id, table]["result", table]
+    return P["searches", table][Id, table]["result", table]
 }
 
 function number searchIsReady(Id:string) {
-    return !varTable("searches"):exists(Id)
+    return !P["searches", table]:exists(Id)
 }

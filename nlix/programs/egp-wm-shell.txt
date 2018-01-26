@@ -4,25 +4,25 @@
 
 @name egp-wm-shell
 
-switch (stateGet()) {
+switch (P["state", number]) {
     # Wait console driver
     case 0,
         if (terminalInit()) {
-            stateNext()
+            P["state", number] = 1
         }
         break
     
     # Wait keyboard driver
     case 1,
         if (simpleKeyboardInit()) {
-            stateNext()
+            P["state", number] = 2
         }
         break
     
     # Wait callback device
     case 2,
         if (driverPopDevice("egp-wm-callback")) {
-            stateNext()
+            P["state", number] = 3
         }
         break
     
@@ -31,7 +31,7 @@ switch (stateGet()) {
         terminalPrint("wm-sh: $ ")
         simpleKeyboardRequestInput()
         
-        stateNext()
+        P["state", number] = 4
         break
     
     # Get input
@@ -40,11 +40,11 @@ switch (stateGet()) {
             local Input = simpleKeyboardGetInput()
             local Commands = Input:trim():explode(" ")
             
-            local CallbackDevice = varTable("device")
+            local CallbackDevice = P["device", table]
             foreach (I, Command:string = Commands) {
                 CallbackDevice["queue", array]:pushString(Command)
             }
-            stateSet(3)
+            P["state", number] = 3
         }
         break
 }

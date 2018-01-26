@@ -9,7 +9,7 @@ function programFinderWrite() {
         E["programFinder", table] = table()
     }
     
-    E["programFinder", table][ThisProgramName, table] = P
+    E["programFinder", table][PName, table] = P
 }
 
 function table programFinderRead(ProgramName:string) {

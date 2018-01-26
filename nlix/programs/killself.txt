@@ -7,6 +7,6 @@
 #[foreach (I, TableName:string = PROGRAM_TABLES) {
     ThisProgram[TableName, table]:clear()
 }]#
-ThisProgram:clear()
+P:clear()
 
-Programs:remove(ThisProgramId)
+Programs:remove(PId)

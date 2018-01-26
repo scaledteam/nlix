@@ -11,7 +11,7 @@ function number simpleKeyboardInit() {
 
 function simpleKeyboardRequestInput() {
     P["simple-keyboard", table]:eventSend("get-input")
-    P["simple-keyboard", table]:eventSend(ThisProgram)
+    P["simple-keyboard", table]:eventSend(P)
 }
 
 function number simpleKeyboardWaitInput() {

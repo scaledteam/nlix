@@ -13,7 +13,7 @@ function table table:programStart(Name:string) {
 }
 
 function table programStart(Name:string) {
-    return ThisEnvironment:programStart(Name)
+    return E:programStart(Name)
 }
 
 function table:programKill() {
@@ -21,13 +21,13 @@ function table:programKill() {
 }
 
 function programKill() {
-    ThisProgram:programKill()
+    P:programKill()
 }
 
 function table programFindByName(Name:string) {
     for (I = 1, Programs:count()) {
         local Program = Programs[I, table]
-        if (Program:type() == Name & Program["environment", table] == ThisEnvironment) {
+        if (Program:type() == Name & Program["environment", table] == E) {
             return Program
         }
     }

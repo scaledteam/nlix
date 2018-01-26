@@ -6,8 +6,7 @@
 
 @persist KERNEL_PERF KERNEL_OVERLOAD 
 @persist KernelState0 KernelState1
-@persist [Programs ThisProgram ThisEnvironment]:table ThisProgramName:string ThisProgramId
-@persist [P E]:table
+@persist [Programs P E]:table PName:string PId
 
 if (first()) {
     #include "nlix/init/first"
@@ -25,7 +24,7 @@ if (tickClk()) {
                     
                     # Important libs
                     #case 3, #include "nlix/libraries/lib-vars" break
-                    #case 4, #include "nlix/libraries/lib-search" break
+                    case 4, #include "nlix/libraries/lib-search" break
                     case 5, #include "nlix/libraries/lib-devices" break
                     case 6, #include "nlix/libraries/lib-event" break
                     #case 7, #include "nlix/libraries/lib-state" break
@@ -36,13 +35,14 @@ if (tickClk()) {
                     case 10, #include "nlix/libraries/drivers/lib-driver"            break
                     case 11, #include "nlix/libraries/drivers/lib-driver-terminal"  break
                     case 12, #include "nlix/libraries/drivers/lib-driver-keyboard"  break
-                    #[case 13, #include "nlix/libraries/drivers/lib-driver-egp"       break
+                    case 13, #include "nlix/libraries/drivers/lib-driver-egp"       break
                     case 14, #include "nlix/libraries/drivers/lib-driver-cursor"    break
                     case 15, #include "nlix/libraries/drivers/lib-driver-digi"      break
-                    case 16, #include "nlix/libraries/drivers/lib-driver-gl"        break]#
+                    case 16, #include "nlix/libraries/drivers/lib-driver-gl"        break
                     
                     # Other libs
                     case 17, #include "nlix/libraries/lib-simple-keyboard" break
+                    #case 18, #include "nlix/libraries/lib-long-math" break
                     
                     # Wine libs
                     #[case 19, #include "nlix/libraries/wine/lib-wine-vars" break
@@ -77,16 +77,16 @@ if (tickClk()) {
         
         case 1,
             while (perf(KERNEL_PERF)) {
-                ThisProgramId++
-                if (ThisProgramId > Programs:count()) {
-                    ThisProgramId = 1
+                PId++
+                if (PId > Programs:count()) {
+                    PId = 1
                 }
                 
-                P = ThisProgram = Programs[ThisProgramId, table]
-                E = ThisEnvironment = ThisProgram["environment", table]
+                P = Programs[PId, table]
+                E = P["environment", table]
                 
-                ThisProgramName = ThisProgram:type()
-                switch (ThisProgramName) {
+                PName = P:type()
+                switch (PName) {
                     # Process kill function
                     case "killself",            #include "nlix/programs/killself"                   break
                     
@@ -96,10 +96,10 @@ if (tickClk()) {
                     # Drivers.
                     case "driver-terminal",     #include "nlix/programs/drivers/driver-terminal"    break
                     case "driver-keyboard",     #include "nlix/programs/drivers/driver-keyboard"    break
-                    #case "driver-egp",          #include "nlix/programs/drivers/driver-egp"       break
-                    #case "driver-cursor",       #include "nlix/programs/drivers/driver-cursor"      break
-                    #case "driver-digi",         #include "nlix/programs/drivers/driver-digi"        break
-                    #case "driver-gl",           #include "nlix/programs/drivers/driver-gl"          break
+                    case "driver-egp",          #include "nlix/programs/drivers/driver-egp"       break
+                    case "driver-cursor",       #include "nlix/programs/drivers/driver-cursor"      break
+                    case "driver-digi",         #include "nlix/programs/drivers/driver-digi"        break
+                    case "driver-gl",           #include "nlix/programs/drivers/driver-gl"          break
                     
                     # Simplifier tools.
                     case "simple-keyboard",     #include "nlix/programs/simple-keyboard"            break
@@ -125,7 +125,7 @@ if (tickClk()) {
                     case "server-info",         #include "nlix/programs/server-info"                break
                     
                     # Apps control.
-                    #case "pkill",               #include "nlix/programs/pkill"                      break
+                    case "pkill",               #include "nlix/programs/pkill"                      break
                     case "kill",                #include "nlix/programs/kill"                       break
                     case "plist",               #include "nlix/programs/plist"                      break
                     case "eventctl",            #include "nlix/programs/eventctl"                   break
@@ -138,12 +138,12 @@ if (tickClk()) {
                     case "uptime",              #include "nlix/programs/uptime"                     break
                     
                     # Egp tests.
-                    #[case "egp-clocks",          #include "nlix/programs/egp-clocks"                 break
+                    case "egp-clocks",          #include "nlix/programs/egp-clocks"                 break
                     case "egp-eyes",            #include "nlix/programs/egp-eyes"                   break
                     
                     # Window manager
-                    #case "egp-wm",              #include "nlix/programs/egp-wm"                     break
-                    #case "egp-wm-shell",        #include "nlix/programs/egp-wm-shell"               break
+                    case "egp-wm",              #include "nlix/programs/egp-wm"                     break
+                    case "egp-wm-shell",        #include "nlix/programs/egp-wm-shell"               break
                     
                     # Workspace management
                     case "environmentctl",      #include "nlix/programs/environmentctl"             break
@@ -156,7 +156,7 @@ if (tickClk()) {
                     
                     # Files
                     case "ls",                  #include "nlix/programs/ls"                         break
-                    case "cat",                 #include "nlix/programs/cat"                        break]#
+                    case "cat",                 #include "nlix/programs/cat"                        break
                     
                     # Apps from windows 10.4
                     #[case "AppDialog",           #include "Windows/Apps/AppDialog"                   break

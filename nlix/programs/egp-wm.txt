@@ -4,45 +4,45 @@
 
 @name egp-wm
 
-switch (stateGet()) {
+switch (P["state", number]) {
     case 0,
         if (egpInit()) {
             egpBox(1, vec2(), egpResolution())
             egpParentToBase(1)
             egpColor(1, vec(127 * egpResolution()[1] / 512))
             
-            stateNext()
+            P["state", number] = 1
         }
         break
     
     case 1,
         if (cursorInit()) {
-            stateNext()
+            P["state", number] = 2
         }
         break
     
     case 2,
         if (keyboardInit()) {
-            stateNext()
+            P["state", number] = 3
         }
         break
     
     case 3,
-        varWrite("egp-size-standart", vec2(300, 150))
-        varWrite("egpids-standart", 20)
+        P["EGP_SIZE_STANDART", vector2] = vec2(300, 150)
+        P["EGPIDS_STANDART", number] = 20
         
-        varWrite("EGP_CURSOR_INVALID_POS", vec2(-1))
-        varWrite("KEYS_NULL", array())
+        P["EGP_CURSOR_INVALID_POS", vector2] = vec2(-1)
+        P["KEYS_NULL", array] = array()
         
-        varWrite("egp-last", 1)
-        varWrite("egp-ids", array())
-        varWrite("egp-poses", array())
-        varWrite("egp-sizes", array())
-        varWrite("egp-id-counts", array())
-        varWrite("workspacesByName", table())
-        varWrite("workspacesById", table())
-        varWrite("workspacesNameToId", table())
-        varWrite("workspacesDevices", table())
+        P["egpLast", number] = 1
+        P["egpIds", array] = array()
+        P["egpPoses", array] = array()
+        P["egpSizes", array] = array()
+        P["egpIdCounts", array] = array()
+        P["workspacesByName", table] = table()
+        P["workspacesById", table] = table()
+        P["workspacesNameToId", table] = table()
+        P["workspacesDevices", table] = table()
         
         local CallBackDevice = object("egp-wm-callback")
         local AppSize = clamp(vec2(300, 160), vec2(), egpResolution() * 0.9 - vec2(0, 25))
@@ -57,33 +57,33 @@ switch (stateGet()) {
             "add-app", "wm-sh", "simple-keyboard",
             "add-app", "wm-sh", "egp-wm-shell"
         )
-        varWrite("callback-device", CallBackDevice)
+        P["callbackDevice", table] = CallBackDevice
         
-        stateNext()
+        P["state", number] = 4
         break
     
     case 4,
         if (egpIsIdle()) {
-            stateNext()
+            P["state", number] = 5
         }
         break
     
     case 5,
-        if (varNumber("workspacesCount") > 0) {
+        if (P["workspacesCount", number] > 0) {
             # Workspaces counter
-            if (varNumber("workspacesCount") > 1) {
-                varWrite("workspaceId", varNumber("workspaceId") % varNumber("workspacesCount") + 1)
+            if (P["workspacesCount", number] > 1) {
+                P["workspaceId", number] = P["workspaceId", number] % P["workspacesCount", number] + 1
             }
             else {
-                varWrite("workspaceId", 1)
+                P["workspaceId", number] = 1
             }
-            local WorkspaceId = varNumber("workspaceId")
-            local Workspace = varTable("workspacesById")[WorkspaceId, table]
+            local WorkspaceId = P["workspaceId", number]
+            local Workspace = P["workspacesById", table][WorkspaceId, table]
             
             # Virtual screen driver
-            local ParentId = varArray("egp-ids")[WorkspaceId, number]
+            local ParentId = P["egpIds", array][WorkspaceId, number]
             for (I = 1, KERNEL_OVERLOAD) {
-                local VirtualScreenDevice = varTable("workspacesDevices")[WorkspaceId, table][1, table]
+                local VirtualScreenDevice = P["workspacesDevices", table][WorkspaceId, table]["devices", table][1, table]
                 #local VirtualScreenDevice = Workspace:findDeviceByType("virtual-egp-screen")
                 local EgpQueue = VirtualScreenDevice["output-queue", array]
                 if (EgpQueue:count() > 0) {
@@ -201,17 +201,17 @@ switch (stateGet()) {
             }
                 
             # Virtual cursor device driver
-            local VirtualCursorDevice = varTable("workspacesDevices")[WorkspaceId, table][2, table]
-            #local VirtualCursorDevice = Workspace:findDeviceByType("virtual-cursor")
+            local VirtualCursorDevice = P["workspacesDevices", table][WorkspaceId, table]["devices", table][2, table]
+            
             local CursorPos = cursorGetPos()
-            if (CursorPos == varVector2("EGP_CURSOR_INVALID_POS")) {
-                VirtualCursorDevice["pos", vector2] = varVector2("EGP_CURSOR_INVALID_POS")
+            if (CursorPos == P["EGP_CURSOR_INVALID_POS", vector2]) {
+                VirtualCursorDevice["pos", vector2] = P["EGP_CURSOR_INVALID_POS", vector2]
             }
             else {
-                VirtualCursorDevice["pos", vector2] = CursorPos - varArray("egp-poses")[WorkspaceId, vector2]
+                VirtualCursorDevice["pos", vector2] = CursorPos - P["egpPoses", array][WorkspaceId, vector2]
             }
             
-            if (WorkspaceId == varNumber("window-focus")) {
+            if (WorkspaceId == P["window-focus", number]) {
                 VirtualCursorDevice["use", number] = cursorGetUse()
             }
             else {
@@ -220,49 +220,45 @@ switch (stateGet()) {
         }
         
         local UseKey = cursorGetUse()
-        for (WorkspaceId = 1, varNumber("workspacesCount")) {
+        for (WorkspaceId = 1, P["workspacesCount", number]) {
             # Window management
-            #local UseKey = keyboardGetKeys()[2, number] == 101
-            if (WorkspaceId == varNumber("window-focus")) {
-                if (UseKey & inrange(cursorGetPos() - varArray("egp-poses")[WorkspaceId, vector2], vec2(0, -25), vec2(varArray("egp-sizes")[WorkspaceId, vector2][1], 0))) {
-                    local NewPos = cursorGetPos() - vec2(varArray("egp-sizes")[WorkspaceId, vector2][1] / 2, -12)
+            if (WorkspaceId == P["window-focus", number]) {
+                if (UseKey & inrange(cursorGetPos() - P["egpPoses", array][WorkspaceId, vector2], vec2(0, -25), vec2(P["egpSizes", array][WorkspaceId, vector2][1], 0))) {
+                    local NewPos = cursorGetPos() - vec2(P["egpSizes", array][WorkspaceId, vector2][1] / 2, -12)
                     #NewPos = clamp(NewPos, vec2(), egpResolution())
                     
-                    local EgpPoses = varArray("egp-poses")
-                    EgpPoses[WorkspaceId, vector2] = NewPos
-                    egpPos(varArray("egp-ids")[WorkspaceId, number], NewPos)
+                    P["egpPoses", array][WorkspaceId, vector2] = NewPos
+                    egpPos(P["egpIds", array][WorkspaceId, number], NewPos)
                 }
             }
             else {
-                if ((UseKey != varNumber("UseKeyOld")) & UseKey & inrange(cursorGetPos() - varArray("egp-poses")[WorkspaceId, vector2], vec2(0, -25), varArray("egp-sizes")[WorkspaceId, vector2])) {
+                if ((UseKey != P["UseKeyOld", number]) & UseKey & inrange(cursorGetPos() - P["egpPoses", array][WorkspaceId, vector2], vec2(0, -25), P["egpSizes", array][WorkspaceId, vector2])) {
                     # Send data for redraw window
-                    local EgpIds = varArray("egp-ids")[WorkspaceId, number]
-                    varWrite("counterOffset", EgpIds)
-                    varWrite("counterStart", -2)
-                    varWrite("counterLimit", varArray("egp-id-counts")[WorkspaceId, number])
+                    local EgpIds = P["egpIds", array][WorkspaceId, number]
+                    P["counterOffset", number] = EgpIds
+                    P["counterStart", number] = -2
+                    P["counterLimit", number] = P["egpIdCounts", array][WorkspaceId, number]
                     
-                    local EgpIDs = varArray("egp-ids")
-                    EgpIDs[WorkspaceId, number] = varNumber("egp-last") + 3
+                    local EgpIDs = P["egpIds", array]
+                    EgpIDs[WorkspaceId, number] = P["egpLast", number] + 3
                     
                     # Change keyboard target
-                    local WorkspacesById = varTable("workspacesById")
-                    local WindowFocusOld = varNumber("window-focus")
-                    varWrite("window-focus", WorkspaceId)
+                    local WindowFocusOld = P["window-focus", number]
+                    P["window-focus", number] = WorkspaceId
                     
-                    local WorkspacesDevices = varTable("workspacesDevices")
-                    WorkspacesDevices[WorkspaceId, table][3, table]["keys", array] = keyboardGetKeys()
-                    WorkspacesDevices[WindowFocusOld, table][3, table]["keys", array] = varArray("KEYS_NULL")
+                    P["workspacesDevices", table][WorkspaceId, table]["devices", table][3, table]["keys", array] = keyboardGetKeys()
+                    P["workspacesDevices", table][WindowFocusOld, table]["devices", table][3, table]["keys", array] = P["KEYS_NULL", array]
                     
                     # Move to redraw state
-                    stateSet(6)
+                    P["state", number] = 6
                 }
             }
         }
-        varWrite("UseKeyOld", UseKey)
+        P["UseKeyOld", number] = UseKey
         
         for (I = 1, KERNEL_OVERLOAD) {
             # Callback device
-            local CommandQueue = varTable("callback-device")["queue", array]
+            local CommandQueue = P["callbackDevice", table]["queue", array]
             if (CommandQueue:count() > 0) {
                 local Command = CommandQueue:shiftString()
                 
@@ -270,33 +266,31 @@ switch (stateGet()) {
                     case "create",
                         # Create workspace
                         local Workspace = table()
+                        Workspace["devices", table] = table()
                         local WorkspaceName = CommandQueue:shiftString()
                         
-                        local WmWorkspacesByName = varTable("workspacesByName")
-                        WmWorkspacesByName[WorkspaceName, table] = Workspace
+                        P["workspacesByName", table][WorkspaceName, table] = Workspace
                         
-                        varTable("workspacesById"):pushTable(Workspace)
-                        local WorkspaceId = varNumber("workspacesCount") + 1
-                        varWrite("workspacesCount", WorkspaceId)
-                        local WorkspacesDevices = varTable("workspacesDevices")
-                        WorkspacesDevices[WorkspaceId, table] = table()
+                        P["workspacesById", table]:pushTable(Workspace)
+                        local WorkspaceId = P["workspacesCount", number] + 1
                         
-                        local WmWorkspacesNameToId = varTable("workspacesNameToId")
-                        WmWorkspacesNameToId[WorkspaceName, number] = WorkspaceId
+                        P["workspacesCount", number] = WorkspaceId
+                        P["workspacesDevices", table][WorkspaceId, table] = Workspace
+                        P["workspacesNameToId", table][WorkspaceName, number] = WorkspaceId
                         
                         # Draw workspace
                         ## Prepare
                         local BorderWidth = 2
                         local LabelHeight = 25
                         
-                        local NewEgpId = varNumber("egp-last") + 3
-                        varArray("egp-ids"):pushNumber(NewEgpId)
+                        local NewEgpId = P["egpLast", number] + 3
+                        P["egpIds", array]:pushNumber(NewEgpId)
                         
                         local Pos = CommandQueue:shiftVector2()
-                        varArray("egp-poses"):pushVector2(Pos)
+                        P["egpPoses", array]:pushVector2(Pos)
                         
                         local Size = CommandQueue:shiftVector2()
-                        varArray("egp-sizes"):pushVector2(Size)
+                        P["egpSizes", array]:pushVector2(Size)
                         
                         ## Drawing
                         egpParentPoint(NewEgpId, Pos)
@@ -312,14 +306,13 @@ switch (stateGet()) {
                         
                         # Initialize place for app
                         local EgpIdsCount = CommandQueue:shiftNumber()
-                        varArray("egp-id-counts"):pushNumber(EgpIdsCount + 1)
-                        varWrite("egp-last", NewEgpId + EgpIdsCount + 1)
+                        P["egpIdCounts", array]:pushNumber(EgpIdsCount + 1)
+                        P["egpLast", number] = NewEgpId + EgpIdsCount + 1
                         
-                        WindowFocusOld = varNumber("window-focus")
-                        varWrite("window-focus", WorkspaceId)
-                        local WorkspacesById = varTable("workspacesById")
+                        WindowFocusOld = P["window-focus", number]
+                        P["window-focus", number] = WorkspaceId
                         if (WindowFocusOld != 0) {
-                            WorkspacesById[WindowFocusOld, table]["devices", table][3, table]["keys", array] = varArray("KEYS_NULL")
+                            P["workspacesById", table][WindowFocusOld, table]["devices", table][3, table]["keys", array] = P["KEYS_NULL", array]
                         }
                         break
                     
@@ -327,15 +320,15 @@ switch (stateGet()) {
                         local WorkspaceName = CommandQueue:shiftString()
                         local DeviceType = CommandQueue:shiftString()
                         
-                        local Workspace = varTable("workspacesByName")[WorkspaceName, table]
-                        local WorkspaceId = varTable("workspacesNameToId")[WorkspaceName, number]
+                        local Workspace = P["workspacesByName", table][WorkspaceName, table]
+                        local WorkspaceId = P["workspacesNameToId", table][WorkspaceName, number]
                         
                         local Device = NULL
                         
                         switch (DeviceType) {
                             case "egp-screen",
-                                local Size = varArray("egp-sizes")[WorkspaceId, vector2]
-                                local EgpIdsCount = varArray("egp-id-counts")[WorkspaceId, number]
+                                local Size = P["egpSizes", array][WorkspaceId, vector2]
+                                local EgpIdsCount = P["egpIdCounts", array][WorkspaceId, number]
                                 
                                 Device = createVirtualEgpScreen(Size, EgpIdsCount)
                                 break
@@ -350,36 +343,36 @@ switch (stateGet()) {
                                 break
                             
                             case "callback",
-                                Device = varTable("callback-device")
+                                Device = P["callbackDevice", table]
                                 break
                         }
                         if (Device != NULL) {
-                            varTable("workspacesDevices")[WorkspaceId, table]:pushTable(Device)
+                            P["workspacesDevices", table][WorkspaceId, table]["devices", table]:pushTable(Device)
                             Workspace:pushTable(Device)
                         }
                         break
                     
                     case "add-app",
                         local WorkspaceName = CommandQueue:shiftString()
-                        local Workspace = varTable("workspacesByName")[WorkspaceName, table]
+                        local Workspace = P["workspacesByName", table][WorkspaceName, table]
                         Workspace:programStart(CommandQueue:shiftString())
                         break
                     
                     case "launch",
                         local AppName = CommandQueue:shiftString()
-                        local WorkspaceName = "window" + varNumber("workspacesCount")
+                        local WorkspaceName = "window" + P["workspacesCount", number]
                         
-                        local AppSize = varVector2("egp-size-standart")
+                        local AppSize = P["EGP_SIZE_STANDART", vector2]
                         #[if (APPS_INFO[AppName, table]:exists("min-egp-size")) {
                             AppSize = clamp(APPS_INFO[AppName, table]["min-egp-size", vector2], vec2(), egpResolution() * 0.75 - vec2(0, 25))
                         }]#
                         
-                        local AppEgpids = varNumber("egpids-standart")
+                        local AppEgpids = P["EGPIDS_STANDART", number]
                         #[if (APPS_INFO[AppName, table]:exists("min-egpid-count")) {
                             AppEgpids = APPS_INFO[AppName, table]["min-egpid-count", number]
                         }]#
                         
-                        local CallBackDevice = varTable("callback-device")
+                        local CallBackDevice = P["callbackDevice", table]
                         CallBackDevice["queue", array] = CallBackDevice["queue", array]:add(array(
                             "create", WorkspaceName, randvec2(vec2(0, 25), egpResolution() - AppSize), AppSize, AppEgpids,
                             "add-device", WorkspaceName, "egp-screen",
@@ -397,7 +390,7 @@ switch (stateGet()) {
                         break
                     
                     case "clear",
-                        local CallBackDevice = varTable("callback-device")
+                        local CallBackDevice = P["callbackDevice", table]
                         CallBackDevice["queue", array]:pushString("add-app")
                         CallBackDevice["queue", array]:pushString("wm-sh")
                         CallBackDevice["queue", array]:pushString("clear")
@@ -407,10 +400,10 @@ switch (stateGet()) {
                         break
                     
                     case "terminal",
-                        local WorkspaceName = "window" + varNumber("workspacesCount")
-                        local AppSize = varVector2("egp-size-standart") * vec2(1, 2)
+                        local WorkspaceName = "window" + P["workspacesCount", number]
+                        local AppSize = P["EGP_SIZE_STANDART", vector2] * vec2(1, 2)
                         
-                        local CallBackDevice = varTable("callback-device")
+                        local CallBackDevice = P["callbackDevice", table]
                         CallBackDevice["queue", array] = CallBackDevice["queue", array]:add(array(
                             "create", WorkspaceName, randvec2(vec2(0, 25), egpResolution() - AppSize), AppSize, 5,
                             "add-device", WorkspaceName, "egp-screen",
@@ -425,7 +418,7 @@ switch (stateGet()) {
                     
                     case "close",
                         local WorkspaceName = CommandQueue:shiftString()
-                        local CallBackDevice = varTable("callback-device")
+                        local CallBackDevice = P["callbackDevice", table]
                         CallBackDevice["queue", array]:pushString("add-app")
                         CallBackDevice["queue", array]:pushString(WorkspaceName)
                         CallBackDevice["queue", array]:pushString("exit")
@@ -445,20 +438,20 @@ switch (stateGet()) {
     
     case 6,
         if (egpIsIdle()) {
-            varWrite("counter", varNumber("counterStart"))
-            stateNext()
+            P["counter", number] = P["counterStart", number]
+            P["state", number] = 7
         }
         break
         
     case 7,
         for (I = 1, KERNEL_OVERLOAD) {
-            local Counter = varNumber("counter")
+            local Counter = P["counter", number]
             
-            local NewId = Counter + varNumber("egp-last") + 3
-            local OldId = Counter + varNumber("counterOffset")
+            local NewId = Counter + P["egpLast", number] + 3
+            local OldId = Counter + P["counterOffset", number]
             
             #[egpCopy(NewId, OldId)
-            if (OldId != varNumber("counterOffset")) {
+            if (OldId != P["counterOffset", number]) {
                 egpParent(NewId, (NewId - OldId) + egpParent(OldId))
             }
             egpRemove(OldId)]#
@@ -472,25 +465,25 @@ switch (stateGet()) {
                 egpMove(NewId, OldId)
             }
             
-            if (Counter >= varNumber("counterLimit")) {
-                stateNext()
+            if (Counter >= P["counterLimit", number]) {
+                P["state", number] = 8
                 break
             }
             else {
-                varWrite("counter", Counter + 1)
+                P["counter", number] = Counter + 1
             }
         }
         break
     
     case 8,
         if (egpIsIdle()) {
-            varWrite("egp-last", varNumber("egp-last") + 3 + varNumber("counterLimit"))
+            P["egpLast", number] = P["egpLast", number] + 3 + P["counterLimit", number]
             
-            varRemove("counter")
-            varRemove("counterLimit")
-            varRemove("counterOffset")
-            varRemove("counterStart")
-            stateSet(5)
+            P:remove("counter")
+            P:remove("counterLimit")
+            P:remove("counterOffset")
+            P:remove("counterStart")
+            P["state", number] = 5
         }
         break
 }
