@@ -1,0 +1,62 @@
+#
+# Created by scaled
+#
+
+@name fs-real
+
+if (P["fs", table]:exists("path")) {
+    switch (P["mode", string]) {
+        case "list",
+            switch (P["state", number]) {
+                case 0,
+                    if (fileCanList()) {
+                        fileList(P["fs", table]["path", string] + P["path", string] + "/")
+                        P["state", number] = 1
+                    }
+                    break
+                
+                case 1,
+                    if (fileLoadedList()) {
+                        out(fileReadList():concat("\n") + "\n")
+                        end()
+                    }
+                    break
+            }
+            break
+        
+        case "read",
+            switch (P["state", number]) {
+                case 0,
+                    if (fileCanLoad()) {
+                        fileLoad(P["fs", table]["path", string] + P["path", string])
+                        P["state", number] = 1
+                    }
+                    break
+                
+                case 1,
+                    if (fileLoaded()) {
+                        out(fileRead() + "\n")
+                        end()
+                    }
+                    break
+            }
+            break
+        
+        case "write",
+            if (fileCanWrite() & wait()) {
+                fileWrite(P["fs", table]["path", string] + P["path", string], in())
+                P["state", number] = 1
+                out("ok\n")
+                end()
+            }
+            break
+        
+        default,
+            out("Error: Unsupported action.\n")
+            end()
+    }
+}
+else {
+    out("Error: No path in fstab\n")
+    end()
+}

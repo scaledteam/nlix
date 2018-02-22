@@ -4,205 +4,110 @@
 
 @name nlix
 
-@persist KERNEL_PERF KERNEL_OVERLOAD 
-@persist KernelState0 KernelState1
-@persist [Programs P E]:table PName:string PId
-
-if (first()) {
-    #include "nlix/init/first"
-}
+@persist [G L S]:table
+@persist [P Ps]:table
+@persist KPerf KState0 KState1
 
 if (tickClk()) {
-    switch (KernelState0) {
+    switch (KState0) {
         case 0,
-            while (perf(KERNEL_PERF)) {
-                KernelState1++
-                switch (KernelState1) {
-                    # Kernel libs
-                    case 1, #include "nlix/libraries/kernel/lib-object" break
-                    case 2, #include "nlix/libraries/kernel/lib-program" break
+            while (perf(KPerf)) {
+                KState1++
+                switch (KState1) {
+                    case 1, #include "nlix/lib/libobject" break
+                    case 2, #include "nlix/lib/libprogram" break
+                    case 3, #include "nlix/lib/libdevices" break
+                    case 4, #include "nlix/lib/libio" break
                     
-                    # Important libs
-                    case 3, #include "nlix/libraries/lib-search" break
-                    case 4, #include "nlix/libraries/lib-devices" break
-                    case 5, #include "nlix/libraries/lib-event" break
-                    case 6, #include "nlix/libraries/lib-program-finder" break
-                    case 7, #include "nlix/libraries/lib-file" break
+                    case 5, #include "nlix/lib/liboverload" break
+                    case 6, #include "nlix/lib/libfs" break
                     
-                    # Driver libs
-                    case 10, #include "nlix/libraries/drivers/lib-driver"            break
-                    case 11, #include "nlix/libraries/drivers/lib-driver-terminal"  break
-                    case 12, #include "nlix/libraries/drivers/lib-driver-keyboard"  break
-                    case 13, #include "nlix/libraries/drivers/lib-driver-egp"       break
-                    case 14, #include "nlix/libraries/drivers/lib-driver-cursor"    break
-                    case 15, #include "nlix/libraries/drivers/lib-driver-digi"      break
-                    case 16, #include "nlix/libraries/drivers/lib-driver-gl"        break
+                    case 7, #include "nlix/lib/libegp" break
                     
-                    # Other libs
-                    case 17, #include "nlix/libraries/lib-simple-keyboard" break
-                    #case 18, #include "nlix/libraries/lib-long-math" break
+                    case 10, #include "nlix/init/g" break
+                    #case 11, SYSTEM_NAME = "system0" #include "nlix/init/sync" break
                     
-                    # Wine libs
-                    #[case 19, #include "nlix/libraries/wine/lib-wine-vars" break
-                    case 20, #include "nlix/libraries/wine/lib-wine-fake-vars" break
-                    case 21, #include "nlix/libraries/wine/lib-wine-egp" break
-                    case 22, #include "nlix/libraries/wine/lib-wine-app" break
-                    
-                    case 23, #include "Windows/System/API/ROM" break
-                    case 24, #include "Windows/System/API/EGP/Object" break
-                    case 25, #include "Windows/System/API/EGP/TextField" break
-                    case 26, #include "Windows/System/API/EGP/Button" break
-                    case 27, #include "Windows/System/API/EGP/Slider" break
-                    case 28, #include "Windows/System/API/EGP/Menu" break
-                    case 29, #include "Windows/System/API/EGP/ArrayField" break
-                    case 30, #include "Windows/System/API/UserFunctions" break]#
-                    
-                    # Init
-                    #case 32, #include "nlix/init/sync/gtable" break
-                    #case 32, #include "nlix/init/sync/port" break
-                    case 33, #include "nlix/init/autostart" break
-                    case 34, #include "nlix/init/files" break
-                    
-                    # Move to execution state
-                    case 35, KernelState0++, KernelState1 = 0
-                }
-                if (KernelState0 != 0) {
-                    break
+                    case 13, #include "nlix/init/autostart" break
+                    case 14, #include "nlix/init/fstab" break
+                    case 15, KState0 = 1 KState1 = 0 break
+                    default,
                 }
             }
             break
         
         case 1,
-            while (perf(KERNEL_PERF)) {
-                PId++
-                if (PId > Programs:count()) {
-                    PId = 1
-                }
-                
-                P = Programs[PId, table]
-                E = P["environment", table]
-                
-                PName = P:type()
-                switch (PName) {
-                    # Process kill function
-                    case "killself",            #include "nlix/programs/killself"                   break
+            if (Ps:count() > 0) {
+                while (perf(KPerf)) {
+                    KState1++
                     
-                    # System daemons
-                    case "hotplugd",            #include "nlix/programs/hotplugd"                   break
+                    if (KState1 > Ps:count()) {
+                        KState1 = 1
+                    }
                     
-                    # Drivers.
-                    case "driver-terminal",     #include "nlix/programs/drivers/driver-terminal"    break
-                    case "driver-keyboard",     #include "nlix/programs/drivers/driver-keyboard"    break
-                    case "driver-egp",          #include "nlix/programs/drivers/driver-egp"         break
-                    case "driver-cursor",       #include "nlix/programs/drivers/driver-cursor"      break
-                    case "driver-digi",         #include "nlix/programs/drivers/driver-digi"        break
-                    case "driver-gl",           #include "nlix/programs/drivers/driver-gl"          break
+                    P = Ps[KState1, table]
+                    local PName = P:type()
                     
-                    # Simplifier tools.
-                    case "simple-keyboard",     #include "nlix/programs/simple-keyboard"            break
-                    
-                    # Shells.
-                    case "sh",                  #include "nlix/programs/sh"                         break
-                    case "rund",                #include "nlix/programs/rund"                       break
-                    
-                    # Quit tools.
-                    case "halt",                #include "nlix/programs/halt"                       break
-                    case "reboot",              #include "nlix/programs/reboot"                     break
-                    case "exit",                #include "nlix/programs/exit"                       break
-                    
-                    # Classic console utilites.
-                    case "clear",               #include "nlix/programs/clear"                      break
-                    case "echo",                #include "nlix/programs/echo"                       break
-                    case "test",                #include "nlix/programs/test"                       break
-                    
-                    # Math
-                    case "bc",                  #include "nlix/programs/bc"                         break
-                    
-                    # Server utils
-                    case "server-info",         #include "nlix/programs/server-info"                break
-                    
-                    # Apps control.
-                    case "pkill",               #include "nlix/programs/pkill"                      break
-                    case "kill",                #include "nlix/programs/kill"                       break
-                    case "plist",               #include "nlix/programs/plist"                      break
-                    case "eventctl",            #include "nlix/programs/eventctl"                   break
-                    
-                    # Performande control and tests.
-                    case "perf",                #include "nlix/programs/perf"                       break
-                    case "overload",            #include "nlix/programs/overload"                   break
-                    case "ops",                 #include "nlix/programs/ops"                        break
-                    case "print-pi",            #include "nlix/programs/print-pi"                   break
-                    case "uptime",              #include "nlix/programs/uptime"                     break
-                    
-                    # Egp tests.
-                    case "egp-clocks",          #include "nlix/programs/egp-clocks"                 break
-                    case "egp-eyes",            #include "nlix/programs/egp-eyes"                   break
-                    
-                    # Window manager
-                    case "egp-wm",              #include "nlix/programs/egp-wm"                     break
-                    case "egp-wm-shell",        #include "nlix/programs/egp-wm-shell"               break
-                    
-                    # Workspace management
-                    case "environmentctl",      #include "nlix/programs/environmentctl"             break
-                    
-                    # Digital screen
-                    case "digi-scanner",        #include "nlix/programs/digi-scanner"               break
-                    
-                    # Egp 3d
-                    case "wustdd",              #include "nlix/programs/wustdd"                     break
-                    
-                    # Files
-                    case "ls",                  #include "nlix/programs/ls"                         break
-                    case "cat",                 #include "nlix/programs/cat"                        break
-                    case "touch",               #include "nlix/programs/touch"                      break
-                    case "cd",                  #include "nlix/programs/cd"                         break
-                    
-                    # http
-                    #ifdef httpRequest(string)
-                    case "wget",                #include "nlix/programs/wget"                       break
-                    #endif
-                    
-                    # Apps from windows 10.4
-                    #[case "AppDialog",           #include "Windows/Apps/AppDialog"                   break
-                    case "Settings",            #include "Windows/Apps/Settings"                    break
-                    case "TaskM",               #include "Windows/Apps/TaskM"                       break
-                    
-                    case "3Dengine",            #include "Windows/Apps/3Dengine"                    break
-                    case "Hluoix3D",            #include "Windows/Apps/Hluoix3D"                    break
-                    case "LineEdit",            #include "Windows/Apps/LineEdit"                    break
-                    
-                    case "Illusion",            #include "Windows/Apps/Illusion"                    break
-                    case "LoadAnim",            #include "Windows/Apps/LoadAnim"                    break
-                    
-                    case "Radar",               #include "Windows/Apps/Radar"                       break
-                    case "OscilloScp",          #include "Windows/Apps/OscilloScp"                  break
-                    case "ArrayM",              #include "Windows/Apps/ArrayM"                      break
-                    case "E2Editor",            #include "Windows/Apps/E2Editor"                    break
-                    
-                    case "Clicker",             #include "Windows/Apps/Clicker"                     break
-                    case "TicTacToe",           #include "Windows/Apps/TicTacToe"                   break
-                    case "PlayerRace",          #include "Windows/Apps/PlayerRace"                  break
-                    
-                    case "YourApp",             #include "Windows/Apps/YourApp"                     break
-                    case "HttpTest",            #include "Windows/Apps/HttpTest"                    break
-                    
-                    case "Diagrams",            #include "Windows/Apps/Diagrams"                    break
-                    case "Calculator",          #include "Windows/Apps/Calculator"                  break
-                    case "Chat",                #include "Windows/Apps/Chat"                        break
-                    case "Infometer",           #include "Windows/Apps/Infometer"                   break
-                    
-                    case "APITest",             #include "Windows/Apps/APITest"                     break
-                    case "PerfTest",            #include "Windows/Apps/PerfTest"                    break
-                    case "TableCMD",            #include "Windows/Apps/TableCMD"                    break]#
-                    
-                    default,
-                        #ThisProgram:programKill()
+                    switch (PName) {
+                        case "term",        #include "nlix/bin/term" break
+                        case "kbd",         #include "nlix/bin/kbd" break
+                        case "skbd",        #include "nlix/bin/skbd" break
+                        
+                        case "hotplugd",    #include "nlix/bin/hotplugd" break
+                        
+                        case "sh",          #include "nlix/bin/sh" break
+                        
+                        case "plist",       #include "nlix/bin/plist" break
+                        case "dlist",       #include "nlix/bin/dlist" break
+                        
+                        case "perf",        #include "nlix/bin/perf" break
+                        case "overload",    #include "nlix/bin/overload" break
+                        
+                        case "kill",        #include "nlix/bin/kill" break
+                        case "reboot",      #include "nlix/bin/reboot" break
+                        
+                        case "print-pi",    #include "nlix/bin/print-pi" break
+                        
+                        case "ls",          #include "nlix/bin/ls" break
+                        case "cat",         #include "nlix/bin/cat" break
+                        case "touch",       #include "nlix/bin/touch" break
+                        case "rm",          #include "nlix/bin/rm" break
+                        
+                        case "cp",          #include "nlix/bin/cp" break
+                        
+                        case "egp",         #include "nlix/bin/egp" break
+                        case "estart",      #include "nlix/bin/estart" break
+                        
+                        case "eclock",      #include "nlix/bin/eclock" break
+                        case "eeyes",       #include "nlix/bin/eeyes" break
+                        
+                        #ifdef httpRequest(string)
+                        case "wget",        #include "nlix/bin/wget" break
+                        #endif
+                        
+                        case "fs-table",    #include "nlix/bin/fs-table" break
+                        #ifdef fileRead()
+                        case "fs-real",     #include "nlix/bin/fs-real" break
+                        #endif
+                        
+                        case "bc",          #include "nlix/bin/bc" break
+                        
+                        case "killself",    end() break
+                        default,
+                            out("Program \"" + PName + "\" is not exist.\n")
+                            end()
+                            break
+                    }
                 }
             }
+            else {
+                runOnTick(0)
+            }
             break
-        
-        default,
-            KernelState0 = 0
-            KernelState1 = 0
     }
+    exit()
+}
+
+if (first()) {
+    KPerf = 10
+    runOnTick(1)
 }

@@ -1,0 +1,21 @@
+#
+# Created by scaled
+#
+
+@name libprogram
+
+function table exec(Name:string) {
+    Program = object(Name)
+    Ps:pushTable(Program)
+    return Program
+}
+
+function table:kill() {
+    This:setType("killself")
+}
+
+function end() {
+    Ps:removeTable(KState1):clear()
+    KState1--
+}
+

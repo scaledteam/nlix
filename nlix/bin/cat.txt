@@ -1,0 +1,42 @@
+#
+# Created by scaled
+#
+
+@name cat
+
+switch (P["state", number]) {
+    case 0,
+        if (argsExist()) {
+            P["path", string] = arg()
+            P["state", number] = 1
+        }
+        
+        elseif (wait()) {
+            P["path", string] = in()
+            P["state", number] = 1
+        }
+        
+        else {
+            out("Error: wrong path.\n")
+            end()
+        }
+        break
+    
+    case 1,
+        if (fsCall("read", P["path", string])) {
+            P["in", array] = P["fs", table]["out", array] = array()
+            P["state", number] = 2
+        }
+        else {
+            out("Error: filesystem don't exist in fstab.\n")
+            end()
+        }
+        break
+    
+    case 2,
+        if (wait()) {
+            out(in())
+            end()
+        }
+        break
+}

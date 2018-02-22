@@ -1,0 +1,15 @@
+#
+# Created by scaled
+#
+
+@name reboot
+
+while (Ps:count() > 0) {
+    Ps:popTable():clear()
+}
+
+G:clear()
+L:clear()
+S:clear()
+
+reset()

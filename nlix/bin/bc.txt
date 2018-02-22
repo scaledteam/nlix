@@ -1,0 +1,226 @@
+#
+# Created by scaled
+#
+
+@name bc
+
+switch (P["state", number]) {
+    case 0,
+        P["parts", array] = array()
+        P["depths", array] = array()
+        P["partsPoses", array] = array()
+        
+        if (!wait()) {
+            out("bc shell mode.\n")
+        }
+        
+        P["state", number] = 1
+        break
+    
+    # Get input
+    case 1,
+        if (wait()) {
+            local Input = in()
+            P["input", string] = Input
+            switch (Input) {
+                case "",
+                    break
+                
+                case "q", case "quit", case "exit",
+                    end()
+                    break
+                
+                default,
+                    P["state", number] = 2
+                    break
+            }
+        }
+        break
+    
+    # Compute
+    case 2,
+        P["state", number] = 3
+        
+        local Input = P["input", string]
+        
+        # Find depth and split by parts
+        local Depths = P["depths", array]
+        
+        local Parts = P["parts", array]
+        local PartPoses = P["partsPoses", array]
+        
+        local ThisDepth = 0
+        local LastPart = 0
+        
+        local Length = Input:length()
+        for (I = 1, Length) {
+            switch (Input[I]) {
+                case "(",
+                    Depths[I, number] = ThisDepth
+                    ThisDepth++
+                    
+                    Parts:pushString(Input:sub(LastPart + 1, I - 1))
+                    PartPoses:pushVector2(vec2(LastPart + 1, I - 1))
+                    LastPart = I
+                    break
+                
+                case ")",
+                    ThisDepth--
+                    Depths[I, number] = ThisDepth
+                    
+                    Parts:pushString(Input:sub(LastPart + 1, I - 1))
+                    PartPoses:pushVector2(vec2(LastPart + 1, I - 1))
+                    LastPart = I
+                    break
+                
+                default,
+                    Depths[I, number] = ThisDepth
+            }
+        }
+        Parts:pushString(Input:sub(LastPart + 1, Length))
+        PartPoses:pushVector2(vec2(LastPart + 1, Length))
+        
+        if (ThisDepth != 0) {
+            out("Error: Something wrong with brakets.\n")
+            P["state", number] = 1
+            break
+        }
+        
+        # Compute all parts
+        local PartExplode = array()
+        local PartActions = array()
+        
+        while (Parts:count() > 0) {
+            local Target = Depths:maxIndex()
+            for (I = 1, PartPoses:count()) {
+                if (Parts:count() == 1 | inrange(Target, PartPoses[I, vector2][1], PartPoses[I, vector2][2])) {
+                    if (Parts:count() > 1) {
+                        local PrevDepth = Depths[Target, number] - 1
+                        for (J = PartPoses[I, vector2][1], PartPoses[I, vector2][2]) {
+                            Depths[J, number] = PrevDepth
+                        }
+                    }
+                    
+                    # Compute part
+                    local Part = Parts[I, string]
+                    local LastDivider = 0
+                    
+                    # replace double minus
+                    while (Part:find("--")) {
+                        Part = Part:replace("--", "")
+                    }
+                    
+                    # Separate numbers
+                    for (J = 1, Part:length()) {
+                        local Char = Part[J]
+                        if (Char == "+" | Char == "*" | Char == "/" | Char == "^") {
+                            PartExplode:pushNumber(Part:sub(LastDivider + 1, J - 1):toNumber())
+                            LastDivider = J
+                            
+                            PartActions:pushString(Char)
+                        }
+                        elseif (Char == "-") {
+                            local PrevNumber = Part:sub(LastDivider + 1, J - 1):toNumber()
+                            if (PrevNumber != 0) {
+                                PartExplode:pushNumber(PrevNumber)
+                                LastDivider = J
+                                
+                                PartActions:pushString(Char)
+                            }
+                        }
+                    }
+                    PartExplode:pushNumber(Part:sub(LastDivider + 1):toNumber())
+                    
+                    # Replace actions on numbers
+                    ## ^
+                    local J = PartActions:count()
+                    while (J > 0) {
+                        if (PartActions[J, string] == "^") {
+                            PartExplode[J, number] = PartExplode[J, number] ^ PartExplode[J + 1, number]
+                            PartActions:remove(J)
+                            PartExplode:remove(J + 1)
+                            J -= 2
+                        }
+                        else {
+                            J--
+                        }
+                    }
+                    
+                    ## *, /
+                    J = 1
+                    while (J <= PartActions:count()) {
+                        if (PartActions[J, string] == "*") {
+                            PartExplode[J, number] = PartExplode[J, number] * PartExplode[J + 1, number]
+                            PartActions:remove(J)
+                            PartExplode:remove(J + 1)
+                        }
+                        elseif (PartActions[J, string] == "/") {
+                            PartExplode[J, number] = PartExplode[J, number] / PartExplode[J + 1, number]
+                            PartActions:remove(J)
+                            PartExplode:remove(J + 1)
+                        }
+                        else {
+                            J++
+                        }
+                    }
+                    
+                    ## +, -
+                    J = 1
+                    while (J <= PartActions:count()) {
+                        if (PartActions[J, string] == "+") {
+                            PartExplode[J, number] = PartExplode[J, number] + PartExplode[J + 1, number]
+                            PartActions:remove(J)
+                            PartExplode:remove(J + 1)
+                        }
+                        elseif (PartActions[J, string] == "-") {
+                            PartExplode[J, number] = PartExplode[J, number] - PartExplode[J + 1, number]
+                            PartActions:remove(J)
+                            PartExplode:remove(J + 1)
+                        }
+                        else {
+                            J++
+                        }
+                    }
+                    
+                    local ComputedPart = PartExplode[1, number]
+                    PartExplode:clear()
+                    PartActions:clear()
+                    
+                    if (Parts:count() > 1) {
+                        Parts[I - 1, string] = Parts[I - 1, string] + ComputedPart + Parts[I + 1, string]
+                        PartPoses[I - 1, vector2][2] = PartPoses[I + 1, vector2][2]
+                        
+                        Parts:remove(I)
+                        Parts:remove(I)
+                        PartPoses:remove(I)
+                        PartPoses:remove(I)
+                    }
+                    else {
+                        out(ComputedPart + "\n")
+                        
+                        P["depths", array]:clear()
+                        P["parts", array]:clear()
+                        P["partsPoses", array]:clear()
+                        
+                        P["state", number] = 1
+                    }
+                    
+                    break
+                }
+            }
+        }
+        
+        if (P["state", number] == 3) {
+            out("Error: Expression can't be computed.\n")
+            
+            P["state", number] = 1
+        }
+        break
+    
+    case 3,
+        out("Error: Tick quota.\n")
+        P["state", number] = 1
+        break
+        
+}
+

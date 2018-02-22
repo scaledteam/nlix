@@ -1,9 +1,0 @@
-#
-# Created by scaled
-#
-
-@name rund
-
-programStart(P["args", array][1, string])
-
-programKill()

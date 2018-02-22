@@ -1,8 +1,0 @@
-#
-# Created by scaled
-#
-
-@name touch
-
-afileWrite(P["args", array][1, string], "test")
-programKill()

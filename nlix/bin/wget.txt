@@ -1,0 +1,55 @@
+#
+# Created by scaled
+#
+
+@name wget
+
+switch (P["state", number]) {
+    case 0,
+        if (P["args", array]:count() < 1) {
+            out("Usage: wget [url] [file out]\n")
+            end()
+        }
+        else {
+            P["state", number] = 1
+        }
+        break
+    
+    case 1,
+        if (httpCanRequest()) {
+            local Arg = arg()
+            if (Arg:sub(1, 7) != "http://") {
+                Arg = "http://" + Arg
+                out("Target url is " + Arg + "\n")
+            }
+            
+            httpRequest(Arg)
+            P["state", number] = 2
+        }
+        break
+    
+    case 2,
+        if (httpCanRequest()) {
+            local Program = exec("touch")
+            
+            local Filename = arg()
+            if (Filename == "") {
+                Filename = "webpage"
+            }
+            Program["in", array] = array(Filename, httpData())
+            
+            #P:setIn(Program:setOut())
+            P["in", array] = Program["out", array] = array()
+            
+            P["state", number] = 3
+        }
+        break
+    
+    case 3,
+        if (wait()) {
+            out(in())
+            end()
+        }
+        break
+}
+

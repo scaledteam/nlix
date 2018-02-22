@@ -1,0 +1,19 @@
+#
+# Created by scaled
+#
+
+@name perf
+
+local ArgNumber = P["args", array]:shiftString():toNumber()
+if (ArgNumber != 0) {
+    if (S:exists("perf")) {
+        S["perf", number] = ArgNumber
+    }
+    else {
+        KPerf = ArgNumber
+    }
+}
+else {
+    out("Entered value is not a number or 0.\n")
+}
+end()

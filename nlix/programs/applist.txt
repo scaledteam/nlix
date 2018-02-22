@@ -1,8 +1,0 @@
-#
-# This E2 made by scaled
-#
-
-@name applist
-
-terminalPrintFast(APPS_INFO:keys():concat(", ") + "\n")
-appClose()

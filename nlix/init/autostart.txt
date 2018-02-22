@@ -1,39 +1,12 @@
 #
-# This E2 made by scaled
+# Created by scaled
 #
 
 @name autostart
 
-# Terminal
-local AUTOSTART = array(
-    "hotplugd",
-    "driver-terminal",
-    "driver-keyboard",
-    "simple-keyboard",
-    "sh"
-)
-
-# Egp
-#[local AUTOSTART = array(
-    "hotplugd",
-    "driver-egp",
-    "driver-cursor",
-    "driver-keyboard",
-    "egp-wm"
-)]#
-
-if (Programs:count() == 0) {
-    local Workspace = table()
+if (!Ps:isValid()) {
+    S["startTime", number] = systime()
     
-    foreach (I, ProgramName:string = AUTOSTART) {
-        Workspace:programStart(ProgramName)
-    }
+    exec("hotplugd")
+    exec("sh")
 }
-
-
-# Digi
-#[local Workspace = table()
-Workspace:pushTable(Port1:toDevice())
-
-Workspace:programStart("driver-digi")
-Workspace:programStart("digi-scanner")]#

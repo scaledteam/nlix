@@ -1,0 +1,79 @@
+#
+# Created by scaled
+#
+
+@name hotplugd
+
+@inputs [Port1 Port2 Port3 Port4]:wirelink
+@persist PORTS_COUNT
+PORTS_COUNT = 4
+
+# hot plug
+if (!L:exists("hotplugd")) {
+    L["hotplugd", table] = table()
+}
+
+P = L["hotplugd", table]
+
+switch (P["state", number]) {
+    case 0,
+        if (!S:exists("devices")) {
+            S["devices", table] = table()
+            S["devicesById", table] = table()
+        }
+        P["state", number] = 1
+        break
+    
+    case 1,
+        local Counter = P["counter", number] + 1
+        
+        if (Counter > PORTS_COUNT) {
+            Counter = 1
+        }
+        
+        local Port = select(Counter,
+            Port1,
+            Port2,
+            Port3,
+            Port4
+        )
+        
+        if (Port != P["portOld" + Counter, wirelink]) {
+            if (Port != nowirelink()) {
+                # Check if device exists
+                local Type = Port:entity():type()
+                
+                if (!S["devices", table]:exists(Type)) {
+                    S["devices", table][Type, array] = array()
+                    
+                    S["devices", table][Type, array]:pushWirelink(Port)
+                    S["devicesById", table][Port:entity():id(), wirelink] = Port
+                }
+                elseif (S["devicesById", table][Port:entity():id(), wirelink] != Port) {
+                    S["devices", table][Type, array]:pushWirelink(Port)
+                    S["devicesById", table][Port:entity():id(), wirelink] = Port
+                }
+                #[else {
+                    local DeviceExists = 0
+                    
+                    local Devices = S["devices", table][Type, array]
+                    for (I = 1, Devices:count()) {
+                        local Device = Devices[I, wirelink]
+                        if (Device == Port) {
+                            DeviceExists = 1
+                            break
+                        }
+                    }
+                    
+                    if (!DeviceExists) {
+                        Devices:pushWirelink(Port)
+                    }
+                }]#
+            }
+            
+            P["portOld" + Counter, wirelink] = Port
+        }
+        
+        P["counter", number] = Counter
+        break
+}

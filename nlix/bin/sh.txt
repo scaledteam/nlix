@@ -1,0 +1,100 @@
+#
+# Created by scaled
+#
+
+@name sh
+
+switch (P["state", number]) {
+    case 0,
+        # init keyboard and terminal
+        local Program = exec("term")
+        P["out", array] = Program["in", array] = array()
+        
+        Program = exec("kbd")
+        P["kbd", array] = Program["out", array] = array()
+        
+        # init simple keyboard
+        Program = exec("skbd")
+        Program["kbd", array] = P["kbd", array]
+        Program["term", array] = P["out", array]
+        
+        P["in", array] = Program["out", array] = array()
+        
+        # Welcome message
+        out("Welcome to the Nlix operating system!\n")
+        
+        # move to next state
+        P["state", number] = 1
+        break
+    
+    case 1,
+        out("$ ")
+        P["state", number] = 2
+        break
+    
+    case 2,
+        if (wait()) {
+            local Command = in()
+            switch (Command) {
+                case "",
+                    P["state", number] = 1
+                    break
+                
+                case "exit",
+                    out("Exit don't work, sorry.\n")
+                    P["state", number] = 1
+                    break
+                
+                default,
+                    local CommandExplode = Command:trim():explode(" ")
+                    
+                    local I = 1
+                    while (I < CommandExplode:count()) {
+                        if (CommandExplode[I, string] == "") {
+                            CommandExplode:remove(I)
+                        }
+                        else {
+                            I++
+                        }
+                    }
+                    
+                    #local Program = exec(CommandExplode:shiftString()):in2in(P):out2out(P)
+                    local Program = exec(CommandExplode:shiftString())
+                    Program["in", array] = P["in", array]
+                    Program["out", array] = P["out", array]
+                    
+                    if (CommandExplode:count() > 0) {
+                        Program["args", array] = CommandExplode
+                    }
+                    
+                    P["program", table] = Program
+                    P["state", number] = 3
+                }
+        }
+        break
+    
+    case 3,
+        if (!P["program", table]:isValid()) {
+            P["state", number] = 1
+        }
+        
+        if (P["kbd", array][1, number] == 158) {
+            switch (toChar(P["kbd", array][2, number])) {
+                case "c",
+                    P["program", table]:kill()
+                    break
+                
+                case "z",
+                    P["program", table]["in", array]:pushString("exit")
+                    break
+                
+                case "x",
+                    P["state", number] = 1
+                    break
+                
+                default,
+            }
+            #Kbd:clear()
+        }
+        break
+}

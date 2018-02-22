@@ -1,0 +1,25 @@
+#
+# Created by scaled
+#
+
+@name fstab
+
+if (!S:exists("fstab")) {
+    S["fstab", table] = table()
+    
+    S["G", table] = G
+    S["P", table] = Ps
+    
+    S["fstab", table]["/", table] = object("table")
+    S["fstab", table]["/", table]["table", table] = S
+    
+    #ifdef fileRead()
+    S["rdir", table] = table()
+    S["fstab", table]["/rdir", table] = object("real")
+    S["fstab", table]["/rdir", table]["path", string] = "/"
+    
+    S["e2shared", table] = table()
+    S["fstab", table]["/e2shared", table] = object("real")
+    S["fstab", table]["/e2shared", table]["path", string] = ">e2shared/"
+    #endif
+}

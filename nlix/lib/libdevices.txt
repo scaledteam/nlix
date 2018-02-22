@@ -1,0 +1,25 @@
+#
+# Created by scaled
+#
+
+@name libdevices
+
+function number deviceGet(Type:string) {
+    if (S["devices", table]:exists(Type)) {
+        local Devices = S["devices", table][Type, array]
+        
+        while (Devices:count() > 0) {
+            local Device = Devices:shiftWirelink()
+            if (Device != nowirelink()) {
+                P["device", wirelink] = Device
+                P["deviceType", string] = Type
+                return 1
+            }
+        }
+    }
+    return 0
+}
+
+function deviceReturn() {
+    S["devices", table][P["deviceType", string], array]:pushWirelink(P["device", wirelink])
+}

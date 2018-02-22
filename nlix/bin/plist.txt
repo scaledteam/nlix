@@ -1,0 +1,12 @@
+#
+# Created by scaled
+#
+
+@name plist
+
+local List = ""
+for (I = 1, Ps:count()) {
+    List += I + ": " + Ps[I, table]:type() + "\n"
+}
+out(List)
+end()

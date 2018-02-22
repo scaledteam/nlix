@@ -1,0 +1,160 @@
+#
+# Created by scaled
+#
+
+@name egp
+
+switch (P["state", number]) {
+    case 0,
+        P["objects", table] = table()
+        P["limit", number] = min(150, egpMaxObjects())
+        
+        P["state", number] = 1
+        break
+    
+    case 1,
+        local Device = P["device", wirelink]
+        local Objects = P["objects", table]
+        
+        for (I = 1, Overload) {
+            local Object = object("box")
+            Object["color", vector] = vec(255)
+            Objects:pushTable(Object)
+            
+            if (Objects:count() >= P["limit", number]) {
+                P["state", number] = 2
+                break
+            }
+        }
+        break
+    
+    case 2,
+        if (deviceGet("gmod_wire_egp")) {
+            local Device = P["device", wirelink]
+            
+            P["res", vector2] = P["out", array][1, vector2] = vec2(512)
+            
+            Device:egpClear()
+            Device:egpDrawTopLeft(1)
+            Device:egpResolution(vec2(), P["res", vector2])
+            
+            P["counter", number] = P["limit", number]
+            P["state", number] = 3
+        }
+        break
+    
+    case 3,
+        local Device = P["device", wirelink]
+        local Objects = P["objects", table]
+        local Counter = 0
+        
+        for (I = 1, Overload) {
+            Counter = P["counter", number]
+            
+            P["in", array]:unshiftNumber(Counter)
+            P["in", array]:unshiftString("update")
+            
+            if (Counter <= 1) {
+                P["state", number] = 4
+                break
+            }
+        }
+        P["counter", number] = Counter - 1
+        break
+    
+    case 4,
+        local In = P["in", array]
+        local Device = P["device", wirelink]
+        local Objects = P["objects", table]
+        
+        if (Device) {
+            for (I = 1, Overload) {
+                if (wait()) {
+                    local Command = in()
+                    local Id = In:shiftNumber()
+                    local Object = Objects[Id, table]
+                    
+                    switch (Command) {
+                        case "box",
+                            Object:setType(Command)
+                            Object["pos", vector2] = In:shiftVector2()
+                            Object["size", vector2] = In:shiftVector2()
+                            Device:egpBox(Id, Object["pos", vector2], Object["size", vector2])
+                            Device:egpColor(Id, Object["color", vector])
+                            break
+                        
+                        case "circle",
+                            Object:setType(Command)
+                            Object["pos", vector2] = In:shiftVector2()
+                            Object["size", vector2] = In:shiftVector2()
+                            Device:egpCircle(Id, Object["pos", vector2], Object["size", vector2])
+                            Device:egpColor(Id, Object["color", vector])
+                            break
+                        
+                        case "line",
+                            Object:setType(Command)
+                            Object["pos", vector2] = In:shiftVector2()
+                            Object["size", vector2] = In:shiftVector2()
+                            Device:egpLine(Id, Object["pos", vector2], Object["size", vector2])
+                            Device:egpColor(Id, Object["color", vector])
+                            break
+                        
+                        case "text",
+                            Object:setType(Command)
+                            Object["text", string] = In:shiftString()
+                            Object["pos", vector2] = In:shiftVector2()
+                            Object["size", vector2] = In:shiftVector2()
+                            Device:egpTextLayout(Id, Object["text", string], Object["pos", vector2], Object["size", vector2])
+                            Device:egpColor(Id, Object["color", vector])
+                            break
+                        
+                        case "update",
+                            local Type = Object:type()
+                            
+                            switch (Type) {
+                               case "box",      Device:egpBox(Id, Object["pos", vector2], Object["size", vector2]) break
+                               case "circle",   Device:egpCircle(Id, Object["pos", vector2], Object["size", vector2]) break
+                               case "line",     Device:egpLine(Id, Object["pos", vector2], Object["size", vector2]) break
+                               case "text",     Device:egpTextLayout(Id, Object["text", string], Object["pos", vector2], Object["size", vector2]) break
+                            }
+                            Device:egpColor(Id, Object["color", vector])
+                            break
+                        
+                        case "color",
+                            Object[Command, vector] = In:shiftVector()
+                            Device:egpColor(Id, Object[Command, vector])
+                            break
+                        
+                        case "pos",
+                            Object[Command, vector2] = In:shiftVector2()
+                            Device:egpPos(Id, Object[Command, vector2])
+                            break
+                        
+                        case "size",
+                            Object[Command, vector2] = In:shiftVector2()
+                            Device:egpSize(Id, Object[Command, vector2])
+                            break
+                        
+                        case "sizeNumber",
+                            Object[Command, number] = In:shiftNumber()
+                            Device:egpSize(Id, Object[Command, number])
+                            break
+                        
+                        case "setText",
+                            Object[Command, string] = In:shiftString()
+                            Device:egpSetText(Id, Object[Command, string])
+                            break
+                        
+                        default,
+                    }
+                }
+            }
+            
+            # Cursor
+            P["out", array][2, vector2] = Device:egpCursor(owner())
+        }
+        else {
+            P["state", number] = 2
+        }
+        break
+}

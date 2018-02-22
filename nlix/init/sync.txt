@@ -1,0 +1,15 @@
+#
+# Created by scaled
+#
+
+@name sync
+@persist SYSTEM_NAME:string
+
+if (G:exists(SYSTEM_NAME)) {
+    S = G[SYSTEM_NAME, table]
+    Ps = S["P", table]
+}
+else {
+    G[SYSTEM_NAME, table] = S
+    S["P", table] = Ps
+}

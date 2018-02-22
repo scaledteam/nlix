@@ -1,0 +1,54 @@
+#
+# Created by scaled
+#
+
+@name skbd
+
+local Keys = P["kbd", array]
+local KeysOld = P["kbdOld", array]
+
+if (Keys:count() > 0 | KeysOld:count() > 0) {
+    if (!P:exists("kbdOld")) {
+        KeysOld = P["kbdOld", array] = array()
+    }
+    
+    if (Keys:count() >= KeysOld:count()) {
+        for (I = 1, Keys:count()) {
+            local Key = Keys[I, number]
+            if (Key != KeysOld[I, number]) {
+                switch (Key) {
+                    # Enter
+                    case 10, case 13, case 142,
+                        P["term", array]:pushString("\n")
+                        
+                        P["out", array]:pushString(P["text", string])
+                        P["text", string] = ""
+                        break
+                    
+                    # Backspace
+                    case 127,
+                        if (P["text", string]:length() > 0) {
+                            P["term", array]:pushString(ERASE1)
+                            P["text", string] = P["text", string]:sub(1, -2)
+                        }
+                        break
+                    
+                    # Normal key
+                    default,
+                        if (inrange(Key, 32, 127)) {
+                            local Char = toChar(Key)
+                            
+                            P["text", string] = P["text", string] + Char
+                            
+                            P["term", array]:pushString(Char)
+                        }
+                }
+            }
+        }
+    }
+    
+    KeysOld:clear()
+    for (I = 1, Keys:count()) {
+        KeysOld[I, number] = Keys[I, number]
+    }
+}

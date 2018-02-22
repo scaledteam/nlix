@@ -1,0 +1,15 @@
+#
+# Created by scaled
+#
+
+@name g
+
+local Gtable = gTable("nlix")
+
+if (Gtable["GExists", number]) {
+    G = Gtable["G", table]
+}
+else {
+    Gtable["G", table] = G
+    Gtable["GExists", number] = 1
+}

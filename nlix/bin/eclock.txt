@@ -1,0 +1,26 @@
+#
+# Created by scaled
+#
+
+@name eclock
+
+switch (P["state", number]) {
+    case 0,
+        if (egpReady()) {
+            egpBox(1, vec2(), egpResolution())
+            egpText(2, "waiting for a time", vec2(), egpResolution())
+            egpColor(2, vec())
+            
+            P["nextUpdate", number] = systime()
+            
+            P["state", number] = 1
+        }
+        break
+    
+    case 1,
+        if (systime() > P["nextUpdate", number]) {
+            egpText(2, format("%02d:%02d, %d-%02d-%02d", time("hour"), time("min"), time("year"), time("month"), time("day")))
+            P["nextUpdate", number] = P["nextUpdate", number] + 60 - time("sec")
+        }
+        break
+}

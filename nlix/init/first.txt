@@ -1,9 +1,0 @@
-#
-# Created by scaled
-#
-
-@name first
-
-runOnTick(1)
-KERNEL_PERF = 30
-KERNEL_OVERLOAD = 5

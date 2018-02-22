@@ -1,0 +1,74 @@
+#
+# Created by scaled
+#
+
+@name eeyes
+
+switch (P["state", number]) {
+    case 0,
+        if (egpReady()) {
+            local Res = egpResolution()
+            # Background
+            egpBox(1, vec2(), Res)
+            
+            # Left eye
+            local Center = Res * vec2(0.25, 0.5)
+            egpCircle(2, Center, Res * vec2(0.25, 0.5))
+            egpColor(2, vec())
+            egpCircle(3, Center, Res * vec2(0.225, 0.45))
+            
+            egpCircle(6, Center, Res * vec2(0.05))
+            egpColor(6, vec())
+            
+            # Right eye
+            Center = Res * vec2(0.75, 0.5)
+            egpCircle(4, Center, Res * vec2(0.25, 0.5))
+            egpColor(4, vec())
+            egpCircle(5, Center, Res * vec2(0.225, 0.45))
+            
+            egpCircle(7, Center, Res * vec2(0.05))
+            egpColor(7, vec())
+            
+            P["state", number] = 1
+        }
+        break
+    
+    case 1,
+        if (egpWait()) {
+            local CursorPos = egpCursor()
+            local Res = egpResolution()
+            if (P["cursorPosOld", vector2] != CursorPos) {
+                if (CursorPos == vec2(-1)) {
+                    egpPos(6, Res * vec2(0.25, 0.5))
+                    egpPos(7, Res * vec2(0.75, 0.5))
+                }
+                else {
+                    local RadiusX = Res[1] / 2
+                    local RadiusY = Res[2]
+                    local Aspect = RadiusY / RadiusX
+                    
+                    local Offset1 = Res * vec2(0.25, 0.5)
+                    local Offset2 = Res * vec2(0.75, 0.5)
+                    
+                    local Direction1 = CursorPos - Offset1
+                    local Direction2 = CursorPos - Offset2
+                    
+                    local Eye1Pos = Direction1 / sqrt(Direction1[1] ^ 2 + (Direction1[2] / Aspect) ^ 2) * RadiusX / 2
+                    local Eye2Pos = Direction2 / sqrt(Direction2[1] ^ 2 + (Direction2[2] / Aspect) ^ 2) * RadiusX / 2
+                    
+                    if (Eye1Pos:length() > Direction1:length()) {
+                        Eye1Pos = Direction1
+                    }
+                    if (Eye2Pos:length() > Direction2:length()) {
+                        Eye2Pos = Direction2
+                    }
+                    
+                    egpPos(6, Eye1Pos + Offset1)
+                    egpPos(7, Eye2Pos + Offset2)
+                    
+                    P["cursorPosOld", vector2] = CursorPos
+                }
+            }
+        }
+        break
+}

@@ -1,0 +1,15 @@
+#
+# Created by scaled
+#
+
+@name kill
+
+local Arg = P["args", array]:shiftString():toNumber()
+if (Arg != 0) {
+    Ps:removeTable(Arg):clear()
+    KState1--
+}
+else {
+    out("Entered value is not a number or 0.\n")
+}
+end()

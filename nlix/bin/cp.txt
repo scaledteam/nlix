@@ -1,0 +1,25 @@
+#
+# Created by scaled
+#
+
+@name cp
+
+switch (P["state", number]) {
+    case 0,
+        local Program = exec("cat")
+        #P:setIn(Program:setOut())
+        P["in", array] = Program["out", array] = array()
+        #Program:setIn(array(arg()))
+        Program["in", array] = array(arg())
+        P["state", number] = 1
+        break
+    
+    case 1,
+        if (wait()) {
+            #exec("touch"):setIn(array(arg(), in():sub(1, -2)))
+            local Program = exec("touch")
+            Program["in", array] = array(arg(), in():sub(1, -2))
+            end()
+        }
+        break
+}

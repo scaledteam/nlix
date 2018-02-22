@@ -1,0 +1,21 @@
+#
+# Created by scaled
+#
+
+@name estart
+
+local Arg = arg()
+
+if (Arg == "") {
+    out("Usage: estart [egp program name]\n")
+    end()
+}
+else {
+    local Driver = exec("egp")
+    local Program = exec(Arg)
+    
+    Driver["in", array] = Program["out", array] = array()
+    Driver["out", array] = Program["in", array] = array()
+    
+    end()
+}
