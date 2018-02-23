@@ -38,3 +38,11 @@ function string arg() {
 function number argsExist() {
     return P["args", array]:count() > 0
 }
+
+#[function kbdGet() {
+    if (!P:exists("kbd")) {
+        local Program = exec("kbd")
+        P["kbd", array] = Program["out", array] = array()
+        P["kbd-in", array] = Program["in", array] = array()
+    }
+}]#

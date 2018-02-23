@@ -82,14 +82,15 @@ if (tickClk()) {
                         case "eeyes",       #include "nlix/bin/eeyes" break
                         
                         case "etitles",     #include "nlix/bin/etitles" break
+                        case "eterm",       #include "nlix/bin/eterm" break
                         
                         #ifdef httpRequest(string)
                         case "wget",        #include "nlix/bin/wget" break
                         #endif
                         
-                        case "fs-table",    #include "nlix/bin/fs-table" break
+                        case "fstable",    #include "nlix/bin/fstable" break
                         #ifdef fileRead()
-                        case "fs-real",     #include "nlix/bin/fs-real" break
+                        case "fsreal",     #include "nlix/bin/fsreal" break
                         #endif
                         
                         case "bc",          #include "nlix/bin/bc" break

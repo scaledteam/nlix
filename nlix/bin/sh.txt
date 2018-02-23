@@ -7,20 +7,23 @@
 switch (P["state", number]) {
     case 0,
         # init keyboard and terminal
-        local Program = exec("term")
-        P["out", array] = Program["in", array] = array()
+        if (!P:exists("out")) {
+            local Program = exec("term")
+            P["out", array] = Program["in", array] = array()
+        }
         
-        Program = exec("kbd")
-        P["kbd", array] = Program["out", array] = array()
-        P["kbd-in", array] = Program["in", array] = array()
-        Program
-        
-        # init simple keyboard
-        Program = P["skbd", table] = exec("skbd")
-        Program["kbd", array] = P["kbd", array]
-        Program["term", array] = P["out", array]
-        
-        P["in", array] = Program["out", array] = array()
+        if (!P:exists("in")) {
+            local Program = exec("kbd")
+            P["kbd", array] = Program["out", array] = array()
+            P["kbd-in", array] = Program["in", array] = array()
+            
+            # init simple keyboard
+            Program = P["skbd", table] = exec("skbd")
+            Program["kbd", array] = P["kbd", array]
+            Program["term", array] = P["out", array]
+            
+            P["in", array] = Program["out", array] = array()
+        }
         
         # Welcome message
         out("Welcome to the Nlix operating system!\n")
@@ -47,6 +50,11 @@ switch (P["state", number]) {
                     P["kbd-in", array]:pushString(EXIT)
                     P["skbd", table]:clear()
                     end()
+                    break
+                
+                case "term",
+                    exec("sh")
+                    P["state", number] = 1
                     break
                 
                 default,

@@ -2,7 +2,7 @@
 # Created by scaled
 #
 
-@name fs-real
+@name fsreal
 
 if (P["fs", table]:exists("path")) {
     switch (P["mode", string]) {

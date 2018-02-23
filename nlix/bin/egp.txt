@@ -127,6 +127,7 @@ switch (P["state", number]) {
                             Object["pos", vector2] = In:shiftVector2()
                             Object["size", vector2] = In:shiftVector2()
                             Device:egpTextLayout(Id, Object["text", string], Object["pos", vector2], Object["size", vector2])
+                            Device:egpFont(Id, "Courier New")
                             Device:egpColor(Id, Object["color", vector])
                             if (Object:exists("parent")) {
                                 Device:egpParent(Id, Object["parent", number])
@@ -216,7 +217,36 @@ switch (P["state", number]) {
             }
             
             # Cursor
-            P["out", array][3, vector2] = Device:egpCursor(owner())
+            if (systime() > P["timer1000", number]) {
+                #ifdef findByClass(string)
+                
+                findByClass("player")
+                findSortByDistance(Device:entity():pos())
+                P["user", entity] = find()
+                
+                #else
+                
+                local ScreenPos = Device:entity():pos()
+                
+                local User = owner():pos()
+                local Distance = ScreenPos:distance(User)
+                
+                foreach (I, Player:entity = players()) {
+                    local TempDistance = ScreenPos:distance(Player:pos())
+                    if (TempDistance < Distance) {
+                        Distance = TempDistance
+                        User = Player
+                    }
+                }
+                
+                P["user", entity] = User
+                
+                #endif
+                
+                P["timer1000", number] = systime() + 1
+            }
+            
+            P["out", array][3, vector2] = Device:egpCursor(P["user", entity])
         }
         else {
             P["state", number] = 2

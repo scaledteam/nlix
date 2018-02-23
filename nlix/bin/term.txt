@@ -16,6 +16,12 @@ switch (P["state", number]) {
             if (!P:exists("resolution")) {
                 P["resolution", vector2] = vec2(10, 5)
             }
+            else {
+                local Resolution = P["resolution", vector2]
+                if (!(Resolution == Resolution) | Resolution[1] == 0 | Resolution[2] == 0) {
+                    P["resolution", vector2] = vec2(10, 5)
+                }
+            }
             P["deviceType", string] = "out"
             P["state", number] = 2
         }

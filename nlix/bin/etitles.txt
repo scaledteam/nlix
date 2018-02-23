@@ -13,6 +13,7 @@ switch (P["state", number]) {
                 egpColor(1, randvec(160, 190))
                 
                 P["PDatas", table] = table()
+                
                 P["state", number] = 1
             }
             else {
@@ -30,7 +31,7 @@ switch (P["state", number]) {
             local PData = table()
             local EgpParentId = 2
             local EgpId = PData["egpId", number] = EgpParentId + 1
-            local EgpPos = PData["egpPos", vector2] = vec2()
+            local EgpPos = PData["egpPos", vector2] = egpResolution() * vec2(0.025)
             local EgpCount = PData["egpCount", number] = int(egpMax() / MaxTitles) - 2
             
             local Program = exec("eeyes")
@@ -49,7 +50,7 @@ switch (P["state", number]) {
             PData = table()
             EgpParentId = 2 + int(egpMax() * 1 / MaxTitles)
             EgpId = PData["egpId", number] = EgpParentId + 1
-            EgpPos = PData["egpPos", vector2] = egpResolution() * vec2(0.5, 0)
+            EgpPos = PData["egpPos", vector2] = egpResolution() * vec2(0.525, 0.025)
             EgpCount = PData["egpCount", number] = int(egpMax() / MaxTitles) - 2
             
             Program = exec("eclock")
@@ -68,10 +69,10 @@ switch (P["state", number]) {
             PData = table()
             EgpParentId = 2 + int(egpMax() * 2 / MaxTitles)
             EgpId = PData["egpId", number] = EgpParentId + 1
-            EgpPos = PData["egpPos", vector2] = egpResolution() * vec2(0, 0.5)
+            EgpPos = PData["egpPos", vector2] = egpResolution() * vec2(0.025, 0.525)
             EgpCount = PData["egpCount", number] = int(egpMax() / MaxTitles) - 2
             
-            Program = exec("etitles")
+            Program = exec("eterm")
             PData["in", array] = Program["in", array] = array(egpResolution() / 2 * 0.95, EgpCount)
             PData["out", array] = Program["out", array] = array()
             

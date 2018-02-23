@@ -1,0 +1,30 @@
+#
+# Created by scaled
+#
+
+@name eterm
+
+switch (P["state", number]) {
+    case 0,
+        if (egpReady()) {
+            egpBox(1, vec2(), egpResolution())
+            egpColor(1, vec(40, 40, 50))
+            
+            egpText(2, "", vec2(), egpResolution())
+            
+            local Term = exec("term")
+            Term["resolution", vector2] = floor(vec2(56, 28) * egpResolution() / vec2(512))
+            P["in", array] = Term["out", array] = array()
+            
+            local Sh = exec("sh")
+            Sh["out", array] = Term["in", array] = array()
+            P["state", number] = 1
+        }
+        break
+    
+    case 1,
+        if (wait()) {
+            egpText(2, in())
+        }
+        break
+}
