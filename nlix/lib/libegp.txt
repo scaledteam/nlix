@@ -78,13 +78,28 @@ function egpColor(Id, Color:vector) {
     P["out", array]:pushVector(Color)
 }
 
+function egpParent(Id, Id2) {
+    P["out", array]:pushString("parent")
+    P["out", array]:pushNumber(Id)
+    P["out", array]:pushNumber(Id2)
+}
+
+function egpRemove(Id) {
+    P["out", array]:pushString("remove")
+    P["out", array]:pushNumber(Id)
+}
+
 # Input
 function vector2 egpResolution() {
     return P["in", array][1, vector2]
 }
 
+function number egpMax() {
+    return P["in", array][2, number]
+}
+
 function vector2 egpCursor() {
-    return P["in", array][2, vector2]
+    return P["in", array][3, vector2]
 }
 
 function number egpWait() {

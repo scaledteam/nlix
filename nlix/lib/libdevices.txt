@@ -5,7 +5,7 @@
 @name libdevices
 
 function number deviceGet(Type:string) {
-    if (S["devices", table]:exists(Type)) {
+    if (S["devices", table]:exists(Type) & (!P:exists("device") | P["device", wirelink] == nowirelink())) {
         local Devices = S["devices", table][Type, array]
         
         while (Devices:count() > 0) {

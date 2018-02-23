@@ -12,9 +12,11 @@ switch (P["state", number]) {
         
         Program = exec("kbd")
         P["kbd", array] = Program["out", array] = array()
+        P["kbd-in", array] = Program["in", array] = array()
+        Program
         
         # init simple keyboard
-        Program = exec("skbd")
+        Program = P["skbd", table] = exec("skbd")
         Program["kbd", array] = P["kbd", array]
         Program["term", array] = P["out", array]
         
@@ -41,8 +43,10 @@ switch (P["state", number]) {
                     break
                 
                 case "exit",
-                    out("Exit don't work, sorry.\n")
-                    P["state", number] = 1
+                    out(EXIT)
+                    P["kbd-in", array]:pushString(EXIT)
+                    P["skbd", table]:clear()
+                    end()
                     break
                 
                 default,
@@ -81,7 +85,7 @@ switch (P["state", number]) {
         if (P["kbd", array][1, number] == 158) {
             switch (toChar(P["kbd", array][2, number])) {
                 case "c",
-                    P["program", table]:kill()
+                    P["program", table]:clear()
                     break
                 
                 case "z",

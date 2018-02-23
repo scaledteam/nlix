@@ -5,4 +5,4 @@
 @name liboverload
 @persist Overload
 
-Overload = 5
+Overload = 20

@@ -1,0 +1,15 @@
+#
+# Created by scaled
+#
+
+@name poweroff
+
+while (Ps:count() > 0) {
+    Ps:popTable():clear()
+}
+
+G:clear()
+L:clear()
+S:clear()
+
+runOnTick(0)

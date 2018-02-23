@@ -1,0 +1,46 @@
+#
+# Created by scaled
+#
+
+@name surl
+
+local Arg = arg():lower()
+switch (Arg) {
+    case "url", 
+        local Url = arg()
+        if (Url:sub(1, 7) != "http://") {
+            Url = "http://" + Url
+            out("Target url is " + Url + "\n")
+        }
+        soundURLload("nlix-surl", Url, 1000, 0, entity())
+        soundURLparent("nlix-surl", entity())
+        out("Music started.\n")
+        break
+    
+    case "stop", 
+        soundURLdelete("nlix-surl")
+        out("Music stoped.\n")
+        break
+    
+    case "resume", 
+        soundURLplay("nlix-surl")
+        out("Music resumed.\n")
+        break
+    
+    case "pause", 
+        soundURLpause("nlix-surl")
+        out("Music paused.\n")
+        break
+    
+    default,
+        out(
+            "Usage: surl [command]:\n"
+            + "Commands:\n"
+            + "url [url string]\n"
+            + "stop\n"
+            + "resume\n"
+            + "pause\n"
+        )
+}
+
+end()

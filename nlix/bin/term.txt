@@ -80,7 +80,7 @@ switch (P["state", number]) {
                         }
                         break
                     
-                    case ERASE,
+                    #[case ERASE,
                         local EraseCount = P["in", array]:shiftNumber()
                         
                         Update = 1
@@ -109,10 +109,32 @@ switch (P["state", number]) {
                                 P["text", string] = Text = Text:sub(1, -2 - StringCount)
                             }
                         }
-                        break
+                        break]#
                     
-                    case "exit",
+                    case EXIT,
                         deviceReturn()
+                        local DeviceType = P["deviceType", string]
+                        switch (DeviceType) {
+                            case "gmod_wire_egp",
+                                Device:egpClear()
+                                break
+                            
+                            case "gmod_wire_consolescreen",
+                                Device[2041] = 1
+                                break
+                                    
+                            case "gmod_wire_textscreen",
+                                Device["String", string] = ""
+                                break
+                            
+                            case "out",
+                                P["out", array]:pushString(EXIT)
+                                break
+                            
+                            default,
+                        }
+                        
+                        P["deviceType", string] = ""
                         end()
                         break
                     
@@ -141,7 +163,7 @@ switch (P["state", number]) {
                         }
                         elseif (NewTextExpCount > P["resolution", vector2][2]) {
                             TextR:clear()
-                            NewTextExp = NewTextExp:concat("\n", max(0, NewTextExpCount - P["resolution", vector2][2])):explode("\n")
+                            NewTextExp = NewTextExp:concat("\n", NewTextExpCount - P["resolution", vector2][2] + 1):explode("\n")
                             
                             foreach (I, NewText2:string = NewTextExp) {
                                 for (I = 0, NewText2:length() / Width) {
@@ -190,6 +212,8 @@ switch (P["state", number]) {
                     case "out",
                         P["out", array]:pushString(Text)
                         break
+                    
+                    default,
                  }
             }
         }

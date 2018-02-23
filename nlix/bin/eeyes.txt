@@ -36,8 +36,9 @@ switch (P["state", number]) {
     case 1,
         if (egpWait()) {
             local CursorPos = egpCursor()
-            local Res = egpResolution()
             if (P["cursorPosOld", vector2] != CursorPos) {
+                local Res = egpResolution()
+                
                 if (CursorPos == vec2(-1)) {
                     egpPos(6, Res * vec2(0.25, 0.5))
                     egpPos(7, Res * vec2(0.75, 0.5))

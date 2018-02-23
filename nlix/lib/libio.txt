@@ -3,10 +3,11 @@
 #
 
 @name libio
-@persist [ERASE ERASE1]:string
+@persist [ERASE ERASE1 EXIT]:string
 
-ERASE  = toChar(15) + "erase"
+#ERASE  = toChar(15) + "erase"
 ERASE1 = toChar(15) + "erase1"
+EXIT   = toChar(15) + "exit"
 
 function out(Text:string) {
     P["out", array]:pushString(Text)
@@ -24,10 +25,10 @@ function erase() {
     P["out", array]:pushString(ERASE1)
 }
 
-function erase(Count) {
+#[function erase(Count) {
     P["out", array]:pushString(ERASE)
     P["out", array]:pushNumber(Count)
-}
+}]#
 
 
 function string arg() {
@@ -36,46 +37,4 @@ function string arg() {
 
 function number argsExist() {
     return P["args", array]:count() > 0
-}
-
-
-#[function array table:setOut(Out:array) {
-    This["out", array] = Out
-    return Out
-}
-
-function array table:setIn(In:array) {
-    This["in", array] = In
-    return In
-}
-
-function array table:setOut() {
-    This["out", array] = array()
-    return This["out", array]
-}
-
-function array table:setIn() {
-    This["in", array] = array()
-    return This["in", array]
-}
-
-
-function table table:out2in(Parent:table) {
-    This["out", array] = Parent["in", array]
-    return This
-}
-
-function table table:in2out(Parent:table) {
-    This["in", array] = Parent["out", array]
-    return This
-}
-
-function table table:in2in(Parent:table) {
-    This["in", array] = Parent["in", array]
-    return This
-}
-
-function table table:out2out(Parent:table) {
-    This["out", array] = Parent["out", array]
-    return This
 }

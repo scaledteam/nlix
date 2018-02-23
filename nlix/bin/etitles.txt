@@ -1,0 +1,137 @@
+#
+# Created by scaled
+#
+
+@name etitles
+
+switch (P["state", number]) {
+    case 0,
+        if (egpReady()) {
+            if (egpMax() > 20) {
+                # Background
+                egpBox(1, vec2(), egpResolution())
+                egpColor(1, randvec(160, 190))
+                
+                P["PDatas", table] = table()
+                P["state", number] = 1
+            }
+            else {
+                end()
+            }
+        }
+        break
+    
+    case 1,
+        if (egpWait()) { 
+            local MaxTitles = 3
+            local TitleId = 0
+            
+            # Set first workspace
+            local PData = table()
+            local EgpParentId = 2
+            local EgpId = PData["egpId", number] = EgpParentId + 1
+            local EgpPos = PData["egpPos", vector2] = vec2()
+            local EgpCount = PData["egpCount", number] = int(egpMax() / MaxTitles) - 2
+            
+            local Program = exec("eeyes")
+            PData["in", array] = Program["in", array] = array(egpResolution() / 2 * 0.95, EgpCount)
+            PData["out", array] = Program["out", array] = array()
+            
+            egpBox(EgpParentId, EgpPos, vec2())
+            for (I = EgpId, EgpId + EgpCount) {
+                egpParent(I, EgpParentId)
+            }
+            
+            P["PDatas", table]:pushTable(PData)
+            # end
+            
+            # Set second workspace
+            PData = table()
+            EgpParentId = 2 + int(egpMax() * 1 / MaxTitles)
+            EgpId = PData["egpId", number] = EgpParentId + 1
+            EgpPos = PData["egpPos", vector2] = egpResolution() * vec2(0.5, 0)
+            EgpCount = PData["egpCount", number] = int(egpMax() / MaxTitles) - 2
+            
+            Program = exec("eclock")
+            PData["in", array] = Program["in", array] = array(egpResolution() / 2 * 0.95, EgpCount)
+            PData["out", array] = Program["out", array] = array()
+            
+            egpBox(EgpParentId, EgpPos, vec2())
+            for (I = EgpId, EgpId + EgpCount) {
+                egpParent(I, EgpParentId)
+            }
+            
+            P["PDatas", table]:pushTable(PData)
+            # end
+            
+            # Set third workspace
+            PData = table()
+            EgpParentId = 2 + int(egpMax() * 2 / MaxTitles)
+            EgpId = PData["egpId", number] = EgpParentId + 1
+            EgpPos = PData["egpPos", vector2] = egpResolution() * vec2(0, 0.5)
+            EgpCount = PData["egpCount", number] = int(egpMax() / MaxTitles) - 2
+            
+            Program = exec("etitles")
+            PData["in", array] = Program["in", array] = array(egpResolution() / 2 * 0.95, EgpCount)
+            PData["out", array] = Program["out", array] = array()
+            
+            egpBox(EgpParentId, EgpPos, vec2())
+            for (I = EgpId, EgpId + EgpCount) {
+                egpParent(I, EgpParentId)
+            }
+            
+            P["PDatas", table]:pushTable(PData)
+            # end
+            
+            P["state", number] = 2
+        }
+        break
+    
+    case 2,
+        local Counter = P["counter", number] + 1
+        
+        if (Counter > P["PDatas", table]:count()) {
+            Counter = 1
+        }
+        
+        local PData = P["PDatas", table][Counter, table]
+        
+        # Cursor
+        PData["in", array][3, vector2] = egpCursor() - PData["egpPos", vector2]
+        
+        # Image
+        if (egpWait()) {
+            local In = PData["out", array]
+            local EgpId = PData["egpId", number]
+            
+            for (I = 1, Overload) {
+                if (In:count() > 0) {
+                    local Command = In:shiftString()
+                    local Id = In:shiftNumber() + EgpId
+                    
+                    switch (Command) {
+                        case "box",         egpBox(Id, In:shiftVector2(), In:shiftVector2()) break
+                        case "circle",      egpCircle(Id, In:shiftVector2(), In:shiftVector2()) break
+                        case "line",        egpLine(Id, In:shiftVector2(), In:shiftVector2()) break
+                        case "text",        egpText(Id, In:shiftString(), In:shiftVector2(), In:shiftVector2()) break
+                        case "color",       egpColor(Id, In:shiftVector()) break
+                        case "pos",         egpPos(Id, In:shiftVector2()) break
+                        case "size",        egpSize(Id, In:shiftVector2()) break
+                        case "sizeNumber",  egpSize(Id, In:shiftNumber()) break
+                        case "setText",     egpText(Id, In:shiftString()) break
+                        case "parent",      egpParent(Id, In:shiftNumber() + EgpId) break
+                        case "remove",      egpRemove(Id) break
+                        
+                        default,
+                    }
+                }
+                else {
+                    break
+                }
+            }
+        }
+        
+        P["counter", number] = Counter
+        break
+}
+

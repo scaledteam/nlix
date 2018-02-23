@@ -25,6 +25,11 @@ switch (P["state", number]) {
                     Out[I, number] = Device[I]
                 }
             }
+            
+            if (wait() & in() == EXIT) {
+                deviceReturn()
+                end()
+            }
         }
         else {
             P["state", number] = 0

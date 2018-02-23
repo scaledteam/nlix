@@ -64,6 +64,7 @@ if (tickClk()) {
                         
                         case "kill",        #include "nlix/bin/kill" break
                         case "reboot",      #include "nlix/bin/reboot" break
+                        case "poweroff",    #include "nlix/bin/poweroff" break
                         
                         case "print-pi",    #include "nlix/bin/print-pi" break
                         
@@ -80,6 +81,8 @@ if (tickClk()) {
                         case "eclock",      #include "nlix/bin/eclock" break
                         case "eeyes",       #include "nlix/bin/eeyes" break
                         
+                        case "etitles",     #include "nlix/bin/etitles" break
+                        
                         #ifdef httpRequest(string)
                         case "wget",        #include "nlix/bin/wget" break
                         #endif
@@ -91,7 +94,11 @@ if (tickClk()) {
                         
                         case "bc",          #include "nlix/bin/bc" break
                         
-                        case "killself",    end() break
+                        #ifdef soundURLload(string, string, number, number, entity)
+                        case "surl",        #include "nlix/bin/surl" break
+                        #endif
+                        
+                        case "",            end() break
                         default,
                             out("Program \"" + PName + "\" is not exist.\n")
                             end()

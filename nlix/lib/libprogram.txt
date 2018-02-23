@@ -10,10 +10,6 @@ function table exec(Name:string) {
     return Program
 }
 
-function table:kill() {
-    This:setType("killself")
-}
-
 function end() {
     Ps:removeTable(KState1):clear()
     KState1--
