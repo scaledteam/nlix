@@ -5,7 +5,7 @@
 @name nlix
 
 @persist [G L S]:table
-@persist [P Ps]:table
+@persist [Ps P]:table PName:string
 @persist KPerf KState0 KState1
 
 if (tickClk()) {
@@ -21,15 +21,18 @@ if (tickClk()) {
                     
                     case 5, #include "nlix/lib/liboverload" break
                     case 6, #include "nlix/lib/libfs" break
+                    case 7, #include "nlix/lib/liborder" break
                     
-                    case 7, #include "nlix/lib/libegp" break
+                    case 9, #include "nlix/lib/libegp" break
                     
                     case 10, #include "nlix/init/g" break
                     #case 11, SYSTEM_NAME = "system0" #include "nlix/init/sync" break
                     
                     case 13, #include "nlix/init/autostart" break
                     case 14, #include "nlix/init/fstab" break
-                    case 15, KState0 = 1 KState1 = 0 break
+                    
+                    #case 15, #include "nlix/init/entity" break
+                    case 17, KState0 = 1 KState1 = 0 break
                     default,
                 }
             }
@@ -45,11 +48,11 @@ if (tickClk()) {
                     }
                     
                     P = Ps[KState1, table]
-                    local PName = P:type()
+                    PName = P:type()
                     
                     switch (PName) {
                         case "term",        #include "nlix/bin/term" break
-                        case "kbd",         #include "nlix/bin/kbd" break
+                        #case "kbd",         #include "nlix/bin/kbd" break
                         case "skbd",        #include "nlix/bin/skbd" break
                         
                         case "hotplugd",    #include "nlix/bin/hotplugd" break
@@ -116,6 +119,6 @@ if (tickClk()) {
 }
 
 if (first()) {
-    KPerf = 10
+    KPerf = 5
     runOnTick(1)
 }

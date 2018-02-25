@@ -4,6 +4,12 @@
 
 @name fsreal
 
+if (!G:exists("fsreal")) {
+    G["fsreal", table] = table()
+}
+
+order(G["fsreal", table])
+
 if (P["fs", table]:exists("path")) {
     switch (P["mode", string]) {
         case "list",

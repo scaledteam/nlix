@@ -13,6 +13,10 @@ if (!L:exists("hotplugd")) {
     L["hotplugd", table] = table()
 }
 
+if (Ps:count() == 1) {
+    end()
+}
+
 P = L["hotplugd", table]
 
 switch (P["state", number]) {
@@ -61,4 +65,31 @@ switch (P["state", number]) {
         
         P["counter", number] = Counter
         break
+}
+
+# return device from dead app
+local P = S["devices", table]
+
+if (!P:exists("P")) {
+    P["P", table] = table()
+    P["D", table] = table()
+}
+
+local Programs = P["P", table]
+
+if (Programs:count() > 0) {
+    local Counter = P["counter", number] + 1
+    
+    if (Counter > Programs:count()) {
+        Counter = 1
+    }
+    
+    if (!Programs[Counter, table]:isValid()) {
+        Programs:remove(Counter)
+        local Device = P["D", table]:removeWirelink(Counter)
+        P[Device:entity():type(), array]:pushWirelink(Device)
+    }
+    else {
+        P["counter", number] = Counter
+    }
 }

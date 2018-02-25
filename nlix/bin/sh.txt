@@ -8,19 +8,17 @@ switch (P["state", number]) {
     case 0,
         # init keyboard and terminal
         if (!P:exists("out")) {
-            local Program = exec("term")
+            local Program = P["term", table] = exec("term")
             P["out", array] = Program["in", array] = array()
         }
         
         if (!P:exists("in")) {
-            local Program = exec("kbd")
-            P["kbd", array] = Program["out", array] = array()
-            P["kbd-in", array] = Program["in", array] = array()
-            
-            # init simple keyboard
-            Program = P["skbd", table] = exec("skbd")
-            Program["kbd", array] = P["kbd", array]
+            local Program = P["skbd", table] = exec("skbd")
             Program["term", array] = P["out", array]
+            #P["skbd-in", array] = Program["in", array] = array()
+            
+            # Get keyboard
+            P["kbd", array] = Program["kbd", array] = array()
             
             P["in", array] = Program["out", array] = array()
         }
@@ -46,16 +44,26 @@ switch (P["state", number]) {
                     break
                 
                 case "exit",
-                    out(EXIT)
-                    P["kbd-in", array]:pushString(EXIT)
+                    #out(EXIT)
+                    #out("skbd-in", EXIT)
+                    P["term", table]:clear()
                     P["skbd", table]:clear()
                     end()
                     break
                 
-                case "term",
+                case "sh",
                     exec("sh")
                     P["state", number] = 1
                     break
+                
+                #[case "stress",
+                    local P1 = exec("ls") P1["args", array] = array("rdir")
+                    local P2 = exec("ls") P2["args", array] = array("e2shared")
+                    local P3 = exec("ls") P3["args", array] = array("rdir/test")
+                    
+                    P1["out", array] = P2["out", array] = P3["out", array] = P["out", array]
+                    P["state", number] = 1
+                    break]#
                 
                 default,
                     local CommandExplode = Command:trim():explode(" ")

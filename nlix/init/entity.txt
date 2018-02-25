@@ -1,0 +1,9 @@
+#
+# Created by scaled
+#
+
+@name entity
+
+if (!S:exists("entity")) {
+    S["entity", entity] = entity()
+}

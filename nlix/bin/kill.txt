@@ -4,10 +4,20 @@
 
 @name kill
 
-local Arg = P["args", array]:shiftString():toNumber()
-if (Arg != 0) {
-    Ps:removeTable(Arg):clear()
-    KState1--
+local Arg1 = arg():toNumber()
+
+if (Arg1 != 0) {
+    local Arg2 = arg():toNumber()
+    
+    if (Arg2 == 0) {
+        Ps:removeTable(Arg1):clear()
+    }
+    else {
+        while (Arg2 >= Arg1) {
+            Ps:removeTable(Arg1):clear()
+            Arg2--
+        }
+    }
 }
 else {
     out("Entered value is not a number or 0.\n")

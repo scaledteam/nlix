@@ -22,7 +22,9 @@ switch (P["state", number]) {
                     P["resolution", vector2] = vec2(10, 5)
                 }
             }
+            
             P["deviceType", string] = "out"
+            
             P["state", number] = 2
         }
         elseif (deviceGet("gmod_wire_textscreen")) {
@@ -30,6 +32,7 @@ switch (P["state", number]) {
             Device["String", string] = P["text", string]
             
             P["resolution", vector2] = vec2(40, 21)
+            P["deviceType", string] = "gmod_wire_textscreen"
             
             P["state", number] = 2
         }
@@ -42,6 +45,7 @@ switch (P["state", number]) {
             Device:egpFont(1, "Courier New")
             
             P["resolution", vector2] = vec2(56, 28)
+            P["deviceType", string] = "gmod_wire_egp"
             
             P["state", number] = 2
         }
@@ -51,6 +55,8 @@ switch (P["state", number]) {
             Device:writeString(P["text", string], 0, 0)
             
             P["resolution", vector2] = vec2(30, 18)
+            P["deviceType", string] = "gmod_wire_consolescreen"
+            
             P["state", number] = 2
         }
         
@@ -117,7 +123,7 @@ switch (P["state", number]) {
                         }
                         break]#
                     
-                    case EXIT,
+                    #[case EXIT,
                         deviceReturn()
                         local DeviceType = P["deviceType", string]
                         switch (DeviceType) {
@@ -142,7 +148,7 @@ switch (P["state", number]) {
                         
                         P["deviceType", string] = ""
                         end()
-                        break
+                        break]#
                     
                     default,
                         local Width = P["resolution", vector2][1]

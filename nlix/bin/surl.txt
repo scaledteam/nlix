@@ -6,41 +6,40 @@
 
 local Arg = arg():lower()
 switch (Arg) {
-    case "url", 
-        local Url = arg()
-        if (Url:sub(1, 7) != "http://") {
-            Url = "http://" + Url
-            out("Target url is " + Url + "\n")
-        }
-        soundURLload("nlix-surl", Url, 1000, 0, entity())
-        soundURLparent("nlix-surl", entity())
-        out("Music started.\n")
+    case "", "help", 
+        out(
+            "Usage: surl [url/command]:\n"
+            + "Commands:\n"
+            + "stop\n"
+            + "resume\n"
+            + "pause\n"
+            + "volume [number 0-1]\n"
+            + "help\n"
+        )
         break
     
     case "stop", 
         soundURLdelete("nlix-surl")
-        out("Music stoped.\n")
         break
     
     case "resume", 
         soundURLplay("nlix-surl")
-        out("Music resumed.\n")
         break
     
     case "pause", 
         soundURLpause("nlix-surl")
-        out("Music paused.\n")
+        break
+    
+    case "volume",
+        soundURLvolume("nlix-surl", arg():toNumber())
         break
     
     default,
-        out(
-            "Usage: surl [command]:\n"
-            + "Commands:\n"
-            + "url [url string]\n"
-            + "stop\n"
-            + "resume\n"
-            + "pause\n"
-        )
+        if (Arg:sub(1, 7) != "http://") {
+            Arg = "http://" + Arg
+        }
+        soundURLload("nlix-surl", Arg, 1000, 0, entity())
+        soundURLparent("nlix-surl", entity())
 }
 
 end()

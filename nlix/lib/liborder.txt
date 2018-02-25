@@ -1,0 +1,26 @@
+#
+# Created by scaled
+#
+
+@name liborder
+
+function order(Memory:table) {
+    if (!P:exists("inOrder")) {
+        P["inOrder", number] = 1
+        Memory:pushTable(P)
+    }
+    
+    if (Memory:count() == 0) {
+        end()
+    }
+    else {
+        if (!Memory[1, table]:isValid()) {
+            Memory:shift()
+            P = NULL
+            end()
+        }
+        else {
+	           P = Memory[1, table]
+        }
+    }
+}

@@ -11,7 +11,7 @@ foreach (DeviceName, DeviceList:array = S["devices", table]) {
 
 List += "--------\n"
 
-local DevicesById = S["devicesById", table]
+local DevicesById = S["devices", table]["byId", table]
 local DevicesByIdKeys = DevicesById:keys()
 for (I = 1, DevicesById:count()) {
     local J = DevicesByIdKeys[I, number]

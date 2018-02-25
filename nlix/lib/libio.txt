@@ -3,11 +3,10 @@
 #
 
 @name libio
-@persist [ERASE ERASE1 EXIT]:string
+@persist [ERASE ERASE1]:string
 
 #ERASE  = toChar(15) + "erase"
 ERASE1 = toChar(15) + "erase1"
-EXIT   = toChar(15) + "exit"
 
 function out(Text:string) {
     P["out", array]:pushString(Text)
@@ -39,10 +38,16 @@ function number argsExist() {
     return P["args", array]:count() > 0
 }
 
-#[function kbdGet() {
-    if (!P:exists("kbd")) {
-        local Program = exec("kbd")
-        P["kbd", array] = Program["out", array] = array()
-        P["kbd-in", array] = Program["in", array] = array()
-    }
-}]#
+
+# Additional functions
+function number wait(OutName:string) {
+    return P[OutName, array]:count() > 0
+}
+
+function string in(OutName:string) {
+    return P[OutName, array]:shiftString()
+}
+
+function out(OutName:string, Text:string) {
+    P[OutName, array]:pushString(Text)
+}

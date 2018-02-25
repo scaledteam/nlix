@@ -12,14 +12,11 @@ function number deviceGet(Type:string) {
             local Device = Devices:shiftWirelink()
             if (Device != nowirelink()) {
                 P["device", wirelink] = Device
-                P["deviceType", string] = Type
+                S["devices", table]["P", table]:pushTable(P)
+                S["devices", table]["D", table]:pushWirelink(Device)
                 return 1
             }
         }
     }
     return 0
-}
-
-function deviceReturn() {
-    S["devices", table][P["deviceType", string], array]:pushWirelink(P["device", wirelink])
 }

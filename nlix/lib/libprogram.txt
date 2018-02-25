@@ -11,7 +11,12 @@ function table exec(Name:string) {
 }
 
 function end() {
-    Ps:removeTable(KState1):clear()
-    KState1--
+    if(Ps[KState1, table] == P){
+        Ps:removeTable(KState1):clear()
+        KState1--
+    }
+    else {
+        P:clear()
+    }
 }
 
