@@ -1,0 +1,8 @@
+#
+# Created by scaled
+#
+
+@name echo
+
+out(P["args", array]:concat("\n") + "\n")
+end()

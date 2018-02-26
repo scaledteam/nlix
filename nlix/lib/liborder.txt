@@ -5,22 +5,19 @@
 @name liborder
 
 function order(Memory:table) {
-    if (!P:exists("inOrder")) {
+    if (!P:exists("inOrder") & P:isValid()) {
         P["inOrder", number] = 1
         Memory:pushTable(P)
+    }
+    
+    while (!Memory[1, table]:isValid()) {
+        Memory:shift()
     }
     
     if (Memory:count() == 0) {
         end()
     }
     else {
-        if (!Memory[1, table]:isValid()) {
-            Memory:shift()
-            P = NULL
-            end()
-        }
-        else {
-	           P = Memory[1, table]
-        }
+        P = Memory[1, table]
     }
 }

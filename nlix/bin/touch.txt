@@ -6,16 +6,10 @@
 
 switch (P["state", number]) {
     case 0,
-        if (argsExist()) {
-            P["path", string] = arg()
+        P["path", string] = arg()
+        if (P["path", string] != "") {
             P["state", number] = 1
         }
-        
-        elseif (wait()) {
-            P["path", string] = in()
-            P["state", number] = 1
-        }
-        
         else {
             out("Error: wrong path.\n")
             end()

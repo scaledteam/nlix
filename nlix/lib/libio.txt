@@ -34,9 +34,9 @@ function string arg() {
     return P["args", array]:shiftString()
 }
 
-function number argsExist() {
+#[function number argsExist() {
     return P["args", array]:count() > 0
-}
+}]#
 
 
 # Additional functions

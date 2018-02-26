@@ -40,7 +40,24 @@ if (P["fs", table]:exists("table")) {
             }
             
             if (P:isValid()) {
-                out(Dir:keys():concat("\n") + "\n")
+                #out(Dir:keys():concat("\n") + "\n")
+                
+                local Out = ""
+                
+                local Types = Dir:typeids()
+                local Keys = Dir:keys()
+                for (I = 1, Dir:count()) {
+                    if (Types[Keys[I, string], string] == "t") {
+                        Out += Keys[I, string] + "/\n"
+                    }
+                    elseif (Types[Keys[I, number], string] == "t") {
+                        Out += Keys[I, number] + "/\n"
+                    }
+                    else {
+                        Out += Keys[I, string] + "\n"
+                    }
+                }
+                out(Out)
                 end()
             }
             break

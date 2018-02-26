@@ -30,9 +30,9 @@ switch (P["state", number]) {
             # Set first workspace
             local PData = table()
             local EgpParentId = 2
-            local EgpId = PData["egpId", number] = EgpParentId + 1
-            local EgpPos = PData["egpPos", vector2] = egpResolution() * vec2(0.025)
-            local EgpCount = PData["egpCount", number] = int(egpMax() / MaxTitles) - 2
+            PData["egpId", number] = local EgpId = EgpParentId + 1
+            PData["egpPos", vector2] = local EgpPos = egpResolution() * vec2(0.025)
+            PData["egpCount", number] = local EgpCount = int(egpMax() / MaxTitles) - 2
             
             local Program = exec("eeyes")
             PData["in", array] = Program["in", array] = array(egpResolution() / 2 * 0.95, EgpCount)

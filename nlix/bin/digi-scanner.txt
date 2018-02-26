@@ -1,0 +1,71 @@
+#
+# Created by scaled
+#
+
+@name digi-scanner
+
+switch (P["state", number]) {
+    case 0,
+        if (deviceGet("gmod_wire_digitalscreen")) {
+            local Device = P["device", wirelink]
+            local Resolution = vec2(64)
+            
+            Device[1048574] = 0
+            Device[1048569] = 3
+            Device[1048575] = 1
+            Device[1048573] = Resolution[1]
+            Device[1048572] = Resolution[2]
+            
+            # Render
+            P["PIXELS_COUNT", number] = Resolution[1] * Resolution[2]
+            P["color", vector] = vec(255)
+            
+            P["state", number] = 1
+        }
+        else {
+            out("Can't find digital screen\n")
+            end()
+        }
+        break
+    
+    case 1,
+        local Device = P["device", wirelink]
+        if (Device) {
+            local Color = P["color", vector]
+            local Counter = P["counter", number]
+            local DIGI_RESOLUTION = vec2(64)
+            local DIGI_OFFSET = shift(DIGI_RESOLUTION) / 2
+            local RANGER_DISTANCE = 2000
+            
+            for (I = 1, Overload) {
+                local X = Counter % DIGI_RESOLUTION[1]
+                local Y = int(Counter / DIGI_RESOLUTION[1])
+                
+                local Direction = Device:entity():toWorldAxis(vec(vec2(Y, X) - DIGI_OFFSET, -DIGI_RESOLUTION[2]))
+                local RangerMain = rangerOffset(RANGER_DISTANCE, Device:entity():toWorld(vec(0, 0, -10)), Direction)
+                local Brightness = 0
+                if (RangerMain:hit()) {
+                    Brightness = min(1, 1 - RangerMain:distance() / RANGER_DISTANCE)
+                }
+                
+                Device[Counter] = rgb2digi(Color * Brightness, 3)
+                
+                if (Counter >= P["PIXELS_COUNT", number]) {
+                    end()
+                    break
+                }
+                else {
+                    Counter++
+                }
+            }
+            if (P:isValid()) {
+                P["counter", number] = Counter
+            }
+        }
+        else {
+            out("Error: screen was lost.\n")
+            end()
+        }
+        break
+}
+

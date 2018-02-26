@@ -20,3 +20,13 @@ function number deviceGet(Type:string) {
     }
     return 0
 }
+
+function string wirelink:type() {
+    local Name = This:entity():type()
+    
+    if (Name == "gmod_wire_expression2") {
+        Name = This:entity():getName()
+    }
+    
+    return Name
+}

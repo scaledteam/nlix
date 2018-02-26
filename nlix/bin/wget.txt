@@ -20,7 +20,6 @@ switch (P["state", number]) {
             local Arg = arg()
             if (Arg:sub(1, 7) != "http://") {
                 Arg = "http://" + Arg
-                out("Target url is " + Arg + "\n")
             }
             
             httpRequest(Arg)
@@ -36,9 +35,9 @@ switch (P["state", number]) {
             if (Filename == "") {
                 Filename = "webpage"
             }
-            Program["in", array] = array(Filename, httpData())
+            Program["args", array] = array(Filename)
+            Program["in", array] = array(httpData())
             
-            #P:setIn(Program:setOut())
             P["in", array] = Program["out", array] = array()
             
             P["state", number] = 3

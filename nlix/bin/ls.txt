@@ -6,13 +6,7 @@
 
 switch (P["state", number]) {
     case 0,
-        if (wait()) {
-            P["path", string] = in()
-        }
-        else {
-            P["path", string] = arg()
-        }
-        if (fsCall("list", P["path", string])) {
+        if (fsCall("list", arg())) {
             P["in", array] = P["fs", table]["out", array] = array()
             P["state", number] = 1
         }

@@ -33,15 +33,31 @@ if (P["fs", table]:exists("path")) {
         case "read",
             switch (P["state", number]) {
                 case 0,
-                    if (fileCanLoad()) {
-                        fileLoad(P["fs", table]["path", string] + P["path", string])
+                    if (P["path", string]:right(4) == ".txt") {
                         P["state", number] = 1
+                    }
+                    else {
+                        out("Error: Missing \".txt\"\n")
+                        end()
                     }
                     break
                 
                 case 1,
+                    if (fileCanLoad()) {
+                        fileLoad(P["fs", table]["path", string] + P["path", string])
+                        
+                        P["timeout", number] = systime() + 5
+                        P["state", number] = 2
+                    }
+                    break
+                
+                case 2,
                     if (fileLoaded()) {
                         out(fileRead() + "\n")
+                        end()
+                    }
+                    elseif (systime() > P["timeout", number]) {
+                        out("Error: Timeout.\n")
                         end()
                     }
                     break
@@ -49,11 +65,24 @@ if (P["fs", table]:exists("path")) {
             break
         
         case "write",
-            if (fileCanWrite() & wait()) {
-                fileWrite(P["fs", table]["path", string] + P["path", string], in())
-                P["state", number] = 1
-                out("ok\n")
-                end()
+            switch (P["state", number]) {
+                case 0,
+                    if (P["path", string]:right(4) == ".txt") {
+                        P["state", number] = 1
+                    }
+                    else {
+                        out("Error: Missing \".txt\"\n")
+                        end()
+                    }
+                    break
+                
+                case 1,
+                    if (fileCanWrite() & wait()) {
+                        fileWrite(P["fs", table]["path", string] + P["path", string], in())
+                        out("ok\n")
+                        end()
+                    }
+                    break
             }
             break
         

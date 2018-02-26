@@ -8,12 +8,12 @@ switch (P["state", number]) {
     case 0,
         # init keyboard and terminal
         if (!P:exists("out")) {
-            local Program = P["term", table] = exec("term")
+            P["term", table] = local Program = exec("term")
             P["out", array] = Program["in", array] = array()
         }
         
         if (!P:exists("in")) {
-            local Program = P["skbd", table] = exec("skbd")
+            P["skbd", table] = local Program = exec("skbd")
             Program["term", array] = P["out", array]
             #P["skbd-in", array] = Program["in", array] = array()
             
@@ -37,7 +37,7 @@ switch (P["state", number]) {
     
     case 2,
         if (wait()) {
-            local Command = in()
+            local Command = in():trim()
             switch (Command) {
                 case "",
                     P["state", number] = 1
@@ -66,19 +66,10 @@ switch (P["state", number]) {
                     break]#
                 
                 default,
-                    local CommandExplode = Command:trim():explode(" ")
+                    Command = Command:replaceRE("  +", " ")
                     
-                    local I = 1
-                    while (I < CommandExplode:count()) {
-                        if (CommandExplode[I, string] == "") {
-                            CommandExplode:remove(I)
-                        }
-                        else {
-                            I++
-                        }
-                    }
+                    local CommandExplode = Command:explode(" ")
                     
-                    #local Program = exec(CommandExplode:shiftString()):in2in(P):out2out(P)
                     local Program = exec(CommandExplode:shiftString())
                     Program["in", array] = P["in", array]
                     Program["out", array] = P["out", array]

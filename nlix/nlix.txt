@@ -31,7 +31,6 @@ if (tickClk()) {
                     case 13, #include "nlix/init/autostart" break
                     case 14, #include "nlix/init/fstab" break
                     
-                    #case 15, #include "nlix/init/entity" break
                     case 17, KState0 = 1 KState1 = 0 break
                     default,
                 }
@@ -52,12 +51,13 @@ if (tickClk()) {
                     
                     switch (PName) {
                         case "term",        #include "nlix/bin/term" break
-                        #case "kbd",         #include "nlix/bin/kbd" break
                         case "skbd",        #include "nlix/bin/skbd" break
                         
                         case "hotplugd",    #include "nlix/bin/hotplugd" break
                         
                         case "sh",          #include "nlix/bin/sh" break
+                        
+                        case "echo",        #include "nlix/bin/echo" break
                         
                         case "plist",       #include "nlix/bin/plist" break
                         case "dlist",       #include "nlix/bin/dlist" break
@@ -79,6 +79,8 @@ if (tickClk()) {
                         case "cp",          #include "nlix/bin/cp" break
                         
                         case "egp",         #include "nlix/bin/egp" break
+                        #case "kbd",         #include "nlix/bin/kbd" break
+                        
                         case "estart",      #include "nlix/bin/estart" break
                         
                         case "eclock",      #include "nlix/bin/eclock" break
@@ -100,6 +102,12 @@ if (tickClk()) {
                         
                         #ifdef soundURLload(string, string, number, number, entity)
                         case "surl",        #include "nlix/bin/surl" break
+                        #endif
+                        
+                        case "bc",          #include "nlix/bin/bc" break
+                        
+                        #ifdef ranger(number)
+                        case "digi-scanner",#include "nlix/bin/digi-scanner" break
                         #endif
                         
                         case "",            end() break
