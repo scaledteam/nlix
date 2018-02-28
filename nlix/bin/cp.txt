@@ -6,19 +6,32 @@
 
 switch (P["state", number]) {
     case 0,
-        local Program = exec("cat")
-        #P:setIn(Program:setOut())
-        P["in", array] = Program["out", array] = array()
-        #Program:setIn(array(arg()))
-        Program["in", array] = array(arg())
-        P["state", number] = 1
+        if (args() < 2) {
+            out("Usage: cp [path from] [path to]\n")
+            end()
+        }
+        else {
+            local Program = exec("cat")
+            Program["args", array] = array(arg(1))
+            P["in", array] = Program["out", array] = array()
+            P["state", number] = 1
+        }
         break
     
     case 1,
         if (wait()) {
-            #exec("touch"):setIn(array(arg(), in():sub(1, -2)))
             local Program = exec("touch")
-            Program["in", array] = array(arg(), in():sub(1, -2))
+            Program["args", array] = array(arg(2))
+            Program["in", array] = array(in():sub(1, -2))
+            
+            P["in", array] = Program["out", array] = array()
+            P["state", number] = 2
+        }
+        break
+    
+    case 2,
+        if (wait()) {
+            out(in())
             end()
         }
         break

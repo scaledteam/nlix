@@ -8,13 +8,13 @@
 @persist PORTS_COUNT
 PORTS_COUNT = 4
 
+if (Ps:count() == 1) {
+    end()
+}
+
 # hot plug
 if (!L:exists("hotplugd")) {
     L["hotplugd", table] = table()
-}
-
-if (Ps:count() == 1) {
-    end()
 }
 
 P = L["hotplugd", table]
@@ -45,7 +45,6 @@ switch (P["state", number]) {
         if (Port != P["portOld" + Counter, wirelink]) {
             if (Port != nowirelink()) {
                 # Check if device exists
-                #local Type = Port:entity():type()
                 local Type = Port:type()
                 local EntityId = Port:entity():id()
                 
@@ -89,7 +88,6 @@ if (Programs:count() > 0) {
     if (!Programs[Counter, table]:isValid()) {
         Programs:remove(Counter)
         local Device = P["D", table]:removeWirelink(Counter)
-        #P[Device:entity():type(), array]:pushWirelink(Device)
         P[Device:type(), array]:pushWirelink(Device)
     }
     else {

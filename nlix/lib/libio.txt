@@ -30,17 +30,17 @@ function erase() {
 }]#
 
 
-function string arg() {
-    return P["args", array]:shiftString()
+function string arg(Number) {
+    return P["args", array][Number, string]
 }
 
-#[function number argsExist() {
-    return P["args", array]:count() > 0
-}]#
+function number args() {
+    return P["args", array]:count()
+}
 
 
 # Additional functions
-function number wait(OutName:string) {
+#[function number wait(OutName:string) {
     return P[OutName, array]:count() > 0
 }
 
@@ -50,4 +50,4 @@ function string in(OutName:string) {
 
 function out(OutName:string, Text:string) {
     P[OutName, array]:pushString(Text)
-}
+}]#

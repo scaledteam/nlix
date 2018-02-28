@@ -17,7 +17,7 @@ switch (P["state", number]) {
     
     case 1,
         if (httpCanRequest()) {
-            local Arg = arg()
+            local Arg = arg(1)
             if (Arg:sub(1, 7) != "http://") {
                 Arg = "http://" + Arg
             }
@@ -31,7 +31,7 @@ switch (P["state", number]) {
         if (httpCanRequest()) {
             local Program = exec("touch")
             
-            local Filename = arg()
+            local Filename = arg(2)
             if (Filename == "") {
                 Filename = "webpage"
             }

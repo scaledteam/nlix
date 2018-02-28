@@ -4,7 +4,19 @@
 
 @name liborder
 
-function order(Memory:table) {
+function number order(Memory:table) {
+    if (!Memory[1, table]:isValid()) {
+        Memory:shift()
+    }
+    elseif (!P:exists("inOrder")) {
+        P["inOrder", number] = 1
+        Memory:pushTable(P)
+    }
+    
+    return Memory[1, table] == P
+}
+
+#[function order(Memory:table) {
     if (!P:exists("inOrder") & P:isValid()) {
         P["inOrder", number] = 1
         Memory:pushTable(P)
@@ -20,4 +32,4 @@ function order(Memory:table) {
     else {
         P = Memory[1, table]
     }
-}
+}]#

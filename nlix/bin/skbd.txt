@@ -48,8 +48,8 @@ switch (P["state", number]) {
                             switch (Key) {
                                 # Enter
                                 case 10, case 13, case 142,
-                                    #P["term", array]:pushString("\n")
-                                    out("term", "\n")
+                                    P["term", array]:pushString("\n")
+                                    #out("term", "\n")
                                     
                                     out(P["text", string])
                                     P["text", string] = ""
@@ -58,8 +58,8 @@ switch (P["state", number]) {
                                 # Backspace
                                 case 127,
                                     if (P["text", string]:length() > 0) {
-                                        #P["term", array]:pushString(ERASE1)
-                                        out("term", ERASE1)
+                                        P["term", array]:pushString(ERASE1)
+                                        #out("term", ERASE1)
                                         P["text", string] = P["text", string]:sub(1, -2)
                                     }
                                     break
@@ -71,8 +71,8 @@ switch (P["state", number]) {
                                         
                                         P["text", string] = P["text", string] + Char
                                         
-                                        #P["term", array]:pushString(Char)
-                                        out("term", Char)
+                                        P["term", array]:pushString(Char)
+                                        #out("term", Char)
                                     }
                             }
                         }
@@ -97,8 +97,8 @@ switch (P["state", number]) {
             
             if (Text != P["textOld", string]) {
                 if (Text != "") {
-                    #P["term", array]:pushString(Text + "\n")
-                    out("term", Text + "\n")
+                    P["term", array]:pushString(Text + "\n")
+                    #out("term", Text + "\n")
                     out(Text)
                 }
                 P["textOld", string] = Text

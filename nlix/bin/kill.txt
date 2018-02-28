@@ -4,10 +4,10 @@
 
 @name kill
 
-local Arg1 = arg():toNumber()
+local Arg1 = arg(1):toNumber()
 
 if (Arg1 != 0) {
-    local Arg2 = arg():toNumber()
+    local Arg2 = arg(2):toNumber()
     
     if (Arg2 == 0) {
         Ps:removeTable(Arg1):clear()

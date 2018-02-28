@@ -4,7 +4,7 @@
 
 @name surl
 
-local Arg = arg():lower()
+local Arg = arg(1):lower()
 switch (Arg) {
     case "", "help", 
         out(
@@ -31,7 +31,12 @@ switch (Arg) {
         break
     
     case "volume",
-        soundURLvolume("nlix-surl", arg():toNumber())
+        if (args() < 2) {
+            out("Usage: volume [number 0-1]\n")
+        }
+        else {
+            soundURLvolume("nlix-surl", arg(2):toNumber())
+        }
         break
     
     default,

@@ -1,0 +1,17 @@
+#
+# Created by scaled
+#
+
+@name rund
+
+if (args() < 1) {
+    out("Usage: rund [program]")
+}
+else {
+    local Args = P["args", array]
+    local Program = exec(Args:shiftString())
+    if (Args:count() > 0) {
+        Program["args", array] = Args
+    }
+}
+end()

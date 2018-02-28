@@ -66,17 +66,28 @@ switch (P["state", number]) {
                     break]#
                 
                 default,
-                    Command = Command:replaceRE("  +", " ")
+                    local Commands = Command:replaceRE("  +", " "):explode(">")
                     
-                    local CommandExplode = Command:explode(" ")
-                    
-                    local Program = exec(CommandExplode:shiftString())
-                    Program["in", array] = P["in", array]
-                    Program["out", array] = P["out", array]
-                    
-                    if (CommandExplode:count() > 0) {
-                        Program["args", array] = CommandExplode
+                    local Program = NULL
+                    for (I = 1, Commands:count()) {
+                        local CommandExplode = Commands[I, string]:trim():explode(" ")
+                        
+                        if (I == 1) {
+                            Program = exec(CommandExplode:shiftString())
+                            Program["in", array] = P["in", array]
+                        }
+                        else {
+                            local PrevProgramOut = Program["out", array] = array()
+                            Program = exec(CommandExplode:shiftString())
+                            Program["in", array] = PrevProgramOut
+                        }
+                        
+                        if (CommandExplode:count() > 0) {
+                            Program["args", array] = CommandExplode
+                        }
                     }
+                    
+                    Program["out", array] = P["out", array]
                     
                     P["program", table] = Program
                     P["state", number] = 3

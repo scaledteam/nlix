@@ -13,13 +13,19 @@ switch (P["state", number]) {
         if (!wait()) {
             out("bc shell mode.\n")
         }
+        else {
+            P["shell", number] = 1
+        }
         
         P["state", number] = 1
         break
     
     # Get input
     case 1,
-        if (wait()) {
+        if (P["shell", number] == 2) {
+            end()
+        }
+        elseif (wait()) {
             local Input = in()
             P["input", string] = Input
             switch (Input) {
@@ -31,6 +37,10 @@ switch (P["state", number]) {
                     break
                 
                 default,
+                    if (P:exists("shell")) {
+                        P["shell", number] = 2
+                    }
+                    
                     P["state", number] = 2
                     break
             }

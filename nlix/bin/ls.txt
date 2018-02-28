@@ -6,7 +6,7 @@
 
 switch (P["state", number]) {
     case 0,
-        if (fsCall("list", arg())) {
+        if (fsCall("list", arg(1))) {
             P["in", array] = P["fs", table]["out", array] = array()
             P["state", number] = 1
         }

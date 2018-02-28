@@ -6,18 +6,17 @@
 
 switch (P["state", number]) {
     case 0,
-        P["path", string] = arg()
-        if (P["path", string] != "") {
-            P["state", number] = 1
+        if (args() < 1) {
+            out("Usage: cat [path to file].\n")
+            end()
         }
         else {
-            out("Error: wrong path.\n")
-            end()
+            P["state", number] = 1
         }
         break
     
     case 1,
-        if (fsCall("write", P["path", string])) {
+        if (fsCall("write", arg(1))) {
             P["fs", table]["in", array] = array(in())
             P["in", array] = P["fs", table]["out", array] = array()
             

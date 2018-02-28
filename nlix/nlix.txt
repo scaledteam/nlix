@@ -65,6 +65,7 @@ if (tickClk()) {
                         case "perf",        #include "nlix/bin/perf" break
                         case "overload",    #include "nlix/bin/overload" break
                         
+                        case "rund",        #include "nlix/bin/rund" break
                         case "kill",        #include "nlix/bin/kill" break
                         case "reboot",      #include "nlix/bin/reboot" break
                         case "poweroff",    #include "nlix/bin/poweroff" break
@@ -107,7 +108,7 @@ if (tickClk()) {
                         case "bc",          #include "nlix/bin/bc" break
                         
                         #ifdef ranger(number)
-                        case "digi-scanner",#include "nlix/bin/digi-scanner" break
+                        case "digi-scan",   #include "nlix/bin/digi-scan" break
                         #endif
                         
                         case "",            end() break
@@ -127,6 +128,11 @@ if (tickClk()) {
 }
 
 if (first()) {
-    KPerf = 5
+    if (owner():name() == "scaled") {
+        KPerf = 2
+    }
+    else {
+        KPerf = 10
+    }
     runOnTick(1)
 }
