@@ -7,14 +7,19 @@
 switch (P["state", number]) {
     case 0,
         if (egpReady()) {
-            egpBox(1, vec2(), egpResolution())
-            egpText(2, "waiting for a time", vec2(), egpResolution())
-            egpColor(2, vec())
-            egpSize(2, 50 * min(egpResolution()[1], egpResolution()[2]) / 512)
-            
-            P["nextUpdate", number] = systime()
-            
-            P["state", number] = 1
+            if (egpMax() >= 2) {
+                egpBox(1, vec2(), egpResolution())
+                egpText(2, "waiting for a time", vec2(), egpResolution())
+                egpColor(2, vec())
+                egpSize(2, 50 * min(egpResolution()[1], egpResolution()[2]) / 512)
+                
+                P["nextUpdate", number] = systime()
+                
+                P["state", number] = 1
+            }
+            else {
+                end()
+            }
         }
         break
     

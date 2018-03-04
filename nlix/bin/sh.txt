@@ -8,19 +8,29 @@ switch (P["state", number]) {
     case 0,
         # init keyboard and terminal
         if (!P:exists("out")) {
-            P["term", table] = local Program = exec("term")
-            P["out", array] = Program["in", array] = array()
+            P["term", table] = exec("term")
+            P["out", array] = P["term", table]["in", array] = array()
         }
         
         if (!P:exists("in")) {
-            P["skbd", table] = local Program = exec("skbd")
-            Program["term", array] = P["out", array]
-            #P["skbd-in", array] = Program["in", array] = array()
-            
-            # Get keyboard
-            P["kbd", array] = Program["kbd", array] = array()
-            
-            P["in", array] = Program["out", array] = array()
+            if (P:exists("kbd")) {
+                local Skbd = exec("skbd")
+                P["skbd", table] = Skbd
+                
+                Skbd["term", array] = P["out", array]
+                Skbd["in", array] = P["kbd", array]
+                
+                P["in", array] = Skbd["out", array] = array()
+            }
+            else {
+                local Skbd = exec("skbd")
+                P["skbd", table] = Skbd
+                
+                Skbd["term", array] = P["out", array]
+                Skbd["kbd", array] = P["kbd", array] = array()
+                
+                P["in", array] = Skbd["out", array] = array()
+            }
         }
         
         # Welcome message
@@ -44,8 +54,6 @@ switch (P["state", number]) {
                     break
                 
                 case "exit",
-                    #out(EXIT)
-                    #out("skbd-in", EXIT)
                     P["term", table]:clear()
                     P["skbd", table]:clear()
                     end()
@@ -56,14 +64,19 @@ switch (P["state", number]) {
                     P["state", number] = 1
                     break
                 
-                #[case "stress",
+                case "stress",
                     local P1 = exec("ls") P1["args", array] = array("rdir")
                     local P2 = exec("ls") P2["args", array] = array("e2shared")
                     local P3 = exec("ls") P3["args", array] = array("rdir/test")
                     
                     P1["out", array] = P2["out", array] = P3["out", array] = P["out", array]
                     P["state", number] = 1
-                    break]#
+                    break
+                
+                case "tulpacode",
+                    out("TuC-0.2.2 S1 EX11-02-13 Tel %C9I10 Sp3 Img.Hum&@.f-22y-M Rls3% W2+ Dr1 XS.i4 RL3@\n")
+                    P["state", number] = 1
+                    break
                 
                 default,
                     local Commands = Command:replaceRE("  +", " "):explode(">")
@@ -77,7 +90,9 @@ switch (P["state", number]) {
                             Program["in", array] = P["in", array]
                         }
                         else {
-                            local PrevProgramOut = Program["out", array] = array()
+                            local PrevProgramOut = array()
+                            Program["out", array] = PrevProgramOut
+                            
                             Program = exec(CommandExplode:shiftString())
                             Program["in", array] = PrevProgramOut
                         }
@@ -100,7 +115,7 @@ switch (P["state", number]) {
             P["state", number] = 1
         }
         
-        if (P["kbd", array][1, number] == 158) {
+        if (P:exists("kbd") & P["kbd", array][1, number] == 158) {
             switch (toChar(P["kbd", array][2, number])) {
                 case "c",
                     P["program", table]:clear()
@@ -116,7 +131,6 @@ switch (P["state", number]) {
                 
                 default,
             }
-            #Kbd:clear()
         }
         break
 }

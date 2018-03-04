@@ -5,12 +5,20 @@
 @name liborder
 
 function number order(Memory:table) {
-    if (!Memory[1, table]:isValid()) {
-        Memory:shift()
-    }
-    elseif (!P:exists("inOrder")) {
+    if (!P:exists("inOrder")) {
         P["inOrder", number] = 1
         Memory:pushTable(P)
+    }
+    
+    if (Memory:count() > 0) {
+        if (!Memory[1, table]:isValid()) {
+            Memory:shift()
+        }
+    }
+    else {
+        out("Error: program end because order is over\n")
+        #print("Error: program end because order is over")
+        end()
     }
     
     return Memory[1, table] == P

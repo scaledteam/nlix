@@ -8,90 +8,90 @@ if (!G:exists("fsreal")) {
     G["fsreal", table] = table()
 }
 
-order(G["fsreal", table])
-
-if (P["fs", table]:exists("path")) {
-    switch (P["mode", string]) {
-        case "list",
-            switch (P["state", number]) {
-                case 0,
-                    if (fileCanList()) {
-                        fileList(P["fs", table]["path", string] + P["path", string] + "/")
-                        P["state", number] = 1
-                    }
-                    break
-                
-                case 1,
-                    if (fileLoadedList()) {
-                        out(fileReadList():concat("\n") + "\n")
-                        end()
-                    }
-                    break
-            }
-            break
-        
-        case "read",
-            switch (P["state", number]) {
-                case 0,
-                    if (P["path", string]:right(4) == ".txt") {
-                        P["state", number] = 1
-                    }
-                    else {
-                        out("Error: Missing \".txt\"\n")
-                        end()
-                    }
-                    break
-                
-                case 1,
-                    if (fileCanLoad()) {
-                        fileLoad(P["fs", table]["path", string] + P["path", string])
-                        
-                        P["timeout", number] = systime() + 5
-                        P["state", number] = 2
-                    }
-                    break
-                
-                case 2,
-                    if (fileLoaded()) {
-                        out(fileRead() + "\n")
-                        end()
-                    }
-                    elseif (systime() > P["timeout", number]) {
-                        out("Error: Timeout.\n")
-                        end()
-                    }
-                    break
-            }
-            break
-        
-        case "write",
-            switch (P["state", number]) {
-                case 0,
-                    if (P["path", string]:right(4) == ".txt") {
-                        P["state", number] = 1
-                    }
-                    else {
-                        out("Error: Missing \".txt\"\n")
-                        end()
-                    }
-                    break
-                
-                case 1,
-                    if (fileCanWrite() & wait()) {
-                        fileWrite(P["fs", table]["path", string] + P["path", string], in())
-                        out("ok\n")
-                        end()
-                    }
-                    break
-            }
-            break
-        
-        default,
-            out("Error: Unsupported action.\n")
-            end()
+if (order(G["fsreal", table])) {
+    if (P["fs", table]:exists("path")) {
+        switch (P["mode", string]) {
+            case "list",
+                switch (P["state", number]) {
+                    case 0,
+                        if (fileCanList()) {
+                            fileList(P["fs", table]["path", string] + P["path", string] + "/")
+                            P["state", number] = 1
+                        }
+                        break
+                    
+                    case 1,
+                        if (fileLoadedList()) {
+                            out(fileReadList():concat("\n") + "\n")
+                            end()
+                        }
+                        break
+                }
+                break
+            
+            case "read",
+                switch (P["state", number]) {
+                    case 0,
+                        if (P["path", string]:right(4) == ".txt") {
+                            P["state", number] = 1
+                        }
+                        else {
+                            out("Error: Missing \".txt\"\n")
+                            end()
+                        }
+                        break
+                    
+                    case 1,
+                        if (fileCanLoad()) {
+                            fileLoad(P["fs", table]["path", string] + P["path", string])
+                            
+                            P["timeout", number] = systime() + 5
+                            P["state", number] = 2
+                        }
+                        break
+                    
+                    case 2,
+                        if (fileLoaded()) {
+                            out(fileRead() + "\n")
+                            end()
+                        }
+                        elseif (systime() > P["timeout", number]) {
+                            out("Error: Timeout.\n")
+                            end()
+                        }
+                        break
+                }
+                break
+            
+            case "write",
+                switch (P["state", number]) {
+                    case 0,
+                        if (P["path", string]:right(4) == ".txt") {
+                            P["state", number] = 1
+                        }
+                        else {
+                            out("Error: Missing \".txt\"\n")
+                            end()
+                        }
+                        break
+                    
+                    case 1,
+                        if (fileCanWrite() & wait()) {
+                            fileWrite(P["fs", table]["path", string] + P["path", string], in())
+                            out("ok\n")
+                            end()
+                        }
+                        break
+                }
+                break
+            
+            default,
+                out("Error: Unsupported action.\n")
+                end()
+        }
     }
-}
-else {
-    out("Error: No path in fstab\n")
-    end()
+    else {
+        out("Error: No path in fstab\n")
+        end()
+    }
 }

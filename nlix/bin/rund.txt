@@ -13,5 +13,8 @@ else {
     if (Args:count() > 0) {
         Program["args", array] = Args
     }
+    
+    Program["in", array] = P["in", array]
+    Program["out", array] = P["out", array]
 }
 end()

@@ -29,18 +29,25 @@ switch (P["state", number]) {
     
     case 2,
         if (httpCanRequest()) {
-            local Program = exec("touch")
-            
-            local Filename = arg(2)
-            if (Filename == "") {
-                Filename = "webpage"
+            local Data = httpData()
+            if (Data == "") {
+                out("Error: Timeout.\n")
+                end()
             }
-            Program["args", array] = array(Filename)
-            Program["in", array] = array(httpData())
-            
-            P["in", array] = Program["out", array] = array()
-            
-            P["state", number] = 3
+            else {
+                local Program = exec("touch")
+                
+                local Filename = arg(2)
+                if (Filename == "") {
+                    Filename = "webpage"
+                }
+                Program["args", array] = array(Filename)
+                Program["in", array] = array(Data)
+                
+                P["in", array] = Program["out", array] = array()
+                
+                P["state", number] = 3
+            }
         }
         break
     

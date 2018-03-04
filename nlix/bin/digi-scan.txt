@@ -26,7 +26,8 @@ switch (P["state", number]) {
             P["offset", vector] = vec(shift(Resolution) / 2, 0)
             
             # Textures list
-            P["textures", table] = local Textures = table()
+            local Textures = table()
+            P["textures", table] = Textures
             
             Textures["default", vector] = vec(80, 180, 255)
             

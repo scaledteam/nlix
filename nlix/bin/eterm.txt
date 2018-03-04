@@ -7,24 +7,37 @@
 switch (P["state", number]) {
     case 0,
         if (egpReady()) {
-            egpBox(1, vec2(), egpResolution())
-            egpColor(1, vec(40, 40, 50))
-            
-            egpText(2, "", vec2(), egpResolution())
-            
-            local Term = exec("term")
-            Term["resolution", vector2] = floor(vec2(56, 28) * egpResolution() / vec2(512))
-            P["in", array] = Term["out", array] = array()
-            
-            local Sh = exec("sh")
-            Sh["out", array] = Term["in", array] = array()
-            P["state", number] = 1
+            if (egpMax() >= 2) {
+                egpBox(1, vec2(), egpResolution())
+                egpColor(1, vec(40, 40, 50))
+                
+                egpText(2, "", vec2(), egpResolution())
+                
+                P["term", table] = exec("term")
+                P["term", table]["resolution", vector2] = floor(vec2(56, 28) * egpResolution() / vec2(512))
+                P["in", array] = P["term", table]["out", array] = array()
+                
+                P["sh", table] = exec("sh")
+                P["sh", table]["out", array] = P["term", table]["in", array] = array()
+                
+                if (P:exists("kbd")) {
+                    P["sh", table]["kbd", array] = P["kbd", array]
+                }
+                P["state", number] = 1
+            }
+            else {
+                end()
+            }
         }
         break
     
     case 1,
         if (wait()) {
             egpText(2, in())
+        }
+        elseif (!P["sh", table]:isValid()) {
+            P["term", table]:clear()
+            end()
         }
         break
 }

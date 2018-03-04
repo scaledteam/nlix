@@ -7,29 +7,34 @@
 switch (P["state", number]) {
     case 0,
         if (egpReady()) {
-            local Res = egpResolution()
-            # Background
-            egpBox(1, vec2(), Res)
-            
-            # Left eye
-            local Center = Res * vec2(0.25, 0.5)
-            egpCircle(2, Center, Res * vec2(0.25, 0.5))
-            egpColor(2, vec())
-            egpCircle(3, Center, Res * vec2(0.225, 0.45))
-            
-            egpCircle(6, Center, Res * vec2(0.05))
-            egpColor(6, vec())
-            
-            # Right eye
-            Center = Res * vec2(0.75, 0.5)
-            egpCircle(4, Center, Res * vec2(0.25, 0.5))
-            egpColor(4, vec())
-            egpCircle(5, Center, Res * vec2(0.225, 0.45))
-            
-            egpCircle(7, Center, Res * vec2(0.05))
-            egpColor(7, vec())
-            
-            P["state", number] = 1
+            if (egpMax() >= 7) {
+                local Res = egpResolution()
+                # Background
+                egpBox(1, vec2(), Res)
+                
+                # Left eye
+                local Center = Res * vec2(0.25, 0.5)
+                egpCircle(2, Center, Res * vec2(0.25, 0.5))
+                egpColor(2, vec())
+                egpCircle(3, Center, Res * vec2(0.225, 0.45))
+                
+                egpCircle(6, Center, Res * vec2(0.05))
+                egpColor(6, vec())
+                
+                # Right eye
+                Center = Res * vec2(0.75, 0.5)
+                egpCircle(4, Center, Res * vec2(0.25, 0.5))
+                egpColor(4, vec())
+                egpCircle(5, Center, Res * vec2(0.225, 0.45))
+                
+                egpCircle(7, Center, Res * vec2(0.05))
+                egpColor(7, vec())
+                
+                P["state", number] = 1
+            }
+            else {
+                end()
+            }
         }
         break
     
