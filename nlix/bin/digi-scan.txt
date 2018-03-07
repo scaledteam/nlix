@@ -2,11 +2,13 @@
 # Created by scaled
 #
 
-@name digi-scanner
+@name digi-scan
 
 switch (P["state", number]) {
     case 0,
         if (deviceGet("gmod_wire_digitalscreen")) {
+            P["startTime", number] = systime()
+            
             local ArgsCount = min(args(), 2)
             switch (ArgsCount) {
                 case 0,
@@ -87,13 +89,14 @@ switch (P["state", number]) {
                 local RangerMain = rangerOffset(20000, Device:entity():toWorld(vec(0, 0, -10)), Direction)
                 local Brightness = 0
                 if (RangerMain:hit()) {
-                    Device[Counter] = rgb2digi(Textures[RangerMain:matType(), vector] * abs(Direction:normalized():dot(RangerMain:hitNormal())), 3)
+                    Device[Counter] = rgb2digi(Textures[RangerMain:matType(), vector] * (abs(Direction:normalized():dot(RangerMain:hitNormal())) * 0.5 + 0.5), 3)
                 }
                 else {
                     Device[Counter] = rgb2digi(Textures["default", vector], 3)
                 }
                 
                 if (Counter >= Count) {
+                    out("Time remaining: " + int(100 * (systime() - P["startTime", number])) / 100 + "\n")
                     end()
                     break
                 }

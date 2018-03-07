@@ -54,13 +54,14 @@ switch (P["state", number]) {
                     break
                 
                 case "exit",
-                    P["term", table]:clear()
-                    P["skbd", table]:clear()
+                    #P["term", table]:clear()
+                    #P["skbd", table]:clear()
                     end()
                     break
                 
                 case "sh",
-                    exec("sh")
+                    local Sh = exec("sh")
+                    Sh:remove("parent")
                     P["state", number] = 1
                     break
                 

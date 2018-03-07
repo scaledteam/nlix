@@ -4,7 +4,7 @@
 
 @name surl
 
-local Arg = arg(1):lower()
+local Arg = arg(1)
 switch (Arg) {
     case "", "help", 
         out(
@@ -44,7 +44,7 @@ switch (Arg) {
             Arg = "http://" + Arg
         }
         soundURLload("nlix-surl", Arg, 1000, 0, entity())
-        soundURLparent("nlix-surl", entity())
+        #soundURLparent("nlix-surl", entity())
 }
 
 end()

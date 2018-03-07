@@ -4,14 +4,6 @@
 
 @name plist
 
-#[local List = ""
-for (I = 1, Ps:count()) {
-    List += I + ": " + Ps[I, table]:type() + "\n"
-}
-out(List)
-end()]#
-
-
 local Counter = P["counter", number]
 local Out = ""
 
@@ -20,14 +12,14 @@ for (I = 1, Overload) {
     
     Out += Counter + ": " + Ps[Counter, table]:type() + "\n"
     
-    if (Counter >= Ps:count()) {
+    if (Counter >= (Ps:count() - 1)) {
         out(Out)
         end()
         break
     }
 }
 
-if (P:isValid()) {
+#if (P:isValid()) {
     P["counter", number] = Counter
     out(Out)
-}
+#}

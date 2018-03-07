@@ -2,7 +2,7 @@
 # Created by scaled
 #
 
-@name etitles
+@name etiles
 
 switch (P["state", number]) {
     case 0,
@@ -10,7 +10,8 @@ switch (P["state", number]) {
             if (egpMax() > 20) {
                 # Background
                 egpBox(1, vec2(), egpResolution())
-                egpColor(1, randvec(160, 190))
+                #egpColor(1, randvec(160, 190))
+                egpColor(1, hsv2rgb(random(360),1,0.7))
                 
                 P["Ws", table] = table()
                 
@@ -42,6 +43,7 @@ switch (P["state", number]) {
         W["P", table] = Program
         
         P["terminal", table] = Program
+        Program["parent", table] = P
         W["in", array] = Program["in", array] = array(egpResolution() * vec2(1, 0.05), W["egpCount", number])
         W["out", array] = Program["out", array] = array()
         
@@ -60,51 +62,58 @@ switch (P["state", number]) {
     
     case 2,
         if (P["Ws", table]:count() > 0) {
-            local Counter = P["counter", number] + 1
-            
-            if (Counter > P["Ws", table]:count()) {
-                Counter = 1
-            }
-            
-            local W = P["Ws", table][Counter, table]
-            
-            if (W["P", table]:isValid()) {
-                # Cursor
-                if (egpCursor()[1] != -1) {
-                    W["in", array][3, vector2] = egpCursor() - W["egpPos", vector2]
-                }
-                else {
-                    W["in", array][3, vector2] = vec2(-1)
+            local OverloadCounter = 0
+            while (OverloadCounter < Overload) {
+                local Counter = P["counter", number] + 1
+                
+                if (Counter > P["Ws", table]:count()) {
+                    #Counter = 1
+                    Counter = 0
+                    P["counter", number] = Counter
+                    break
                 }
                 
-                # Focus
-                if (inrange(egpCursor(), W["egpPos", vector2], W["egpPos", vector2] + egpResolution() * vec2(0.5, 0.475))) {
-                    P["focus", number] = Counter
-                }
+                P["counter", number] = Counter
                 
-                # Keyboard
-                if (Counter == P["focus", number]) {
-                    local KbdReal = P["kbd", array]
-                    local KbdW = W["kbd", array]
+                local W = P["Ws", table][Counter, table]
+                
+                if (W["P", table]:isValid()) {
+                    # Cursor
+                    if (egpCursor()[1] != -1) {
+                        W["in", array][3, vector2] = egpCursor() - W["egpPos", vector2]
+                    }
+                    else {
+                        W["in", array][3, vector2] = vec2(-1)
+                    }
                     
-                    KbdW:clear()
-                    for (I = 1, KbdReal:count()) {
-                        KbdW[I, number] = KbdReal[I, number]
+                    # Focus
+                    if (inrange(egpCursor(), W["egpPos", vector2], W["egpPos", vector2] + egpResolution() * vec2(0.5, 0.475))) {
+                        P["focus", number] = Counter
                     }
-                }
-                else {
-                    local KbdW = W["kbd", array]
-                    if (KbdW:count() > 0) {
+                    
+                    # Keyboard
+                    if (Counter == P["focus", number]) {
+                        local KbdReal = P["kbd", array]
+                        local KbdW = W["kbd", array]
+                        
                         KbdW:clear()
+                        for (I = 1, KbdReal:count()) {
+                            KbdW[I, number] = KbdReal[I, number]
+                        }
                     }
-                }
-                
-                # Image
-                if (egpWait()) {
+                    else {
+                        local KbdW = W["kbd", array]
+                        if (KbdW:count() > 0) {
+                            KbdW:clear()
+                        }
+                    }
+                    
+                    # Image
                     local In = W["out", array]
                     local EgpId = W["egpId", number]
                     
-                    for (I = 1, Overload) {
+                    while (OverloadCounter < Overload) {
+                        OverloadCounter++
                         if (In:count() > 0) {
                             local Command = In:shiftString()
                             local Id = In:shiftNumber() + EgpId
@@ -121,9 +130,56 @@ switch (P["state", number]) {
                                 case "setText",     egpText(Id, In:shiftString()) break
                                 case "parent",      egpParent(Id, In:shiftNumber() + EgpId) break
                                 case "remove",      egpRemove(Id) break
+                                default,
+                            }
+                        }
+                        else {
+                            break
+                        }
+                    }
+                    
+                    # Terminal
+                    if (W["P", table] == P["terminal", table]) {
+                        P = P["terminal", table]
+                        
+                        switch (P["state", number]) {
+                            case 0,
+                                egpBox(1, vec2(), egpResolution())
+                                egpColor(1, vec())
                                 
-                                case "command",
-                                    local CommandExp = In:shiftString():explode(" ")
+                                P["text", string] = "command: "
+                                egpText(2, P["text", string], vec2(), egpResolution())
+                                egpSize(2, egpResolution()[2])
+                                
+                                local Skbd = exec("skbd")
+                                P["in", array] = Skbd["out", array] = array()
+                                P["term", array] = Skbd["term", array] = array()
+                                Skbd["in", array] = P["kbd", array]
+                                
+                                Skbd["parent", table] = P["parent", table]
+                                
+                                P["state", number] = 1
+                                break
+                            
+                            case 1,
+                                if (P["term", array]:count() > 0) {
+                                    local In = P["term", array]:shiftString()
+                                    if (In == ERASE1) {
+                                        P["text", string] = P["text", string]:sub(1, -2)
+                                    }
+                                    elseif (In == "\n") {
+                                        P["text", string] = "command: "
+                                    }
+                                    else {
+                                        P["text", string] = P["text", string] + In
+                                    }
+                                    egpText(2, P["text", string])
+                                }
+                                
+                                if (wait()) {
+                                    local CommandExp = in():explode(" ")
+                                    
+                                    P = P["parent", table]
                                     
                                     switch (CommandExp[1, string]) {
                                         case "start",
@@ -164,78 +220,30 @@ switch (P["state", number]) {
                                             break
                                         
                                         case "exit",
-                                            end()
+                                            P:clear()
+                                            P["terminal", table]:clear()
                                             break
                                         
                                         default,
-                                            print("Error: Unknown command \"" + CommandExp:concat(" ") + "\".")
+                                            P = P["terminal", table]
+                                            egpText(2, "Error: Unknown command.")
                                     }
-                                    break
-                                
-                                default,
-                                    print("Error: Unknown command \"" + Command + "\".")
-                            }
-                        }
-                        else {
-                            break
+                                }
+                                break
                         }
                     }
                 }
-            }
-            else {
-                for (I = W["egpId", number], W["egpId", number] + W["egpCount", number]) {
-                    egpRemove(I)
+                else {
+                    for (I = W["egpId", number], W["egpId", number] + W["egpCount", number]) {
+                        egpRemove(I)
+                    }
+                    
+                    W:clear()
+                    
+                    P["Ws", table]:remove(Counter)
+                    Counter--
                 }
-                
-                W:clear()
-                
-                P["Ws", table]:remove(Counter)
-                Counter--
-            }
-            
-            P["counter", number] = Counter
-        }
-        
-        # Terminal
-        if (P:exists("terminal")) {
-            P = P["terminal", table]
-            
-            switch (P["state", number]) {
-                case 0,
-                    egpBox(1, vec2(), egpResolution())
-                    egpColor(1, vec())
-                    egpText(2, "", vec2(), egpResolution())
-                    egpSize(2, egpResolution()[2])
-                    
-                    local Skbd = exec("skbd")
-                    P["in", array] = Skbd["out", array] = array()
-                    P["term", array] = Skbd["term", array] = array()
-                    Skbd["in", array] = P["kbd", array]
-                    
-                    P["state", number] = 1
-                    break
-                
-                case 1,
-                    if (wait()) {
-                        out("command")
-                        P["out", array]:pushNumber(0)
-                        out(in())
-                    }
-                    
-                    if (P["term", array]:count() > 0) {
-                        local In = P["term", array]:shiftString()
-                        if (In == ERASE1) {
-                            P["text", string] = P["text", string]:sub(1, -2)
-                        }
-                        elseif (In == "\n") {
-                            P["text", string] = ""
-                        }
-                        else {
-                            P["text", string] = P["text", string] + In
-                        }
-                        egpText(2, P["text", string])
-                    }
-                    break
+                OverloadCounter++
             }
         }
         break

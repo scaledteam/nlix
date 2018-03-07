@@ -4,7 +4,9 @@
 
 @name libobject
 
-@persist NULL:table
+#@persist NULL:table
+
+NULL = table()
 
 function number table:isValid() {
     return This:count() != 0

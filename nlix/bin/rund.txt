@@ -16,5 +16,7 @@ else {
     
     Program["in", array] = P["in", array]
     Program["out", array] = P["out", array]
+    
+    Program:remove("parent")
 }
 end()

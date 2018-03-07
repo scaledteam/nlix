@@ -20,15 +20,6 @@ function string in() {
     return P["in", array]:shiftString()
 }
 
-function erase() {
-    P["out", array]:pushString(ERASE1)
-}
-
-#[function erase(Count) {
-    P["out", array]:pushString(ERASE)
-    P["out", array]:pushNumber(Count)
-}]#
-
 
 function string arg(Number) {
     return P["args", array][Number, string]
@@ -37,17 +28,3 @@ function string arg(Number) {
 function number args() {
     return P["args", array]:count()
 }
-
-
-# Additional functions
-#[function number wait(OutName:string) {
-    return P[OutName, array]:count() > 0
-}
-
-function string in(OutName:string) {
-    return P[OutName, array]:shiftString()
-}
-
-function out(OutName:string, Text:string) {
-    P[OutName, array]:pushString(Text)
-}]#

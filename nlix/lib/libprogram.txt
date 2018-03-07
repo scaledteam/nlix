@@ -7,16 +7,22 @@
 function table exec(Name:string) {
     Program = object(Name)
     Ps:pushTable(Program)
+    
+    if (P:isValid()) {
+        Program["parent", table] = P
+    }
+    
     return Program
 }
 
 function end() {
-    if(Ps[KState1, table] == P){
-        Ps:removeTable(KState1):clear()
-        KState1--
+    if(Ps[KState, table] == P){
+        Ps:removeTable(KState):clear()
+        KState--
     }
     else {
         P:clear()
     }
+    
+    P = NULL
 }
-

@@ -6,139 +6,147 @@
 
 @persist [G L S]:table
 @persist [Ps P]:table PName:string
-@persist KPerf KState0 KState1
+@persist KPerf KState
+@persist PNames:table
 
-if (tickClk()) {
-    switch (KState0) {
-        case 0,
-            while (perf(KPerf)) {
-                KState1++
-                switch (KState1) {
-                    case 1, #include "nlix/lib/libobject" break
-                    case 2, #include "nlix/lib/libprogram" break
-                    case 3, #include "nlix/lib/libdevices" break
-                    case 4, #include "nlix/lib/libio" break
-                    
-                    case 5, #include "nlix/lib/liboverload" break
-                    case 6, #include "nlix/lib/libfs" break
-                    case 7, #include "nlix/lib/liborder" break
-                    
-                    case 9, #include "nlix/lib/libegp" break
-                    
-                    case 10, #include "nlix/init/g" break
-                    #case 11, SYSTEM_NAME = "system0" #include "nlix/init/sync" break
-                    
-                    case 13, #include "nlix/init/autostart" break
-                    case 14, #include "nlix/init/fstab" break
-                    
-                    case 40, KState0 = 1 KState1 = 1 break
-                    default,
-                }
+if (!tickClk()) {
+    if (clk()) {
+        while (perf(KPerf)) {
+            KState++
+            switch (KState) {
+                case 1, #include "nlix/lib/libobject" break
+                case 2, #include "nlix/lib/libprogram" break
+                case 3, #include "nlix/lib/libdevices" break
+                case 4, #include "nlix/lib/libio" break
+                
+                case 5, #include "nlix/lib/liboverload" break
+                case 6, #include "nlix/lib/libfs" break
+                case 7, #include "nlix/lib/liborder" break
+                
+                case 9, #include "nlix/lib/libegp" break
+                
+                case 10, #include "nlix/init/g" break
+                #case 11, SYSTEM_NAME = "system0" #include "nlix/init/sync" break
+                
+                case 13, #include "nlix/init/autostart" break
+                case 14, #include "nlix/init/fstab" break
+                
+                case 15, KState = 0 break
+                default,
             }
-            break
+            
+            if (KState == 0) {
+                runOnTick(1)
+                break
+            }
+        }
         
-        case 1,
-            while (perf(KPerf)) {
-                if (KState1 >= Ps:count()) {
-                    KState1 = 1
+        if (KState != 0) {
+            interval(0)
+        }
+    }
+    elseif (first()) {
+        KPerf = 2
+        
+        interval(0)
+    }
+}  
+else {
+    while (perf(KPerf)) {
+        if (KState >= Ps:count()) {
+            KState = 1
+        }
+        else {
+            KState++
+        }
+        
+        P = Ps[KState, table]
+        
+        if (P:exists("parent") & P["parent", table]:count() == 0) {
+            end()
+            continue
+        }
+        
+        PName = P["type", string]
+        switch (PName) {
+            case "term",        #include "nlix/bin/term" break
+            case "skbd",        #include "nlix/bin/skbd" break
+            
+            case "hotplugd",    #include "nlix/bin/hotplugd" break
+            
+            case "sh",          #include "nlix/bin/sh" break
+            
+            case "echo",        #include "nlix/bin/echo" break
+            
+            case "plist",       #include "nlix/bin/plist" break
+            case "dlist",       #include "nlix/bin/dlist" break
+            
+            case "perf",        #include "nlix/bin/perf" break
+            case "overload",    #include "nlix/bin/overload" break
+            
+            case "rund",        #include "nlix/bin/rund" break
+            case "kill",        #include "nlix/bin/kill" break
+            case "reboot",      #include "nlix/bin/reboot" break
+            case "poweroff",    #include "nlix/bin/poweroff" break
+            
+            case "print-pi",    #include "nlix/bin/print-pi" break
+            
+            # Files
+            case "ls",          #include "nlix/bin/ls" break
+            case "cat",         #include "nlix/bin/cat" break
+            case "touch",       #include "nlix/bin/touch" break
+            case "rm",          #include "nlix/bin/rm" break
+            
+            case "cp",          #include "nlix/bin/cp" break
+            
+            #ifdef httpRequest(string)
+            case "wget",        #include "nlix/bin/wget" break
+            #endif
+            
+            case "fstable",    #include "nlix/bin/fstable" break
+            #ifdef fileRead()
+            case "fsreal",     #include "nlix/bin/fsreal" break
+            #endif
+            
+            # EGP
+            case "egp",         #include "nlix/bin/egp" break
+            case "kbd",         #include "nlix/bin/kbd" break
+            
+            case "estart",      #include "nlix/bin/estart" break
+            
+            case "eclock",      #include "nlix/bin/eclock" break
+            case "eeyes",       #include "nlix/bin/eeyes" break
+            
+            case "etiles",      #include "nlix/bin/etiles" break
+            case "eterm",       #include "nlix/bin/eterm" break
+            
+            # Other
+            case "bc",          #include "nlix/bin/bc" break
+            
+            #ifdef soundURLload(string, string, number, number, entity)
+            case "surl",        #include "nlix/bin/surl" break
+            #endif
+            
+            case "bc",          #include "nlix/bin/bc" break
+            
+            #ifdef ranger(number)
+            case "digi-scan",   #include "nlix/bin/digi-scan" break
+            #endif
+            
+            case "",
+                if (Ps:count() > 0) {
+                    end()
                 }
                 else {
-                    KState1++
+                    KPerf = 0
+                    runOnTick(0)
                 }
-                
-                P = Ps[KState1, table]
-                PName = P["type", string]
-                
-                switch (PName) {
-                    case "term",        #include "nlix/bin/term" break
-                    case "skbd",        #include "nlix/bin/skbd" break
-                    
-                    case "hotplugd",    #include "nlix/bin/hotplugd" break
-                    
-                    case "sh",          #include "nlix/bin/sh" break
-                    
-                    case "echo",        #include "nlix/bin/echo" break
-                    
-                    case "plist",       #include "nlix/bin/plist" break
-                    case "dlist",       #include "nlix/bin/dlist" break
-                    
-                    case "perf",        #include "nlix/bin/perf" break
-                    case "overload",    #include "nlix/bin/overload" break
-                    
-                    case "rund",        #include "nlix/bin/rund" break
-                    case "kill",        #include "nlix/bin/kill" break
-                    case "reboot",      #include "nlix/bin/reboot" break
-                    case "poweroff",    #include "nlix/bin/poweroff" break
-                    
-                    case "print-pi",    #include "nlix/bin/print-pi" break
-                    
-                    # Files
-                    case "ls",          #include "nlix/bin/ls" break
-                    case "cat",         #include "nlix/bin/cat" break
-                    case "touch",       #include "nlix/bin/touch" break
-                    case "rm",          #include "nlix/bin/rm" break
-                    
-                    case "cp",          #include "nlix/bin/cp" break
-                    
-                    #ifdef httpRequest(string)
-                    case "wget",        #include "nlix/bin/wget" break
-                    #endif
-                    
-                    case "fstable",    #include "nlix/bin/fstable" break
-                    #ifdef fileRead()
-                    case "fsreal",     #include "nlix/bin/fsreal" break
-                    #endif
-                    
-                    # EGP
-                    case "egp",         #include "nlix/bin/egp" break
-                    case "kbd",         #include "nlix/bin/kbd" break
-                    
-                    case "estart",      #include "nlix/bin/estart" break
-                    
-                    case "eclock",      #include "nlix/bin/eclock" break
-                    case "eeyes",       #include "nlix/bin/eeyes" break
-                    
-                    case "etitles",     #include "nlix/bin/etitles" break
-                    case "eterm",       #include "nlix/bin/eterm" break
-                    
-                    # Other
-                    case "bc",          #include "nlix/bin/bc" break
-                    
-                    #ifdef soundURLload(string, string, number, number, entity)
-                    case "surl",        #include "nlix/bin/surl" break
-                    #endif
-                    
-                    case "bc",          #include "nlix/bin/bc" break
-                    
-                    #ifdef ranger(number)
-                    case "digi-scan",   #include "nlix/bin/digi-scan" break
-                    #endif
-                    
-                    case "",
-                        if (Ps:count() > 0) {
-                            end()
-                        }
-                        else {
-                            runOnTick(0)
-                        }
-                        break
-                    
-                    default,
-                        out("Program \"" + PName + "\" is not exist.\n")
-                        end()
-                        break
-                }
-            }
-            break
+                break
+            
+            default,
+                out("Program \"" + PName + "\" is not exist.\n")
+                end()
+                break
+        }
     }
-}
-
-elseif (first()) {
-    if (owner():name() == "scaled") {
-        KPerf = 2
-    }
-    else {
-        KPerf = 10
-    }
-    runOnTick(1)
 }

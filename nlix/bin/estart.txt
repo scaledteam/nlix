@@ -9,11 +9,14 @@ if (arg(1) == "") {
     end()
 }
 else {
-    local Driver = exec("egp")
+    local Egp = exec("egp")
     local Program = exec(arg(1))
     
-    Driver["in", array] = Program["out", array] = array()
-    Driver["out", array] = Program["in", array] = array()
+    Egp["in", array] = Program["out", array] = array()
+    Egp["out", array] = Program["in", array] = array()
+    
+    Egp["parent", table] = Program
+    Program["parent", table] = Egp
     
     end()
 }
