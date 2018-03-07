@@ -6,6 +6,19 @@
 
 switch (P["state", number]) {
     case 0,
+        if (P["parent", table]:type() == "sh") {
+            P["parent", table]:clear()
+            
+            local Egp = exec("egp")
+            P["parent", table] = Egp
+            P["in", array] = Egp["out", array] = array()
+            P["out", array] = Egp["in", array] = array()
+        }
+        
+        P["state", number] = 1
+        break
+    
+    case 1,
         if (egpReady()) {
             if (egpMax() > 20) {
                 # Background
@@ -15,7 +28,7 @@ switch (P["state", number]) {
                 
                 P["Ws", table] = table()
                 
-                P["state", number] = 1
+                P["state", number] = 2
             }
             else {
                 end()
@@ -23,7 +36,7 @@ switch (P["state", number]) {
         }
         break
     
-    case 1,
+    case 2,
         local MaxTitles = 4
         local TitleId = 0
         
@@ -38,13 +51,14 @@ switch (P["state", number]) {
         W["egpId", number] = EgpParentId + 1
         W["egpPos", vector2] = vec2(0, egpResolution()[2] * 0.95)
         W["egpCount", number] = 2
+        W["egpResolution", vector2] = egpResolution() * vec2(1, 0.05)
         
         local Program = table()
         W["P", table] = Program
         
         P["terminal", table] = Program
         Program["parent", table] = P
-        W["in", array] = Program["in", array] = array(egpResolution() * vec2(1, 0.05), W["egpCount", number])
+        W["in", array] = Program["in", array] = array(W["egpResolution", vector2], W["egpCount", number])
         W["out", array] = Program["out", array] = array()
         
         Program["kbd", array] = W["kbd", array] = array()
@@ -57,10 +71,10 @@ switch (P["state", number]) {
         P["Ws", table]:pushTable(W)
         # end
         
-        P["state", number] = 2
+        P["state", number] = 3
         break
     
-    case 2,
+    case 3,
         if (P["Ws", table]:count() > 0) {
             local OverloadCounter = 0
             while (OverloadCounter < Overload) {
@@ -78,6 +92,17 @@ switch (P["state", number]) {
                 local W = P["Ws", table][Counter, table]
                 
                 if (W["P", table]:isValid()) {
+                    # Focus
+                    if (P["focus", number] != Counter & inrange(egpCursor() - W["egpPos", vector2], vec2(), W["egpResolution", vector2])) {
+                        # Clear old data after focus changed
+                        local OldW = P["Ws", table][P["focus", number], table]
+                        OldW["kbd", array]:clear()
+                        OldW["in", array][4, number] = 0
+                        
+                        # set new focus
+                        P["focus", number] = Counter
+                    }
+                    
                     # Cursor
                     if (egpCursor()[1] != -1) {
                         W["in", array][3, vector2] = egpCursor() - W["egpPos", vector2]
@@ -86,25 +111,17 @@ switch (P["state", number]) {
                         W["in", array][3, vector2] = vec2(-1)
                     }
                     
-                    # Focus
-                    if (inrange(egpCursor(), W["egpPos", vector2], W["egpPos", vector2] + egpResolution() * vec2(0.5, 0.475))) {
-                        P["focus", number] = Counter
-                    }
-                    
-                    # Keyboard
                     if (Counter == P["focus", number]) {
+                        # Use key from egp
+                        W["in", array][4, number] = egpUse()
+                        
+                        # Keyboard
                         local KbdReal = P["kbd", array]
                         local KbdW = W["kbd", array]
                         
                         KbdW:clear()
                         for (I = 1, KbdReal:count()) {
                             KbdW[I, number] = KbdReal[I, number]
-                        }
-                    }
-                    else {
-                        local KbdW = W["kbd", array]
-                        if (KbdW:count() > 0) {
-                            KbdW:clear()
                         }
                     }
                     
@@ -127,6 +144,8 @@ switch (P["state", number]) {
                                 case "pos",         egpPos(Id, In:shiftVector2()) break
                                 case "size",        egpSize(Id, In:shiftVector2()) break
                                 case "sizeNumber",  egpSize(Id, In:shiftNumber()) break
+                                case "align1",      egpAlign(Id, In:shiftNumber()) break
+                                case "align2",      egpAlign(Id, In:shiftNumber(), In:shiftNumber()) break
                                 case "setText",     egpText(Id, In:shiftString()) break
                                 case "parent",      egpParent(Id, In:shiftNumber() + EgpId) break
                                 case "remove",      egpRemove(Id) break
@@ -190,11 +209,12 @@ switch (P["state", number]) {
                                             W["egpId", number] = EgpParentId + 1
                                             W["egpPos", vector2] = vec2(Id % 2, int(Id / 2)) * egpResolution() * vec2(0.5, 0.475)
                                             W["egpCount", number] = int((egpMax() - 6) / 4)
+                                            W["egpResolution", vector2] = egpResolution() * vec2(0.5, 0.475)
                                             
                                             local Program = exec(CommandExp[2, string])
                                             W["P", table] = Program
                                             
-                                            W["in", array] = Program["in", array] = array(egpResolution() * vec2(0.5, 0.475), W["egpCount", number])
+                                            W["in", array] = Program["in", array] = array(W["egpResolution", vector2], W["egpCount", number])
                                             W["out", array] = Program["out", array] = array()
                                             
                                             Program["kbd", array] = W["kbd", array] = array()

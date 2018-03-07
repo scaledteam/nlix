@@ -23,15 +23,15 @@ if (!tickClk()) {
                 case 6, #include "nlix/lib/libfs" break
                 case 7, #include "nlix/lib/liborder" break
                 
-                case 9, #include "nlix/lib/libegp" break
+                case 8, #include "nlix/lib/libegp" break
                 
-                case 10, #include "nlix/init/g" break
-                #case 11, SYSTEM_NAME = "system0" #include "nlix/init/sync" break
+                case 9, #include "nlix/init/g" break
+                #case 10, SYSTEM_NAME = "system0" #include "nlix/init/sync" break
                 
-                case 13, #include "nlix/init/autostart" break
-                case 14, #include "nlix/init/fstab" break
+                case 11, #include "nlix/init/autostart" break
+                case 12, #include "nlix/init/fstab" break
                 
-                case 15, KState = 0 break
+                case 13, KState = 0 break
                 default,
             }
             
@@ -46,7 +46,7 @@ if (!tickClk()) {
         }
     }
     elseif (first()) {
-        KPerf = 2
+        KPerf = 5
         
         interval(0)
     }
@@ -119,6 +119,8 @@ else {
             
             case "etiles",      #include "nlix/bin/etiles" break
             case "eterm",       #include "nlix/bin/eterm" break
+            
+            case "eclicker",    #include "nlix/bin/eclicker" break
             
             # Other
             case "bc",          #include "nlix/bin/bc" break

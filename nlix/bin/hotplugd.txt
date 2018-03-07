@@ -88,7 +88,8 @@ if (Programs:count() > 0) {
     if (!Programs[Counter, table]:isValid()) {
         Programs:remove(Counter)
         local Device = P["D", table]:removeWirelink(Counter)
-        P[Device:type(), array]:pushWirelink(Device)
+        #P[Device:type(), array]:pushWirelink(Device)
+        P[Device:type(), array]:unshiftWirelink(Device)
     }
     else {
         P["counter", number] = Counter

@@ -11,6 +11,9 @@ switch (P["state", number]) {
             
             if (!P:exists("kbdOld")) {
                 P["kbdOld", array] = array()
+                
+                P["kbdTable", table] = table()
+                P["kbdTableOld", table] = table()
             }
             P["state", number] = 2
         }
@@ -21,6 +24,9 @@ switch (P["state", number]) {
             
             if (!P:exists("kbdOld")) {
                 P["kbdOld", array] = array()
+                
+                P["kbdTable", table] = table()
+                P["kbdTableOld", table] = table()
             }
             
             P["state", number] = 1
@@ -56,47 +62,51 @@ switch (P["state", number]) {
     
     case 2,
         local Keys = P["kbd", array]
-        local KeysOld = P["kbdOld", array]
         
-        if (Keys:count() > 0 | KeysOld:count() > 0) {
-            if (Keys:count() >= KeysOld:count()) {
-                for (I = 1, Keys:count()) {
-                    local Key = Keys[I, number]
-                    if (Key != KeysOld[I, number]) {
-                        switch (Key) {
-                            # Enter
-                            case 10, case 13, case 142,
-                                P["term", array]:pushString("\n")
+        if (Keys:count() > 0 | P["kbdTableOld", table]:count() > 0) {
+            local KbdTableOld = P["kbdTableOld", table]
+            KbdTableOld:clear()
+            P["kbdTableOld", table] = P["kbdTable", table]
+            P["kbdTable", table] = KbdTableOld
+        }
+        
+        foreach (I, Key:number = Keys) {
+            P["kbdTable", table][Key, number] = 1
+        }
+        
+        if (Keys:count() > 0) {
+            for (I = 1, Keys:count()) {
+                local Key = Keys[I, number]
+                #if (Key != KeysOld[I, number]) {
+                if (P["kbdTable", table][Key, number] > P["kbdTableOld", table][Key, number]) {
+                    switch (Key) {
+                        # Enter
+                        case 10, case 13, case 142,
+                            P["term", array]:pushString("\n")
+                            
+                            out(P["text", string])
+                            P["text", string] = ""
+                            break
+                        
+                        # Backspace
+                        case 127,
+                            if (P["text", string]:length() > 0) {
+                                P["term", array]:pushString(ERASE1)
+                                P["text", string] = P["text", string]:sub(1, -2)
+                            }
+                            break
+                        
+                        # Normal key
+                        default,
+                            if (inrange(Key, 32, 127)) {
+                                local Char = toChar(Key)
                                 
-                                out(P["text", string])
-                                P["text", string] = ""
-                                break
-                            
-                            # Backspace
-                            case 127,
-                                if (P["text", string]:length() > 0) {
-                                    P["term", array]:pushString(ERASE1)
-                                    P["text", string] = P["text", string]:sub(1, -2)
-                                }
-                                break
-                            
-                            # Normal key
-                            default,
-                                if (inrange(Key, 32, 127)) {
-                                    local Char = toChar(Key)
-                                    
-                                    P["text", string] = P["text", string] + Char
-                                    
-                                    P["term", array]:pushString(Char)
-                                }
-                        }
+                                P["text", string] = P["text", string] + Char
+                                
+                                P["term", array]:pushString(Char)
+                            }
                     }
                 }
-            }
-            
-            KeysOld:clear()
-            for (I = 1, Keys:count()) {
-                KeysOld[I, number] = Keys[I, number]
             }
         }
         break

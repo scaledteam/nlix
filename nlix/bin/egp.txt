@@ -136,14 +136,6 @@ switch (P["state", number]) {
                                 Device:egpUnParent(Id)
                             }
                             break
-                        
-                        case "remove", 
-                            Object:clear()
-                            Object:setType("box")
-                            Object["color", vector] = vec(255)
-                            
-                            Device:egpBox(Id, vec2(), vec2())
-                            break
                             
                         case "update",
                             local Type = Object:type()
@@ -203,6 +195,25 @@ switch (P["state", number]) {
                             Device:egpSetText(Id, Object["text", string])
                             break
                         
+                        case "align1",
+                            Object["alignX", number] = In:shiftNumber()
+                            Device:egpAlign(Id, Object["alignX", number])
+                            break
+                        
+                        case "align2",
+                            Object["alignX", number] = In:shiftNumber()
+                            Object["alignY", number] = In:shiftNumber()
+                            Device:egpAlign(Id, Object["alignX", number], Object["alignY", number])
+                            break
+                        
+                        case "remove", 
+                            Object:clear()
+                            Object:setType("box")
+                            Object["color", vector] = vec(255)
+                            
+                            Device:egpBox(Id, vec2(), vec2())
+                            break
+                        
                         case "parent",
                             Object[Command, number] = In:shiftNumber()
                             Device:egpParent(Id, Object[Command, number])
@@ -247,6 +258,7 @@ switch (P["state", number]) {
             }
             
             P["out", array][3, vector2] = Device:egpCursor(P["user", entity])
+            P["out", array][4, number] = P["user", entity]:keyUse()
         }
         else {
             P["state", number] = 2

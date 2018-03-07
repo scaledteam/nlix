@@ -78,6 +78,21 @@ function egpColor(Id, Color:vector) {
     P["out", array]:pushVector(Color)
 }
 
+function egpAlign(Id, AlignX) {
+    P["out", array]:pushString("align1")
+    P["out", array]:pushNumber(Id)
+    P["out", array]:pushNumber(AlignX)
+}
+
+function egpAlign(Id, AlignX, AlignY) {
+    local Out = P["out", array]
+    Out:pushString("align2")
+    Out:pushNumber(Id)
+    Out:pushNumber(AlignX)
+    Out:pushNumber(AlignY)
+}
+
+
 function egpParent(Id, Id2) {
     P["out", array]:pushString("parent")
     P["out", array]:pushNumber(Id)
@@ -90,6 +105,15 @@ function egpRemove(Id) {
 }
 
 # Input
+function number egpWait() {
+    return P["out", array]:count() == 0
+}
+
+function number egpReady() {
+    return P["in", array]:count() > 0
+}
+
+
 function vector2 egpResolution() {
     return P["in", array][1, vector2]
 }
@@ -102,10 +126,6 @@ function vector2 egpCursor() {
     return P["in", array][3, vector2]
 }
 
-function number egpWait() {
-    return P["out", array]:count() == 0
-}
-
-function number egpReady() {
-    return P["in", array]:count() > 0
+function number egpUse() {
+    return P["in", array][4, number]
 }
