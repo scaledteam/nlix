@@ -8,7 +8,7 @@ switch (P["state", number]) {
     case 0,
         P["objects", table] = table()
         
-        P["limit", number] = min(100, egpMaxObjects())
+        P["limit", number] = min(200, egpMaxObjects())
         
         P["state", number] = 1
         break

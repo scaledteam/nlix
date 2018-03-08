@@ -7,30 +7,26 @@
 switch (P["state", number]) {
     case 0,
         # init keyboard and terminal
-        if (!P:exists("out")) {
-            P["term", table] = exec("term")
-            P["out", array] = P["term", table]["in", array] = array()
-        }
-        
         if (!P:exists("in")) {
+            local Skbd = execUp("skbd")
+            
+            P["in", array] = Skbd["out", array] = array()
+            
             if (P:exists("kbd")) {
-                local Skbd = exec("skbd")
-                P["skbd", table] = Skbd
-                
-                Skbd["term", array] = P["out", array]
                 Skbd["in", array] = P["kbd", array]
-                
-                P["in", array] = Skbd["out", array] = array()
             }
             else {
-                local Skbd = exec("skbd")
-                P["skbd", table] = Skbd
-                
-                Skbd["term", array] = P["out", array]
                 Skbd["kbd", array] = P["kbd", array] = array()
-                
-                P["in", array] = Skbd["out", array] = array()
             }
+            
+            if (!P:exists("out")) {
+                local Term = exec("term")
+                P["out", array] = Term["in", array] = Skbd["term", array] = array()
+            }
+        }
+        elseif (!P:exists("out")) {
+            local Term = exec("term")
+            P["out", array] = Term["in", array] = array()
         }
         
         # Welcome message
@@ -54,8 +50,6 @@ switch (P["state", number]) {
                     break
                 
                 case "exit",
-                    #P["term", table]:clear()
-                    #P["skbd", table]:clear()
                     end()
                     break
                 

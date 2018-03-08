@@ -41,7 +41,8 @@ switch (P["state", number]) {
         local TitleId = 0
         
         if (!P:exists("kbd")) {
-            local Kbd = exec("kbd")
+            local Kbd = execUp("kbd")
+            
             P["kbd", array] = Kbd["out", array] = array()
         }
         

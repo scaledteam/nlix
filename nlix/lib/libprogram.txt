@@ -26,3 +26,14 @@ function end() {
     
     P = NULL
 }
+
+function table execUp(Name:string) {
+    Ps:remove(KState)
+    
+    local Program = exec(Name)
+    
+    Ps:pushTable(P)
+    KState = Ps:count()
+    
+    return Program
+}

@@ -13,16 +13,25 @@ switch (P["state", number]) {
                 
                 egpText(2, "", vec2(), egpResolution())
                 
-                P["term", table] = exec("term")
-                P["term", table]["resolution", vector2] = floor(vec2(56, 28) * egpResolution() / vec2(512))
-                P["in", array] = P["term", table]["out", array] = array()
+                local Skbd = execUp("skbd")
+                local Sh = execUp("sh")
+                local Term = execUp("term")
                 
-                P["sh", table] = exec("sh")
-                P["sh", table]["out", array] = P["term", table]["in", array] = array()
+                P["sh", table] = Sh
+                P["term", table] = Term
                 
+                Term["resolution", vector2] = floor(vec2(56, 28) * egpResolution() / vec2(512))
+                
+                # input output
                 if (P:exists("kbd")) {
-                    P["sh", table]["kbd", array] = P["kbd", array]
+                    Skbd["in", array] = Sh["kbd", array] = P["kbd", array]
                 }
+                
+                Skbd["out", array] = Sh["in", array] = array()
+                Skbd["term", array] = Sh["out", array] = Term["in", array] = array()
+                
+                P["in", array] = Term["out", array] = array()
+                
                 P["state", number] = 1
             }
             else {
