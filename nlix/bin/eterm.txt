@@ -13,9 +13,10 @@ switch (P["state", number]) {
                 
                 egpText(2, "", vec2(), egpResolution())
                 
-                local Skbd = execUp("skbd")
-                local Sh = execUp("sh")
-                local Term = execUp("term")
+                local Skbd = exec("skbd")
+                local Sh = exec("sh")
+                local Term = exec("term")
+                makeProgramLast()
                 
                 P["sh", table] = Sh
                 P["term", table] = Term
@@ -32,6 +33,7 @@ switch (P["state", number]) {
                 
                 P["in", array] = Term["out", array] = array()
                 
+                P["parent", table] = P["sh", table]
                 P["state", number] = 1
             }
             else {
@@ -43,10 +45,6 @@ switch (P["state", number]) {
     case 1,
         if (wait()) {
             egpText(2, in())
-        }
-        elseif (!P["sh", table]:isValid()) {
-            P["term", table]:clear()
-            end()
         }
         break
 }

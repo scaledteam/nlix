@@ -126,8 +126,28 @@ switch (P["state", number]) {
                             Object["text", string] = In:shiftString()
                             Object["pos", vector2] = In:shiftVector2()
                             Object["size", vector2] = In:shiftVector2()
+                            Object["sizeNumber", number] = 18
+                            Object["alignX", number] = 0
+                            Object["alignY", number] = 0
                             Device:egpTextLayout(Id, Object["text", string], Object["pos", vector2], Object["size", vector2])
                             Device:egpFont(Id, "Courier New")
+                            Device:egpSize(Id, Object["sizeNumber", number])
+                            Device:egpAlign(Id, Object["alignX", number], Object["alignY", number])
+                            Device:egpColor(Id, Object["color", vector])
+                            if (Object:exists("parent")) {
+                                Device:egpParent(Id, Object["parent", number])
+                            }
+                            else {
+                                Device:egpUnParent(Id)
+                            }
+                            break
+                        
+                        case "triangle",
+                            Object:setType(Command)
+                            Object["pos1", vector2] = In:shiftVector2()
+                            Object["pos2", vector2] = In:shiftVector2()
+                            Object["pos3", vector2] = In:shiftVector2()
+                            Device:egpTriangle(Id, Object["pos1", vector2], Object["pos2", vector2], Object["pos3", vector2])
                             Device:egpColor(Id, Object["color", vector])
                             if (Object:exists("parent")) {
                                 Device:egpParent(Id, Object["parent", number])
@@ -156,7 +176,9 @@ switch (P["state", number]) {
                                 
                                 case "text",
                                     Device:egpTextLayout(Id, Object["text", string], Object["pos", vector2], Object["size", vector2])
-                                    Device:egpSize(Id, Object[Command, number])
+                                    Device:egpFont(Id, "Courier New")
+                                    Device:egpSize(Id, Object["sizeNumber", number])
+                                    Device:egpAlign(Id, Object["alignX", number], Object["alignY", number])
                                     break
                                 
                                 default,

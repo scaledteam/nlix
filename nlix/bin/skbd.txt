@@ -96,6 +96,15 @@ switch (P["state", number]) {
                             }
                             break
                         
+                        # Escape # Delete
+                        case 18, case 148,
+                            if (P["text", string]:length() > 0) {
+                                P["term", array]:pushString(ERASE)
+                                P["term", array]:pushNumber(P["text", string]:length())
+                                P["text", string] = ""
+                            }
+                            break
+                        
                         # Normal key
                         default,
                             if (inrange(Key, 32, 127)) {

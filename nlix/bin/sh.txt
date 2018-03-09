@@ -8,7 +8,8 @@ switch (P["state", number]) {
     case 0,
         # init keyboard and terminal
         if (!P:exists("in")) {
-            local Skbd = execUp("skbd")
+            local Skbd = exec("skbd")
+            makeProgramLast()
             
             P["in", array] = Skbd["out", array] = array()
             

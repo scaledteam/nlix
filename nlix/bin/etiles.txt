@@ -10,6 +10,7 @@ switch (P["state", number]) {
             P["parent", table]:clear()
             
             local Egp = exec("egp")
+            makeProgramLast()
             P["parent", table] = Egp
             P["in", array] = Egp["out", array] = array()
             P["out", array] = Egp["in", array] = array()
@@ -41,7 +42,8 @@ switch (P["state", number]) {
         local TitleId = 0
         
         if (!P:exists("kbd")) {
-            local Kbd = execUp("kbd")
+            local Kbd = exec("kbd")
+            makeProgramLast()
             
             P["kbd", array] = Kbd["out", array] = array()
         }
@@ -187,7 +189,7 @@ switch (P["state", number]) {
                                     if (In == ERASE1) {
                                         P["text", string] = P["text", string]:sub(1, -2)
                                     }
-                                    elseif (In == "\n") {
+                                    elseif (In == ERASE | In == "\n") {
                                         P["text", string] = "command: "
                                     }
                                     else {
@@ -201,8 +203,25 @@ switch (P["state", number]) {
                                     
                                     P = P["parent", table]
                                     
-                                    switch (CommandExp[1, string]) {
-                                        case "start",
+                                    switch (CommandExp[1, string]) {case "close", case "c",
+                                            local W = P["Ws", table]:removeTable(CommandExp[2, string]:toNumber())
+                                            
+                                            for (I = W["egpId", number], W["egpId", number] + W["egpCount", number]) {
+                                                egpRemove(I)
+                                            }
+                                            
+                                            W["P", table]:clear()
+                                            
+                                            W:clear()
+                                            break
+                                        
+                                        case "exit", case "e", case "quit", case "q",
+                                            P:clear()
+                                            P["terminal", table]:clear()
+                                            break
+                                        
+                                        default,
+                                        #case "start", case "s",
                                             local Id = P["Ws", table]:count() - 1
                                             
                                             local W = table()
@@ -212,7 +231,8 @@ switch (P["state", number]) {
                                             W["egpCount", number] = int((egpMax() - 6) / 4)
                                             W["egpResolution", vector2] = egpResolution() * vec2(0.5, 0.475)
                                             
-                                            local Program = exec(CommandExp[2, string])
+                                            #local Program = exec(CommandExp[2, string])
+                                            local Program = exec(CommandExp[1, string])
                                             W["P", table] = Program
                                             
                                             W["in", array] = Program["in", array] = array(W["egpResolution", vector2], W["egpCount", number])
@@ -226,28 +246,11 @@ switch (P["state", number]) {
                                             }
                                             
                                             P["Ws", table]:pushTable(W)
-                                            break
-                                        
-                                        case "close",
-                                            local W = P["Ws", table]:removeTable(CommandExp[2, string]:toNumber())
-                                            
-                                            for (I = W["egpId", number], W["egpId", number] + W["egpCount", number]) {
-                                                egpRemove(I)
-                                            }
-                                            
-                                            W["P", table]:clear()
-                                            
-                                            W:clear()
-                                            break
-                                        
-                                        case "exit",
-                                            P:clear()
-                                            P["terminal", table]:clear()
-                                            break
+                                            #[break
                                         
                                         default,
                                             P = P["terminal", table]
-                                            egpText(2, "Error: Unknown command.")
+                                            egpText(2, "Error: Unknown command.")]#
                                     }
                                 }
                                 break

@@ -92,13 +92,10 @@ switch (P["state", number]) {
                         }
                         break
                     
-                    #[case ERASE,
+                    case ERASE,
                         local EraseCount = P["in", array]:shiftNumber()
                         
                         Update = 1
-                        
-                        local String = TextR:popString()
-                        local StringCount = String:length()
                         
                         while (EraseCount > 0) {
                             local String = TextR:popString()
@@ -121,7 +118,9 @@ switch (P["state", number]) {
                                 P["text", string] = Text = Text:sub(1, -2 - StringCount)
                             }
                         }
-                        break]#
+                        
+                        Text = TextR:concat("\n")
+                        break
                     
                     #[case EXIT,
                         deviceReturn()

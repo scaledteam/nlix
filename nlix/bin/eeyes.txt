@@ -11,6 +11,7 @@ switch (P["state", number]) {
                 local Res = egpResolution()
                 # Background
                 egpBox(1, vec2(), Res)
+                egpColor(1, vec(127))
                 
                 # Left eye
                 local Center = Res * vec2(0.25, 0.5)

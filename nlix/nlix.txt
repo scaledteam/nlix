@@ -7,7 +7,6 @@
 @persist [G L S]:table
 @persist [Ps P]:table PName:string
 @persist KPerf KState
-@persist PNames:table
 
 if (!tickClk()) {
     if (clk()) {
