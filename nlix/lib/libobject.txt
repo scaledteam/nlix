@@ -4,8 +4,6 @@
 
 @name libobject
 
-#@persist NULL:table
-
 NULL = table()
 
 function number table:isValid() {
@@ -13,9 +11,7 @@ function number table:isValid() {
 }
 
 function table object(Type:string) {
-    local Object = table()
-    Object["type", string] = Type
-    return Object
+    return table("type" = Type)
 }
 
 function string table:type() {

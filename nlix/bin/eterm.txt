@@ -33,7 +33,6 @@ switch (P["state", number]) {
                 
                 P["in", array] = Term["out", array] = array()
                 
-                P["parent", table] = P["sh", table]
                 P["state", number] = 1
             }
             else {
@@ -45,6 +44,9 @@ switch (P["state", number]) {
     case 1,
         if (wait()) {
             egpText(2, in())
+        }
+        elseif (!P["sh", table]:isValid()) {
+            end()
         }
         break
 }

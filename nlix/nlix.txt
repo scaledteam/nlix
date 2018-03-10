@@ -120,6 +120,7 @@ else {
             case "eterm",       #include "nlix/bin/eterm" break
             
             case "eclicker",    #include "nlix/bin/eclicker" break
+            case "eobj",        #include "nlix/bin/eobj" break
             
             # Other
             case "bc",          #include "nlix/bin/bc" break

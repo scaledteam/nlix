@@ -38,7 +38,7 @@ switch (P["state", number]) {
         break
     
     case 1,
-        out("$ ")
+        out("sh $ ")
         P["state", number] = 2
         break
     
@@ -75,11 +75,11 @@ switch (P["state", number]) {
                     break
                 
                 default,
-                    local Commands = Command:replaceRE("  +", " "):explode(">")
+                    local Commands = Command:trim():replaceRE("  +", " "):explode(">")
                     
                     local Program = NULL
                     for (I = 1, Commands:count()) {
-                        local CommandExplode = Commands[I, string]:trim():explode(" ")
+                        local CommandExplode = Commands[I, string]:explode(" ")
                         
                         if (I == 1) {
                             Program = exec(CommandExplode:shiftString())

@@ -47,6 +47,16 @@ function egpTriangle(Id, Point1:vector2, Point2:vector2, Point3:vector2) {
     Out:pushVector2(Point3)
 }
 
+function egpPoly(Id, Point1:vector2, Point2:vector2, Point3:vector2, Point4:vector2) {
+    local Out = P["out", array]
+    Out:pushString("poly")
+    Out:pushNumber(Id)
+    Out:pushVector2(Point1)
+    Out:pushVector2(Point2)
+    Out:pushVector2(Point3)
+    Out:pushVector2(Point4)
+}
+
 
 function egpPos(Id, Pos:vector2) {
     P["out", array]:pushString("pos")

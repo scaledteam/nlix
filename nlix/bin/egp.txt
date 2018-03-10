@@ -156,6 +156,22 @@ switch (P["state", number]) {
                                 Device:egpUnParent(Id)
                             }
                             break
+                        
+                        case "poly",
+                            Object:setType(Command)
+                            Object["pos1", vector2] = In:shiftVector2()
+                            Object["pos2", vector2] = In:shiftVector2()
+                            Object["pos3", vector2] = In:shiftVector2()
+                            Object["pos4", vector2] = In:shiftVector2()
+                            Device:egpPolyOutline(Id, Object["pos1", vector2], Object["pos2", vector2], Object["pos3", vector2], Object["pos4", vector2])
+                            Device:egpColor(Id, Object["color", vector])
+                            if (Object:exists("parent")) {
+                                Device:egpParent(Id, Object["parent", number])
+                            }
+                            else {
+                                Device:egpUnParent(Id)
+                            }
+                            break
                             
                         case "update",
                             local Type = Object:type()

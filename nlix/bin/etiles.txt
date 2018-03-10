@@ -24,8 +24,7 @@ switch (P["state", number]) {
             if (egpMax() > 20) {
                 # Background
                 egpBox(1, vec2(), egpResolution())
-                #egpColor(1, randvec(160, 190))
-                egpColor(1, hsv2rgb(random(360),1,0.7))
+                egpColor(1, hsv2rgb(random(360), 1, 0.7))
                 
                 P["Ws", table] = table()
                 
@@ -169,7 +168,7 @@ switch (P["state", number]) {
                                 egpBox(1, vec2(), egpResolution())
                                 egpColor(1, vec())
                                 
-                                P["text", string] = "command: "
+                                P["text", string] = "etiles $ "
                                 egpText(2, P["text", string], vec2(), egpResolution())
                                 egpSize(2, egpResolution()[2])
                                 
@@ -190,7 +189,7 @@ switch (P["state", number]) {
                                         P["text", string] = P["text", string]:sub(1, -2)
                                     }
                                     elseif (In == ERASE | In == "\n") {
-                                        P["text", string] = "command: "
+                                        P["text", string] = "etiles $ "
                                     }
                                     else {
                                         P["text", string] = P["text", string] + In
@@ -199,7 +198,7 @@ switch (P["state", number]) {
                                 }
                                 
                                 if (wait()) {
-                                    local CommandExp = in():explode(" ")
+                                    local CommandExp = in():trim():replaceRE("  +", " "):explode(" ")
                                     
                                     P = P["parent", table]
                                     
@@ -215,13 +214,22 @@ switch (P["state", number]) {
                                             W:clear()
                                             break
                                         
+                                        case "sh",
+                                            P:clear()
+                                            P["terminal", table]:clear()
+                                            exec("sh")
+                                            break
+                                        
+                                        case "background",
+                                            egpColor(1, hsv2rgb(random(360), 1, 0.7))
+                                            break
+                                        
                                         case "exit", case "e", case "quit", case "q",
                                             P:clear()
                                             P["terminal", table]:clear()
                                             break
                                         
                                         default,
-                                        #case "start", case "s",
                                             local Id = P["Ws", table]:count() - 1
                                             
                                             local W = table()
@@ -231,8 +239,12 @@ switch (P["state", number]) {
                                             W["egpCount", number] = int((egpMax() - 6) / 4)
                                             W["egpResolution", vector2] = egpResolution() * vec2(0.5, 0.475)
                                             
-                                            #local Program = exec(CommandExp[2, string])
-                                            local Program = exec(CommandExp[1, string])
+                                            local Program = exec(CommandExp:shiftString())
+                                            #makeProgramLast()
+                                            if (CommandExp:count() > 0) {
+                                                Program["args", array] = CommandExp
+                                            }
+                                            
                                             W["P", table] = Program
                                             
                                             W["in", array] = Program["in", array] = array(W["egpResolution", vector2], W["egpCount", number])
@@ -246,11 +258,6 @@ switch (P["state", number]) {
                                             }
                                             
                                             P["Ws", table]:pushTable(W)
-                                            #[break
-                                        
-                                        default,
-                                            P = P["terminal", table]
-                                            egpText(2, "Error: Unknown command.")]#
                                     }
                                 }
                                 break

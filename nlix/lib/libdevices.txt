@@ -10,7 +10,7 @@ function number deviceGet(Type:string) {
         
         if (Devices:count() > 0) {
             local Device = Devices:shiftWirelink()
-            if (Device != nowirelink()) {
+            if (Device != nowirelink() & Device:entity():isValid()) {
                 P["device", wirelink] = Device
                 S["devices", table]["P", table]:pushTable(P)
                 S["devices", table]["D", table]:pushWirelink(Device)
@@ -31,9 +31,19 @@ function number deviceGet(Type:string) {
 function string wirelink:type() {
     local Name = This:entity():type()
     
-    if (Name == "gmod_wire_expression2") {
+    if (Name == "gmod_wire_expression2" | Name == "expadv_gate") {
         Name = This:entity():getName()
     }
     
     return Name
 }
+
+#[function string wirelink:type() {
+    local Name = This:entity():getName()
+    
+    if (Name == "") {
+        Name = This:entity():type()
+    }
+    
+    return Name
+}]#
