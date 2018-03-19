@@ -4,16 +4,16 @@
 
 @name perf
 
-local ArgNumber = P["args", array]:shiftString():toNumber()
-if (ArgNumber != 0) {
-    if (S:exists("perf")) {
-        S["perf", number] = ArgNumber
-    }
-    else {
-        KPerf = ArgNumber
-    }
+if (args() < 1) {
+    out("Usage: perf [number]")
 }
 else {
-    out("Entered value is not a number or 0.\n")
+    local Arg = arg(1):toNumber()
+    if (Arg > 0) {
+        KPerf = Arg
+    }
+    else {
+        out("Entered value is incorrect.\n")
+    }
 }
 end()

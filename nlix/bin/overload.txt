@@ -4,16 +4,16 @@
 
 @name overload
 
-local ArgNumber = P["args", array]:shiftString():toNumber()
-if (ArgNumber != 0) {
-    if (S:exists("overload")) {
-        S["overload", number] = ArgNumber
-    }
-    else {
-        Overload = ArgNumber
-    }
+if (args() < 1) {
+    out("Usage: overload [number]")
 }
 else {
-    out("Entered value is not a number or 0.\n")
+    local Arg = arg(1):toNumber()
+    if (Arg > 0) {
+        Overload = Arg
+    }
+    else {
+        out("Entered value is incorrect.\n")
+    }
 }
 end()

@@ -4,22 +4,21 @@
 
 @name kill
 
-local Arg1 = arg(1):toNumber()
-
-if (Arg1 != 0) {
-    local Arg2 = arg(2):toNumber()
-    
-    if (Arg2 == 0) {
-        Ps:removeTable(Arg1):clear()
+if (args() < 1) {
+    out("Usage: kill [id] [end id]\n")
+}
+else {
+    if (args() < 2) {
+        Ps:removeTable(arg(1):toNumber()):clear()
     }
     else {
+        local Arg1 = arg(1):toNumber()
+        local Arg2 = arg(2):toNumber()
+        
         while (Arg2 >= Arg1) {
             Ps:removeTable(Arg1):clear()
             Arg2--
         }
     }
-}
-else {
-    out("Entered value is not a number or 0.\n")
 }
 end()

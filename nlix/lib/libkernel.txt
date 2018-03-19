@@ -2,7 +2,7 @@
 # Created by scaled
 #
 
-@name libprogram
+@name libkernel
 
 function table exec(Name:string) {
     Program = object(Name)

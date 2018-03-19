@@ -5,7 +5,7 @@
 @name fstab
 
 if (!S:exists("fstab")) {
-    S["fstab", table] = table()
+    #[S["fstab", table] = table()
     
     S["G", table] = G
     S["P", table] = Ps
@@ -21,10 +21,22 @@ if (!S:exists("fstab")) {
     S["e2shared", table] = table()
     S["fstab", table]["/e2shared", table] = object("real")
     S["fstab", table]["/e2shared", table]["path", string] = ">e2shared/"
-    #endif
+    #endif]#
     
-    # Test of many-level mounting
-    #[S["fstab", table]["/rdir/windows10", table] = object("table")
-    S["fstab", table]["/rdir/windows10", table]["table", table] = table()
-    S["fstab", table]["/rdir/windows10", table]["table", table]["test", string] = "Success."]#
+    S["fstab", table] = table(
+    #   path                            type        args
+    	"/" =           table("type" = "table",     "table" = S)
+    	#ifdef fileRead()
+    	,"/rdir" =      table("type" = "real",      "path" = "/")
+    	,"/e2shared" =  table("type" = "real",      "path" = ">e2shared/")
+    	#endif
+    )
+    
+    S["G", table] = G
+    S["P", table] = Ps
+    
+    #ifdef fileRead()
+    S["rdir", table] = table()
+    S["e2shared", table] = table()
+    #endif
 }

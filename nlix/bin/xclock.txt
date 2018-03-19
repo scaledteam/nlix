@@ -1,0 +1,39 @@
+#
+# Created by scaled
+#
+
+@name xclock
+
+switch (P["state", number]) {
+    case 0,
+        if (!P["xframe", table]["blocked", number] & P["xframe", table]["count", number] < 2) {
+            out("Error: Not enough place\n")
+            end()
+        }
+        else {
+            local Res = P["xframe", table]["size", vector2]
+            xcreate(table(
+                "type" = "box",
+                "size" = Res
+            ))
+            
+            P["text", table] = xcreate(table(
+                "type" = "text",
+                "text" = "waiting for a time",
+                "sizeNum" = 50 * min(Res[1], Res[2]) / 512,
+                "color" = vec()
+            ))
+            
+            P["state", number] = 1
+        }
+        break
+    
+    case 1,
+        if (systime() > P["nextUpdate", number]) {
+            P["text", table]["text", string] = format("%02d:%02d:%02d, %d-%02d-%02d", time("hour"), time("min"), time("sec"), time("year"), time("month"), time("day"))
+            xdraw(P["text", table])
+            P["nextUpdate", number] = systime() + 1
+        }
+        break
+}
+

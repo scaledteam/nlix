@@ -32,7 +32,7 @@ switch (Arg) {
     
     case "volume",
         if (args() < 2) {
-            out("Usage: volume [number 0-1]\n")
+            out("Usage: surl volume [number 0-1]\n")
         }
         else {
             soundURLvolume("nlix-surl", arg(2):toNumber())

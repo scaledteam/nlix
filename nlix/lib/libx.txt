@@ -1,0 +1,91 @@
+#
+# Created by scaled
+#
+
+@name libx
+
+function xdraw(Object:table) {
+    local Type = Object["type", string]
+    local Id = Object["id", number]
+    local Device = P["device", wirelink]
+    
+    switch (Type) {
+        case "box",
+            Device:egpBox(Id, Object["pos", vector2], Object["size", vector2])
+            break
+        
+        case "circle",
+            Device:egpCircle(Id, Object["pos", vector2], Object["size", vector2])
+            break
+        
+        case "line",
+            Device:egpLine(Id, Object["pos", vector2], Object["size", vector2])
+            break
+        
+        case "text",
+            if (Object:exists("size")) {
+                Device:egpTextLayout(Id, Object["text", string], Object["pos", vector2], Object["size", vector2])
+            }
+            else {
+                Device:egpText(Id, Object["text", string], Object["pos", vector2])
+            }
+            Device:egpAlign(Id, Object["align", vector2][1], Object["align", vector2][2])
+            if (!Object:exists("sizeNum")) {
+                Object["sizeNum", number] = 20
+            }
+            Device:egpSize(Id, Object["sizeNum", number] * Object["parent", table]["textMultiplier", number])
+            break
+        
+        case "poly",
+            Device:egpPoly(Id, Object["poses", array])
+            break
+        
+        case "frame",
+            Device:egpBox(Id, Object["pos", vector2], vec2())
+            break
+        
+        case "",
+            Device:egpLine(Id, vec2(), vec2())
+            break
+        
+        default,
+            out("Error: unknown type \"" + Type + "\".")
+            
+            Object["type", string] = ""
+            Object["color", vector] = vec(255)
+            
+            Device:egpLine(Id, vec2(), vec2())
+    }
+    
+    Device:egpParent(Id, Object["parent", table]["id", number])
+    Device:egpColor(Id, Object["color", vector])
+}
+
+function table xcreate(Input:table) {
+    local Frame = P["xframe", table]
+    local Id = Frame["lastId", number] + 1
+    Frame["lastId", number] = Id
+    
+    if (Frame["objects", table]:exists(Id)) {
+        local Object = Frame["objects", table][Id, table]
+        Object["type", string] = Input["type", string]
+        if (Input:exists("pos")) { Object["pos", vector2] = Input["pos", vector2] }
+        if (Input:exists("size")) { Object["size", vector2] = Input["size", vector2] }
+        if (Input:exists("poses")) { Object["poses", array] = Input["poses", array] }
+        if (Input:exists("text")) { Object["text", string] = Input["text", string] }
+        if (Input:exists("align")) { Object["align", vector2] = Input["align", vector2] }
+        if (Input:exists("sizeNum")) { Object["sizeNum", number] = Input["sizeNum", number] }
+        
+        if (Input:exists("color")) { Object["color", vector] = Input["color", vector] }
+        if (Input:exists("parent")) { Object["parent", table] = Input["parent", table] }
+        
+        Input:clear()
+        xdraw(Object)
+        
+        return Object
+    }
+    else {
+        # FIX IT
+        return NULL
+    }
+}

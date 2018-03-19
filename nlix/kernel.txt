@@ -14,7 +14,7 @@ if (!tickClk()) {
             KState++
             switch (KState) {
                 case 1, #include "nlix/lib/libobject" break
-                case 2, #include "nlix/lib/libprogram" break
+                case 2, #include "nlix/lib/libkernel" break
                 case 3, #include "nlix/lib/libdevices" break
                 case 4, #include "nlix/lib/libio" break
                 
@@ -23,14 +23,15 @@ if (!tickClk()) {
                 case 7, #include "nlix/lib/liborder" break
                 
                 case 8, #include "nlix/lib/libegp" break
+                case 9, #include "nlix/lib/libx" break
                 
-                case 9, #include "nlix/init/g" break
-                #case 10, SYSTEM_NAME = "system0" #include "nlix/init/sync" break
+                case 10, #include "nlix/init/g" break
+                #case 11, SYSTEM_NAME = "system0" #include "nlix/init/sync" break
                 
-                case 11, #include "nlix/init/autostart" break
-                case 12, #include "nlix/init/fstab" break
+                case 12, #include "nlix/init/autostart" break
+                case 13, #include "nlix/init/fstab" break
                 
-                case 13, KState = 0 break
+                case 14, KState = 0 break
                 default,
             }
             
@@ -134,6 +135,13 @@ else {
             #ifdef ranger(number)
             case "digi-scan",   #include "nlix/bin/digi-scan" break
             #endif
+            
+            # X
+            case "x",           #include "nlix/bin/x" break
+            case "xstart",      #include "nlix/bin/xstart" break
+            
+            case "xclock",      #include "nlix/bin/xclock" break
+            case "xres",        #include "nlix/bin/xres" break
             
             case "",
                 if (Ps:count() > 0) {

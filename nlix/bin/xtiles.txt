@@ -1,0 +1,66 @@
+#
+# Created by scaled
+#
+
+@name xtiles
+
+switch (P["state", number]) {
+    case 0,
+        if (P["xframe", table]["count", number] < 5) {
+            out("Error: Not enough place\n")
+            end()
+        }
+        else {
+            ProgramNames = array("xclock", "xtiles")
+            
+            foreach (I, ProgramName:string = ProgramNames) {
+                local Program = exec(ProgramName)
+                Program["xframe", table] = xcreate(table(
+                    "type" = "frame",
+                    "size" = P["xframe", table]["size", vector2] / 2,
+                    "pos" = vec2((I - 1) * P["xframe", table]["size", vector2][1] / 2, 0)
+                ))
+                
+                Program["out", array] = P["out", array]
+                
+                Program["device", wirelink] = P["device", wirelink]
+                
+                Program["xframe", table]["objects", table] = table()
+                Program["xframe", table]["textMultiplier", number] = P["xframe", table]["textMultiplier", number]
+                
+                #[Program["xframe", table]["count", number] = P["xframe", table]["count", number] / 2 - 2
+                for (J = 1, Program["xframe", table]["count", number]) {
+                    Program["xframe", table]["objects", table]:pushTable(xcreate(table("parent" = Program["xframe", table])))
+                }]#
+                
+                if (I == 1) {
+                    Program["xframe", table]["count", number] = 3
+                    
+                    for (J = 1, Program["xframe", table]["count", number]) {
+                        Program["xframe", table]["objects", table]:pushTable(xcreate(table("parent" = Program["xframe", table])))
+                    }
+                }
+                else {
+                    local Count = 0
+                    local Object = table()
+                    
+                    while (Object != NULL) {
+                        Count++
+                        Object = xcreate(table("parent" = Program["xframe", table]))
+                        Program["xframe", table]["objects", table]:pushTable(Object)
+                    }
+                    
+                    Program["xframe", table]["count", number] = Count - 1
+                }
+                
+                #Program["xframe", table]["blocked", number] = 1
+            }
+            
+            P["state", number] = 1
+        }
+        break
+    
+    case 1,
+        break
+}
+

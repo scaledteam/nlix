@@ -17,7 +17,6 @@ function number order(Memory:table) {
     }
     else {
         out("Error: program end because order is over\n")
-        #print("Error: program end because order is over")
         end()
     }
     
