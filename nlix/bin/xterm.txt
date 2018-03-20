@@ -1,0 +1,66 @@
+#
+# Created by scaled
+#
+
+@name xterm
+
+P2F["xterm", string] = "xterm"
+
+function xterm() {
+    switch (P["state", number]) {
+        case 0,
+            if (!P["xframe", table]["blocked", number] & P["xframe", table]["count", number] < 2) {
+                out("Error: Not enough egp elements.\n")
+                end()
+            }
+            else {
+                local Res = P["xframe", table]["size", vector2]
+                xcreate(table(
+                    "type" = "box",
+                    "size" = Res,
+                    "color" = vec(40, 40, 50)
+                ))
+                
+                P["text", table] = xcreate(table(
+                    "type" = "text",
+                    "size" = Res,
+                    "sizeNum" = 15
+                ))
+                
+                local Skbd = exec("skbd")
+                local Sh = exec("sh")
+                local Term = exec("term")
+                programUp()
+                
+                P["sh", table] = Sh
+                P["term", table] = Term
+                
+                #Term["resolution", vector2] = floor(vec2(56, 28) * Res / vec2(512) / vec2(P["xframe", table]["textMultiplier", number], 1))
+                Term["resolution", vector2] = floor(vec2(2 * Res[1] / 15 / P["xframe", table]["textMultiplier", number], Res[2] / 15))
+                print(Term["resolution", vector2])
+                
+                # input output
+                if (P:exists("kbd")) {
+                    Skbd["in", array] = Sh["kbd", array] = P["kbd", array]
+                }
+                
+                Skbd["out", array] = Sh["in", array] = array()
+                Skbd["term", array] = Sh["out", array] = Term["in", array] = array()
+                
+                P["in", array] = Term["out", array] = array()
+                
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            if (wait()) {
+                P["text", table]["text", string] = in()
+                xdraw(P["text", table])
+            }
+            elseif (!P["sh", table]:isValid()) {
+                end()
+            }
+            break
+    }
+}

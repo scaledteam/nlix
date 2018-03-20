@@ -27,7 +27,7 @@ function end() {
     P = NULL
 }
 
-function makeProgramLast() {
+function programUp() {
     if(Ps[KState, table] == P){
         Ps:remove(KState)
         Ps:pushTable(P)

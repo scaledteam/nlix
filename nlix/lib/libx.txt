@@ -34,6 +34,7 @@ function xdraw(Object:table) {
                 Object["sizeNum", number] = 20
             }
             Device:egpSize(Id, Object["sizeNum", number] * Object["parent", table]["textMultiplier", number])
+            Device:egpFont(Id, "Courier New")
             break
         
         case "poly",
@@ -125,6 +126,7 @@ function vector2 xcursor() {
         }
         
         Frame["cursor", vector2] = Device:egpCursor(Frame["cursorUser", entity])
+        Frame["keyUse", number] = Frame["cursorUser", entity]:keyUse()
     }
     else {
         local Cursor = Frame["parent", table]["cursor", vector2]
@@ -134,6 +136,12 @@ function vector2 xcursor() {
         else {
             Frame["cursor", vector2] = Cursor
         }
+        
+        Frame["keyUse", number] = Frame["parent", table]["keyUse", number]
     }
     return Frame["cursor", vector2]
+}
+
+function number xkeyUse() {
+    return P["xframe", table]["keyUse", number]
 }

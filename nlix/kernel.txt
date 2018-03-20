@@ -73,6 +73,7 @@ if (!tickClk()) {
                 case 52, #include "nlix/bin/digi-scan" break
                 
                 # X
+                case 59, #include "nlix/bin/kbd" break
                 case 60, #include "nlix/lib/libx" break
                 case 61, #include "nlix/bin/x" break
                 case 62, #include "nlix/bin/xstart" break
@@ -80,7 +81,8 @@ if (!tickClk()) {
                 case 64, #include "nlix/bin/xres" break
                 case 65, #include "nlix/bin/xtiles" break
                 case 66, #include "nlix/bin/xeyes" break
-                #case 67, #include "nlix/bin/xclicker" break
+                case 67, #include "nlix/bin/xclicker" break
+                case 68, #include "nlix/bin/xterm" break
                 
                 # End
                 case 70, KState = 1 runOnTick(1) exit() break

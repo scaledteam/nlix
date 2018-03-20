@@ -12,6 +12,7 @@ P2F["hotplugd", string] = "hotplugd"
 
 function hotplugd() {
     if (Ps:count() == 1) {
+        S:clear()
         end()
     }
 

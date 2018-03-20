@@ -22,7 +22,6 @@ function xclock() {
                 
                 P["text", table] = xcreate(table(
                     "type" = "text",
-                    "text" = "waiting for a time",
                     "sizeNum" = 50 * min(Res[1], Res[2]) / 512,
                     "color" = vec()
                 ))

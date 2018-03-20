@@ -9,7 +9,7 @@ P2F["xres", string] = "xres"
 function xres() {
     switch (P["state", number]) {
         case 0,
-            if (P["xframe", table]["count", number] < 4) {
+            if (P["xframe", table]["count", number] < 3) {
                 out("Error: Not enough egp elements.\n")
                 end()
             }
@@ -20,20 +20,13 @@ function xres() {
                 
                 xcreate(table(
                     "type" = "box",
-                    "size" = Size,
+                    "size" = Res,
                     "color" = vec(255, 127, 63)
                 ))
                 
                 xcreate(table(
                     "type" = "box",
-                    "size" = Res / 2,
-                    "color" = vec(63, 127, 255)
-                ))
-                
-                xcreate(table(
-                    "type" = "box",
-                    "pos" = Res / 2,
-                    "size" = Res / 2,
+                    "size" = Size,
                     "color" = vec(63, 127, 255)
                 ))
                 

@@ -9,7 +9,17 @@ P2F["xtiles", string] = "xtiles"
 function xtiles() {
     switch (P["state", number]) {
         case 0,
-            if (P["xframe", table]["count", number] < 5) {
+            if (P["parent", table]["type", string] == "sh") {
+                P:removeTable("parent"):clear()
+            }
+            elseif (!P:exists("xframe")) {
+                if (!P:exists("args")) {
+                    P["args", array] = array()
+                }
+                P["args", array]:unshiftString(P["type", string])
+                P["type", string] = "xstart"
+            }
+            elseif (P["xframe", table]["count", number] < 5) {
                 out("Error: Not enough egp elements.\n")
                 end()
             }
@@ -21,37 +31,72 @@ function xtiles() {
                     "color" = hsv2rgb(random(360), 1, 0.7)
                 ))
                 
-                #[local CmdHeight = 0.05
-                xcreate(table(
+                local Cmd = table()
+                local CmdHeight = 0.05
+                P["cmdHeight", number] = CmdHeight
+                Cmd["xframe", table] = xcreate(table(
                     "type" = "box",
                     "size" = Res * vec2(1, CmdHeight),
                     "pos" = Res * vec2(0, 1 - CmdHeight),
                     "color" = vec()
                 ))
                 
-                xcreate(table(
+                P["cmd", table] = xcreate(table(
                     "type" = "text",
                     "text" = "xtiles $ ",
                     "size" = Res * vec2(1, CmdHeight),
                     "sizeNum" = Res[2] * CmdHeight,
                     "pos" = Res * vec2(0, 1 - CmdHeight)
-                ))]#
+                ))
                 
-                P["programs", table] = table()
+                local Kbd = exec("kbd")
+                local Skbd = exec("skbd")
+                programUp()
+                
+                Cmd["kbd", array] = Skbd["in", array] = array()
+                
+                P["kbd", array] = Kbd["out", array] = array()
+                P["in", array] = Skbd["out", array] = array()
+                
+                P["term", array] = Skbd["term", array] = array()
+                
+                P["programs", table] = table(Cmd)
                 
                 P["state", number] = 1
             }
             break
             
         case 1,
-            xcursor()
+            # Send cursor to programs
+            local Cursor = xcursor()
             
+            # Command line
+            if (P["term", array]:count() > 0) {
+                local In = P["term", array]:shiftString()
+                if (In == ERASE1) {
+                    P["cmd", table]["text", string] = P["cmd", table]["text", string]:sub(1, -2)
+                }
+                elseif (In == ERASE | In == "\n") {
+                    P["cmd", table]["text", string] = "xtiles $ "
+                }
+                else {
+                    P["cmd", table]["text", string] = P["cmd", table]["text", string] + In
+                }
+                xdraw(P["cmd", table])
+            }
+            
+            # Commands
             if (wait()) {
-                local CommandExp = in():trim():replaceRE("  +", " "):explode(" ")
+                local CommandExp = in():trim():explodeRE(" +")
                 
                 switch (CommandExp[1, string]) {
                     case "exit",
                         end()
+                        break
+                        
+                    case "sh",
+                        end()
+                        exec("sh")
                         break
                     
                     default,
@@ -59,9 +104,9 @@ function xtiles() {
                         Program["args", array] = CommandExp
                         
                         local Count = 2
-                        local Size = P["xframe", table]["size", vector2] / Count
+                        local Size = P["xframe", table]["size", vector2] * vec2(1, 1 - P["cmdHeight", number]) / Count
                         
-                        local Pos = P["programs", table]:count()
+                        local Pos = P["programs", table]:count() - 1
                         
                         Program["xframe", table] = xcreate(table(
                             "type" = "frame",
@@ -84,6 +129,45 @@ function xtiles() {
                         }
                         
                         P["programs", table]:pushTable(Program)
+                        Program["kbd", array] = array()
+                }
+            }
+            
+            # Programs actions
+            for (I = 1, Overload) {
+                local Counter = P["counter", number] + 1
+                if (Counter > P["programs", table]:count()) {
+                    P["counter", number] = 0
+                    break
+                }
+                P["counter", number] = Counter
+                
+                # Check if program is dead
+                local Program = P["programs", table][Counter, table]
+                if (!Program:isValid()) {
+                    P["programs", table]:remove(Counter)
+                }
+                else {
+                    # Focus
+                    if (P["focus", number] != Counter & inrange(Cursor - Program["xframe", table]["pos", vector2], vec2(), Program["xframe", table]["size", vector2])) {
+                        # Clear old data after focus changed
+                        local ProgramOld = P["programs", table][P["focus", number], table]
+                        ProgramOld["kbd", array]:clear()
+                        
+                        # set new focus
+                        P["focus", number] = Counter
+                    }
+                    
+                    if (Counter == P["focus", number]) {
+                        # Keyboard
+                        local KbdReal = P["kbd", array]
+                        local KbdInsideProgram = Program["kbd", array]
+                        
+                        KbdInsideProgram:clear()
+                        for (I = 1, KbdReal:count()) {
+                            KbdInsideProgram[I, number] = KbdReal[I, number]
+                        }
+                    }
                 }
             }
             break

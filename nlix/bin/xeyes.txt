@@ -22,6 +22,8 @@ function xeyes() {
                     "color" = vec(127)
                 ))
                 
+                P["eyeSize", vector2] = vec2(min(Res[1], Res[2]) * 0.05)
+                
                 # Left eye
                 local Center = Res * vec2(0.25, 0.5)
                 xcreate(table(
@@ -39,7 +41,7 @@ function xeyes() {
                 P["leftEye", table] = xcreate(table(
                     "type" = "circle",
                     "pos" = Center,
-                    "size" = Res * vec2(0.05),
+                    "size" = P["eyeSize", vector2],
                     "color" = vec()
                 ))
                 
@@ -60,7 +62,7 @@ function xeyes() {
                 P["rightEye", table] = xcreate(table(
                     "type" = "circle",
                     "pos" = Center,
-                    "size" = Res * vec2(0.05),
+                    "size" = P["eyeSize", vector2],
                     "color" = vec()
                 ))
                 
@@ -81,8 +83,8 @@ function xeyes() {
                     xdraw(P["rightEye", table])
                 }
                 else {
-                    local RadiusX = Res[1] / 2
-                    local RadiusY = Res[2]
+                    local RadiusX = Res[1] * 0.45 - P["eyeSize", vector2][1] * 2
+                    local RadiusY = Res[2] * 0.9  - P["eyeSize", vector2][2] * 2
                     local Aspect = RadiusY / RadiusX
                     
                     local Offset1 = Res * vec2(0.25, 0.5)

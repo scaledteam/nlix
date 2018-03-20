@@ -12,7 +12,7 @@ function sh() {
             # init keyboard and terminal
             if (!P:exists("in")) {
                 local Skbd = exec("skbd")
-                makeProgramLast()
+                programUp()
                 
                 P["in", array] = Skbd["out", array] = array()
                 
@@ -78,11 +78,11 @@ function sh() {
                         break
                     
                     default,
-                        local Commands = Command:trim():replaceRE("  +", " "):explode(">")
+                        local Commands = Command:explode(">")
                         
                         local Program = NULL
                         for (I = 1, Commands:count()) {
-                            local CommandExplode = Commands[I, string]:explode(" ")
+                            local CommandExplode = Commands[I, string]:trim():explodeRE(" +")
                             
                             if (I == 1) {
                                 Program = exec(CommandExplode:shiftString())
