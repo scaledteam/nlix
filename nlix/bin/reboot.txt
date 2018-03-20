@@ -4,12 +4,14 @@
 
 @name reboot
 
-while (Ps:count() > 0) {
-    Ps:popTable():clear()
+P2F["reboot", string] = "reboot"
+
+function reboot() {
+    while (Ps:count() > 0) {
+        Ps:popTable():clear()
+    }
+    
+    S:clear()
+
+    reset()
 }
-
-G:clear()
-L:clear()
-S:clear()
-
-reset()

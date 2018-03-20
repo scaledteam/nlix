@@ -1,0 +1,13 @@
+#
+# Created by scaled
+#
+
+@name uptime
+
+P2F["uptime", string] = "uptime"
+
+function uptime() {
+    out((int((systime() - S["startTime", number]) * 100) / 100) + "\n")
+    end()
+}
+

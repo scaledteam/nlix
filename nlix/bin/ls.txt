@@ -4,22 +4,26 @@
 
 @name ls
 
-switch (P["state", number]) {
-    case 0,
-        if (fsCall("list", arg(1))) {
-            P["in", array] = P["fs", table]["out", array] = array()
-            P["state", number] = 1
-        }
-        else {
-            out("Error: filesystem don't exist in fstab.\n")
-            end()
-        }
-        break
-    
-    case 1,
-        if (wait()) {
-            out(in())
-            end()
-        }
-        break
+P2F["ls", string] = "ls"
+
+function ls() {
+    switch (P["state", number]) {
+        case 0,
+            if (fsCall("list", arg(1))) {
+                P["in", array] = P["fs", table]["out", array] = array()
+                P["state", number] = 1
+            }
+            else {
+                out("Error: filesystem don't exist in fstab.\n")
+                end()
+            }
+            break
+        
+        case 1,
+            if (wait()) {
+                out(in())
+                end()
+            }
+            break
+    }
 }

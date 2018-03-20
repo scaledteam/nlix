@@ -4,19 +4,23 @@
 
 @name rund
 
-if (args() < 1) {
-    out("Usage: rund [program]")
-}
-else {
-    local Args = P["args", array]
-    local Program = exec(Args:shiftString())
-    if (Args:count() > 0) {
-        Program["args", array] = Args
+P2F["rund", string] = "rund"
+
+function rund() { 
+    if (args() < 1) {
+        out("Usage: rund [program]")
     }
-    
-    Program["in", array] = P["in", array]
-    Program["out", array] = P["out", array]
-    
-    Program:remove("parent")
+    else {
+        local Args = P["args", array]
+        local Program = exec(Args:shiftString())
+        if (Args:count() > 0) {
+            Program["args", array] = Args
+        }
+        
+        #Program["in", array] = P["in", array]
+        Program["out", array] = P["out", array]
+        
+        Program:remove("parent")
+    }
+    end()
 }
-end()

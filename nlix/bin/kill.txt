@@ -4,21 +4,25 @@
 
 @name kill
 
-if (args() < 1) {
-    out("Usage: kill [id] [end id]\n")
-}
-else {
-    if (args() < 2) {
-        Ps:removeTable(arg(1):toNumber()):clear()
+P2F["kill", string] = "kill"
+
+function kill() {
+    if (args() < 1) {
+        out("Usage: kill [id] [end id]\n")
     }
     else {
-        local Arg1 = arg(1):toNumber()
-        local Arg2 = arg(2):toNumber()
-        
-        while (Arg2 >= Arg1) {
-            Ps:removeTable(Arg1):clear()
-            Arg2--
+        if (args() < 2) {
+            Ps:removeTable(arg(1):toNumber()):clear()
+        }
+        else {
+            local Arg1 = arg(1):toNumber()
+            local Arg2 = arg(2):toNumber()
+            
+            while (Arg2 >= Arg1) {
+                Ps:removeTable(Arg1):clear()
+                Arg2--
+            }
         }
     }
+    end()
 }
-end()

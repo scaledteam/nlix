@@ -4,34 +4,38 @@
 
 @name touch
 
-switch (P["state", number]) {
-    case 0,
-        if (args() < 1) {
-            out("Usage: cat [path to file].\n")
-            end()
-        }
-        else {
-            P["state", number] = 1
-        }
-        break
-    
-    case 1,
-        if (fsCall("write", arg(1))) {
-            P["fs", table]["in", array] = array(in())
-            P["in", array] = P["fs", table]["out", array] = array()
-            
-            P["state", number] = 2
-        }
-        else {
-            out("Error: filesystem don't exist in fstab.\n")
-            end()
-        }
-        break
-    
-    case 2,
-        if (wait()) {
-            out(in())
-            end()
-        }
-        break
+P2F["touch", string] = "touch"
+
+function touch() {
+    switch (P["state", number]) {
+        case 0,
+            if (args() < 1) {
+                out("Usage: cat [path to file].\n")
+                end()
+            }
+            else {
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            if (fsCall("write", arg(1))) {
+                P["fs", table]["in", array] = array(in())
+                P["in", array] = P["fs", table]["out", array] = array()
+                
+                P["state", number] = 2
+            }
+            else {
+                out("Error: filesystem don't exist in fstab.\n")
+                end()
+            }
+            break
+        
+        case 2,
+            if (wait()) {
+                out(in())
+                end()
+            }
+            break
+    }
 }

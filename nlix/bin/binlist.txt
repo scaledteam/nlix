@@ -1,0 +1,12 @@
+#
+# Created by scaled
+#
+
+@name binlist
+
+P2F["binlist", string] = "binlist"
+
+function binlist() {
+    out(P2F:keys():concat(" ") + "\n")
+    end()
+}

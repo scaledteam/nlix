@@ -4,18 +4,22 @@
 
 @name dlist
 
-local List = ""
-foreach (DeviceName, DeviceList:array = S["devices", table]) {
-    List += DeviceName + ": " + DeviceList:count() + "\n"
-}
+P2F["dlist", string] = "dlist"
 
-List += "--------\n"
+function dlist() {
+    local List = ""
+    foreach (DeviceName, DeviceList:array = S["devices", table]) {
+        List += DeviceName + ": " + DeviceList:count() + "\n"
+    }
 
-local DevicesById = S["devices", table]["byId", table]
-local DevicesByIdKeys = DevicesById:keys()
-for (I = 1, DevicesById:count()) {
-    local J = DevicesByIdKeys[I, number]
-    List += J + ": " + (DevicesById[J, wirelink] != nowirelink() ? "valid" : "invalid") + "\n"
+    List += "--------\n"
+
+    local DevicesById = S["devices", table]["byId", table]
+    local DevicesByIdKeys = DevicesById:keys()
+    for (I = 1, DevicesById:count()) {
+        local J = DevicesByIdKeys[I, number]
+        List += J + ": " + (DevicesById[J, wirelink] != nowirelink() ? "valid" : "invalid") + "\n"
+    }
+    out(List)
+    end()
 }
-out(List)
-end()

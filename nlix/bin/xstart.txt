@@ -4,119 +4,124 @@
 
 @name xstart
 
-switch (P["state", number]) {
-    case 0,
-        if (args() < 1) {
-            out("Usage: xstart [program name]\n")
-            end()
-        }
-        else {
-            P["xframe", table] = table(
-                "id" = 1,
-                "count" = min(50, egpMaxObjects()),
-                "objects" = table(),
-                "device" = nowirelink(),
-                "textMultiplier" = 1
-            )
-            
-            P["counter", number] = P["xframe", table]["id", number]
-            
-            P["state", number] = 1
-        }
-        break
-    
-    case 1,
-        local Frame = P["xframe", table]
-        local Counter = P["counter", number]
-        
-        for (I = 1, Overload) {
-            Counter++
-            
-            # cycle code
-            Frame["objects", table]:pushTable(table(
-                "id" = Counter,
-                "type" = "",
-                "color" = vec(255),
-                "parent" = Frame
-            ))
-            # end
-            
-            if (Counter >= Frame["count", number]) {
-                Counter = 0
-                P["state", number] = 2
-                break
+P2F["xstart", string] = "xstart"
+
+function xstart() {
+    switch (P["state", number]) {
+        case 0,
+            if (args() < 1) {
+                out("Usage: xstart [program name]\n")
+                end()
             }
-        }
-        P["counter", number] = Counter
-        break
-    
-    case 2,
-        if (deviceGet("gmod_wire_egp")) {
-            local Device = P["device", wirelink]
-            
-            Device:egpClear()
-            Device:egpDrawTopLeft(1)
-            Device:egpResolution(vec2(), vec2(512))
-            
-            Device:egpBox(1, vec2(), vec2())
-            
-            P["xframe", table]["device", wirelink] = Device
-            P["xframe", table]["size", vector2] = vec2(512)
-            
-            P["counter", number] = 0
-            
-            P["NULL", table] = NULL
-            
-            P["state", number] = 3
-        }
-        break
-    
-    case 3,
-        if (P["NULL", table] != NULL) {
-            local Device = P["device", wirelink]
-            
-            local Pos0 = Device:egpToWorld(vec2())
-            local PosX = Device:egpToWorld(vec2(512, 0))
-            local PosY = Device:egpToWorld(vec2(0, 512))
-            
-            local SizeX = Pos0:distance(PosX)
-            local SizeY = Pos0:distance(PosY)
-            
-            local Res = floor(vec2(SizeX, SizeY) / max(SizeX, SizeY) * 512)
-            
-            Device:egpResolution(vec2(), Res)
-            
-            P["xframe", table]["size", vector2] = Res
-            P["xframe", table]["textMultiplier", number] = 512 / Res[2]
-            
-            P:remove("NULL")
-            P["state", number] = 4
-        }
-        break
-    
-    case 4,
-        local Objects = P["xframe", table]["objects", table]
-        local Counter = P["counter", number]
-        
-        for (I = 1, Overload) {
-            Counter++
-            
-            xdraw(Objects[Counter, table])
-            
-            if (Counter >= Objects:count()) {
-                P["xframe", table]["blocked", number] = 0
+            else {
+                P["xframe", table] = table(
+                    "id" = 1,
+                    "count" = min(50, egpMaxObjects()),
+                    "objects" = table(),
+                    "device" = nowirelink(),
+                    "textMultiplier" = 1
+                )
                 
-                Counter = 0
-                P["state", number] = 5
-                break
+                P["counter", number] = P["xframe", table]["id", number]
+                
+                P["state", number] = 1
             }
-        }
-        P["counter", number] = Counter
-        break
-    
-    case 5,
-        P["type", string] = P["args", array]:shiftString()
-        P:remove("state")
-        P:remove("counter")
-        break
+            break
+        
+        case 1,
+            local Frame = P["xframe", table]
+            local Counter = P["counter", number]
+            
+            for (I = 1, Overload) {
+                Counter++
+                
+                # cycle code
+                Frame["objects", table]:pushTable(table(
+                    "id" = Counter,
+                    "type" = "",
+                    "color" = vec(255),
+                    "parent" = Frame
+                ))
+                # end
+                
+                if (Counter >= Frame["count", number]) {
+                    Counter = 0
+                    P["state", number] = 2
+                    P:remove("counter")
+                    return
+                }
+            }
+            P["counter", number] = Counter
+            break
+        
+        case 2,
+            if (deviceGet("gmod_wire_egp")) {
+                local Device = P["device", wirelink]
+                
+                Device:egpClear()
+                Device:egpDrawTopLeft(1)
+                Device:egpResolution(vec2(), vec2(512))
+                
+                Device:egpBox(1, vec2(), vec2())
+                
+                P["xframe", table]["device", wirelink] = Device
+                P["xframe", table]["size", vector2] = vec2(512)
+                
+                P["counter", number] = 0
+                
+                P["NULL", table] = NULL
+                
+                P["state", number] = 3
+            }
+            break
+        
+        case 3,
+            if (P["NULL", table] != NULL) {
+                local Device = P["device", wirelink]
+                
+                local Pos0 = Device:egpToWorld(vec2())
+                local PosX = Device:egpToWorld(vec2(512, 0))
+                local PosY = Device:egpToWorld(vec2(0, 512))
+                
+                local SizeX = Pos0:distance(PosX)
+                local SizeY = Pos0:distance(PosY)
+                
+                local Res = floor(vec2(SizeX, SizeY) / max(SizeX, SizeY) * 512)
+                
+                Device:egpResolution(vec2(), Res)
+                
+                P["xframe", table]["size", vector2] = Res
+                P["xframe", table]["textMultiplier", number] = 512 / Res[2]
+                
+                P:remove("NULL")
+                P["state", number] = 4
+            }
+            break
+        
+        case 4,
+            local Objects = P["xframe", table]["objects", table]
+            local Counter = P["counter", number]
+            
+            for (I = 1, Overload) {
+                Counter++
+                
+                xdraw(Objects[Counter, table])
+                
+                if (Counter >= Objects:count()) {
+                    P["xframe", table]["blocked", number] = 0
+                    
+                    Counter = 0
+                    P["state", number] = 5
+                    P:remove("counter")
+                    return
+                }
+            }
+            P["counter", number] = Counter
+            break
+        
+        case 5,
+            P["type", string] = P["args", array]:shiftString()
+            P:remove("state")
+            break
+    }
 }

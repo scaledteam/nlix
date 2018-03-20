@@ -4,30 +4,34 @@
 
 @name kbd
 
-switch (P["state", number]) {
-    case 0,
-        if (deviceGet("gmod_wire_keyboard")) {
-            P["state", number] = 1
-        }
-        break
-    
-    case 1,
-        local Device = P["device", wirelink]
-        if (Device) {
-            local Out = P["out", array]
-            
-            if (Out:count() > 0) {
-                Out:clear()
+P2F["kbd", string] = "kbd"
+
+function kbd() {
+    switch (P["state", number]) {
+        case 0,
+            if (deviceGet("gmod_wire_keyboard")) {
+                P["state", number] = 1
             }
-            
-            if (Device[0] > 0) {
-                for (I = 1, Device[0]) {
-                    Out[I, number] = Device[I]
+            break
+        
+        case 1,
+            local Device = P["device", wirelink]
+            if (Device) {
+                local Out = P["out", array]
+                
+                if (Out:count() > 0) {
+                    Out:clear()
+                }
+                
+                if (Device[0] > 0) {
+                    for (I = 1, Device[0]) {
+                        Out[I, number] = Device[I]
+                    }
                 }
             }
-        }
-        else {
-            P["state", number] = 0
-        }
-        break
+            else {
+                P["state", number] = 0
+            }
+            break
+    }
 }

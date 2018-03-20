@@ -4,16 +4,20 @@
 
 @name perf
 
-if (args() < 1) {
-    out("Usage: perf [number]")
-}
-else {
-    local Arg = arg(1):toNumber()
-    if (Arg > 0) {
-        KPerf = Arg
+P2F["perf", string] = "setperf"
+
+function setperf() {
+    if (args() < 1) {
+        out("Usage: perf [number]")
     }
     else {
-        out("Entered value is incorrect.\n")
+        local Arg = arg(1):toNumber()
+        if (Arg > 0) {
+            KPerf = Arg
+        }
+        else {
+            out("Entered value is incorrect.\n")
+        }
     }
+    end()
 }
-end()

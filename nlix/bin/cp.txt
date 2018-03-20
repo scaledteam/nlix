@@ -4,35 +4,39 @@
 
 @name cp
 
-switch (P["state", number]) {
-    case 0,
-        if (args() < 2) {
-            out("Usage: cp [path from] [path to]\n")
-            end()
-        }
-        else {
-            local Program = exec("cat")
-            Program["args", array] = array(arg(1))
-            P["in", array] = Program["out", array] = array()
-            P["state", number] = 1
-        }
-        break
-    
-    case 1,
-        if (wait()) {
-            local Program = exec("touch")
-            Program["args", array] = array(arg(2))
-            Program["in", array] = array(in():sub(1, -2))
-            
-            P["in", array] = Program["out", array] = array()
-            P["state", number] = 2
-        }
-        break
-    
-    case 2,
-        if (wait()) {
-            out(in())
-            end()
-        }
-        break
+P2F["cp", string] = "cp"
+
+function cp() { 
+    switch (P["state", number]) {
+        case 0,
+            if (args() < 2) {
+                out("Usage: cp [path from] [path to]\n")
+                end()
+            }
+            else {
+                local Program = exec("cat")
+                Program["args", array] = array(arg(1))
+                P["in", array] = Program["out", array] = array()
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            if (wait()) {
+                local Program = exec("touch")
+                Program["args", array] = array(arg(2))
+                Program["in", array] = array(in():sub(1, -2))
+                
+                P["in", array] = Program["out", array] = array()
+                P["state", number] = 2
+            }
+            break
+        
+        case 2,
+            if (wait()) {
+                out(in())
+                end()
+            }
+            break
+    }
 }

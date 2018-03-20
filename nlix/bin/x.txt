@@ -4,35 +4,39 @@
 
 @name x
 
-switch (P["state", number]) {
-    case 0,
-        break
-    #[case *,
-        local Device = P["device", wirelink]
-        
-        if (Device) {
+P2F["x", string] = "x"
+
+function x() {
+    switch (P["state", number]) {
+        case 0,
+            break
+        #[case *,
+            local Device = P["device", wirelink]
             
-        }
-        else {
-            P["state", number] = 2
-        }
-        break]#
-    
-    #[case *,
-        local Device = P["device", wirelink]
-        local Frames = P["frames", table]
-        local Counter = P["counter", number]
-        
-        for (I = 1, Overload) {
-            Counter++
-            
-            # cycle code
-            
-            if (Counter >= P["limit", number]) {
-                P["state", number] = 2
-                break
+            if (Device) {
+                
             }
-        }
-        P["counter", number] = Counter
-        break]#
+            else {
+                P["state", number] = 2
+            }
+            break]#
+        
+        #[case *,
+            local Device = P["device", wirelink]
+            local Frames = P["frames", table]
+            local Counter = P["counter", number]
+            
+            for (I = 1, Overload) {
+                Counter++
+                
+                # cycle code
+                
+                if (Counter >= P["limit", number]) {
+                    P["state", number] = 2
+                    break
+                }
+            }
+            P["counter", number] = Counter
+            break]#
+    }
 }

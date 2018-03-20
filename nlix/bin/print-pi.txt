@@ -4,43 +4,46 @@
 
 @name print-pi
 
-switch (P["state", number]) {
-    case 0,
-        local ArgNumber = P["args", array]:shiftString():toNumber()
-        if (ArgNumber) {
-            P["iterations", number] = ArgNumber
-            P["printStep", number] = ArgNumber / 30
-        }
-        else {
-            P["iterations", number] = 300
-            P["printStep", number] = 10
-        }
-        
-        P["start-time", number] = systime()
-        out("Computing started...\n")
-        out("--------------|50%-----------|100%\n")
-        P["state", number] = 1
-        break
-    
-    case 1,
-        for (I = 1, Overload) {
-            local N = P["counter", number] + 1
-            
-            P["result", number] = P["result", number] + 4 * ((-1) ^ (N - 1)) / (2 * N - 1)
-            
-            if (N > P["lastPrintStep", number]) {
-                out(".")
-                P["lastPrintStep", number] = P["lastPrintStep", number] + P["printStep", number]
-            }
-            
-            if (N > P["iterations", number]) {
-                out("\nNumber pi = " + P["result", number] + ". Time remaining: " + (int((systime() - P["start-time", number]) * 1000) / 1000) + "\n")
-                end()
-                break
-            }
-            
-            P["counter", number] = N
-        }
-        break
-}
+P2F["print-pi", string] = "printpi"
 
+function printpi() { 
+    switch (P["state", number]) {
+        case 0,
+            local ArgNumber = P["args", array]:shiftString():toNumber()
+            if (ArgNumber) {
+                P["iterations", number] = ArgNumber
+                P["printStep", number] = ArgNumber / 30
+            }
+            else {
+                P["iterations", number] = 300
+                P["printStep", number] = 10
+            }
+            
+            P["start-time", number] = systime()
+            out("Computing started...\n")
+            out("--------------|50%-----------|100%\n")
+            P["state", number] = 1
+            break
+        
+        case 1,
+            for (I = 1, Overload) {
+                local N = P["counter", number] + 1
+                
+                P["result", number] = P["result", number] + 4 * ((-1) ^ (N - 1)) / (2 * N - 1)
+                
+                if (N > P["lastPrintStep", number]) {
+                    out(".")
+                    P["lastPrintStep", number] = P["lastPrintStep", number] + P["printStep", number]
+                }
+                
+                if (N > P["iterations", number]) {
+                    out("\nNumber pi = " + P["result", number] + ". Time remaining: " + (int((systime() - P["start-time", number]) * 1000) / 1000) + "\n")
+                    end()
+                    break
+                }
+                
+                P["counter", number] = N
+            }
+            break
+    }
+}

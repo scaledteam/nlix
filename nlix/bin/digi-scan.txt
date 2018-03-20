@@ -4,114 +4,119 @@
 
 @name digi-scan
 
-switch (P["state", number]) {
-    case 0,
-        if (deviceGet("gmod_wire_digitalscreen")) {
-            P["startTime", number] = systime()
-            
-            local ArgsCount = min(args(), 2)
-            switch (ArgsCount) {
-                case 0,
-                    P["resolution", vector2] = vec2(64)
-                    break
-                
-                case 1,
-                    P["resolution", vector2] = vec2(arg(1):toNumber())
-                    break
-                
-                case 2,
-                    P["resolution", vector2] = vec2(arg(1):toNumber(), arg(2):toNumber())
-                    break
-            }       
-            
-            local Resolution = P["resolution", vector2]
-            P["offset", vector] = vec(shift(Resolution) / 2, 0)
-            
-            # Textures list
-            local Textures = table()
-            P["textures", table] = Textures
-            
-            Textures["default", vector] = vec(80, 180, 255)
-            
-            Textures["metal", vector] = vec(128)
-            Textures["concrete", vector] = vec(200)
-            Textures["wood", vector] = vec(255, 223, 127)
-            Textures["flesh", vector] = vec(255, 200, 150)
-            Textures["alienflesh", vector] = vec(255, 200, 150)
-            Textures["computer", vector] = vec(127, 63, 0)
-            
-            Textures["grass", vector] = vec(0, 180, 80)
-            Textures["dirt", vector] = vec(0, 180, 80) * 0.8
-            Textures["sand", vector] = vec(127, 127, 63)
-            
-            Textures["glass", vector] = vec(100, 100, 150)
-            Textures["tile", vector] = vec(150, 60, 60)
-            Textures["plastic", vector] = vec(60, 60, 150)
-            Textures["grate", vector] = vec(200)
-            
-            Textures["slosh", vector] = vec(100, 100, 255)
-            Textures["vent", vector] = vec(100)
-            
-            local Device = P["device", wirelink]
-            
-            Device[1048574] = 0
-            Device[1048569] = 3
-            Device[1048575] = 1
-            Device[1048573] = Resolution[1]
-            Device[1048572] = Resolution[2]
-            
-            # Render
-            P["count", number] = Resolution[1] * Resolution[2]
-            
-            P["state", number] = 1
-        }
-        else {
-            out("Can't find digital screen\n")
-            end()
-        }
-        break
-    
-    case 1,
-        local Device = P["device", wirelink]
-        if (Device) {
-            local Counter = P["counter", number]
-            local ResolutionX = P["resolution", vector2][1]
-            local ResolutionY = P["resolution", vector2][2]
-            local Offset = P["offset", vector]
-            local Count = P["count", number]
-            local Textures = P["textures", table]
-            
-            for (I = 1, Overload) {
-                local X = Counter % ResolutionX
-                local Y = int(Counter / ResolutionX)
-                
-                local Direction = Device:entity():toWorldAxis(vec(Y, X, -ResolutionY) - Offset)
-                local RangerMain = rangerOffset(20000, Device:entity():toWorld(vec(0, 0, -10)), Direction)
-                local Brightness = 0
-                if (RangerMain:hit()) {
-                    Device[Counter] = rgb2digi(Textures[RangerMain:matType(), vector] * (abs(Direction:normalized():dot(RangerMain:hitNormal())) * 0.5 + 0.5), 3)
-                }
-                else {
-                    Device[Counter] = rgb2digi(Textures["default", vector], 3)
-                }
-                
-                if (Counter >= Count) {
-                    out("Time remaining: " + int(100 * (systime() - P["startTime", number])) / 100 + "\n")
-                    end()
-                    break
-                }
-                else {
-                    Counter++
-                }
-            }
-            if (P:isValid()) {
-                P["counter", number] = Counter
-            }
-        }
-        else {
-            out("Error: screen was lost.\n")
-            end()
-        }
-        break
-}
+#ifdef ranger(number)
+P2F["digi-scan", string] = "digiscan"
 
+function digiscan() { 
+    switch (P["state", number]) {
+        case 0,
+            if (deviceGet("gmod_wire_digitalscreen")) {
+                P["startTime", number] = systime()
+                
+                local ArgsCount = min(args(), 2)
+                switch (ArgsCount) {
+                    case 0,
+                        P["resolution", vector2] = vec2(64)
+                        break
+                    
+                    case 1,
+                        P["resolution", vector2] = vec2(arg(1):toNumber())
+                        break
+                    
+                    case 2,
+                        P["resolution", vector2] = vec2(arg(1):toNumber(), arg(2):toNumber())
+                        break
+                }       
+                
+                local Resolution = P["resolution", vector2]
+                P["offset", vector] = vec(shift(Resolution) / 2, 0)
+                
+                # Textures list
+                local Textures = table()
+                P["textures", table] = Textures
+                
+                Textures["default", vector] = vec(80, 180, 255)
+                
+                Textures["metal", vector] = vec(128)
+                Textures["concrete", vector] = vec(200)
+                Textures["wood", vector] = vec(255, 223, 127)
+                Textures["flesh", vector] = vec(255, 200, 150)
+                Textures["alienflesh", vector] = vec(255, 200, 150)
+                Textures["computer", vector] = vec(127, 63, 0)
+                
+                Textures["grass", vector] = vec(0, 180, 80)
+                Textures["dirt", vector] = vec(0, 180, 80) * 0.8
+                Textures["sand", vector] = vec(127, 127, 63)
+                
+                Textures["glass", vector] = vec(100, 100, 150)
+                Textures["tile", vector] = vec(150, 60, 60)
+                Textures["plastic", vector] = vec(60, 60, 150)
+                Textures["grate", vector] = vec(200)
+                
+                Textures["slosh", vector] = vec(100, 100, 255)
+                Textures["vent", vector] = vec(100)
+                
+                local Device = P["device", wirelink]
+                
+                Device[1048574] = 0
+                Device[1048569] = 3
+                Device[1048575] = 1
+                Device[1048573] = Resolution[1]
+                Device[1048572] = Resolution[2]
+                
+                # Render
+                P["count", number] = Resolution[1] * Resolution[2]
+                
+                P["state", number] = 1
+            }
+            else {
+                out("Can't find digital screen\n")
+                end()
+            }
+            break
+        
+        case 1,
+            local Device = P["device", wirelink]
+            if (Device) {
+                local Counter = P["counter", number]
+                local ResolutionX = P["resolution", vector2][1]
+                local ResolutionY = P["resolution", vector2][2]
+                local Offset = P["offset", vector]
+                local Count = P["count", number]
+                local Textures = P["textures", table]
+                
+                for (I = 1, Overload) {
+                    local X = Counter % ResolutionX
+                    local Y = int(Counter / ResolutionX)
+                    
+                    local Direction = Device:entity():toWorldAxis(vec(Y, X, -ResolutionY) - Offset)
+                    local RangerMain = rangerOffset(20000, Device:entity():toWorld(vec(0, 0, -10)), Direction)
+                    local Brightness = 0
+                    if (RangerMain:hit()) {
+                        Device[Counter] = rgb2digi(Textures[RangerMain:matType(), vector] * (abs(Direction:normalized():dot(RangerMain:hitNormal())) * 0.5 + 0.5), 3)
+                    }
+                    else {
+                        Device[Counter] = rgb2digi(Textures["default", vector], 3)
+                    }
+                    
+                    if (Counter >= Count) {
+                        out("Time remaining: " + int(100 * (systime() - P["startTime", number])) / 100 + "\n")
+                        end()
+                        break
+                    }
+                    else {
+                        Counter++
+                    }
+                }
+                if (P:isValid()) {
+                    P["counter", number] = Counter
+                }
+            }
+            else {
+                out("Error: screen was lost.\n")
+                end()
+            }
+            break
+    }
+}
+#endif

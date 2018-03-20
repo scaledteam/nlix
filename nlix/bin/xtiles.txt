@@ -4,63 +4,88 @@
 
 @name xtiles
 
-switch (P["state", number]) {
-    case 0,
-        if (P["xframe", table]["count", number] < 5) {
-            out("Error: Not enough place\n")
-            end()
-        }
-        else {
-            ProgramNames = array("xclock", "xtiles")
-            
-            foreach (I, ProgramName:string = ProgramNames) {
-                local Program = exec(ProgramName)
-                Program["xframe", table] = xcreate(table(
-                    "type" = "frame",
-                    "size" = P["xframe", table]["size", vector2] / 2,
-                    "pos" = vec2((I - 1) * P["xframe", table]["size", vector2][1] / 2, 0)
+P2F["xtiles", string] = "xtiles"
+
+function xtiles() {
+    switch (P["state", number]) {
+        case 0,
+            if (P["xframe", table]["count", number] < 5) {
+                out("Error: Not enough egp elements.\n")
+                end()
+            }
+            else {
+                local Res = P["xframe", table]["size", vector2]
+                xcreate(table(
+                    "type" = "box",
+                    "size" = Res,
+                    "color" = hsv2rgb(random(360), 1, 0.7)
                 ))
                 
-                Program["out", array] = P["out", array]
+                #[local CmdHeight = 0.05
+                xcreate(table(
+                    "type" = "box",
+                    "size" = Res * vec2(1, CmdHeight),
+                    "pos" = Res * vec2(0, 1 - CmdHeight),
+                    "color" = vec()
+                ))
                 
-                Program["device", wirelink] = P["device", wirelink]
+                xcreate(table(
+                    "type" = "text",
+                    "text" = "xtiles $ ",
+                    "size" = Res * vec2(1, CmdHeight),
+                    "sizeNum" = Res[2] * CmdHeight,
+                    "pos" = Res * vec2(0, 1 - CmdHeight)
+                ))]#
                 
-                Program["xframe", table]["objects", table] = table()
-                Program["xframe", table]["textMultiplier", number] = P["xframe", table]["textMultiplier", number]
+                P["programs", table] = table()
                 
-                #[Program["xframe", table]["count", number] = P["xframe", table]["count", number] / 2 - 2
-                for (J = 1, Program["xframe", table]["count", number]) {
-                    Program["xframe", table]["objects", table]:pushTable(xcreate(table("parent" = Program["xframe", table])))
-                }]#
-                
-                if (I == 1) {
-                    Program["xframe", table]["count", number] = 3
-                    
-                    for (J = 1, Program["xframe", table]["count", number]) {
-                        Program["xframe", table]["objects", table]:pushTable(xcreate(table("parent" = Program["xframe", table])))
-                    }
-                }
-                else {
-                    local Count = 0
-                    local Object = table()
-                    
-                    while (Object != NULL) {
-                        Count++
-                        Object = xcreate(table("parent" = Program["xframe", table]))
-                        Program["xframe", table]["objects", table]:pushTable(Object)
-                    }
-                    
-                    Program["xframe", table]["count", number] = Count - 1
-                }
-                
-                #Program["xframe", table]["blocked", number] = 1
+                P["state", number] = 1
             }
+            break
             
-            P["state", number] = 1
-        }
-        break
-    
-    case 1,
-        break
+        case 1,
+            xcursor()
+            
+            if (wait()) {
+                local CommandExp = in():trim():replaceRE("  +", " "):explode(" ")
+                
+                switch (CommandExp[1, string]) {
+                    case "exit",
+                        end()
+                        break
+                    
+                    default,
+                        local Program = exec(CommandExp:shiftString())
+                        Program["args", array] = CommandExp
+                        
+                        local Count = 2
+                        local Size = P["xframe", table]["size", vector2] / Count
+                        
+                        local Pos = P["programs", table]:count()
+                        
+                        Program["xframe", table] = xcreate(table(
+                            "type" = "frame",
+                            "size" = Size,
+                            "pos" = Size * vec2(Pos % Count, int(Pos / Count)),
+                            "parent" = P["xframe", table]
+                        ))
+                        
+                        Program["out", array] = P["out", array]
+                        
+                        Program["device", wirelink] = P["device", wirelink]
+                        
+                        Program["xframe", table]["objects", table] = table()
+                        Program["xframe", table]["textMultiplier", number] = P["xframe", table]["textMultiplier", number]
+                        
+                        Program["xframe", table]["count", number] = 10
+                        
+                        for (J = 1, Program["xframe", table]["count", number]) {
+                            Program["xframe", table]["objects", table]:pushTable(xcreate(table("parent" = Program["xframe", table])))
+                        }
+                        
+                        P["programs", table]:pushTable(Program)
+                }
+            }
+            break
+    }
 }
-

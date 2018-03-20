@@ -4,5 +4,9 @@
 
 @name echo
 
-out(P["args", array]:concat("\n") + "\n")
-end()
+P2F["echo", string] = "echo"
+
+function echo() {
+    out(P["args", array]:concat("\n") + "\n")
+    end()
+}

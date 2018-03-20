@@ -4,58 +4,63 @@
 
 @name wget
 
-switch (P["state", number]) {
-    case 0,
-        if (P["args", array]:count() < 1) {
-            out("Usage: wget [url] [file out]\n")
-            end()
-        }
-        else {
-            P["state", number] = 1
-        }
-        break
-    
-    case 1,
-        if (httpCanRequest()) {
-            local Arg = arg(1)
-            if (Arg:sub(1, 7) != "http://") {
-                Arg = "http://" + Arg
-            }
-            
-            httpRequest(Arg)
-            P["state", number] = 2
-        }
-        break
-    
-    case 2,
-        if (httpCanRequest()) {
-            local Data = httpData()
-            if (Data == "") {
-                out("Error: Timeout.\n")
+#ifdef httpRequest(string)
+P2F["wget", string] = "wget"
+
+function wget() {
+    switch (P["state", number]) {
+        case 0,
+            if (P["args", array]:count() < 1) {
+                out("Usage: wget [url] [file out]\n")
                 end()
             }
             else {
-                local Program = exec("touch")
-                
-                local Filename = arg(2)
-                if (Filename == "") {
-                    Filename = "webpage"
-                }
-                Program["args", array] = array(Filename)
-                Program["in", array] = array(Data)
-                
-                P["in", array] = Program["out", array] = array()
-                
-                P["state", number] = 3
+                P["state", number] = 1
             }
-        }
-        break
-    
-    case 3,
-        if (wait()) {
-            out(in())
-            end()
-        }
-        break
+            break
+        
+        case 1,
+            if (httpCanRequest()) {
+                local Arg = arg(1)
+                if (Arg:sub(1, 7) != "http://") {
+                    Arg = "http://" + Arg
+                }
+                
+                httpRequest(Arg)
+                P["state", number] = 2
+            }
+            break
+        
+        case 2,
+            if (httpCanRequest()) {
+                local Data = httpData()
+                if (Data == "") {
+                    out("Error: Timeout.\n")
+                    end()
+                }
+                else {
+                    local Program = exec("touch")
+                    
+                    local Filename = arg(2)
+                    if (Filename == "") {
+                        Filename = "webpage"
+                    }
+                    Program["args", array] = array(Filename)
+                    Program["in", array] = array(Data)
+                    
+                    P["in", array] = Program["out", array] = array()
+                    
+                    P["state", number] = 3
+                }
+            }
+            break
+        
+        case 3,
+            if (wait()) {
+                out(in())
+                end()
+            }
+            break
+    }
 }
-
+#endif

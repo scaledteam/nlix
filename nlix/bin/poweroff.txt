@@ -4,12 +4,14 @@
 
 @name poweroff
 
-while (Ps:count() > 0) {
-    Ps:popTable():clear()
+P2F["poweroff", string] = "poweroff"
+
+function poweroff() {
+    while (Ps:count() > 0) {
+        Ps:popTable():clear()
+    }
+    
+    S:clear()
+
+    runOnTick(0)
 }
-
-G:clear()
-L:clear()
-S:clear()
-
-runOnTick(0)

@@ -4,22 +4,21 @@
 
 @name plist
 
-local Counter = P["counter", number]
-local Out = ""
+P2F["plist", string] = "plist"
 
-for (I = 1, Overload) {
-    Counter++
-    
-    Out += Counter + ": " + Ps[Counter, table]:type() + "\n"
-    
-    if (Counter >= (Ps:count() - 1)) {
-        out(Out)
-        end()
-        break
+function plist() {
+    local Counter = P["counter", number]
+    local Out = ""
+
+    for (I = 1, Overload) {
+        Counter++
+        
+        Out += Counter + ": " + Ps[Counter, table]:type() + "\n"
+        
+        if (Counter >= (Ps:count() - 1)) {
+            out(Out)
+            end()
+            return
+        }
     }
 }
-
-#if (P:isValid()) {
-    P["counter", number] = Counter
-    out(Out)
-#}

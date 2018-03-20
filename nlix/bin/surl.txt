@@ -4,47 +4,53 @@
 
 @name surl
 
-local Arg = arg(1)
-switch (Arg) {
-    case "", "help", 
-        out(
-            "Usage: surl [url/command]:\n"
-            + "Commands:\n"
-            + "stop\n"
-            + "resume\n"
-            + "pause\n"
-            + "volume [number 0-1]\n"
-            + "help\n"
-        )
-        break
-    
-    case "stop", 
-        soundURLdelete("nlix-surl")
-        break
-    
-    case "resume", 
-        soundURLplay("nlix-surl")
-        break
-    
-    case "pause", 
-        soundURLpause("nlix-surl")
-        break
-    
-    case "volume",
-        if (args() < 2) {
-            out("Usage: surl volume [number 0-1]\n")
-        }
-        else {
-            soundURLvolume("nlix-surl", arg(2):toNumber())
-        }
-        break
-    
-    default,
-        if (Arg:sub(1, 7) != "http://") {
-            Arg = "http://" + Arg
-        }
-        soundURLload("nlix-surl", Arg, 1000, 0, entity())
-        #soundURLparent("nlix-surl", entity())
-}
+#ifdef soundURLload(string, string, number, number, entity)
+P2F["surl", string] = "surl"
 
-end()
+function surl() {
+    local Arg = arg(1)
+    switch (Arg) {
+        case "", "help", 
+            out(
+                "Usage: surl [url/command]:\n"
+                + "Commands:\n"
+                + "stop\n"
+                + "resume\n"
+                + "pause\n"
+                + "volume [number 0-1]\n"
+                + "help\n"
+            )
+            break
+        
+        case "stop", 
+            soundURLdelete("nlix-surl")
+            break
+        
+        case "resume", 
+            soundURLplay("nlix-surl")
+            break
+        
+        case "pause", 
+            soundURLpause("nlix-surl")
+            break
+        
+        case "volume",
+            if (args() < 2) {
+                out("Usage: surl volume [number 0-1]\n")
+            }
+            else {
+                soundURLvolume("nlix-surl", arg(2):toNumber())
+            }
+            break
+        
+        default,
+            if (Arg:sub(1, 7) != "http://") {
+                Arg = "http://" + Arg
+            }
+            soundURLload("nlix-surl", Arg, 1000, 0, entity())
+            #soundURLparent("nlix-surl", entity())
+    }
+
+    end()
+}
+#endif

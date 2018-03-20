@@ -4,232 +4,237 @@
 
 @name term
 
-switch (P["state", number]) {
-    case 0,
-        P["textR", array] = array()
+P2F["term", string] = "term"
+
+function term() {
+    switch (P["state", number]) {
+        case 0,
+            P["textR", array] = array()
+            
+            P["state", number] = 1
+            break
         
-        P["state", number] = 1
-        break
-    
-    case 1,
-        if (P:exists("out")) {
-            if (!P:exists("resolution")) {
-                P["resolution", vector2] = vec2(10, 5)
-            }
-            else {
-                local Resolution = P["resolution", vector2]
-                if (!(Resolution == Resolution) | Resolution[1] == 0 | Resolution[2] == 0) {
+        case 1,
+            if (P:exists("out")) {
+                if (!P:exists("resolution")) {
                     P["resolution", vector2] = vec2(10, 5)
                 }
+                else {
+                    local Resolution = P["resolution", vector2]
+                    if (!(Resolution == Resolution) | Resolution[1] == 0 | Resolution[2] == 0) {
+                        P["resolution", vector2] = vec2(10, 5)
+                    }
+                }
+                
+                P["deviceType", string] = "out"
+                
+                P["state", number] = 2
+            }
+            elseif (deviceGet("gmod_wire_textscreen")) {
+                local Device = P["device", wirelink]
+                Device["String", string] = P["text", string]
+                
+                #P["resolution", vector2] = vec2(40, 21)
+                P["resolution", vector2] = vec2(39, 21)
+                P["deviceType", string] = "gmod_wire_textscreen"
+                
+                P["state", number] = 2
+            }
+            elseif (deviceGet("gmod_wire_egp")) {
+                local Device = P["device", wirelink]
+                Device:egpClear()
+                Device:egpDrawTopLeft(1)
+                
+                Device:egpTextLayout(1, P["text", string], vec2(), vec2(512))
+                Device:egpFont(1, "Courier New")
+                
+                P["resolution", vector2] = vec2(56, 28)
+                P["deviceType", string] = "gmod_wire_egp"
+                
+                P["state", number] = 2
+            }
+            elseif (deviceGet("gmod_wire_consolescreen")) {
+                local Device = P["device", wirelink]
+                Device[2041] = 1
+                Device:writeString(P["text", string], 0, 0)
+                
+                P["resolution", vector2] = vec2(30, 18)
+                P["deviceType", string] = "gmod_wire_consolescreen"
+                
+                P["state", number] = 2
             }
             
-            P["deviceType", string] = "out"
-            
-            P["state", number] = 2
-        }
-        elseif (deviceGet("gmod_wire_textscreen")) {
-            local Device = P["device", wirelink]
-            Device["String", string] = P["text", string]
-            
-            P["resolution", vector2] = vec2(40, 21)
-            P["deviceType", string] = "gmod_wire_textscreen"
-            
-            P["state", number] = 2
-        }
-        elseif (deviceGet("gmod_wire_egp")) {
-            local Device = P["device", wirelink]
-            Device:egpClear()
-            Device:egpDrawTopLeft(1)
-            
-            Device:egpTextLayout(1, P["text", string], vec2(), vec2(512))
-            Device:egpFont(1, "Courier New")
-            
-            P["resolution", vector2] = vec2(56, 28)
-            P["deviceType", string] = "gmod_wire_egp"
-            
-            P["state", number] = 2
-        }
-        elseif (deviceGet("gmod_wire_consolescreen")) {
-            local Device = P["device", wirelink]
-            Device[2041] = 1
-            Device:writeString(P["text", string], 0, 0)
-            
-            P["resolution", vector2] = vec2(30, 18)
-            P["deviceType", string] = "gmod_wire_consolescreen"
-            
-            P["state", number] = 2
-        }
+            break
         
-        break
-    
-    case 2,
-        local Device = P["device", wirelink]
-        
-        if (Device | P:exists("out")) {
-            if (wait()) {
-                local In = in()
-                
-                local Text = P["text", string]
-                local TextR = P["textR", array]
-                
-                local Update = 0
-                
-                switch (In) {
-                    case ERASE1,
-                        local EraseCount = 1
-                        
-                        Update = 1
-                        
-                        local String = TextR:popString()
-                        local StringCount = String:length()
-                        
-                        if (StringCount > 1) {
-                            TextR:pushString(String:sub(1, -2))
-                            P["text", string] = Text = Text:sub(1, -2)
-                        }
-                        else {
-                            P["text", string] = Text = Text:sub(1, -3)
-                        }
-                        break
+        case 2,
+            local Device = P["device", wirelink]
+            
+            if (Device | P:exists("out")) {
+                if (wait()) {
+                    local In = in()
                     
-                    case ERASE,
-                        local EraseCount = P["in", array]:shiftNumber()
-                        
-                        Update = 1
-                        
-                        while (EraseCount > 0) {
+                    local Text = P["text", string]
+                    local TextR = P["textR", array]
+                    
+                    local Update = 0
+                    
+                    switch (In) {
+                        case ERASE1,
+                            local EraseCount = 1
+                            
+                            Update = 1
+                            
                             local String = TextR:popString()
                             local StringCount = String:length()
                             
-                            if (StringCount == 0) {
-                                break
-                            }
-                            elseif (EraseCount < StringCount) {
-                                TextR:pushString(String:sub(1, -1 - EraseCount))
-                                P["text", string] = Text = Text:sub(1, -1 - EraseCount)
-                                break
-                            }
-                            elseif (EraseCount == StringCount) {
-                                P["text", string] = Text = Text:sub(1, -2 - EraseCount)
-                                break
+                            if (StringCount > 1) {
+                                TextR:pushString(String:sub(1, -2))
+                                P["text", string] = Text = Text:sub(1, -2)
                             }
                             else {
-                                EraseCount -= StringCount
-                                P["text", string] = Text = Text:sub(1, -2 - StringCount)
+                                P["text", string] = Text = Text:sub(1, -3)
                             }
-                        }
+                            break
                         
-                        Text = TextR:concat("\n")
-                        break
-                    
-                    #[case EXIT,
-                        deviceReturn()
-                        local DeviceType = P["deviceType", string]
-                        switch (DeviceType) {
-                            case "gmod_wire_egp",
-                                Device:egpClear()
-                                break
+                        case ERASE,
+                            local EraseCount = P["in", array]:shiftNumber()
                             
-                            case "gmod_wire_consolescreen",
-                                Device[2041] = 1
-                                break
+                            Update = 1
+                            
+                            while (EraseCount > 0) {
+                                local String = TextR:popString()
+                                local StringCount = String:length()
+                                
+                                if (StringCount == 0) {
+                                    break
+                                }
+                                elseif (EraseCount < StringCount) {
+                                    TextR:pushString(String:sub(1, -1 - EraseCount))
+                                    P["text", string] = Text = Text:sub(1, -1 - EraseCount)
+                                    break
+                                }
+                                elseif (EraseCount == StringCount) {
+                                    P["text", string] = Text = Text:sub(1, -2 - EraseCount)
+                                    break
+                                }
+                                else {
+                                    EraseCount -= StringCount
+                                    P["text", string] = Text = Text:sub(1, -2 - StringCount)
+                                }
+                            }
+                            
+                            Text = TextR:concat("\n")
+                            break
+                        
+                        #[case EXIT,
+                            deviceReturn()
+                            local DeviceType = P["deviceType", string]
+                            switch (DeviceType) {
+                                case "gmod_wire_egp",
+                                    Device:egpClear()
+                                    break
+                                
+                                case "gmod_wire_consolescreen",
+                                    Device[2041] = 1
+                                    break
+                                        
+                                case "gmod_wire_textscreen",
+                                    Device["String", string] = ""
+                                    break
+                                
+                                case "out",
+                                    P["out", array]:pushString(EXIT)
+                                    break
+                                
+                                default,
+                            }
+                            
+                            P["deviceType", string] = ""
+                            end()
+                            break]#
+                        
+                        default,
+                            local Width = P["resolution", vector2][1]
+                            
+                            local NewText = TextR:popString() + In:replace("\t", " ")
+                            local NewTextExp = NewText:explode("\n")
+                            
+                            local NewTextExpCount = NewTextExp:count()
+                            if (NewTextExpCount == 1) {
+                                local NewText2 = NewTextExp:shiftString()
+                                
+                                if (NewText2:length() >= Width) {
+                                    for (I = 0, NewText2:length() / Width) {
+                                        TextR:pushString(NewText2:sub(I * Width, (I + 1) * Width - 1))
+                                    }
                                     
-                            case "gmod_wire_textscreen",
-                                Device["String", string] = ""
-                                break
-                            
-                            case "out",
-                                P["out", array]:pushString(EXIT)
-                                break
-                            
-                            default,
-                        }
-                        
-                        P["deviceType", string] = ""
-                        end()
-                        break]#
-                    
-                    default,
-                        local Width = P["resolution", vector2][1]
-                        
-                        local NewText = TextR:popString() + In:replace("\t", " ")
-                        local NewTextExp = NewText:explode("\n")
-                        
-                        local NewTextExpCount = NewTextExp:count()
-                        if (NewTextExpCount == 1) {
-                            local NewText2 = NewTextExp:shiftString()
-                            
-                            if (NewText2:length() >= Width) {
-                                for (I = 0, NewText2:length() / Width) {
-                                    TextR:pushString(NewText2:sub(I * Width, (I + 1) * Width - 1))
+                                    Update = 1
+                                    Text = TextR:concat("\n")
+                                }
+                                else {
+                                    Text += In
+                                    TextR:pushString(NewText)
+                                }
+                            }
+                            elseif (NewTextExpCount > P["resolution", vector2][2]) {
+                                TextR:clear()
+                                NewTextExp = NewTextExp:concat("\n", NewTextExpCount - P["resolution", vector2][2] + 1):explode("\n")
+                                
+                                foreach (I, NewText2:string = NewTextExp) {
+                                    for (I = 0, NewText2:length() / Width) {
+                                        TextR:pushString(NewText2:sub(I * Width, (I + 1) * Width - 1))
+                                    }
                                 }
                                 
                                 Update = 1
                                 Text = TextR:concat("\n")
                             }
                             else {
-                                Text += In
-                                TextR:pushString(NewText)
-                            }
-                        }
-                        elseif (NewTextExpCount > P["resolution", vector2][2]) {
-                            TextR:clear()
-                            NewTextExp = NewTextExp:concat("\n", NewTextExpCount - P["resolution", vector2][2] + 1):explode("\n")
-                            
-                            foreach (I, NewText2:string = NewTextExp) {
-                                for (I = 0, NewText2:length() / Width) {
-                                    TextR:pushString(NewText2:sub(I * Width, (I + 1) * Width - 1))
+                                foreach (I, NewText2:string = NewTextExp) {
+                                    for (I = 0, NewText2:length() / Width) {
+                                        TextR:pushString(NewText2:sub(I * Width, (I + 1) * Width - 1))
+                                    }
                                 }
-                            }
-                            
-                            Update = 1
-                            Text = TextR:concat("\n")
-                        }
-                        else {
-                            foreach (I, NewText2:string = NewTextExp) {
-                                for (I = 0, NewText2:length() / Width) {
-                                    TextR:pushString(NewText2:sub(I * Width, (I + 1) * Width - 1))
+                                
+                                while (TextR:count() > P["resolution", vector2][2]) {
+                                    TextR:shift()
                                 }
+                                
+                                Update = 1
+                                Text = TextR:concat("\n")
                             }
                             
-                            while (TextR:count() > P["resolution", vector2][2]) {
-                                TextR:shift()
-                            }
+                            P["text", string] = Text
+                    }
                             
-                            Update = 1
-                            Text = TextR:concat("\n")
-                        }
+                    local DeviceType = P["deviceType", string]
+                    switch (DeviceType) {
+                        case "gmod_wire_egp",
+                            Device:egpSetText(1, Text)
+                            break
                         
-                        P["text", string] = Text
+                        case "gmod_wire_consolescreen",
+                            if (Update) {
+                                Device[2041] = 1
+                            }
+                            Device:writeString(Text, 0, 0)
+                            break
+                                
+                        case "gmod_wire_textscreen",
+                            Device["String", string] = Text
+                            break
+                        
+                        case "out",
+                            P["out", array]:pushString(Text)
+                            break
+                        
+                        default,
+                     }
                 }
-                        
-                local DeviceType = P["deviceType", string]
-                switch (DeviceType) {
-                    case "gmod_wire_egp",
-                        Device:egpSetText(1, Text)
-                        break
-                    
-                    case "gmod_wire_consolescreen",
-                        if (Update) {
-                            Device[2041] = 1
-                        }
-                        Device:writeString(Text, 0, 0)
-                        break
-                            
-                    case "gmod_wire_textscreen",
-                        Device["String", string] = Text
-                        break
-                    
-                    case "out",
-                        P["out", array]:pushString(Text)
-                        break
-                    
-                    default,
-                 }
             }
-        }
-        else {
-            P["state", number] = 1
-        }
-        break
+            else {
+                P["state", number] = 1
+            }
+            break
+    }
 }

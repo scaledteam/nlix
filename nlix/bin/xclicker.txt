@@ -1,0 +1,11 @@
+#
+# Created by scaled
+#
+
+@name xclicker
+
+P2F["xclicker", string] = "xclicker"
+
+function xclicker() {
+    
+}

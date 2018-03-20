@@ -4,129 +4,133 @@
 
 @name sh
 
-switch (P["state", number]) {
-    case 0,
-        # init keyboard and terminal
-        if (!P:exists("in")) {
-            local Skbd = exec("skbd")
-            makeProgramLast()
-            
-            P["in", array] = Skbd["out", array] = array()
-            
-            if (P:exists("kbd")) {
-                Skbd["in", array] = P["kbd", array]
-            }
-            else {
-                Skbd["kbd", array] = P["kbd", array] = array()
-            }
-            
-            if (!P:exists("out")) {
-                local Term = exec("term")
-                P["out", array] = Term["in", array] = Skbd["term", array] = array()
-            }
-        }
-        elseif (!P:exists("out")) {
-            local Term = exec("term")
-            P["out", array] = Term["in", array] = array()
-        }
-        
-        # Welcome message
-        out("Welcome to the Nlix operating system!\n")
-        
-        # move to next state
-        P["state", number] = 1
-        break
-    
-    case 1,
-        out("sh $ ")
-        P["state", number] = 2
-        break
-    
-    case 2,
-        if (wait()) {
-            local Command = in():trim()
-            switch (Command) {
-                case "",
-                    P["state", number] = 1
-                    break
+P2F["sh", string] = "sh"
+
+function sh() {
+    switch (P["state", number]) {
+        case 0,
+            # init keyboard and terminal
+            if (!P:exists("in")) {
+                local Skbd = exec("skbd")
+                makeProgramLast()
                 
-                case "exit",
-                    end()
-                    break
+                P["in", array] = Skbd["out", array] = array()
                 
-                case "sh",
-                    local Sh = exec("sh")
-                    Sh:remove("parent")
-                    P["state", number] = 1
-                    break
-                
-                case "stress",
-                    local P1 = exec("ls") P1["args", array] = array("rdir")
-                    local P2 = exec("ls") P2["args", array] = array("e2shared")
-                    local P3 = exec("ls") P3["args", array] = array("rdir/test")
-                    
-                    P1["out", array] = P2["out", array] = P3["out", array] = P["out", array]
-                    P["state", number] = 1
-                    break
-                
-                case "tulpacode",
-                    out("TuC-0.2.2 S1 EX11-02-13 Tel %C9I10 Sp3 Img.Hum&@.f-22y-M Rls3% W2+ Dr1 XS.i4 RL3@\n")
-                    P["state", number] = 1
-                    break
-                
-                default,
-                    local Commands = Command:trim():replaceRE("  +", " "):explode(">")
-                    
-                    local Program = NULL
-                    for (I = 1, Commands:count()) {
-                        local CommandExplode = Commands[I, string]:explode(" ")
-                        
-                        if (I == 1) {
-                            Program = exec(CommandExplode:shiftString())
-                            Program["in", array] = P["in", array]
-                        }
-                        else {
-                            local PrevProgramOut = array()
-                            Program["out", array] = PrevProgramOut
-                            
-                            Program = exec(CommandExplode:shiftString())
-                            Program["in", array] = PrevProgramOut
-                        }
-                        
-                        if (CommandExplode:count() > 0) {
-                            Program["args", array] = CommandExplode
-                        }
-                    }
-                    
-                    Program["out", array] = P["out", array]
-                    
-                    P["program", table] = Program
-                    P["state", number] = 3
+                if (P:exists("kbd")) {
+                    Skbd["in", array] = P["kbd", array]
                 }
-        }
-        break
-    
-    case 3,
-        if (!P["program", table]:isValid()) {
-            P["state", number] = 1
-        }
-        
-        if (P:exists("kbd") & P["kbd", array][1, number] == 158) {
-            switch (toChar(P["kbd", array][2, number])) {
-                case "c",
-                    P["program", table]:clear()
-                    break
+                else {
+                    Skbd["kbd", array] = P["kbd", array] = array()
+                }
                 
-                case "z",
-                    P["program", table]["in", array]:pushString("exit")
-                    break
-                
-                case "x",
-                    P["state", number] = 1
-                    break
-                
-                default,
+                if (!P:exists("out")) {
+                    local Term = exec("term")
+                    P["out", array] = Term["in", array] = Skbd["term", array] = array()
+                }
             }
-        }
-        break
+            elseif (!P:exists("out")) {
+                local Term = exec("term")
+                P["out", array] = Term["in", array] = array()
+            }
+            
+            # Welcome message
+            out("Welcome to the Nlix operating system!\n")
+            
+            # move to next state
+            P["state", number] = 1
+            break
+        
+        case 1,
+            out("sh $ ")
+            P["state", number] = 2
+            break
+        
+        case 2,
+            if (wait()) {
+                local Command = in():trim()
+                switch (Command) {
+                    case "",
+                        P["state", number] = 1
+                        break
+                    
+                    case "exit",
+                        end()
+                        break
+                    
+                    case "sh",
+                        local Sh = exec("sh")
+                        Sh:remove("parent")
+                        P["state", number] = 1
+                        break
+                    
+                    case "stress",
+                        local P1 = exec("ls") P1["args", array] = array("rdir")
+                        local P2 = exec("ls") P2["args", array] = array("e2shared")
+                        local P3 = exec("ls") P3["args", array] = array("rdir/test")
+                        
+                        P1["out", array] = P2["out", array] = P3["out", array] = P["out", array]
+                        P["state", number] = 1
+                        break
+                    
+                    case "tulpacode",
+                        out("TuC-0.2.2 S1 EX11-02-13 Tel %C9I10 Sp3 Img.Hum&@.f-22y-M Rls3% W2+ Dr1 XS.i4 RL3@\n")
+                        P["state", number] = 1
+                        break
+                    
+                    default,
+                        local Commands = Command:trim():replaceRE("  +", " "):explode(">")
+                        
+                        local Program = NULL
+                        for (I = 1, Commands:count()) {
+                            local CommandExplode = Commands[I, string]:explode(" ")
+                            
+                            if (I == 1) {
+                                Program = exec(CommandExplode:shiftString())
+                                Program["in", array] = P["in", array]
+                            }
+                            else {
+                                local PrevProgramOut = array()
+                                Program["out", array] = PrevProgramOut
+                                
+                                Program = exec(CommandExplode:shiftString())
+                                Program["in", array] = PrevProgramOut
+                            }
+                            
+                            if (CommandExplode:count() > 0) {
+                                Program["args", array] = CommandExplode
+                            }
+                        }
+                        
+                        Program["out", array] = P["out", array]
+                        
+                        P["program", table] = Program
+                        P["state", number] = 3
+                    }
+            }
+            break
+        
+        case 3,
+            if (!P["program", table]:isValid()) {
+                P["state", number] = 1
+            }
+            
+            if (P:exists("kbd") & P["kbd", array][1, number] == 158) {
+                switch (toChar(P["kbd", array][2, number])) {
+                    case "c",
+                        P["program", table]:clear()
+                        break
+                    
+                    case "z",
+                        P["program", table]["in", array]:pushString("exit")
+                        break
+                    
+                    case "x",
+                        P["state", number] = 1
+                        break
+                    
+                    default,
+                }
+            }
+            break
+    }
 }

@@ -4,16 +4,20 @@
 
 @name overload
 
-if (args() < 1) {
-    out("Usage: overload [number]")
-}
-else {
-    local Arg = arg(1):toNumber()
-    if (Arg > 0) {
-        Overload = Arg
+P2F["overload", string] = "overload"
+
+function overload() {
+    if (args() < 1) {
+        out("Usage: overload [number]")
     }
     else {
-        out("Entered value is incorrect.\n")
+        local Arg = arg(1):toNumber()
+        if (Arg > 0) {
+            Overload = Arg
+        }
+        else {
+            out("Entered value is incorrect.\n")
+        }
     }
+    end()
 }
-end()

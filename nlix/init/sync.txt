@@ -5,11 +5,15 @@
 @name sync
 @persist SYSTEM_NAME:string
 
-if (G:exists(SYSTEM_NAME)) {
-    S = G[SYSTEM_NAME, table]
-    Ps = S["P", table]
+local Gtable = gTable("nlix")
+
+if (Gtable[SYSTEM_NAME, table]["S", table]:isValid()) {
+    S = Gtable[SYSTEM_NAME, table]["S", table]
+    Ps = Gtable[SYSTEM_NAME, table]["Ps", table]
 }
 else {
-    G[SYSTEM_NAME, table] = S
-    S["P", table] = Ps
+    Gtable[SYSTEM_NAME, table] = table(
+        "S" = S,
+        "Ps" = Ps
+    )
 }

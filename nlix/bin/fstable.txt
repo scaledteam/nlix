@@ -4,131 +4,167 @@
 
 @name fstable
 
-if (P["fs", table]:exists("table")) {
-    local Dir = P["fs", table]["table", table]
-    
-    switch (P["mode", string]) {
-        case "list",
-            if (P["path", string] != "") {
-                foreach (I, NextDir:string = P["path", string]:explode("/")) {
-                    if (Dir:exists(NextDir)) {
-                        if (Dir:typeids()[NextDir, string] == "t") {
-                            Dir = Dir[NextDir, table]
+P2F["fstable", string] = "fstable"
+
+function fstable() {
+    if (P["fs", table]:exists("table")) {
+        local Dir = P["fs", table]["table", table]
+        
+        switch (P["mode", string]) {
+            case "list",
+                if (P["path", string] != "") {
+                    foreach (I, NextDir:string = P["path", string]:explode("/")) {
+                        if (Dir:exists(NextDir)) {
+                            if (Dir:typeids()[NextDir, string] == "t") {
+                                Dir = Dir[NextDir, table]
+                            }
+                            else {
+                                out("Error: This not a directory.\n")
+                                end()
+                                break
+                            }
+                        }
+                        elseif (Dir:exists(NextDir:toNumber())) {
+                            if (Dir:typeids()[NextDir:toNumber(), string] == "t") {
+                                Dir = Dir[NextDir:toNumber(), table]
+                            }
+                            else {
+                                out("Error: This not a directory.\n")
+                                end()
+                                break
+                            }
                         }
                         else {
-                            out("Error: This not a directory.\n")
+                            out("Error: Wrong path.\n")
                             end()
                             break
                         }
-                    }
-                    elseif (Dir:exists(NextDir:toNumber())) {
-                        if (Dir:typeids()[NextDir:toNumber(), string] == "t") {
-                            Dir = Dir[NextDir:toNumber(), table]
-                        }
-                        else {
-                            out("Error: This not a directory.\n")
-                            end()
-                            break
-                        }
-                    }
-                    else {
-                        out("Error: Wrong path.\n")
-                        end()
-                        break
                     }
                 }
-            }
+                
+                if (P:isValid()) {
+                    #out(Dir:keys():concat("\n") + "\n")
+                    
+                    local Out = ""
+                    
+                    local Types = Dir:typeids()
+                    local Keys = Dir:keys()
+                    for (I = 1, Dir:count()) {
+                        if (Types[Keys[I, string], string] == "t") {
+                            Out += Keys[I, string] + "/\n"
+                        }
+                        elseif (Types[Keys[I, number], string] == "t") {
+                            Out += Keys[I, number] + "/\n"
+                        }
+                        else {
+                            Out += Keys[I, string] + "\n"
+                        }
+                    }
+                    out(Out)
+                    end()
+                }
+                break
             
-            if (P:isValid()) {
-                #out(Dir:keys():concat("\n") + "\n")
-                
-                local Out = ""
-                
-                local Types = Dir:typeids()
-                local Keys = Dir:keys()
-                for (I = 1, Dir:count()) {
-                    if (Types[Keys[I, string], string] == "t") {
-                        Out += Keys[I, string] + "/\n"
-                    }
-                    elseif (Types[Keys[I, number], string] == "t") {
-                        Out += Keys[I, number] + "/\n"
-                    }
-                    else {
-                        Out += Keys[I, string] + "\n"
+            case "read",
+                if (P["path", string] != "") {
+                    local PathExp = P["path", string]:explode("/")
+                    
+                    while (PathExp:count() > 0) {
+                        local NextDir = PathExp:shiftString()
+                        if (Dir:exists(NextDir)) {
+                            if (PathExp:count() != 0) {
+                                Dir = Dir[NextDir, table]
+                            }
+                            else {
+                                local Type = Dir:typeids()[NextDir, string]
+                                
+                                switch (Type) {
+                                    case "t",
+                                        out("Error: This is not a regular file.\n")
+                                        break
+                                    
+                                    case "s",
+                                        out(Dir[NextDir, string] + "\n")
+                                        break
+                                    
+                                    case "n",
+                                        out(Dir[NextDir, number] + "\n")
+                                        break
+                                    
+                                    default,
+                                        out("Error: Unsupported type.\n")
+                                }
+                            }
+                        }
+                        elseif (Dir:exists(NextDir:toNumber())) {
+                            if (PathExp:count() != 0) {
+                                Dir = Dir[NextDir:toNumber(), table]
+                            }
+                            else {
+                                local Type = Dir:typeids()[NextDir:toNumber(), string]
+                                
+                                switch (Type) {
+                                    case "t",
+                                        out("Error: This is not a regular file.\n")
+                                        break
+                                    
+                                    case "s",
+                                        out(Dir[NextDir:toNumber(), string] + "\n")
+                                        break
+                                    
+                                    case "n",
+                                        out(Dir[NextDir:toNumber(), number] + "\n")
+                                        break
+                                    
+                                    default,
+                                        out("Error: Unsupported type.\n")
+                                }
+                            }
+                        }
+                        else {
+                            out("Error: Wrong path.\n")
+                        }
                     }
                 }
-                out(Out)
+                
                 end()
-            }
-            break
-        
-        case "read",
-            if (P["path", string] != "") {
-                local PathExp = P["path", string]:explode("/")
-                
-                while (PathExp:count() > 0) {
-                    local NextDir = PathExp:shiftString()
-                    if (Dir:exists(NextDir)) {
-                        if (PathExp:count() != 0) {
-                            Dir = Dir[NextDir, table]
-                        }
-                        else {
-                            local Type = Dir:typeids()[NextDir, string]
-                            
-                            switch (Type) {
-                                case "t",
-                                    out("Error: This is not a regular file.\n")
+                break
+            
+            case "write",
+                if (wait()) {
+                    if (P["path", string] != "") {
+                        local PathExp = P["path", string]:explode("/")
+                        
+                        while (PathExp:count() > 0) {
+                            local NextDir = PathExp:shiftString()
+                            if (PathExp:count() != 0) {
+                                if (Dir:exists(NextDir)) {
+                                    Dir = Dir[NextDir, table]
+                                }
+                                elseif (Dir:exists(NextDir:toNumber())) {
+                                    Dir = Dir[NextDir:toNumber(), table]
+                                }
+                                else {
+                                    out("Error: Wrong path.\n")
+                                    end()
                                     break
-                                
-                                case "s",
-                                    out(Dir[NextDir, string] + "\n")
-                                    break
-                                
-                                case "n",
-                                    out(Dir[NextDir, number] + "\n")
-                                    break
-                                
-                                default,
-                                    out("Error: Unsupported type.\n")
+                                }
+                            }
+                            else {
+                                Dir[NextDir, string] = in()
+                                break
                             }
                         }
                     }
-                    elseif (Dir:exists(NextDir:toNumber())) {
-                        if (PathExp:count() != 0) {
-                            Dir = Dir[NextDir:toNumber(), table]
-                        }
-                        else {
-                            local Type = Dir:typeids()[NextDir:toNumber(), string]
-                            
-                            switch (Type) {
-                                case "t",
-                                    out("Error: This is not a regular file.\n")
-                                    break
-                                
-                                case "s",
-                                    out(Dir[NextDir:toNumber(), string] + "\n")
-                                    break
-                                
-                                case "n",
-                                    out(Dir[NextDir:toNumber(), number] + "\n")
-                                    break
-                                
-                                default,
-                                    out("Error: Unsupported type.\n")
-                            }
-                        }
-                    }
-                    else {
-                        out("Error: Wrong path.\n")
+                    
+                    if (P:isValid()) {
+                        out("ok\n")
+                        end()
                     }
                 }
-            }
+                break
             
-            end()
-            break
-        
-        case "write",
-            if (wait()) {
+            case "remove",
                 if (P["path", string] != "") {
                     local PathExp = P["path", string]:explode("/")
                     
@@ -148,7 +184,7 @@ if (P["fs", table]:exists("table")) {
                             }
                         }
                         else {
-                            Dir[NextDir, string] = in()
+                            Dir:remove(NextDir)
                             break
                         }
                     }
@@ -158,47 +194,15 @@ if (P["fs", table]:exists("table")) {
                     out("ok\n")
                     end()
                 }
-            }
-            break
-        
-        case "remove",
-            if (P["path", string] != "") {
-                local PathExp = P["path", string]:explode("/")
-                
-                while (PathExp:count() > 0) {
-                    local NextDir = PathExp:shiftString()
-                    if (PathExp:count() != 0) {
-                        if (Dir:exists(NextDir)) {
-                            Dir = Dir[NextDir, table]
-                        }
-                        elseif (Dir:exists(NextDir:toNumber())) {
-                            Dir = Dir[NextDir:toNumber(), table]
-                        }
-                        else {
-                            out("Error: Wrong path.\n")
-                            end()
-                            break
-                        }
-                    }
-                    else {
-                        Dir:remove(NextDir)
-                        break
-                    }
-                }
-            }
+                break
             
-            if (P:isValid()) {
-                out("ok\n")
+            default,
+                out("Error: Unsupported action.\n")
                 end()
-            }
-            break
-        
-        default,
-            out("Error: Unsupported action.\n")
-            end()
+        }
     }
-}
-else {
-    out("Error: No table in fstab.\n")
-    end()
+    else {
+        out("Error: No table in fstab.\n")
+        end()
+    }
 }

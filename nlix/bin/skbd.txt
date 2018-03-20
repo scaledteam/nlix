@@ -4,137 +4,141 @@
 
 @name skbd
 
-switch (P["state", number]) {
-    case 0,
-        if (P:exists("in")) {
-            P["kbd", array] = P["in", array]
-            
-            if (!P:exists("kbdOld")) {
-                P["kbdOld", array] = array()
+P2F["skbd", string] = "skbd"
+
+function skbd() { 
+    switch (P["state", number]) {
+        case 0,
+            if (P:exists("in")) {
+                P["kbd", array] = P["in", array]
                 
-                P["kbdTable", table] = table()
-                P["kbdTableOld", table] = table()
-            }
-            P["state", number] = 2
-        }
-        elseif (deviceGet("gmod_wire_keyboard")) {
-            if (!P:exists("kbd")) {
-                P["kbd", array] = array()
-            }
-            
-            if (!P:exists("kbdOld")) {
-                P["kbdOld", array] = array()
-                
-                P["kbdTable", table] = table()
-                P["kbdTableOld", table] = table()
-            }
-            
-            P["state", number] = 1
-        }
-        elseif (deviceGet("gmod_wire_textentry")) {
-            P["textOld", string] = P["device", wirelink]["Text", string]
-            
-            P["state", number] = 3
-        }
-        break
-    
-    case 1,
-        local Device = P["device", wirelink]
-        if (Device) {
-            local Keys = P["kbd", array]
-            
-            if (Keys:count() > 0) {
-                Keys:clear()
-            }
-            
-            if (Device[0] > 0) {
-                for (I = 1, Device[0]) {
-                    Keys[I, number] = Device[I]
+                if (!P:exists("kbdOld")) {
+                    P["kbdOld", array] = array()
+                    
+                    P["kbdTable", table] = table()
+                    P["kbdTableOld", table] = table()
                 }
+                P["state", number] = 2
             }
-        }
-        else {
-            P:removeArray("kbd"):clear()
-            P["state", number] = 0
+            elseif (deviceGet("gmod_wire_keyboard")) {
+                if (!P:exists("kbd")) {
+                    P["kbd", array] = array()
+                }
+                
+                if (!P:exists("kbdOld")) {
+                    P["kbdOld", array] = array()
+                    
+                    P["kbdTable", table] = table()
+                    P["kbdTableOld", table] = table()
+                }
+                
+                P["state", number] = 1
+            }
+            elseif (deviceGet("gmod_wire_textentry")) {
+                P["textOld", string] = P["device", wirelink]["Text", string]
+                
+                P["state", number] = 3
+            }
             break
-        }
-        # no break
-    
-    case 2,
-        local Keys = P["kbd", array]
         
-        if (Keys:count() > 0 | P["kbdTableOld", table]:count() > 0) {
-            local KbdTableOld = P["kbdTableOld", table]
-            KbdTableOld:clear()
-            P["kbdTableOld", table] = P["kbdTable", table]
-            P["kbdTable", table] = KbdTableOld
-        }
-        
-        foreach (I, Key:number = Keys) {
-            P["kbdTable", table][Key, number] = 1
-        }
-        
-        if (Keys:count() > 0) {
-            for (I = 1, Keys:count()) {
-                local Key = Keys[I, number]
-                #if (Key != KeysOld[I, number]) {
-                if (P["kbdTable", table][Key, number] > P["kbdTableOld", table][Key, number]) {
-                    switch (Key) {
-                        # Enter
-                        case 10, case 13, case 142,
-                            P["term", array]:pushString("\n")
-                            
-                            out(P["text", string])
-                            P["text", string] = ""
-                            break
-                        
-                        # Backspace
-                        case 127,
-                            if (P["text", string]:length() > 0) {
-                                P["term", array]:pushString(ERASE1)
-                                P["text", string] = P["text", string]:sub(1, -2)
-                            }
-                            break
-                        
-                        # Escape # Delete
-                        case 18, case 148,
-                            if (P["text", string]:length() > 0) {
-                                P["term", array]:pushString(ERASE)
-                                P["term", array]:pushNumber(P["text", string]:length())
-                                P["text", string] = ""
-                            }
-                            break
-                        
-                        # Normal key
-                        default,
-                            if (inrange(Key, 32, 127)) {
-                                local Char = toChar(Key)
-                                
-                                P["text", string] = P["text", string] + Char
-                                
-                                P["term", array]:pushString(Char)
-                            }
+        case 1,
+            local Device = P["device", wirelink]
+            if (Device) {
+                local Keys = P["kbd", array]
+                
+                if (Keys:count() > 0) {
+                    Keys:clear()
+                }
+                
+                if (Device[0] > 0) {
+                    for (I = 1, Device[0]) {
+                        Keys[I, number] = Device[I]
                     }
                 }
             }
-        }
-        break
-    
-    case 3,
-        local Device = P["device", wirelink]
-        if (Device) {
-            local Text = Device["Text", string]
-            
-            if (Text != P["textOld", string]) {
-                if (Text != "") {
-                    P["term", array]:pushString(Text + "\n")
-                    out(Text)
-                }
-                P["textOld", string] = Text
+            else {
+                P:removeArray("kbd"):clear()
+                P["state", number] = 0
+                break
             }
-        }
-        else {
-            P["state", number] = 0
-        }
-        break
+            # no break
+        
+        case 2,
+            local Keys = P["kbd", array]
+            
+            if (Keys:count() > 0 | P["kbdTableOld", table]:count() > 0) {
+                local KbdTableOld = P["kbdTableOld", table]
+                KbdTableOld:clear()
+                P["kbdTableOld", table] = P["kbdTable", table]
+                P["kbdTable", table] = KbdTableOld
+            }
+            
+            foreach (I, Key:number = Keys) {
+                P["kbdTable", table][Key, number] = 1
+            }
+            
+            if (Keys:count() > 0) {
+                for (I = 1, Keys:count()) {
+                    local Key = Keys[I, number]
+                    #if (Key != KeysOld[I, number]) {
+                    if (P["kbdTable", table][Key, number] > P["kbdTableOld", table][Key, number]) {
+                        switch (Key) {
+                            # Enter
+                            case 10, case 13, case 142,
+                                P["term", array]:pushString("\n")
+                                
+                                out(P["text", string])
+                                P["text", string] = ""
+                                break
+                            
+                            # Backspace
+                            case 127,
+                                if (P["text", string]:length() > 0) {
+                                    P["term", array]:pushString(ERASE1)
+                                    P["text", string] = P["text", string]:sub(1, -2)
+                                }
+                                break
+                            
+                            # Escape # Delete
+                            case 18, case 148,
+                                if (P["text", string]:length() > 0) {
+                                    P["term", array]:pushString(ERASE)
+                                    P["term", array]:pushNumber(P["text", string]:length())
+                                    P["text", string] = ""
+                                }
+                                break
+                            
+                            # Normal key
+                            default,
+                                if (inrange(Key, 32, 127)) {
+                                    local Char = toChar(Key)
+                                    
+                                    P["text", string] = P["text", string] + Char
+                                    
+                                    P["term", array]:pushString(Char)
+                                }
+                        }
+                    }
+                }
+            }
+            break
+        
+        case 3,
+            local Device = P["device", wirelink]
+            if (Device) {
+                local Text = Device["Text", string]
+                
+                if (Text != P["textOld", string]) {
+                    if (Text != "") {
+                        P["term", array]:pushString(Text + "\n")
+                        out(Text)
+                    }
+                    P["textOld", string] = Text
+                }
+            }
+            else {
+                P["state", number] = 0
+            }
+            break
+    }
 }

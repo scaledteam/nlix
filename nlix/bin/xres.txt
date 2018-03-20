@@ -4,48 +4,52 @@
 
 @name xres
 
-switch (P["state", number]) {
-    case 0,
-        if (P["xframe", table]["count", number] < 4) {
-            out("Error: Not enough place\n")
-            end()
-        }
-        else {
-            local Res = P["xframe", table]["size", vector2]
-            
-            local Size = vec2(min(Res[1], Res[2]))
-            
-            xcreate(table(
-                "type" = "box",
-                "size" = Size,
-                "color" = vec(255, 127, 63)
-            ))
-            
-            xcreate(table(
-                "type" = "box",
-                "size" = Res / 2,
-                "color" = vec(63, 127, 255)
-            ))
-            
-            xcreate(table(
-                "type" = "box",
-                "pos" = Res / 2,
-                "size" = Res / 2,
-                "color" = vec(63, 127, 255)
-            ))
-            
-            P["text", table] = xcreate(table(
-                "type" = "text",
-                "text" = "Res = (" + Res[1] + ", " + Res[2] + ")\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10",
-                "size" = Size,
-                "sizeNum" = Size[2] / 10,
-                "color" = vec()
-            ))
-            
-            P["state", number] = 1
-        }
-        break
-    
-    case 1,
-        break
+P2F["xres", string] = "xres"
+
+function xres() {
+    switch (P["state", number]) {
+        case 0,
+            if (P["xframe", table]["count", number] < 4) {
+                out("Error: Not enough egp elements.\n")
+                end()
+            }
+            else {
+                local Res = P["xframe", table]["size", vector2]
+                
+                local Size = vec2(min(Res[1], Res[2]))
+                
+                xcreate(table(
+                    "type" = "box",
+                    "size" = Size,
+                    "color" = vec(255, 127, 63)
+                ))
+                
+                xcreate(table(
+                    "type" = "box",
+                    "size" = Res / 2,
+                    "color" = vec(63, 127, 255)
+                ))
+                
+                xcreate(table(
+                    "type" = "box",
+                    "pos" = Res / 2,
+                    "size" = Res / 2,
+                    "color" = vec(63, 127, 255)
+                ))
+                
+                P["text", table] = xcreate(table(
+                    "type" = "text",
+                    "text" = "Res = (" + Res[1] + ", " + Res[2] + ")\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10",
+                    "size" = Size,
+                    "sizeNum" = Size[2] / 10,
+                    "color" = vec()
+                ))
+                
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            break
+    }
 }

@@ -4,11 +4,10 @@
 
 @name fsreal
 
-if (!G:exists("fsreal")) {
-    G["fsreal", table] = table()
-}
+#ifdef fileRead()
+P2F["fsreal", string] = "fsreal"
 
-if (order(G["fsreal", table])) {
+function fsreal() {
     if (P["fs", table]:exists("path")) {
         switch (P["mode", string]) {
             case "list",
