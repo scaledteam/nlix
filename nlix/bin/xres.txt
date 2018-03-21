@@ -9,11 +9,7 @@ P2F["xres", string] = "xres"
 function xres() {
     switch (P["state", number]) {
         case 0,
-            if (P["xframe", table]["count", number] < 3) {
-                out("Error: Not enough egp elements.\n")
-                end()
-            }
-            else {
+            if (xcanCreate(3)) {
                 local Res = P["xframe", table]["size", vector2]
                 
                 local Size = vec2(min(Res[1], Res[2]))

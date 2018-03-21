@@ -9,11 +9,7 @@ P2F["xterm", string] = "xterm"
 function xterm() {
     switch (P["state", number]) {
         case 0,
-            if (!P["xframe", table]["blocked", number] & P["xframe", table]["count", number] < 2) {
-                out("Error: Not enough egp elements.\n")
-                end()
-            }
-            else {
+            if (xcanCreate(2)) {
                 local Res = P["xframe", table]["size", vector2]
                 xcreate(table(
                     "type" = "box",
@@ -36,8 +32,10 @@ function xterm() {
                 P["term", table] = Term
                 
                 #Term["resolution", vector2] = floor(vec2(56, 28) * Res / vec2(512) / vec2(P["xframe", table]["textMultiplier", number], 1))
-                Term["resolution", vector2] = floor(vec2(2 * Res[1] / 15 / P["xframe", table]["textMultiplier", number], Res[2] / 15))
-                print(Term["resolution", vector2])
+                #Term["resolution", vector2] = floor(vec2(2 * Res[1] / 15 / P["xframe", table]["textMultiplier", number], Res[2] / 15))
+                Term["resolution", vector2] = floor(vec2(Res[1] / (15 * P["xframe", table]["textWidth", number]), Res[2] / 15))
+                
+                #print(Term["resolution", vector2])
                 
                 # input output
                 if (P:exists("kbd")) {

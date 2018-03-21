@@ -9,21 +9,17 @@ P2F["xtiles", string] = "xtiles"
 function xtiles() {
     switch (P["state", number]) {
         case 0,
-            if (P["parent", table]["type", string] == "sh") {
+            if (P["parent", table]["name", string] == "sh") {
                 P:removeTable("parent"):clear()
             }
             elseif (!P:exists("xframe")) {
                 if (!P:exists("args")) {
                     P["args", array] = array()
                 }
-                P["args", array]:unshiftString(P["type", string])
-                P["type", string] = "xstart"
+                P["args", array]:unshiftString(P["name", string])
+                P["name", string] = "xstart"
             }
-            elseif (P["xframe", table]["count", number] < 5) {
-                out("Error: Not enough egp elements.\n")
-                end()
-            }
-            else {
+            elseif (xcanCreate(5)) {
                 local Res = P["xframe", table]["size", vector2]
                 xcreate(table(
                     "type" = "box",
@@ -62,6 +58,15 @@ function xtiles() {
                 
                 P["programs", table] = table(Cmd)
                 
+                # Clocks
+                P["clock", table] = xcreate(table(
+                    "type" = "text",
+                    "size" = Res * vec2(1, CmdHeight),
+                    "sizeNum" = Res[2] * CmdHeight,
+                    "pos" = Res * vec2(0, 1 - CmdHeight),
+                    "align" = vec2(2, 0)
+                ))
+                
                 P["state", number] = 1
             }
             break
@@ -73,11 +78,14 @@ function xtiles() {
             # Command line
             if (P["term", array]:count() > 0) {
                 local In = P["term", array]:shiftString()
-                if (In == ERASE1) {
+                if (In == TERM_ERASE1) {
                     P["cmd", table]["text", string] = P["cmd", table]["text", string]:sub(1, -2)
                 }
-                elseif (In == ERASE | In == "\n") {
+                elseif (In == "\n") {
                     P["cmd", table]["text", string] = "xtiles $ "
+                }
+                elseif (In == TERM_ERASE) {
+                    P["cmd", table]["text", string] = P["cmd", table]["text", string]:sub(1, -1 - P["term", array]:shiftNumber())
                 }
                 else {
                     P["cmd", table]["text", string] = P["cmd", table]["text", string] + In
@@ -86,7 +94,7 @@ function xtiles() {
             }
             
             # Commands
-            if (wait()) {
+            if (wait() & xcanCreate(1)) {
                 local CommandExp = in():trim():explodeRE(" +")
                 
                 switch (CommandExp[1, string]) {
@@ -121,12 +129,19 @@ function xtiles() {
                         
                         Program["xframe", table]["objects", table] = table()
                         Program["xframe", table]["textMultiplier", number] = P["xframe", table]["textMultiplier", number]
+                        Program["xframe", table]["textWidth", number] = P["xframe", table]["textWidth", number]
                         
-                        Program["xframe", table]["count", number] = 10
+                        Program["xframe", table]["mainFrame", table] = P["xframe", table]["mainFrame", table]
                         
-                        for (J = 1, Program["xframe", table]["count", number]) {
-                            Program["xframe", table]["objects", table]:pushTable(xcreate(table("parent" = Program["xframe", table])))
-                        }
+                        #[for (J = 1, 10) {
+                            local Object = xcreate(table("parent" = Program["xframe", table]))
+                            if (Object != NULL) {
+                                Program["xframe", table]["objects", table]:pushTable(Object)
+                            }
+                            else {
+                                break
+                            }
+                        }]#
                         
                         P["programs", table]:pushTable(Program)
                         Program["kbd", array] = array()
@@ -169,6 +184,14 @@ function xtiles() {
                         }
                     }
                 }
+            }
+            
+            # Clocks
+            if (systime() > P["clockTimer", number]) {
+                P["clock", table]["text", string] = format("%02d:%02d:%02d", time("hour"), time("min"), time("sec"))
+                xdraw(P["clock", table])
+                
+                P["clockTimer", number] = systime() + 1
             }
             break
     }

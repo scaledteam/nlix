@@ -7,7 +7,8 @@
 P2F["uptime", string] = "uptime"
 
 function uptime() {
-    out((int((systime() - S["startTime", number]) * 100) / 100) + "\n")
+    local Uptime = systime() - S["startTime", number]
+    out(format("%02d:%02d:%02d", int(Uptime / 60 / 60) % 24, int(Uptime / 60) % 60, int(Uptime) % 60) + "\n")
     end()
 }
 

@@ -94,7 +94,7 @@ function skbd() {
                             # Backspace
                             case 127,
                                 if (P["text", string]:length() > 0) {
-                                    P["term", array]:pushString(ERASE1)
+                                    P["term", array]:pushString(TERM_ERASE1)
                                     P["text", string] = P["text", string]:sub(1, -2)
                                 }
                                 break
@@ -102,7 +102,7 @@ function skbd() {
                             # Escape # Delete
                             case 18, case 148,
                                 if (P["text", string]:length() > 0) {
-                                    P["term", array]:pushString(ERASE)
+                                    P["term", array]:pushString(TERM_ERASE)
                                     P["term", array]:pushNumber(P["text", string]:length())
                                     P["text", string] = ""
                                 }

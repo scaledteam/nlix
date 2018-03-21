@@ -9,15 +9,3 @@ NULL = table()
 function number table:isValid() {
     return This:count() != 0
 }
-
-function table object(Type:string) {
-    return table("type" = Type)
-}
-
-function string table:type() {
-    return This["type", string]
-}
-
-function table:setType(Type:string) {
-    This["type", string] = Type
-}

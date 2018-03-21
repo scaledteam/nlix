@@ -88,7 +88,13 @@ function hotplugd() {
         if (!Programs[Counter, table]:isValid()) {
             Programs:remove(Counter)
             local Device = P["D", table]:removeWirelink(Counter)
-            P[Device:type(), array]:unshiftWirelink(Device)
+            local DeviceType = Device:type()
+            
+            if (!P:exists(DeviceType)) {
+                P[DeviceType, array] = array()
+            }
+            
+            P[DeviceType, array]:unshiftWirelink(Device)
         }
         else {
             P["counter", number] = Counter

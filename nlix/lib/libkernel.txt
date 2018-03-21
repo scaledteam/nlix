@@ -5,12 +5,13 @@
 @name libkernel
 
 function table exec(Name:string) {
-    Program = object(Name)
-    Ps:pushTable(Program)
-    
     if (P:isValid()) {
-        Program["parent", table] = P
+        Program = table("name" = Name, "parent" = P)
     }
+    else {
+        Program = table("name" = Name)
+    }
+    Ps:pushTable(Program)
     
     return Program
 }

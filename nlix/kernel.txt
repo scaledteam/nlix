@@ -4,11 +4,7 @@
 
 @name nlix
 
-@persist P2F:table
-@persist [Ps P]:table PName:string
-@persist KPerf KState
-
-@persist S:table
+@persist [P2F Ps P]:table KPerf KState PName:string
 
 if (!tickClk()) {
     if (clk()) {
@@ -18,22 +14,17 @@ if (!tickClk()) {
                 # Libraries
                 case 1, #include "nlix/lib/libobject" break
                 case 2, #include "nlix/lib/libkernel" break
-                case 3, #include "nlix/lib/libdevices" break
-                case 4, #include "nlix/lib/libio" break
-                case 5, #include "nlix/lib/liboverload" break
-                
-                # Init
-                #case 10, SYSTEM_NAME = "system0" #include "nlix/init/sync" break
-                case 11, #include "nlix/init/autostart" break
-                case 12, #include "nlix/init/fstab" break
+                case 3, #include "nlix/lib/libio" break
+                case 4, #include "nlix/lib/liboverload" break
+                case 5, #include "nlix/init/system-memory" break
                 
                 # Binaries
+                case 10, #include "nlix/lib/libdevices" break
+                case 11, #include "nlix/bin/hotplugd" break
+                
                 # Terminal
-                case 20, #include "nlix/bin/term" break
-                case 21, #include "nlix/bin/skbd" break
-                
-                case 22, #include "nlix/bin/hotplugd" break
-                
+                case 21, #include "nlix/bin/term" break
+                case 22, #include "nlix/bin/skbd" break
                 case 23, #include "nlix/bin/sh" break
                 
                 case 24, #include "nlix/bin/echo" break
@@ -55,17 +46,17 @@ if (!tickClk()) {
                 
                 # Files
                 case 40, #include "nlix/lib/libfs" break
-                case 41, #include "nlix/bin/ls" break
-                case 42, #include "nlix/bin/cat" break
-                case 43, #include "nlix/bin/touch" break
-                case 44, #include "nlix/bin/rm" break
+                case 41, #include "nlix/init/fstab" break
+                case 42, #include "nlix/bin/fstable" break
+                case 43, #include "nlix/bin/fsreal" break
                 
-                case 45, #include "nlix/bin/cp" break
+                case 44, #include "nlix/bin/ls" break
+                case 45, #include "nlix/bin/cat" break
+                case 46, #include "nlix/bin/touch" break
+                case 47, #include "nlix/bin/rm" break
                 
-                case 46, #include "nlix/bin/wget" break
-                
-                case 47, #include "nlix/bin/fstable" break
-                case 48, #include "nlix/bin/fsreal" break
+                case 48, #include "nlix/bin/cp" break
+                case 49, #include "nlix/bin/wget" break
                 
                 # Other
                 case 50, #include "nlix/bin/bc" break
@@ -75,7 +66,7 @@ if (!tickClk()) {
                 # X
                 case 59, #include "nlix/bin/kbd" break
                 case 60, #include "nlix/lib/libx" break
-                case 61, #include "nlix/bin/x" break
+                case 61, #include "nlix/bin/xworker" break
                 case 62, #include "nlix/bin/xstart" break
                 case 63, #include "nlix/bin/xclock" break
                 case 64, #include "nlix/bin/xres" break
@@ -84,8 +75,12 @@ if (!tickClk()) {
                 case 67, #include "nlix/bin/xclicker" break
                 case 68, #include "nlix/bin/xterm" break
                 
+                # Init
+                #case 70, SYSTEM_NAME = "system0" #include "nlix/init/sync" break
+                case 71, #include "nlix/init/autostart" break
+                
                 # End
-                case 70, KState = 1 runOnTick(1) exit() break
+                case 73, KState = 1 runOnTick(1) exit() break
                 default,
             }
         }
@@ -118,20 +113,21 @@ else {
         }
         
         # Program name
-        PName = P["type", string]
+        PName = P["name", string]
         
         # If exist binary (function)
         if (P2F:exists(PName)) {
             P2F[PName, string]()
         }
-        # If all apps killed
         elseif (P:count() == 0) {
-            if (Ps:count() > 0) {
-                end()
-            }
-            else {
+            # If all programs killed
+            if (Ps:count() == 0) {
                 runOnTick(0)
                 break
+            }
+            # If program is not valid
+            else {
+                end()
             }
         }
         # If wrong name

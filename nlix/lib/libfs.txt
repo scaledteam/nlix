@@ -28,7 +28,7 @@ function number fsCall(Mode:string, Path:string) {
         
         if (Fstab:exists(BeforeFsPath)) {
             local Fs = Fstab[BeforeFsPath, table]
-            local Program = exec("fs" + Fs:type())
+            local Program = exec("fs" + Fs["type", string])
             
             Program["mode", string] = Mode
             Program["fs", table] = Fs

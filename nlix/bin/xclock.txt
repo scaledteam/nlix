@@ -9,11 +9,7 @@ P2F["xclock", string] = "xclock"
 function xclock() {
     switch (P["state", number]) {
         case 0,
-            if (!P["xframe", table]["blocked", number] & P["xframe", table]["count", number] < 2) {
-                out("Error: Not enough egp elements.\n")
-                end()
-            }
-            else {
+            if (xcanCreate(2)) {
                 local Res = P["xframe", table]["size", vector2]
                 xcreate(table(
                     "type" = "box",

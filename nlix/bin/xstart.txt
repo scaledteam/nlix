@@ -21,6 +21,7 @@ function xstart() {
                     "device" = nowirelink(),
                     "textMultiplier" = 1
                 )
+                P["xframe", table]["mainFrame", table] = P["xframe", table]
                 
                 P["counter", number] = P["xframe", table]["id", number]
                 
@@ -92,6 +93,7 @@ function xstart() {
                 
                 P["xframe", table]["size", vector2] = Res
                 P["xframe", table]["textMultiplier", number] = 512 / Res[2]
+                P["xframe", table]["textWidth", number] = 0.5 * P["xframe", table]["textMultiplier", number]
                 
                 P:remove("NULL")
                 P["state", number] = 4
@@ -120,7 +122,7 @@ function xstart() {
             break
         
         case 5,
-            P["type", string] = P["args", array]:shiftString()
+            P["name", string] = P["args", array]:shiftString()
             P:remove("state")
             break
     }

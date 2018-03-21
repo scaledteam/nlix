@@ -3,6 +3,10 @@
 #
 
 @name term
+@persist [TERM_ERASE TERM_ERASE1]:string
+
+TERM_ERASE  = toChar(15) + "erase"
+TERM_ERASE1 = toChar(15) + "erase1"
 
 P2F["term", string] = "term"
 
@@ -79,7 +83,7 @@ function term() {
                     local Update = 0
                     
                     switch (In) {
-                        case ERASE1,
+                        case TERM_ERASE1,
                             local EraseCount = 1
                             
                             Update = 1
@@ -96,7 +100,7 @@ function term() {
                             }
                             break
                         
-                        case ERASE,
+                        case TERM_ERASE,
                             local EraseCount = P["in", array]:shiftNumber()
                             
                             Update = 1

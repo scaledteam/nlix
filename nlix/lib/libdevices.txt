@@ -15,15 +15,15 @@ function number deviceGet(Type:string) {
                 S["devices", table]["P", table]:pushTable(P)
                 S["devices", table]["D", table]:pushWirelink(Device)
                 
-                #[if (Devices:count() == 0) {
+                if (Devices:count() == 0) {
                     S["devices", table]:remove(Type)
-                }]#
+                }
                 return 1
             }
         }
-        #[else {
+        else {
             S["devices", table]:remove(Type)
-        }]#
+        }
     }
     return 0
 }
@@ -37,13 +37,3 @@ function string wirelink:type() {
     
     return Name
 }
-
-#[function string wirelink:type() {
-    local Name = This:entity():getName()
-    
-    if (Name == "") {
-        Name = This:entity():type()
-    }
-    
-    return Name
-}]#

@@ -145,3 +145,26 @@ function vector2 xcursor() {
 function number xkeyUse() {
     return P["xframe", table]["keyUse", number]
 }
+
+function number xcanCreate(Count) {
+    local Frame = P["xframe", table]
+    
+    if ((Frame["objects", table]:count() - Frame["lastId", number]) >= Count) {
+        return 1
+    }
+    elseif (!P:exists("xworker")) {
+        local Program = exec("xworker")
+        P["xworker", table] = Program
+        
+        Program["action", string] = "free"
+        Program["count", number] = Count
+        Program["xframe", table] = Frame
+    }
+    else {
+        if (!P["xworker", table]:isValid()) {
+            P:remove("xworker")
+            return 1
+        }
+    }
+    return 0
+}

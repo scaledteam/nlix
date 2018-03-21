@@ -9,11 +9,7 @@ P2F["xeyes", string] = "xeyes"
 function xeyes() {
     switch (P["state", number]) {
         case 0,
-            if (P["xframe", table]["count", number] < 7) {
-                out("Error: Not enough egp elements.\n")
-                end()
-            }
-            else {
+            if (xcanCreate(7)) {
                 local Res = P["xframe", table]["size", vector2]
                 # Background
                 xcreate(table(

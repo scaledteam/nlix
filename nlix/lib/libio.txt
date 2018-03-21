@@ -3,10 +3,6 @@
 #
 
 @name libio
-@persist [ERASE ERASE1]:string
-
-ERASE  = toChar(15) + "erase"
-ERASE1 = toChar(15) + "erase1"
 
 function out(Text:string) {
     P["out", array]:pushString(Text)

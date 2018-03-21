@@ -1,0 +1,6 @@
+#
+# Created by scaled
+#
+
+@name system-memory
+@persist S:table

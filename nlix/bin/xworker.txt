@@ -1,0 +1,116 @@
+#
+# Created by scaled
+#
+
+@name xworker
+
+P2F["xworker", string] = "xworker"
+
+function xworker() {
+    switch (P["state", number]) {
+        case 0,
+            switch (P["action", string]) {
+                case "free",
+                    P["state", number] = 1
+                    break
+                
+                default,
+                    out("Error: unknown action.\n")
+                    end()
+            }
+            break
+        
+        case 1,
+            local Frame = P["xframe", table]
+            if (Frame:exists("parent")) {
+                local MainFrame = Frame["mainFrame", table]
+                
+                if (Frame == MainFrame["objects", table][MainFrame["lastId", number], table]) {
+                    if ((MainFrame["objects", table]:count() - MainFrame["lastId", number]) >= P["count", number]) {
+                        P["xframeSource", table] = MainFrame
+                        P["state", number] = 2
+                    }
+                    else {
+                        out("Error: Can't free place.\n")
+                        end()
+                    }
+                }
+                else {
+                    print("oops")
+                    P["state", number] = 3
+                }
+            }
+            else {
+                out("Error: Can't free place.\n")
+                end()
+            }
+            break
+        
+        case 2,
+            local Frame = P["xframe", table]
+            local Source = P["xframeSource", table]
+            
+            local Counter = P["counter", number]
+            
+            for (I = 1, Overload) {
+                Counter++
+                
+                local Id = Source["lastId", number] + 1
+                Source["lastId", number] = Id
+                
+                local Object = P["xframeSource", table]["objects", table][Id, table]
+                Object["parent", table] = Frame
+                Frame["objects", table]:pushTable(Object)
+                
+                if (Counter >= P["count", number]) {
+                    end()
+                    return
+                }
+            }
+            P["counter", number] = Counter
+            break
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        #[case *,
+            local Device = P["device", wirelink]
+            
+            if (Device) {
+                
+            }
+            else {
+                P["state", number] = 2
+            }
+            break]#
+        
+        #[case *,
+            local Device = P["device", wirelink]
+            local Frames = P["frames", table]
+            local Counter = P["counter", number]
+            
+            for (I = 1, Overload) {
+                Counter++
+                
+                # cycle code
+                
+                if (Counter >= P["limit", number]) {
+                    P["state", number] = 2
+                    break
+                }
+            }
+            P["counter", number] = Counter
+            break]#
+    }
+}
