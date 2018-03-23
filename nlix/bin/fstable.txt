@@ -151,7 +151,14 @@ function fstable() {
                                 }
                             }
                             else {
-                                Dir[NextDir, string] = in()
+                                #Dir[NextDir, string] = in()
+                                local In = in()
+                                if (In:trim() == "0" | In:toNumber() != 0) {
+                                    Dir[NextDir, number] = In:toNumber()
+                                }
+                                else {
+                                    Dir[NextDir, string] = In
+                                }
                                 break
                             }
                         }

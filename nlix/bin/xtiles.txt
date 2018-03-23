@@ -73,6 +73,8 @@ function xtiles() {
                 P["programs", table] = table(Cmd)
                 P["frames", table] = table(Cmd["xframe", table])
                 
+                P["focus", number] = 1
+                
                 # Clocks
                 if (CmdLength > 30) {
                     P["clock", table] = xcreate(table(

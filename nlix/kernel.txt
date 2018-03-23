@@ -43,6 +43,7 @@ if (!tickClk()) {
                 case 35, #include "nlix/bin/poweroff" break
                 
                 case 36, #include "nlix/bin/print-pi" break
+                case 37, #include "nlix/bin/autoperf" break
                 
                 # Files
                 case 40, #include "nlix/lib/libfs" break
@@ -74,6 +75,7 @@ if (!tickClk()) {
                 case 66, #include "nlix/bin/xeyes" break
                 case 67, #include "nlix/bin/xclicker" break
                 case 68, #include "nlix/bin/xterm" break
+                case 69, #include "nlix/bin/xobj" break
                 
                 # Init
                 #case 70, SYSTEM_NAME = "system0" #include "nlix/init/sync" break

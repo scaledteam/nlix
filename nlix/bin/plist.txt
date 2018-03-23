@@ -21,4 +21,7 @@ function plist() {
             return
         }
     }
+    
+    out(Out)
+    P["counter", number] = Counter
 }

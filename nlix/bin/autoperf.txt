@@ -1,0 +1,26 @@
+#
+# Created by scaled
+#
+
+@name autoperf
+
+P2F["autoperf", string] = "autoperf"
+
+function autoperf() {
+    if (Ps:count() <= 2 & Ps[1, table]["name", string] == "hotplugd") {
+        end()
+    }
+    
+    if (P:exists("lastRun")) {
+        local DeltaTime = max(tickInterval(), systime() - P["lastRun", number])
+        local Speed = 1 / DeltaTime
+        
+        if (Speed > 15) {
+            KPerf = max(KPerf - 20 * DeltaTime, 2)
+        }
+        elseif (Speed < 15) {
+            KPerf = min(KPerf + 20 * DeltaTime, 100 - min(Overload, 50))
+        }
+    }
+    P["lastRun", number] = systime()
+}

@@ -41,6 +41,14 @@ function xdraw(Object:table) {
             Device:egpPoly(Id, Object["poses", array])
             break
         
+        case "polyOutline",
+            Device:egpPolyOutline(Id, Object["poses", array])
+            break
+        
+        case "lineStrip",
+            Device:egpLineStrip(Id, Object["poses", array])
+            break
+        
         case "frame",
             Device:egpBox(Id, Object["pos", vector2], vec2())
             break
