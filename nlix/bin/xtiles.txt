@@ -27,7 +27,8 @@ function xtiles() {
                     "type" = "box",
                     "size" = Res,
                     #"color" = hsv2rgb(random(360), 1, 0.7)
-                    "color" = hsv2rgb(240 + randint(-10, 10), 1, 0.7)
+                    #"color" = hsv2rgb(KState * 100 % 360, 1, 0.7)
+                    "color" = hsv2rgb(Res[2] * 1.5, 1, 0.7)
                 ))
                 
                 local Cmd = table()
@@ -43,7 +44,7 @@ function xtiles() {
                 ))
                 
                 
-                if (CmdLength > 30) {
+                if (CmdLength > 20) {
                     P["cmdPhrase", string] = "xtiles $ "
                 }
                 else {
@@ -70,6 +71,7 @@ function xtiles() {
                 P["term", array] = Skbd["term", array] = array()
                 
                 P["programs", table] = table(Cmd)
+                P["frames", table] = table(Cmd["xframe", table])
                 
                 # Clocks
                 if (CmdLength > 30) {
@@ -149,6 +151,7 @@ function xtiles() {
                         Program["xframe", table]["mainFrame", table] = P["xframe", table]["mainFrame", table]
                         
                         P["programs", table]:pushTable(Program)
+                        P["frames", table]:pushTable(Program["xframe", table])
                         Program["kbd", array] = array()
                 }
             }
@@ -166,6 +169,7 @@ function xtiles() {
                 local Program = P["programs", table][Counter, table]
                 if (!Program:isValid()) {
                     P["programs", table]:remove(Counter)
+                    xremove(P["frames", table]:removeTable(Counter))
                 }
                 else {
                     # Focus

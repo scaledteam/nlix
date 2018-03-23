@@ -58,6 +58,12 @@ function xdraw(Object:table) {
             Device:egpLine(Id, vec2(), vec2())
     }
     
+    if (!Object["parent", table]:exists("parentFor")) {
+        Object["parent", table]["parentFor", table] = table(Object)
+    }
+    else {
+        Object["parent", table]["parentFor", table]:pushTable(Object)
+    }
     Device:egpParent(Id, Object["parent", table]["id", number])
     Device:egpColor(Id, Object["color", vector])
 }
@@ -131,7 +137,7 @@ function vector2 xcursor() {
     else {
         local Cursor = Frame["parent", table]["cursor", vector2]
         if (Cursor != vec2(-1)) {
-            Frame["cursor", vector2] = Cursor - vec2(Device:egpGlobalPos(Frame["id", number]))
+            Frame["cursor", vector2] = Cursor - Device:egpPos(Frame["id", number])
         }
         else {
             Frame["cursor", vector2] = Cursor
@@ -207,47 +213,24 @@ function xswitch(Objects:table, Id1, Id2) {
     Objects[Id2, table]["id", number] = IId2
 }
 
-#[function xswitch(Object1:table, Object2:table) {
-    #local TempNumber = Object1["id", number]
-    #Object1["id", number] = Object2["id", number]
-    #Object2["id", number] = TempNumber
+function xparentUpdate(Object:table) {
+    P["device", wirelink]:egpParent(Object["id", number], Object["parent", table]["id", number])
+}
+
+function xremove(Object:table) {
+    local Id = Object["id", number]
     
-    local TempString = Object1["type", string]
-    Object1["type", string] = Object2["type", string]
-    Object2["type", string] = TempString
+    if (Object["parentFor", table]:count() > 0) {
+        local XWorker = exec("xworker")
+        
+        XWorker["action", string] = "fullRemove"
+        XWorker["object", table] = Object
+        XWorker["parentFor", table] = Object["parentFor", table]
+        XWorker["device", wirelink] = P["device", wirelink]
+    }
     
-    local TempVec2 = Object1["pos", vector2]
-    Object1["pos", vector2] = Object2["pos", vector2]
-    Object2["pos", vector2] = TempVec2
+    Object:clear()
+    Object["id", number] = Id
     
-    TempVec2 = Object1["size", vector2]
-    Object1["size", vector2] = Object2["size", vector2]
-    Object2["size", vector2] = TempVec2
-    
-    TempString = Object1["text", string]
-    Object1["text", string] = Object2["text", string]
-    Object2["text", string] = TempString
-    
-    local TempArray = Object1["poses", array]
-    Object1["poses", array] = Object2["poses", array]
-    Object2["poses", array] = TempArray
-    
-    TempVec2 = Object1["align", vector2]
-    Object1["align", vector2] = Object2["align", vector2]
-    Object2["align", vector2] = TempVec2
-    
-    local TempNumber = Object1["sizeNum", number]
-    Object1["sizeNum", number] = Object2["sizeNum", number]
-    Object2["sizeNum", number] = TempNumber
-    
-    local TempVec = Object1["color", vector]
-    Object1["color", vector] = Object2["color", vector]
-    Object2["color", vector] = TempVec
-    
-    local TempTable = Object1["parent", table]
-    Object1["parent", table] = Object2["parent", table]
-    Object2["parent", table] = TempTable
-    
-    xdraw(Object1)
-    xdraw(Object2)
-}]#
+    P["device", wirelink]:egpLine(Id, vec2(), vec2())
+}

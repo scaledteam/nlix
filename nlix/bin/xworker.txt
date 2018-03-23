@@ -14,6 +14,10 @@ function xworker() {
                     P["state", number] = 1
                     break
                 
+                case "fullRemove",
+                    P["state", number] = 6
+                    break
+                
                 default,
                     out("Error: unknown action.\n")
                     end()
@@ -174,6 +178,50 @@ function xworker() {
                     print(Text)]#
                     
                     P["xframeTargets", table]:clear()
+                    #end()
+                    
+                    P["counter", number] = 0
+                    
+                    P["state", number] = 5
+                    return
+                }
+            }
+            P["counter", number] = Counter
+            break
+        
+        # Parent update
+        case 5,
+            local MainFrame = P["xframe", table]["mainFrame", table]
+            
+            local Counter = P["counter", number]
+            
+            for (I = 1, Overload) {
+                Counter++
+                
+                xparentUpdate(MainFrame["objects", table][Counter, table])
+                
+                if (Counter >= MainFrame["lastId", number]) {
+                    end()
+                    return
+                }
+            }
+            P["counter", number] = Counter
+            break
+        
+        # Full remove
+        case 6,
+            local Objects = P["parentFor", table]
+            
+            local Counter = P["counter", number]
+            
+            for (I = 1, Overload) {
+                Counter++
+                
+                #print(Objects[Counter, table]["id", number])
+                xremove(Objects[Counter, table])
+                
+                if (Counter >= Objects:count()) {
+                    P["parentFor", table]:clear()
                     end()
                     return
                 }

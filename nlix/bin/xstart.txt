@@ -16,7 +16,7 @@ function xstart() {
             else {
                 P["xframe", table] = table(
                     "id" = 1,
-                    "count" = min(50, egpMaxObjects()),
+                    "count" = min(100, egpMaxObjects()),
                     "objects" = table(),
                     "device" = nowirelink(),
                     "textMultiplier" = 1
