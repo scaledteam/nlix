@@ -149,22 +149,105 @@ function number xkeyUse() {
 function number xcanCreate(Count) {
     local Frame = P["xframe", table]
     
-    if ((Frame["objects", table]:count() - Frame["lastId", number]) >= Count) {
+    #print("Calling xcanCreate ", Count)
+    
+    if (!P:exists("xworker") & (Frame["objects", table]:count() - Frame["lastId", number]) >= Count) {
+        #print("xcanCreate done ", Count)
+        
         return 1
     }
     elseif (!P:exists("xworker")) {
-        local Program = exec("xworker")
-        P["xworker", table] = Program
+        local XWorker = exec("xworker")
+        P["xworker", table] = XWorker
+        P["xworkerOut", array] = XWorker["out", array] = array()
         
-        Program["action", string] = "free"
-        Program["count", number] = Count
-        Program["xframe", table] = Frame
+        XWorker["action", string] = "free"
+        XWorker["count", number] = Count
+        XWorker["xframe", table] = Frame
+        XWorker["device", wirelink] = P["device", wirelink]
+        
+        #print("Calling xworker ", Count)
     }
-    else {
-        if (!P["xworker", table]:isValid()) {
-            P:remove("xworker")
+    elseif (!P["xworker", table]:isValid()) {
+        P:remove("xworker")
+        
+        if (P["xworkerOut", array]:count() > 0) {
+            #print(P["xworkerOut", array])
+            P:removeArray("xworkerOut"):clear()
+            return 0
+        }
+        else {
+            #print("Xworker done ", Count)
             return 1
         }
     }
     return 0
 }
+
+function xregister(Category:string, ProgramName:string) {
+    if (S["xmenu", table]:exists(Category)) {
+        S["xmenu", table][Category, array]:pushString(ProgramName)
+    }
+    else {
+        S["xmenu", table][Category, array] = array(ProgramName)
+    }
+}
+
+function xswitch(Objects:table, Id1, Id2) {
+    local IId1 = Objects[Id1, table]["id", number]
+    local IId2 = Objects[Id2, table]["id", number]
+    
+    #print(Id1, IId1, "|", Id2, IId2)
+    
+    local TempObject = Objects[Id1, table]
+    Objects[Id1, table] = Objects[Id2, table]
+    Objects[Id2, table] = TempObject
+    
+    Objects[Id1, table]["id", number] = IId1
+    Objects[Id2, table]["id", number] = IId2
+}
+
+#[function xswitch(Object1:table, Object2:table) {
+    #local TempNumber = Object1["id", number]
+    #Object1["id", number] = Object2["id", number]
+    #Object2["id", number] = TempNumber
+    
+    local TempString = Object1["type", string]
+    Object1["type", string] = Object2["type", string]
+    Object2["type", string] = TempString
+    
+    local TempVec2 = Object1["pos", vector2]
+    Object1["pos", vector2] = Object2["pos", vector2]
+    Object2["pos", vector2] = TempVec2
+    
+    TempVec2 = Object1["size", vector2]
+    Object1["size", vector2] = Object2["size", vector2]
+    Object2["size", vector2] = TempVec2
+    
+    TempString = Object1["text", string]
+    Object1["text", string] = Object2["text", string]
+    Object2["text", string] = TempString
+    
+    local TempArray = Object1["poses", array]
+    Object1["poses", array] = Object2["poses", array]
+    Object2["poses", array] = TempArray
+    
+    TempVec2 = Object1["align", vector2]
+    Object1["align", vector2] = Object2["align", vector2]
+    Object2["align", vector2] = TempVec2
+    
+    local TempNumber = Object1["sizeNum", number]
+    Object1["sizeNum", number] = Object2["sizeNum", number]
+    Object2["sizeNum", number] = TempNumber
+    
+    local TempVec = Object1["color", vector]
+    Object1["color", vector] = Object2["color", vector]
+    Object2["color", vector] = TempVec
+    
+    local TempTable = Object1["parent", table]
+    Object1["parent", table] = Object2["parent", table]
+    Object2["parent", table] = TempTable
+    
+    xdraw(Object1)
+    xdraw(Object2)
+}]#

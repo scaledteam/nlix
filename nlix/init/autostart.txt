@@ -8,5 +8,6 @@ if (!Ps:isValid()) {
     S["startTime", number] = systime()
     
     exec("hotplugd")
-    exec("sh")
+    #exec("sh")
+    exec("xtiles")
 }

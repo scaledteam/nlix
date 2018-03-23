@@ -4,6 +4,8 @@
 
 @name xterm
 
+xregister("system", "xterm")
+
 P2F["xterm", string] = "xterm"
 
 function xterm() {

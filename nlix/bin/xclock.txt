@@ -4,6 +4,8 @@
 
 @name xclock
 
+xregister("tests", "xclock")
+
 P2F["xclock", string] = "xclock"
 
 function xclock() {

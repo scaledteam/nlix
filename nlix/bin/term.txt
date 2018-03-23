@@ -173,6 +173,9 @@ function term() {
                                     }
                                     
                                     Update = 1
+                                    while (TextR:count() > P["resolution", vector2][2]) {
+                                        TextR:shift()
+                                    }
                                     Text = TextR:concat("\n")
                                 }
                                 else {
@@ -191,6 +194,9 @@ function term() {
                                 }
                                 
                                 Update = 1
+                                while (TextR:count() > P["resolution", vector2][2]) {
+                                    TextR:shift()
+                                }
                                 Text = TextR:concat("\n")
                             }
                             else {
@@ -200,11 +206,10 @@ function term() {
                                     }
                                 }
                                 
+                                Update = 1
                                 while (TextR:count() > P["resolution", vector2][2]) {
                                     TextR:shift()
                                 }
-                                
-                                Update = 1
                                 Text = TextR:concat("\n")
                             }
                             

@@ -88,12 +88,13 @@ function xstart() {
                 local SizeY = Pos0:distance(PosY)
                 
                 local Res = floor(vec2(SizeX, SizeY) / max(SizeX, SizeY) * 512)
+                #local Res = vec2(400, 300)
                 
                 Device:egpResolution(vec2(), Res)
                 
                 P["xframe", table]["size", vector2] = Res
                 P["xframe", table]["textMultiplier", number] = 512 / Res[2]
-                P["xframe", table]["textWidth", number] = 0.5 * P["xframe", table]["textMultiplier", number]
+                P["xframe", table]["textWidth", number] = 0.53 * Res[1] / Res[2] #P["xframe", table]["textMultiplier", number]
                 
                 P:remove("NULL")
                 P["state", number] = 4

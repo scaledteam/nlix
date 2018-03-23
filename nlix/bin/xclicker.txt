@@ -4,6 +4,8 @@
 
 @name xclicker
 
+xregister("games", "xclicker")
+
 P2F["xclicker", string] = "xclicker"
 
 function xclicker() {

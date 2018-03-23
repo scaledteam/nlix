@@ -4,6 +4,8 @@
 
 @name xres
 
+xregister("tests", "xres")
+
 P2F["xres", string] = "xres"
 
 function xres() {

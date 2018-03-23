@@ -4,6 +4,8 @@
 
 @name xtiles
 
+xregister("wm's", "xtiles")
+
 P2F["xtiles", string] = "xtiles"
 
 function xtiles() {
@@ -19,30 +21,41 @@ function xtiles() {
                 P["args", array]:unshiftString(P["name", string])
                 P["name", string] = "xstart"
             }
-            elseif (xcanCreate(5)) {
+            elseif (xcanCreate(4)) {
                 local Res = P["xframe", table]["size", vector2]
                 xcreate(table(
                     "type" = "box",
                     "size" = Res,
-                    "color" = hsv2rgb(random(360), 1, 0.7)
+                    #"color" = hsv2rgb(random(360), 1, 0.7)
+                    "color" = hsv2rgb(240 + randint(-10, 10), 1, 0.7)
                 ))
                 
                 local Cmd = table()
-                local CmdHeight = 0.05
+                local CmdHeight = 20
+                local CmdLength = Res[1] / (P["xframe", table]["textWidth", number] * CmdHeight)
+                
                 P["cmdHeight", number] = CmdHeight
                 Cmd["xframe", table] = xcreate(table(
                     "type" = "box",
-                    "size" = Res * vec2(1, CmdHeight),
-                    "pos" = Res * vec2(0, 1 - CmdHeight),
+                    "size" = vec2(Res[1], CmdHeight),
+                    "pos" = vec2(0, Res[2] - CmdHeight),
                     "color" = vec()
                 ))
                 
+                
+                if (CmdLength > 30) {
+                    P["cmdPhrase", string] = "xtiles $ "
+                }
+                else {
+                    P["cmdPhrase", string] = "$ "
+                }
+                
                 P["cmd", table] = xcreate(table(
                     "type" = "text",
-                    "text" = "xtiles $ ",
-                    "size" = Res * vec2(1, CmdHeight),
-                    "sizeNum" = Res[2] * CmdHeight,
-                    "pos" = Res * vec2(0, 1 - CmdHeight)
+                    "text" = P["cmdPhrase", string],
+                    "sizeNum" = CmdHeight,
+                    "size" = vec2(Res[1], CmdHeight),
+                    "pos" = vec2(0, Res[2] - CmdHeight)
                 ))
                 
                 local Kbd = exec("kbd")
@@ -59,13 +72,15 @@ function xtiles() {
                 P["programs", table] = table(Cmd)
                 
                 # Clocks
-                P["clock", table] = xcreate(table(
-                    "type" = "text",
-                    "size" = Res * vec2(1, CmdHeight),
-                    "sizeNum" = Res[2] * CmdHeight,
-                    "pos" = Res * vec2(0, 1 - CmdHeight),
-                    "align" = vec2(2, 0)
-                ))
+                if (CmdLength > 30) {
+                    P["clock", table] = xcreate(table(
+                        "type" = "text",
+                        "sizeNum" = CmdHeight,
+                        "size" = vec2(Res[1], CmdHeight),
+                        "pos" = vec2(0, Res[2] - CmdHeight),
+                        "align" = vec2(2, 0)
+                    ))
+                }
                 
                 P["state", number] = 1
             }
@@ -82,7 +97,7 @@ function xtiles() {
                     P["cmd", table]["text", string] = P["cmd", table]["text", string]:sub(1, -2)
                 }
                 elseif (In == "\n") {
-                    P["cmd", table]["text", string] = "xtiles $ "
+                    P["cmd", table]["text", string] = P["cmdPhrase", string]
                 }
                 elseif (In == TERM_ERASE) {
                     P["cmd", table]["text", string] = P["cmd", table]["text", string]:sub(1, -1 - P["term", array]:shiftNumber())
@@ -112,7 +127,7 @@ function xtiles() {
                         Program["args", array] = CommandExp
                         
                         local Count = 2
-                        local Size = P["xframe", table]["size", vector2] * vec2(1, 1 - P["cmdHeight", number]) / Count
+                        local Size = (P["xframe", table]["size", vector2] - vec2(0, P["cmdHeight", number])) / Count
                         
                         local Pos = P["programs", table]:count() - 1
                         
@@ -132,16 +147,6 @@ function xtiles() {
                         Program["xframe", table]["textWidth", number] = P["xframe", table]["textWidth", number]
                         
                         Program["xframe", table]["mainFrame", table] = P["xframe", table]["mainFrame", table]
-                        
-                        #[for (J = 1, 10) {
-                            local Object = xcreate(table("parent" = Program["xframe", table]))
-                            if (Object != NULL) {
-                                Program["xframe", table]["objects", table]:pushTable(Object)
-                            }
-                            else {
-                                break
-                            }
-                        }]#
                         
                         P["programs", table]:pushTable(Program)
                         Program["kbd", array] = array()
@@ -187,7 +192,7 @@ function xtiles() {
             }
             
             # Clocks
-            if (systime() > P["clockTimer", number]) {
+            if (P:exists("clock") & systime() > P["clockTimer", number]) {
                 P["clock", table]["text", string] = format("%02d:%02d:%02d", time("hour"), time("min"), time("sec"))
                 xdraw(P["clock", table])
                 

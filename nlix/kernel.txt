@@ -107,7 +107,7 @@ else {
         P = Ps[KState, table]
         
         # Clear if parent killed
-        if (P:exists("parent") & P["parent", table]:count() == 0) {
+        if (P["parent", table]:count() == 0 & P:exists("parent")) {
             end()
             continue
         }
@@ -119,13 +119,14 @@ else {
         if (P2F:exists(PName)) {
             P2F[PName, string]()
         }
+        # If program is not valid
         elseif (P:count() == 0) {
-            # If all programs killed
+            # If all programs is not valid
             if (Ps:count() == 0) {
                 runOnTick(0)
                 break
             }
-            # If program is not valid
+            # If one program is not valid
             else {
                 end()
             }

@@ -4,6 +4,8 @@
 
 @name xeyes
 
+xregister("tests", "xeyes")
+
 P2F["xeyes", string] = "xeyes"
 
 function xeyes() {
