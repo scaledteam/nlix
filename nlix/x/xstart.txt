@@ -68,8 +68,6 @@ function xstart() {
                 P["xframe", table]["device", wirelink] = Device
                 P["xframe", table]["size", vector2] = vec2(512)
                 
-                P["counter", number] = 0
-                
                 P["NULL", table] = NULL
                 
                 P["state", number] = 3
@@ -117,6 +115,10 @@ function xstart() {
                     P["state", number] = 5
                     P:remove("counter")
                     return
+                }
+                
+                if (Objects[Counter, table]["parentFor", table]:count() > (Overload - I)) {
+                    break
                 }
             }
             P["counter", number] = Counter

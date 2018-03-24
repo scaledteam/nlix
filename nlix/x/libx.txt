@@ -66,13 +66,26 @@ function xdraw(Object:table) {
             Device:egpLine(Id, vec2(), vec2())
     }
     
-    if (!Object["parent", table]:exists("parentFor")) {
+    Device:egpParent(Id, Object["parent", table]["id", number])
+    #[if (!Object["parent", table]:exists("parentFor")) {
         Object["parent", table]["parentFor", table] = table(Object)
     }
     else {
         Object["parent", table]["parentFor", table]:pushTable(Object)
     }
-    Device:egpParent(Id, Object["parent", table]["id", number])
+    
+    if (Object["idOld", number] != Object["id", number]) {
+        Object["idOld", number] = Object["id", number]
+        
+        local Objects = Object["parentFor", table]
+        if (Objects:count() > 0) {
+            print(Object["id", number], Objects:count())
+        }
+        for (I = 1, Objects:count()) {
+            Device:egpParent(Objects[I, table]["id", number], Object["id", number])
+        }
+    }]#
+    
     Device:egpColor(Id, Object["color", vector])
 }
 

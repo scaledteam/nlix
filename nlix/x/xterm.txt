@@ -16,7 +16,7 @@ function xterm() {
                 xcreate(table(
                     "type" = "box",
                     "size" = Res,
-                    "color" = vec(40, 40, 50)
+                    "color" = vec()
                 ))
                 
                 P["text", table] = xcreate(table(

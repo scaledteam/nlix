@@ -181,7 +181,6 @@ function xworker() {
                     #end()
                     
                     P["counter", number] = 0
-                    
                     P["state", number] = 5
                     return
                 }

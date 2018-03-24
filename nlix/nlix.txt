@@ -1,0 +1,143 @@
+#
+# Created by scaled
+#
+
+@name nlix
+
+@persist [P2F Ps P]:table KPerf KState PName:string
+
+if (!tickClk()) {
+    if (clk()) {
+        while (perf(KPerf)) {
+            KState++
+            switch (KState) {
+                # Kernel
+                case 1, #include "nlix/kernel/libobject" break
+                case 2, #include "nlix/kernel/libkernel" break
+                
+                # System
+                case 3, #include "nlix/system/libio" break
+                case 4, #include "nlix/system/liboverload" break
+                case 5, #include "nlix/system/system-memory" break
+                
+                # Devices
+                case 10, #include "nlix/devices/libdevices" break
+                case 11, #include "nlix/devices/hotplugd" break
+                case 12, #include "nlix/devices/dlist" break
+                
+                # Terminal
+                case 21, #include "nlix/terminal/term" break
+                case 22, #include "nlix/terminal/skbd" break
+                case 23, #include "nlix/terminal/sh" break
+                
+                case 24, #include "nlix/terminal/echo" break
+                case 25, #include "nlix/terminal/plist" break
+                
+                case 26, #include "nlix/terminal/rund" break
+                case 27, #include "nlix/terminal/kill" break
+                case 28, #include "nlix/terminal/reboot" break
+                case 29, #include "nlix/terminal/poweroff" break
+                
+                # Performance
+                case 30, #include "nlix/performance/autoperf" break
+                case 31, #include "nlix/performance/perf" break
+                case 32, #include "nlix/performance/overload" break
+                case 33, #include "nlix/performance/uptime" break
+                case 34, #include "nlix/performance/print-pi" break
+                
+                # Files
+                case 40, #include "nlix/files/libfs" break
+                case 41, #include "nlix/files/fstab" break
+                case 42, #include "nlix/files/fstable" break
+                case 43, #include "nlix/files/fsreal" break
+                
+                case 44, #include "nlix/files/ls" break
+                case 45, #include "nlix/files/cat" break
+                case 46, #include "nlix/files/touch" break
+                case 47, #include "nlix/files/rm" break
+                case 48, #include "nlix/files/cp" break
+                
+                # Other
+                case 50, #include "nlix/other/bc" break
+                case 51, #include "nlix/other/surl" break
+                case 52, #include "nlix/other/digi-scan" break
+                case 53, #include "nlix/other/wget" break
+                
+                # X
+                case 59, #include "nlix/x/kbd" break
+                case 60, #include "nlix/x/libx" break
+                case 61, #include "nlix/x/xworker" break
+                case 62, #include "nlix/x/xstart" break
+                
+                case 63, #include "nlix/x/xclock" break
+                case 64, #include "nlix/x/xres" break
+                case 65, #include "nlix/x/xtiles" break
+                case 66, #include "nlix/x/xeyes" break
+                case 67, #include "nlix/x/xclicker" break
+                case 68, #include "nlix/x/xterm" break
+                case 69, #include "nlix/x/xobj" break
+                case 70, #include "nlix/x/xradar" break
+                
+                # Init
+                #case 80, SYSTEM_NAME = "system0" #include "nlix/system/sync" break
+                case 81, #include "nlix/system/autostart" break
+                
+                # End
+                case 82, KState = 1 runOnTick(1) exit() break
+                default,
+            }
+        }
+        
+        interval(0)
+    }
+    elseif (first()) {
+        KPerf = 5
+        
+        interval(0)
+    }
+}  
+else {
+    while (perf(KPerf)) {
+        # Counter
+        if (KState >= Ps:count()) {
+            KState = 1
+        }
+        else {
+            KState++
+        }
+        
+        # Program memory
+        P = Ps[KState, table]
+        
+        # Clear if parent killed
+        if (P["parent", table]:count() == 0 & P:exists("parent")) {
+            end()
+            continue
+        }
+        
+        # Program name
+        PName = P["name", string]
+        
+        # If exist binary (function)
+        if (P2F:exists(PName)) {
+            P2F[PName, string]()
+        }
+        # If program is not valid
+        elseif (P:count() == 0) {
+            # If all programs is not valid
+            if (Ps:count() == 0) {
+                runOnTick(0)
+                break
+            }
+            # If one program is not valid
+            else {
+                end()
+            }
+        }
+        # If wrong name
+        else {
+            out("Program \"" + PName + "\" is not exist.\n")
+            end()
+        }
+    }
+}

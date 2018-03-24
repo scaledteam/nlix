@@ -10,7 +10,7 @@ function rm() {
     switch (P["state", number]) {
         case 0,
             if (args() < 1) {
-                out("Usage: cat [path to file].\n")
+                out("Usage: rm [path to file].\n")
                 end()
             }
             else {
