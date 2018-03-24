@@ -10,5 +10,6 @@ if (!Ps:isValid()) {
     exec("hotplugd")
     exec("autoperf")
     #exec("sh")
-    exec("xtiles")
+    #exec("xtiles")
+    exec("xwm")
 }

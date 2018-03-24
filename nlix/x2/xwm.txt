@@ -1,0 +1,186 @@
+#
+# Created by scaled
+#
+
+@name xwm
+
+xregister("wm's", "xwm")
+
+P2F["xwm", string] = "xwm"
+
+function xwm() {
+    switch (P["state", number]) {
+        case 0,
+            if (P["parent", table]["name", string] == "sh") {
+                P:removeTable("parent"):clear()
+            }
+            elseif (!P:exists("xframe")) {
+                if (!P:exists("args")) {
+                    P["args", array] = array()
+                }
+                P["args", array]:unshiftString(P["name", string])
+                P["name", string] = "xstart"
+            }
+            elseif (xcanCreate(4)) {
+                local Res = P["xframe", table]["size", vector2]
+                xcreate("box"):xsize(Res):xcolor(hsv2rgb(150 * 512 / Res[2], 1, 0.7))
+                
+                local Cmd = table()
+                local CmdHeight = 20
+                local CmdLength = Res[1] / (P["xparam", table]["symbolWidth", number] * CmdHeight)
+                
+                P["cmdHeight", number] = CmdHeight
+                Cmd["xframe", table] = xcreate("box"):xsize(vec2(Res[1], CmdHeight)):xpos(vec2(0, Res[2] - CmdHeight)):xcolor(vec())
+                
+                if (CmdLength > 20) {
+                    P["cmdPhrase", string] = "xwm $ "
+                }
+                else {
+                    P["cmdPhrase", string] = "$ "
+                }
+                
+                P["cmd", table] = xcreate("text"):xtext(P["cmdPhrase", string]):xsize(CmdHeight):xpos(vec2(0, Res[2] - CmdHeight))
+                
+                local Kbd = exec("kbd")
+                local Skbd = exec("skbd")
+                programUp()
+                
+                Cmd["kbd", array] = Skbd["in", array] = array()
+                
+                P["kbd", array] = Kbd["out", array] = array()
+                P["in", array] = Skbd["out", array] = array()
+                
+                P["term", array] = Skbd["term", array] = array()
+                
+                P["programs", table] = table(Cmd)
+                P["frames", table] = table(Cmd["xframe", table])
+                P["windows", table] = table(table())
+                
+                P["focus", number] = 1
+                
+                # Clocks
+                if (CmdLength > 30) {
+                    P["clock", table] = xcreate("text"):xsize(CmdHeight):xpos(Res - vec2(0, CmdHeight)):xalign(vec2(2, 0))
+                }
+                
+                P["state", number] = 1
+            }
+            break
+            
+        case 1,
+            # Send cursor to programs
+            local Cursor = xcursor()
+            
+            # Command line
+            if (P["term", array]:count() > 0) {
+                local In = P["term", array]:shiftString()
+                if (In == TERM_ERASE1) {
+                    P["cmd", table]:xtext(P["cmd", table]["text", string]:sub(1, -2))
+                }
+                elseif (In == "\n") {
+                    P["cmd", table]:xtext(P["cmdPhrase", string])
+                }
+                elseif (In == TERM_ERASE) {
+                    P["cmd", table]:xtext(P["cmd", table]["text", string]:sub(1, -1 - P["term", array]:shiftNumber()))
+                }
+                else {
+                    P["cmd", table]:xtext(P["cmd", table]["text", string] + In)
+                }
+            }
+            
+            # Commands
+            if (wait() & xcanCreate(3)) {
+                local CommandExp = in():trim():explodeRE(" +")
+                
+                switch (CommandExp[1, string]) {
+                    case "exit",
+                        end()
+                        break
+                        
+                    case "sh",
+                        end()
+                        exec("sh")
+                        break
+                    
+                    default,
+                        local ProgramName = CommandExp:shiftString()
+                        
+                        local Res = P["xframe", table]["size", vector2]
+                        local Size = floor(Res / 2.5)
+                        local Pos = randvec2(vec2(0, 20), Res - vec2(0, 20) - Size)
+                        
+                        local Window = xcreate("box"):xpos(Pos - vec2(0, 20)):xsize(Size + vec2(0, 20))
+                        xcreate("text"):xparent(Window):xpos(-Window["size", vector2] / 2):xtext(ProgramName):xsize(20):xcolor(vec())
+                        
+                        local Program = xexec(ProgramName, Size)
+                        Program["xframe", table]:xpos(Pos)
+                        
+                        Program["args", array] = CommandExp
+                        Program["out", array] = P["out", array]
+                        Program["kbd", array] = array()
+                        
+                        P["programs", table]:pushTable(Program)
+                        P["frames", table]:pushTable(Program["xframe", table])
+                        P["windows", table]:pushTable(Window)
+                }
+            }
+            
+            # Programs actions
+            for (I = 1, Overload) {
+                local Counter = P["counter", number] + 1
+                if (Counter > P["programs", table]:count()) {
+                    P["counter", number] = 0
+                    break
+                }
+                P["counter", number] = Counter
+                
+                # Check if program is dead
+                local Program = P["programs", table][Counter, table]
+                if (!Program:isValid()) {
+                    P["programs", table]:remove(Counter)
+                    P["frames", table]:removeTable(Counter):xremove()
+                    P["windows", table]:removeTable(Counter):xremove()
+                }
+                else {
+                    # Focus
+                    if (P["focus", number] != Counter & inrange(Cursor - Program["xframe", table]["pos", vector2], vec2(), Program["xframe", table]["size", vector2])) {
+                        # Clear old data after focus changed
+                        local ProgramOld = P["programs", table][P["focus", number], table]
+                        ProgramOld["kbd", array]:clear()
+                        
+                        # set new focus
+                        P["focus", number] = Counter
+                    }
+                    
+                    if (Counter == P["focus", number]) {
+                        # Keyboard
+                        local KbdReal = P["kbd", array]
+                        local KbdInsideProgram = Program["kbd", array]
+                        
+                        KbdInsideProgram:clear()
+                        for (I = 1, KbdReal:count()) {
+                            KbdInsideProgram[I, number] = KbdReal[I, number]
+                        }
+                    }
+                    
+                    # Moving windows
+                    if (xkeyUse() & inrange(Cursor - Program["xframe", table]["pos", vector2], vec2(0, -20), Program["xframe", table]["size", vector2]:setY(0))) {
+                        local Res = P["xframe", table]["size", vector2]
+                        local Size = Program["xframe", table]["size", vector2]
+                        
+                        local NewPos = clamp(Cursor + vec2(-Program["xframe", table]["size", vector2][1], 20) / 2, vec2(0, 20), Res - vec2(0, 20) - Size)
+                        Program["xframe", table]:xpos(NewPos)
+                        P["windows", table][Counter, table]:xpos(NewPos - vec2(0, 20))
+                    }
+                }
+            }
+            
+            # Clocks
+            if (P:exists("clock") & systime() > P["clockTimer", number]) {
+                P["clock", table]:xtext(format("%02d:%02d:%02d", time("hour"), time("min"), time("sec")))
+                
+                P["clockTimer", number] = systime() + 1
+            }
+            break
+    }
+}
