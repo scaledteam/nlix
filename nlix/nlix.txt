@@ -40,7 +40,7 @@ if (!tickClk()) {
                 
                 # Performance
                 case 30, #include "nlix/performance/autoperf" break
-                #[case 31, #include "nlix/performance/perf" break
+                case 31, #include "nlix/performance/perf" break
                 case 32, #include "nlix/performance/overload" break
                 case 33, #include "nlix/performance/uptime" break
                 case 34, #include "nlix/performance/print-pi" break
@@ -61,7 +61,7 @@ if (!tickClk()) {
                 case 50, #include "nlix/other/bc" break
                 case 51, #include "nlix/other/surl" break
                 case 52, #include "nlix/other/digi-scan" break
-                case 53, #include "nlix/other/wget" break]#
+                case 53, #include "nlix/other/wget" break
                 
                 # X
                 case 59, #include "nlix/x/kbd" break
