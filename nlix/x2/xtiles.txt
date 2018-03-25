@@ -131,7 +131,7 @@ function xtiles() {
                 local Program = P["programs", table][Counter, table]
                 if (!Program:isValid()) {
                     P["programs", table]:remove(Counter)
-                    #xremove(P["frames", table]:removeTable(Counter))
+                    P["frames", table]:removeTable(Counter):xremove()
                 }
                 else {
                     # Focus

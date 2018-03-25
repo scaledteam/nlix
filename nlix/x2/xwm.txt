@@ -166,7 +166,7 @@ function xwm() {
                     }
                     
                     # Moving windows
-                    if (xkeyUse() & inrange(Cursor - Program["xframe", table]["pos", vector2], vec2(0, -20), Program["xframe", table]["size", vector2]:setY(0))) {
+                    if (P["windows", table][Counter, table]:isValid() & xkeyUse() & inrange(Cursor - Program["xframe", table]["pos", vector2], vec2(0, -20), Program["xframe", table]["size", vector2]:setY(0))) {
                         if (Cursor[1] > Program["xframe", table]["pos", vector2][1] + Program["xframe", table]["size", vector2][1] - 20) {
                             Program:clear()
                         }

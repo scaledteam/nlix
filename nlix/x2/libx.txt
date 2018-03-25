@@ -33,7 +33,11 @@ function table xcreate(Type:string) {
                 Object["sizeNum", number] = 20
                 Device:egpSize(20 * P["xparam", table]["textMultiplier", number])
                 break
-            case "textLayout", Device:egpTextLayout(Id, "", vec2(), vec2()) break
+            case "textLayout",
+                Device:egpTextLayout(Id, "", vec2(), vec2())
+                Object["sizeNum", number] = 20
+                Device:egpSize(20 * P["xparam", table]["textMultiplier", number])
+                break
             case "poly", Device:egpPoly(Id, vec2(), vec2(), vec2()) break
             case "polyOutLine", Device:egpPolyOutline(Id, vec2(), vec2(), vec2()) break
             case "lineStrip", Device:egpLineStrip(Id, vec2(), vec2(), vec2()) break
@@ -356,11 +360,15 @@ function number xcanCreate(Count) {
     return 0
 }
 
-function table:xclear() {
+function number table:xclear() {
     if (This["id", number] != 0) {
         local Id = This["id", number]
         This:clear()
         P["xdevice", wirelink]:egpLine(Id, vec2(), vec2())
+        return Id
+    }
+    else {
+        return 0
     }
 }
 
@@ -372,6 +380,15 @@ function table:xremove() {
         P["xremove", table] = Program
         
         Program["xobjectsAll", table] = P["xobjectsAll", table]
+        Program["xparam", table] = P["xparam", table]
         Program["xdevice", wirelink] = P["xdevice", wirelink]
     }
+}
+
+function xprintAll() {
+    local Text = "xprintAll\n"
+    for (I = 1, P["xobjectsAll", table]:count()) {
+        Text += I + ", " + P["xobjectsAll", table][I, table]["id", number] + ", " + P["xobjectsAll", table][I, table]["type", string] + "\n"
+    }
+    print(Text:sub(1, -2))
 }

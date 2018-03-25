@@ -87,6 +87,8 @@ if (!tickClk()) {
                 case 65, #include "nlix/x2/xeyes" break
                 case 66, #include "nlix/x2/xterm" break
                 case 67, #include "nlix/x2/xwm" break
+                case 68, #include "nlix/x2/xradar" break
+                case 69, #include "nlix/x2/xclicker" break
                 
                 # Init
                 #case 80, SYSTEM_NAME = "system0" #include "nlix/system/sync" break
