@@ -4,123 +4,182 @@
 
 @name libx
 
-function xdraw(Object:table) {
-    local Type = Object["type", string]
-    local Id = Object["id", number]
-    local Device = P["device", wirelink]
+S["xmenu", table] = table()
+
+function xregister(Category:string, ProgramName:string) {
+    if (S["xmenu", table]:exists(Category)) {
+        S["xmenu", table][Category, array]:pushString(ProgramName)
+    }
+    else {
+        S["xmenu", table][Category, array] = array(ProgramName)
+    }
+}
+
+
+function table xcreate(Type:string) {
+    if (P["xobjects", table]:count() > 0) {
+        local Device = P["xdevice", wirelink]
+        
+        local Object = P["xobjects", table]:removeTable(1)
+        local Id = Object["id", number]
+        Object["type", string] = Type
+        
+        switch (Type) {
+            case "box", case "frame", Device:egpBox(Id, vec2(), vec2()) break
+            case "circle", Device:egpCircle(Id, vec2(), vec2()) break
+            case "line", Device:egpLine(Id, vec2(), vec2()) break
+            case "text",
+                Device:egpText(Id, "", vec2())
+                Object["sizeNum", number] = 20
+                Device:egpSize(20 * P["xparam", table]["textMultiplier", number])
+                break
+            case "textLayout",
+                Device:egpTextLayout(Id, "", vec2(), vec2())
+                Object["sizeNum", number] = 20
+                Device:egpSize(20 * P["xparam", table]["textMultiplier", number])
+                
+                Object["monospaced", number] = 1
+                Device:egpFont(Id, "Courier New")
+                break
+            case "poly", Device:egpPoly(Id, vec2(), vec2(), vec2(), vec2()) break
+            case "polyOutline", Device:egpPolyOutline(Id, vec2(), vec2(), vec2(), vec2()) break
+            case "lineStrip", Device:egpLineStrip(Id, vec2(), vec2(), vec2()) break
+            default, return NULL
+        }
+        
+        Device:egpParent(Id, Object["parent", table]["id", number])
+        
+        return Object
+    }
+    else {
+        return NULL
+    }
+}
+
+function table:xredraw() {
+    local Device = P["xdevice", wirelink]
     
+    local Id = This["id", number]
+    local Type = This["type", string]
     switch (Type) {
         case "box",
-            Device:egpBox(Id, Object["pos", vector2], Object["size", vector2])
-            break
-        
-        case "circle",
-            Device:egpCircle(Id, Object["pos", vector2], Object["size", vector2])
-            break
-        
-        case "line",
-            Device:egpLine(Id, Object["pos", vector2], Object["size", vector2])
-            break
-        
-        case "text",
-            if (Object:exists("size")) {
-                Device:egpTextLayout(Id, Object["text", string], Object["pos", vector2], Object["size", vector2])
-            }
-            else {
-                Device:egpText(Id, Object["text", string], Object["pos", vector2])
-            }
-            Device:egpAlign(Id, Object["align", vector2][1], Object["align", vector2][2])
-            if (!Object:exists("sizeNum")) {
-                Object["sizeNum", number] = 20
-            }
-            Device:egpSize(Id, Object["sizeNum", number] * Object["parent", table]["textMultiplier", number])
-            Device:egpFont(Id, "Courier New")
-            break
-        
-        case "poly",
-            Device:egpPoly(Id, Object["poses", array])
-            break
-        
-        case "polyOutline",
-            Device:egpPolyOutline(Id, Object["poses", array])
-            break
-        
-        case "lineStrip",
-            Device:egpLineStrip(Id, Object["poses", array])
+            Device:egpBox(Id, This["pos", vector2], This["size", vector2])
             break
         
         case "frame",
-            Device:egpBox(Id, Object["pos", vector2], vec2())
+            Device:egpBox(Id, This["pos", vector2], vec2())
+            break
+        
+        case "circle",
+            Device:egpCircle(Id, This["pos", vector2], This["size", vector2])
+            break
+        
+        case "line", 
+            Device:egpLine(Id, This["pos", vector2], This["size", vector2])
+            Device:egpSize(Id, This["sizeNum", number])
+            break
+        
+        case "text",
+            Device:egpText(Id, This["text", string], This["pos", vector2])
+            Device:egpFont(Id, This["monospaced", number] ? "Courier New" : "")
+            Device:egpAlign(Id, This["align", vector2][1], This["align", vector2][2])
+            Device:egpSize(Id, This["sizeNum", number] * P["xparam", table]["textMultiplier", number])
+            break
+        
+        case "textLayout",
+            Device:egpTextLayout(Id, This["text", string], This["pos", vector2], This["size", vector2])
+            Device:egpFont(Id, This["monospaced", number] ? "Courier New" : "")
+            Device:egpAlign(Id, This["align", vector2][1], This["align", vector2][2])
+            Device:egpSize(Id, This["sizeNum", number] * P["xparam", table]["textMultiplier", number])
+            break
+        
+        case "poly",
+            Device:egpPoly(Id, This["verticles", array])
+            break
+        
+        case "polyOutline",
+            Device:egpPolyOutline(Id, This["verticles", array])
+            Device:egpSize(Id, This["sizeNum", number])
+            break
+        
+        case "lineStrip",
+            Device:egpLineStrip(Id, This["verticles", array])
+            Device:egpSize(Id, This["sizeNum", number])
             break
         
         case "",
             Device:egpLine(Id, vec2(), vec2())
             break
-        
         default,
-            out("Error: unknown type \"" + Type + "\".")
-            
-            Object["type", string] = ""
-            Object["color", vector] = vec(255)
-            
-            Device:egpLine(Id, vec2(), vec2())
     }
     
-    Device:egpParent(Id, Object["parent", table]["id", number])
-    #[if (!Object["parent", table]:exists("parentFor")) {
-        Object["parent", table]["parentFor", table] = table(Object)
-    }
-    else {
-        Object["parent", table]["parentFor", table]:pushTable(Object)
-    }
-    
-    if (Object["idOld", number] != Object["id", number]) {
-        Object["idOld", number] = Object["id", number]
-        
-        local Objects = Object["parentFor", table]
-        if (Objects:count() > 0) {
-            print(Object["id", number], Objects:count())
-        }
-        for (I = 1, Objects:count()) {
-            Device:egpParent(Objects[I, table]["id", number], Object["id", number])
-        }
-    }]#
-    
-    Device:egpColor(Id, Object["color", vector])
+    Device:egpColor(Id, This["color", vector])
+    Device:egpParent(Id, This["parent", table]["id", number])
 }
 
-function table xcreate(Input:table) {
-    local Frame = P["xframe", table]
-    local Id = Frame["lastId", number] + 1
-    Frame["lastId", number] = Id
-    
-    if (Frame["objects", table]:exists(Id)) {
-        local Object = Frame["objects", table][Id, table]
-        Object["type", string] = Input["type", string]
-        if (Input:exists("pos")) { Object["pos", vector2] = Input["pos", vector2] }
-        if (Input:exists("size")) { Object["size", vector2] = Input["size", vector2] }
-        if (Input:exists("poses")) { Object["poses", array] = Input["poses", array] }
-        if (Input:exists("text")) { Object["text", string] = Input["text", string] }
-        if (Input:exists("align")) { Object["align", vector2] = Input["align", vector2] }
-        if (Input:exists("sizeNum")) { Object["sizeNum", number] = Input["sizeNum", number] }
-        
-        if (Input:exists("color")) { Object["color", vector] = Input["color", vector] }
-        if (Input:exists("parent")) { Object["parent", table] = Input["parent", table] }
-        
-        Input:clear()
-        xdraw(Object)
-        
-        return Object
-    }
-    else {
-        # FIX IT
-        return NULL
-    }
+function table table:xpos(Pos:vector2) {
+    This["pos", vector2] = Pos
+    P["xdevice", wirelink]:egpPos(This["id", number], Pos)
+    return This
 }
+
+function table table:xsize(Size:vector2) {
+    This["size", vector2] = Size
+    P["xdevice", wirelink]:egpSize(This["id", number], Size)
+    return This
+}
+
+function table table:xsize(Size) {
+    This["sizeNum", number] = Size
+    P["xdevice", wirelink]:egpSize(This["id", number], Size * P["xparam", table]["textMultiplier", number])
+    return This
+}
+
+function table table:xtext(Text:string) {
+    This["text", string] = Text
+    P["xdevice", wirelink]:egpSetText(This["id", number], Text)
+    return This
+}
+
+function table table:xcolor(Color:vector) {
+    This["color", vector] = Color
+    P["xdevice", wirelink]:egpColor(This["id", number], Color)
+    return This
+}
+
+function table table:xalign(Align:vector2) {
+    This["align", vector2] = Align
+    P["xdevice", wirelink]:egpAlign(This["id", number], Align[1], Align[2])
+    return This
+}
+
+function table table:xmonospaced(Monospaced) {
+    This["monospaced", number] = Monospaced
+    P["xdevice", wirelink]:egpFont(This["id", number], Monospaced ? "Courier New" : "")
+    return This
+}
+
+function table table:xparent(Parent:table) {
+    This["parent", table] = Parent
+    P["xdevice", wirelink]:egpParent(This["id", number], Parent["id", number])
+    return This
+}
+
+function table table:xverticles(Verticles:array) {
+    This["verticles", array] = Verticles
+    switch (This["type", string]) {
+        case "poly", P["xdevice", wirelink]:egpPoly(This["id", number], Verticles) break
+        case "polyOutline", P["xdevice", wirelink]:egpPolyOutline(This["id", number], Verticles) break
+        case "lineStrip", P["xdevice", wirelink]:egpLineStrip(This["id", number], Verticles) break
+        default,
+    }
+    return This
+}
+
 
 function vector2 xcursor() {
     local Frame = P["xframe", table]
-    local Device = P["device", wirelink]
+    local Device = P["xdevice", wirelink]
     
     if (!Frame:exists("parent")) {
         if (systime() > Frame["cursorTimer", number]) {
@@ -173,85 +232,166 @@ function number xkeyUse() {
     return P["xframe", table]["keyUse", number]
 }
 
+function table xexec(ProgramName:string, Size:vector2) {
+    local Program = exec(ProgramName)
+    
+    Program["xframe", table] = xcreate("frame"):xparent(P["xframe", table])
+    Program["xframe", table]["size", vector2] = Size
+    
+    Program["xparam", table] = P["xparam", table]
+    Program["xobjects", table] = table()
+    Program["xobjectsAll", table] = P["xobjectsAll", table]
+    Program["xdevice", wirelink] = P["xdevice", wirelink]
+    
+    return Program
+}
+
+
+function number table:xxlastObjectId() {
+    return This["id", number] + This["count", number]
+}
+
+function number xxlastObjectId() {
+    return P["xobjectsAll", table]:count()
+}
+
+function number table:xxobjectsLeft() {
+    return egpMaxObjects() - This:xxlastObjectId()
+}
+
+function number xxobjectsLeft() {
+    return egpMaxObjects() - xxlastObjectId()
+}
+
+function table xnewObject(Id) {
+    return table("id" = Id, "parent" = P["xframe", table], "color" = vec(255))
+}
+
 function number xcanCreate(Count) {
-    local Frame = P["xframe", table]
-    
-    #print("Calling xcanCreate ", Count)
-    
-    if (!P:exists("xworker") & (Frame["objects", table]:count() - Frame["lastId", number]) >= Count) {
-        #print("xcanCreate done ", Count)
-        
-        return 1
-    }
-    elseif (!P:exists("xworker")) {
-        local XWorker = exec("xworker")
-        P["xworker", table] = XWorker
-        P["xworkerOut", array] = XWorker["out", array] = array()
-        
-        XWorker["action", string] = "free"
-        XWorker["count", number] = Count
-        XWorker["xframe", table] = Frame
-        XWorker["device", wirelink] = P["device", wirelink]
-        
-        #print("Calling xworker ", Count)
-    }
-    elseif (!P["xworker", table]:isValid()) {
-        P:remove("xworker")
-        
-        if (P["xworkerOut", array]:count() > 0) {
-            #print(P["xworkerOut", array])
-            P:removeArray("xworkerOut"):clear()
-            return 0
-        }
-        else {
-            #print("Xworker done ", Count)
-            return 1
+    for (I = 1, Overload) {
+        switch (P["xworkerState", number]) {
+            case 0,
+                if (!P["xframe", table]:exists("parent")) {
+                    if (xxobjectsLeft() > Count) {
+                        P["xworkerState", number] = 1
+                    }
+                    else {
+                        return 0
+                    }
+                }
+                else {
+                    if (P["xframe", table]:xxlastObjectId() >= xxlastObjectId()) {
+                        P["xworkerState", number] = 1
+                    }
+                    else {
+                        P["xshiftStart", number] = P["xframe", table]:xxlastObjectId()
+                        P["xobjectsTemp", table] = table()
+                        
+                        P["xcounter", number] = P["xshiftStart", number]
+                        P["xworkerState", number] = 2
+                    }
+                }
+                break
+            
+            # For last objects
+            case 1,
+                if (P["xobjects", table]:count() < Count) {
+                    local Object = xnewObject(P["xobjectsAll", table]:count() + 1)
+                    P["xobjects", table]:pushTable(Object)
+                    P["xobjectsAll", table]:pushTable(Object)
+                    
+                    P["xframe", table]["count", number] = P["xframe", table]["count", number] + 1
+                }
+                else {
+                    P:remove("xworkerState")
+                    return 1
+                }
+                break
+            
+            # For middle objects
+            case 2,
+                P["xcounter", number] = P["xcounter", number] + 1
+                
+                if (P["xcounter", number] <= P["xobjectsAll", table]:count()) {
+                    local Id = P["xcounter", number]
+                    P["xobjectsTemp", table]:pushTable(P["xobjectsAll", table][Id, table])
+                }
+                else {
+                    P["xcounter", number] = 0
+                    P["xworkerState", number] = 3
+                }
+                break
+            
+            case 3,
+                P["xcounter", number] = P["xcounter", number] + 1
+                
+                if (P["xcounter", number] <= Count) {
+                    local Id = P["xcounter", number] + P["xshiftStart", number]
+                    local Object = xnewObject(Id)
+                    Object:xredraw()
+                    
+                    P["xobjectsAll", table][Id, table] = Object
+                    P["xobjects", table]:pushTable(Object)
+                }
+                else {
+                    P["xcounter", number] = 0
+                    P["xworkerState", number] = 4
+                }
+                break
+            
+            case 4,
+                P["xcounter", number] = P["xcounter", number] + 1
+                
+                if (P["xobjectsTemp", table]:count() > 0) {
+                    local Object = P["xobjectsTemp", table]:removeTable(1)
+                    local Id = P["xcounter", number] + P["xshiftStart", number] + Count
+                    
+                    Object["id", number] = Id
+                    P["xobjectsAll", table][Id, table] = Object
+                    
+                    Object:xredraw()
+                }
+                else {
+                    P:remove("xworkerState")
+                    P:remove("xcounter")
+                    P:remove("xobjectsTemp")
+                    return 1
+                }
+                break
         }
     }
     return 0
 }
 
-function xregister(Category:string, ProgramName:string) {
-    if (S["xmenu", table]:exists(Category)) {
-        S["xmenu", table][Category, array]:pushString(ProgramName)
+function number table:xclear() {
+    if (This["id", number] != 0) {
+        local Id = This["id", number]
+        This:clear()
+        P["xdevice", wirelink]:egpLine(Id, vec2(), vec2())
+        return Id
     }
     else {
-        S["xmenu", table][Category, array] = array(ProgramName)
+        return 0
     }
 }
 
-function xswitch(Objects:table, Id1, Id2) {
-    local IId1 = Objects[Id1, table]["id", number]
-    local IId2 = Objects[Id2, table]["id", number]
+function table:xremove() {
+    This:xclear()
     
-    #print(Id1, IId1, "|", Id2, IId2)
-    
-    local TempObject = Objects[Id1, table]
-    Objects[Id1, table] = Objects[Id2, table]
-    Objects[Id2, table] = TempObject
-    
-    Objects[Id1, table]["id", number] = IId1
-    Objects[Id2, table]["id", number] = IId2
-}
-
-function xparentUpdate(Object:table) {
-    P["device", wirelink]:egpParent(Object["id", number], Object["parent", table]["id", number])
-}
-
-function xremove(Object:table) {
-    local Id = Object["id", number]
-    
-    if (Object["parentFor", table]:count() > 0) {
-        local XWorker = exec("xworker")
+    if (!P["xremove", table]:isValid()) {
+        local Program = exec("xremove")
+        P["xremove", table] = Program
         
-        XWorker["action", string] = "fullRemove"
-        XWorker["object", table] = Object
-        XWorker["parentFor", table] = Object["parentFor", table]
-        XWorker["device", wirelink] = P["device", wirelink]
+        Program["xobjectsAll", table] = P["xobjectsAll", table]
+        Program["xparam", table] = P["xparam", table]
+        Program["xdevice", wirelink] = P["xdevice", wirelink]
     }
-    
-    Object:clear()
-    Object["id", number] = Id
-    
-    P["device", wirelink]:egpLine(Id, vec2(), vec2())
+}
+
+function xprintAll() {
+    local Text = "xprintAll\n"
+    for (I = 1, P["xobjectsAll", table]:count()) {
+        Text += I + ", " + P["xobjectsAll", table][I, table]["id", number] + ", " + P["xobjectsAll", table][I, table]["type", string] + "\n"
+    }
+    print(Text:sub(1, -2))
 }

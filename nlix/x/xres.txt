@@ -13,28 +13,12 @@ function xres() {
         case 0,
             if (xcanCreate(3)) {
                 local Res = P["xframe", table]["size", vector2]
+                local Size = vec2(int(min(Res[1], Res[2]) / 10) * 10)
                 
-                local Size = vec2(min(Res[1], Res[2]))
+                xcreate("box"):xsize(Res):xcolor(vec(255, 127, 63))
+                xcreate("box"):xsize(Size):xcolor(vec(63, 127, 255))
                 
-                xcreate(table(
-                    "type" = "box",
-                    "size" = Res,
-                    "color" = vec(255, 127, 63)
-                ))
-                
-                xcreate(table(
-                    "type" = "box",
-                    "size" = Size,
-                    "color" = vec(63, 127, 255)
-                ))
-                
-                P["text", table] = xcreate(table(
-                    "type" = "text",
-                    "text" = "Res = (" + Res[1] + ", " + Res[2] + ")\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10",
-                    "size" = Size,
-                    "sizeNum" = Size[2] / 10,
-                    "color" = vec()
-                ))
+                P["text", table] = xcreate("textLayout"):xsize(Size):xsize(Size[2] / 10):xcolor(vec()):xtext("Res = (" + Res[1] + ", " + Res[2] + ")\nSize = " + Size[1] + "\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10")
                 
                 P["state", number] = 1
             }

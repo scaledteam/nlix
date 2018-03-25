@@ -13,17 +13,9 @@ function xterm() {
         case 0,
             if (xcanCreate(2)) {
                 local Res = P["xframe", table]["size", vector2]
-                xcreate(table(
-                    "type" = "box",
-                    "size" = Res,
-                    "color" = vec()
-                ))
                 
-                P["text", table] = xcreate(table(
-                    "type" = "text",
-                    "size" = Res,
-                    "sizeNum" = 15
-                ))
+                xcreate("box"):xsize(Res):xcolor(vec())
+                P["text", table] = xcreate("textLayout"):xsize(Res):xsize(15):xmonospaced(1)
                 
                 local Skbd = exec("skbd")
                 local Sh = exec("sh")
@@ -33,9 +25,7 @@ function xterm() {
                 P["sh", table] = Sh
                 P["term", table] = Term
                 
-                #Term["resolution", vector2] = floor(vec2(56, 28) * Res / vec2(512) / vec2(P["xframe", table]["textMultiplier", number], 1))
-                #Term["resolution", vector2] = floor(vec2(2 * Res[1] / 15 / P["xframe", table]["textMultiplier", number], Res[2] / 15))
-                Term["resolution", vector2] = floor(vec2(Res[1] / (15 * P["xframe", table]["textWidth", number]), Res[2] / 15))
+                Term["resolution", vector2] = floor(vec2(Res[1] / (15 * P["xparam", table]["symbolWidth", number]), Res[2] / 15))
                 
                 #print(Term["resolution", vector2])
                 
@@ -55,8 +45,7 @@ function xterm() {
         
         case 1,
             if (wait()) {
-                P["text", table]["text", string] = in()
-                xdraw(P["text", table])
+                P["text", table]:xtext(in())
             }
             elseif (!P["sh", table]:isValid()) {
                 end()

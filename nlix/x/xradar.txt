@@ -15,18 +15,23 @@ function xradar() {
             if (xcanCreate(11)) {
                 local Res = P["xframe", table]["size", vector2]
                 
-                xcreate(table(
-                    "type" = "box",
-                    "size" = Res,
-                    "color" = vec()
-                ))
+                xcreate("box"):xsize(Res):xcolor(vec())
                 
                 P["texts", table] = table()
                 for (I = 1, 10) {
-                    P["texts", table]:pushTable(xcreate(table("type" = "text", "sizeNum" = 12)))
+                    P["texts", table]:pushTable(xcreate("text"):xsize(12))
                 }
                 
-                P["distance", number] = 2000
+                findByClass("player")
+                local Distance = 2000
+                for (I = 1, min(10, findCount())) {
+                    local TargetDistance = entity():pos():distance(find():pos())
+                    if (TargetDistance > Distance) {
+                        Distance = TargetDistance
+                    }
+                }
+                
+                P["distance", number] = Distance * sqrt(2)
                 P["multiplier", number] = min(Res[1], Res[2]) / P["distance", number] / 2 * sqrt(2)
                 
                 P["state", number] = 1
@@ -53,27 +58,24 @@ function xradar() {
                 for (I = 1, Count) {
                     local Object = P["texts", table][I, table]
                     
-                    #Object["pos", vector2] = clamp(vec2(FindToArray[I, entity]:pos() - Pos):rotate(90 - Entity:angles()[2]) * vec2(-1, 1) * P["multiplier", number] + Offset, vec2(), Res - vec2(0, 12))
-                    Object["pos", vector2] = clamp(shift(vec2(entity():toLocal(FindToArray[I, entity]:pos()))) * P["multiplier", number] + Offset, vec2(), Res - vec2(0, 12))
+                    #Object:xpos(clamp(vec2(FindToArray[I, entity]:pos() - Pos):rotate(90 - Entity:angles()[2]) * vec2(-1, 1) * P["multiplier", number] + Offset, vec2(), Res - vec2(0, 12)))
+                    Object:xpos(clamp(shift(vec2(entity():toLocal(FindToArray[I, entity]:pos()))) * P["multiplier", number] + Offset, vec2(), Res - vec2(0, 12)))
                     
                     if (Object["pos", vector2][1] > Offset[1]) {
-                        Object["text", string] = FindToArray[I, entity]:name() + " '"
-                        Object["align", vector2] = vec2(2, 0)
+                        Object:xtext(FindToArray[I, entity]:name() + " '")
+                        Object:xalign(vec2(2, 0))
                     }
                     else {
-                        Object["text", string] = "' " + FindToArray[I, entity]:name()
-                        Object["align", vector2] = vec2()
+                        Object:xtext("' " + FindToArray[I, entity]:name())
+                        Object:xalign(vec2())
                     }
-                    
-                    xdraw(Object)
                 }
                 
                 local I = P["countOld", number]
                 while (I > Count) {
                     local Object = P["texts", table][I, table]
                     
-                    Object["text", string] = ""
-                    xdraw(Object)
+                    Object:xtext("")
                     
                     I--
                 }

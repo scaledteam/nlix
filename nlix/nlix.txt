@@ -65,30 +65,17 @@ if (!tickClk()) {
                 
                 # X
                 case 59, #include "nlix/x/kbd" break
-                #[case 60, #include "nlix/x/libx" break
-                case 61, #include "nlix/x/xworker" break
-                case 62, #include "nlix/x/xstart" break
-                
-                case 63, #include "nlix/x/xclock" break
-                case 64, #include "nlix/x/xres" break
-                case 65, #include "nlix/x/xtiles" break
-                case 66, #include "nlix/x/xeyes" break
-                case 67, #include "nlix/x/xclicker" break
-                case 68, #include "nlix/x/xterm" break
-                case 69, #include "nlix/x/xobj" break
-                case 70, #include "nlix/x/xradar" break]#
-                
-                # X2
-                case 60, #include "nlix/x2/libx" break
-                case 61, #include "nlix/x2/xstart" break
-                case 62, #include "nlix/x2/xremove" break
-                case 63, #include "nlix/x2/xres" break
-                case 64, #include "nlix/x2/xtiles" break
-                case 65, #include "nlix/x2/xeyes" break
-                case 66, #include "nlix/x2/xterm" break
-                case 67, #include "nlix/x2/xwm" break
-                case 68, #include "nlix/x2/xradar" break
-                case 69, #include "nlix/x2/xclicker" break
+                case 60, #include "nlix/x/libx" break
+                case 61, #include "nlix/x/xstart" break
+                case 62, #include "nlix/x/xremove" break
+                case 63, #include "nlix/x/xres" break
+                case 64, #include "nlix/x/xtiles" break
+                case 65, #include "nlix/x/xeyes" break
+                case 66, #include "nlix/x/xterm" break
+                case 67, #include "nlix/x/xwm" break
+                case 68, #include "nlix/x/xradar" break
+                case 69, #include "nlix/x/xclicker" break
+                case 70, #include "nlix/x/xobj" break
                 
                 # Init
                 #case 80, SYSTEM_NAME = "system0" #include "nlix/system/sync" break

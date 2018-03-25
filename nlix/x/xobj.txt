@@ -117,11 +117,7 @@ function xobj() {
         
         case 3,
             if (xcanCreate(P["limit", number])) {
-                xcreate(table(
-                    "type" = "box",
-                    "size" = P["xframe", table]["size", vector2],
-                    "color" = vec()
-                ))
+                xcreate("box"):xsize(P["xframe", table]["size", vector2]):xcolor(vec())
                 
                 P["limit", number] = min(P["model", table]["f", table]:count(), P["limit", number] - 1)
                 P["state", number] = 4
@@ -143,14 +139,11 @@ function xobj() {
                     return
                 }
                 
-                xcreate(table(
-                    "type" = "polyOutline",
-                    "poses" = array(
-                        clamp(Scale * vec2(Matrix * P["model", table]["v", array][P["model", table]["f", table][Counter, table]["v", array][1, number], vector]) + Offset, vec2(), Res),
-                        clamp(Scale * vec2(Matrix * P["model", table]["v", array][P["model", table]["f", table][Counter, table]["v", array][2, number], vector]) + Offset, vec2(), Res),
-                        clamp(Scale * vec2(Matrix * P["model", table]["v", array][P["model", table]["f", table][Counter, table]["v", array][3, number], vector]) + Offset, vec2(), Res),
-                        clamp(Scale * vec2(Matrix * P["model", table]["v", array][P["model", table]["f", table][Counter, table]["v", array][4, number], vector]) + Offset, vec2(), Res)
-                    )
+                xcreate("polyOutline"):xverticles(array(
+                    clamp(Scale * vec2(Matrix * P["model", table]["v", array][P["model", table]["f", table][Counter, table]["v", array][1, number], vector]) + Offset, vec2(), Res),
+                    clamp(Scale * vec2(Matrix * P["model", table]["v", array][P["model", table]["f", table][Counter, table]["v", array][2, number], vector]) + Offset, vec2(), Res),
+                    clamp(Scale * vec2(Matrix * P["model", table]["v", array][P["model", table]["f", table][Counter, table]["v", array][3, number], vector]) + Offset, vec2(), Res),
+                    clamp(Scale * vec2(Matrix * P["model", table]["v", array][P["model", table]["f", table][Counter, table]["v", array][4, number], vector]) + Offset, vec2(), Res)
                 ))
                 
                 P["counter", number] = Counter

@@ -13,50 +13,7 @@ function xstart() {
                 out("Usage: xstart [program name]\n")
                 end()
             }
-            else {
-                P["xframe", table] = table(
-                    "id" = 1,
-                    "count" = min(100, egpMaxObjects()),
-                    "objects" = table(),
-                    "device" = nowirelink(),
-                    "textMultiplier" = 1
-                )
-                P["xframe", table]["mainFrame", table] = P["xframe", table]
-                
-                P["counter", number] = P["xframe", table]["id", number]
-                
-                P["state", number] = 1
-            }
-            break
-        
-        case 1,
-            local Frame = P["xframe", table]
-            local Counter = P["counter", number]
-            
-            for (I = 1, Overload) {
-                Counter++
-                
-                # cycle code
-                Frame["objects", table]:pushTable(table(
-                    "id" = Counter,
-                    "type" = "",
-                    "color" = vec(255),
-                    "parent" = Frame
-                ))
-                # end
-                
-                if (Counter >= Frame["count", number]) {
-                    Counter = 0
-                    P["state", number] = 2
-                    P:remove("counter")
-                    return
-                }
-            }
-            P["counter", number] = Counter
-            break
-        
-        case 2,
-            if (deviceGet("gmod_wire_egp")) {
+            elseif (deviceGet("gmod_wire_egp")) {
                 local Device = P["device", wirelink]
                 
                 Device:egpClear()
@@ -65,18 +22,17 @@ function xstart() {
                 
                 Device:egpBox(1, vec2(), vec2())
                 
-                P["xframe", table]["device", wirelink] = Device
-                P["xframe", table]["size", vector2] = vec2(512)
+                P["xdevice", wirelink] = Device
+                P:remove("device")
                 
                 P["NULL", table] = NULL
-                
-                P["state", number] = 3
+                P["state", number] = 1
             }
             break
         
-        case 3,
+        case 1,
             if (P["NULL", table] != NULL) {
-                local Device = P["device", wirelink]
+                local Device = P["xdevice", wirelink]
                 
                 local Pos0 = Device:egpToWorld(vec2())
                 local PosX = Device:egpToWorld(vec2(512, 0))
@@ -86,45 +42,30 @@ function xstart() {
                 local SizeY = Pos0:distance(PosY)
                 
                 local Res = floor(vec2(SizeX, SizeY) / max(SizeX, SizeY) * 512)
-                #local Res = vec2(400, 300)
                 
                 Device:egpResolution(vec2(), Res)
                 
-                P["xframe", table]["size", vector2] = Res
-                P["xframe", table]["textMultiplier", number] = 512 / Res[2]
-                P["xframe", table]["textWidth", number] = 0.53 * Res[1] / Res[2] #P["xframe", table]["textMultiplier", number]
+                P["xframe", table] = table(
+                    "id" = 1,
+                    "type" = "frame",
+                    "count" = 1,
+                    "size" = Res
+                )
+                
+                P["xobjectsAll", table] = table(P["xframe", table])
+                
+                P["xparam", table] = table(
+                    "textMultiplier" = 512 / Res[2],
+                    "symbolWidth" = 0.53 * Res[1] / Res[2]
+                )
+                P["xobjects", table] = table()
                 
                 P:remove("NULL")
-                P["state", number] = 4
+                P["state", number] = 2
             }
             break
         
-        case 4,
-            local Objects = P["xframe", table]["objects", table]
-            local Counter = P["counter", number]
-            
-            for (I = 1, Overload) {
-                Counter++
-                
-                xdraw(Objects[Counter, table])
-                
-                if (Counter >= Objects:count()) {
-                    P["xframe", table]["blocked", number] = 0
-                    
-                    Counter = 0
-                    P["state", number] = 5
-                    P:remove("counter")
-                    return
-                }
-                
-                if (Objects[Counter, table]["parentFor", table]:count() > (Overload - I)) {
-                    break
-                }
-            }
-            P["counter", number] = Counter
-            break
-        
-        case 5,
+        case 2,
             P["name", string] = P["args", array]:shiftString()
             P:remove("state")
             break
