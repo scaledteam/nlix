@@ -40,7 +40,7 @@ if (!tickClk()) {
                 
                 # Performance
                 case 30, #include "nlix/performance/autoperf" break
-                case 31, #include "nlix/performance/perf" break
+                #[case 31, #include "nlix/performance/perf" break
                 case 32, #include "nlix/performance/overload" break
                 case 33, #include "nlix/performance/uptime" break
                 case 34, #include "nlix/performance/print-pi" break
@@ -61,7 +61,7 @@ if (!tickClk()) {
                 case 50, #include "nlix/other/bc" break
                 case 51, #include "nlix/other/surl" break
                 case 52, #include "nlix/other/digi-scan" break
-                case 53, #include "nlix/other/wget" break
+                case 53, #include "nlix/other/wget" break]#
                 
                 # X
                 case 59, #include "nlix/x/kbd" break
@@ -81,11 +81,12 @@ if (!tickClk()) {
                 # X2
                 case 60, #include "nlix/x2/libx" break
                 case 61, #include "nlix/x2/xstart" break
-                case 62, #include "nlix/x2/xres" break
-                case 63, #include "nlix/x2/xtiles" break
-                case 64, #include "nlix/x2/xeyes" break
-                case 65, #include "nlix/x2/xterm" break
-                case 66, #include "nlix/x2/xwm" break
+                case 62, #include "nlix/x2/xremove" break
+                case 63, #include "nlix/x2/xres" break
+                case 64, #include "nlix/x2/xtiles" break
+                case 65, #include "nlix/x2/xeyes" break
+                case 66, #include "nlix/x2/xterm" break
+                case 67, #include "nlix/x2/xwm" break
                 
                 # Init
                 #case 80, SYSTEM_NAME = "system0" #include "nlix/system/sync" break

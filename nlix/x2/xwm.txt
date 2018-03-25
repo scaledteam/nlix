@@ -89,7 +89,7 @@ function xwm() {
             }
             
             # Commands
-            if (wait() & xcanCreate(3)) {
+            if (wait() & xcanCreate(4)) {
                 local CommandExp = in():trim():explodeRE(" +")
                 
                 switch (CommandExp[1, string]) {
@@ -111,6 +111,8 @@ function xwm() {
                         
                         local Window = xcreate("box"):xpos(Pos - vec2(0, 20)):xsize(Size + vec2(0, 20))
                         xcreate("text"):xparent(Window):xpos(-Window["size", vector2] / 2):xtext(ProgramName):xsize(20):xcolor(vec())
+                        local Offset = vec2(Window["size", vector2][1] - 20, -(Window["size", vector2][2] - 20)) / 2
+                        xcreate("lineStrip"):xparent(Window):xsize(2):xverticles(array(vec2(-6) + Offset, vec2(6) + Offset, vec2() + Offset, vec2(-6, 6) + Offset, vec2(6, -6) + Offset)):xcolor(vec())
                         
                         local Program = xexec(ProgramName, Size)
                         Program["xframe", table]:xpos(Pos)
@@ -165,12 +167,17 @@ function xwm() {
                     
                     # Moving windows
                     if (xkeyUse() & inrange(Cursor - Program["xframe", table]["pos", vector2], vec2(0, -20), Program["xframe", table]["size", vector2]:setY(0))) {
-                        local Res = P["xframe", table]["size", vector2]
-                        local Size = Program["xframe", table]["size", vector2]
-                        
-                        local NewPos = clamp(Cursor + vec2(-Program["xframe", table]["size", vector2][1], 20) / 2, vec2(0, 20), Res - vec2(0, 20) - Size)
-                        Program["xframe", table]:xpos(NewPos)
-                        P["windows", table][Counter, table]:xpos(NewPos - vec2(0, 20))
+                        if (Cursor[1] > Program["xframe", table]["pos", vector2][1] + Program["xframe", table]["size", vector2][1] - 20) {
+                            Program:clear()
+                        }
+                        else {
+                            local Res = P["xframe", table]["size", vector2]
+                            local Size = Program["xframe", table]["size", vector2]
+                            
+                            local NewPos = clamp(Cursor + vec2(-Program["xframe", table]["size", vector2][1], 20) / 2, vec2(0, 20), Res - vec2(0, 20) - Size)
+                            Program["xframe", table]:xpos(NewPos)
+                            P["windows", table][Counter, table]:xpos(NewPos - vec2(0, 20))
+                        }
                     }
                 }
             }

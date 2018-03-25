@@ -28,11 +28,15 @@ function table xcreate(Type:string) {
             case "box", case "frame", Device:egpBox(Id, vec2(), vec2()) break
             case "circle", Device:egpCircle(Id, vec2(), vec2()) break
             case "line", Device:egpLine(Id, vec2(), vec2()) break
-            case "text", Device:egpText(Id, "", vec2()) break
+            case "text",
+                Device:egpText(Id, "", vec2())
+                Object["sizeNum", number] = 20
+                Device:egpSize(20 * P["xparam", table]["textMultiplier", number])
+                break
             case "textLayout", Device:egpTextLayout(Id, "", vec2(), vec2()) break
-            case "poly", Device:egpPoly(Id) break
-            case "polyOutLine", Device:egpPolyOutline(Id) break
-            case "lineStrip", Device:egpLineStrip(Id) break
+            case "poly", Device:egpPoly(Id, vec2(), vec2(), vec2()) break
+            case "polyOutLine", Device:egpPolyOutline(Id, vec2(), vec2(), vec2()) break
+            case "lineStrip", Device:egpLineStrip(Id, vec2(), vec2(), vec2()) break
             default, return NULL
         }
         
@@ -51,24 +55,54 @@ function table:xredraw() {
     local Id = This["id", number]
     local Type = This["type", string]
     switch (Type) {
-        case "box", Device:egpBox(Id, This["pos", vector2], This["size", vector2]) break
-        case "frame", Device:egpBox(Id, This["pos", vector2], vec2()) break
-        case "circle", Device:egpCircle(Id, This["pos", vector2], This["size", vector2]) break
-        case "line", Device:egpLine(Id, This["pos", vector2], This["size", vector2]) break
+        case "box",
+            Device:egpBox(Id, This["pos", vector2], This["size", vector2])
+            break
+        
+        case "frame",
+            Device:egpBox(Id, This["pos", vector2], vec2())
+            break
+        
+        case "circle",
+            Device:egpCircle(Id, This["pos", vector2], This["size", vector2])
+            break
+        
+        case "line", 
+            Device:egpLine(Id, This["pos", vector2], This["size", vector2])
+            Device:egpSize(Id, This["sizeNum", number])
+            break
+        
         case "text",
-            Device:egpText(Id, "", This["pos", vector2])
+            Device:egpText(Id, This["text", string], This["pos", vector2])
             Device:egpFont(Id, P["monospaced", number] ? "Courier New" : "")
             Device:egpAlign(Id, This["align", vector2][1], This["align", vector2][2])
+            Device:egpSize(Id, This["sizeNum", number] * P["xparam", table]["textMultiplier", number])
             break
+        
         case "textLayout", 
-            Device:egpTextLayout(Id, "", This["pos", vector2], This["size", vector2])
+            Device:egpTextLayout(Id, This["text", string], This["pos", vector2], This["size", vector2])
             Device:egpFont(Id, P["monospaced", number] ? "Courier New" : "")
             Device:egpAlign(Id, This["align", vector2][1], This["align", vector2][2])
+            Device:egpSize(Id, This["sizeNum", number] * P["xparam", table]["textMultiplier", number])
             break
-        case "poly", Device:egpPoly(Id, This["verticles", array]) break
-        case "polyOutLine", Device:egpPolyOutline(Id, This["verticles", array]) break
-        case "lineStrip", Device:egpLineStrip(Id, This["verticles", array]) break
-        case "", Device:egpLine(Id, vec2(), vec2()) break
+        
+        case "poly",
+            Device:egpPoly(Id, This["verticles", array])
+            break
+        
+        case "polyOutLine",
+            Device:egpPolyOutline(Id, This["verticles", array])
+            Device:egpSize(Id, This["sizeNum", number])
+            break
+        
+        case "lineStrip",
+            Device:egpLineStrip(Id, This["verticles", array])
+            Device:egpSize(Id, This["sizeNum", number])
+            break
+        
+        case "",
+            Device:egpLine(Id, vec2(), vec2())
+            break
         default,
     }
     
@@ -322,7 +356,22 @@ function number xcanCreate(Count) {
     return 0
 }
 
+function table:xclear() {
+    if (This["id", number] != 0) {
+        local Id = This["id", number]
+        This:clear()
+        P["xdevice", wirelink]:egpLine(Id, vec2(), vec2())
+    }
+}
+
 function table:xremove() {
+    This:xclear()
     
-    #This:clear()
+    if (!P["xremove", table]:isValid()) {
+        local Program = exec("xremove")
+        P["xremove", table] = Program
+        
+        Program["xobjectsAll", table] = P["xobjectsAll", table]
+        Program["xdevice", wirelink] = P["xdevice", wirelink]
+    }
 }
