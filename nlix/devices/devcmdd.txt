@@ -1,0 +1,29 @@
+#
+# Created by scaled
+#
+
+@name devcmdd
+
+P2F["devcmdd", string] = "devcmdd"
+
+function devcmdd() {
+    switch (P["state", number]) {
+        case 0,
+            out("Error: no action\n")
+            end()
+            break
+        
+        case 1,
+            if (deviceGet(P["deviceType", string])) {
+                P["state", number] = 2
+            }
+            break
+        
+        case 2,
+            if (P["device", wirelink] == nowirelink() | !P["device", wirelink]:entity():isValid()) {
+                P["state", number] = 1
+                out("devcmd: Device was lost. Trying to find new one.\n")
+            }
+            break
+    }
+}

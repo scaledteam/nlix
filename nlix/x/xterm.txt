@@ -15,7 +15,8 @@ function xterm() {
                 local Res = P["xframe", table]["size", vector2]
                 
                 xcreate("box"):xsize(Res):xcolor(vec())
-                P["text", table] = xcreate("textLayout"):xsize(Res):xsize(15):xmonospaced(1)
+                local TextSize = 10
+                P["text", table] = xcreate("textLayout"):xsize(Res):xsize(TextSize):xmonospaced(1)
                 
                 local Skbd = exec("skbd")
                 local Sh = exec("sh")
@@ -25,7 +26,7 @@ function xterm() {
                 P["sh", table] = Sh
                 P["term", table] = Term
                 
-                Term["resolution", vector2] = floor(vec2(Res[1] / (15 * P["xparam", table]["symbolWidth", number]), Res[2] / 15))
+                Term["resolution", vector2] = floor(vec2(Res[1] / (TextSize * P["xparam", table]["symbolWidth", number]), Res[2] / TextSize))
                 
                 #print(Term["resolution", vector2])
                 
