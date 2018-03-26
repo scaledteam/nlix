@@ -4,28 +4,8 @@
 
 @name libdevices
 
-function number deviceGet(Type:string) {
-    if (S["devices", table]:exists(Type) & P["device", wirelink] == nowirelink()) {
-        local Devices = S["devices", table][Type, array]
-        
-        if (Devices:count() > 0) {
-            local Device = Devices:shiftWirelink()
-            if (Device != nowirelink() & Device:entity():isValid()) {
-                P["device", wirelink] = Device
-                S["devices", table]["P", table]:pushTable(P)
-                S["devices", table]["D", table]:pushWirelink(Device)
-                
-                if (Devices:count() == 0) {
-                    S["devices", table]:remove(Type)
-                }
-                return 1
-            }
-        }
-        else {
-            S["devices", table]:remove(Type)
-        }
-    }
-    return 0
+function number wirelink:isValid() {
+    return This != nowirelink() & This:entity():isValid()
 }
 
 function string wirelink:type() {
@@ -36,4 +16,44 @@ function string wirelink:type() {
     }
     
     return Name
+}
+
+function number deviceGet(Type:string) {
+    if (S["devices", table]:exists(Type) & !P["device", wirelink]:isValid()) {
+        local Devices = S["devices", table][Type, array]
+        
+        if (Devices:count() > 0) {
+            local Device = Devices:shiftWirelink()
+            if (Device:isValid()) {
+                P["device", wirelink] = Device
+                S["devices", table]["P", table]:pushTable(P)
+                S["devices", table]["D", table]:pushWirelink(Device)
+                
+                if (Devices:count() == 0) {
+                    S["devices", table]:remove(Type)
+                }
+                return 1
+            }
+        }
+        
+        if (Devices:count() == 0) {
+            S["devices", table]:remove(Type)
+        }
+    }
+    return 0
+}
+
+function number deviceReturn() {
+    local Device = P["device", wirelink]
+    if (Device:isValid()) {
+        local DeviceType = Device:type()
+        
+        if (P:exists(DeviceType)) {
+            P[DeviceType, array]:unshiftWirelink(Device)
+        }
+        else {
+            P[DeviceType, array] = array(Device)
+        }
+    }
+    P:remove("device")
 }

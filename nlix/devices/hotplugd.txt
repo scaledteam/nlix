@@ -43,16 +43,16 @@ function hotplugd() {
             )
             
             if (Port != P["portOld" + Counter, wirelink]) {
-                if (Port != nowirelink() & Port:entity():isValid()) {
+                P["portOld" + Counter, wirelink] = Port
+                
+                if (Port:isValid()) {
                     # Check if device exists
                     local Type = Port:type()
                     local EntityId = Port:entity():id()
                     
                     local Devices = S["devices", table]
                     if (!Devices:exists(Type)) {
-                        Devices[Type, array] = array()
-                        
-                        Devices[Type, array]:pushWirelink(Port)
+                        Devices[Type, array] = array(Port)
                         Devices["byId", table][EntityId, wirelink] = Port
                     }
                     elseif (Devices["byId", table][EntityId, wirelink] != Port) {
@@ -60,8 +60,6 @@ function hotplugd() {
                         Devices["byId", table][EntityId, wirelink] = Port
                     }
                 }
-                
-                P["portOld" + Counter, wirelink] = Port
             }
             
             P["counter", number] = Counter
@@ -88,13 +86,17 @@ function hotplugd() {
         if (!Programs[Counter, table]:isValid()) {
             Programs:remove(Counter)
             local Device = P["D", table]:removeWirelink(Counter)
-            local DeviceType = Device:type()
             
-            if (!P:exists(DeviceType)) {
-                P[DeviceType, array] = array()
+            if (Device:isValid()) {
+                local DeviceType = Device:type()
+                
+                if (P:exists(DeviceType)) {
+                    P[DeviceType, array]:unshiftWirelink(Device)
+                }
+                else {
+                    P[DeviceType, array] = array(Device)
+                }
             }
-            
-            P[DeviceType, array]:unshiftWirelink(Device)
         }
         else {
             P["counter", number] = Counter

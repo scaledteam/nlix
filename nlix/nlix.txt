@@ -1,4 +1,4 @@
-#q
+#
 # Created by scaled
 #
 
@@ -25,7 +25,6 @@ if (!tickClk()) {
                 case 11, #include "nlix/devices/hotplugd" break
                 case 12, #include "nlix/devices/dlist" break
                 case 13, #include "nlix/devices/devcmd" break
-                case 14, #include "nlix/devices/devcmdd" break
                 
                 # Terminal
                 case 21, #include "nlix/terminal/term" break
@@ -70,8 +69,8 @@ if (!tickClk()) {
                 case 60, #include "nlix/x/libx" break
                 case 61, #include "nlix/x/xstart" break
                 case 62, #include "nlix/x/xremove" break
-                case 63, #include "nlix/x/xres" break
-                case 64, #include "nlix/x/xtiles" break
+                case 63, #include "nlix/x/xup" break
+                case 64, #include "nlix/x/xres" break
                 case 65, #include "nlix/x/xeyes" break
                 case 66, #include "nlix/x/xterm" break
                 case 67, #include "nlix/x/xwm" break

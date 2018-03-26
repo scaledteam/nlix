@@ -7,109 +7,131 @@
 P2F["devcmd", string] = "devcmd"
 
 function devcmd() {
-    local Arg = arg(1)
-    switch (Arg) {
-        case "c", case "connect",
-            if (arg(2) != "") {
-                if (S["devcmdd", table]:isValid()) {
-                    S["devcmdd", table]:clear()
-                    out("Daemon replaced.\n")
-                }
-                S["devcmdd", table] = exec("devcmdd")
-                S["devcmdd", table]:remove("parent")
-                
-                S["devcmdd", table]["out", array] = P["out", array]
-                
-                S["devcmdd", table]["state", number] = 1
-                S["devcmdd", table]["deviceType", string] = arg(2)
-            }
-            else {
-                out("Usage: devcmd start [type]\n")
+    switch (P["state", number]) {
+        case 0,
+            out("devcmd shell mode.\n")
+            P["state", number] = 1
+            break
+        
+        case 1,
+            if (P["deviceType", string] != "") {
+                P["state", number] = 2
             }
             break
         
-        case "d", case "disconnect",
-            S["devcmdd", table]:clear()
-            break
-        
-        case "i", case "inputs",
-            if (S["devcmdd", table]["device", wirelink]) {
-                out(S["devcmdd", table]["device", wirelink]:inputs():concat("\n") + "\n")
-            }
-            else {
-                out("Error: devcmdd don't find device yet.\n")
+        case 2,
+            if (deviceGet(P["deviceType", string])) {
+                out("Connected.\n")
+                P["state", number] = 3
             }
             break
         
-        case "o", case "outputs",
-            if (S["devcmdd", table]["device", wirelink]) {
-                out(S["devcmdd", table]["device", wirelink]:outputs():concat("\n") + "\n")
-            }
-            else {
-                out("Error: devcmdd don't find device yet.\n")
+        case 3,
+            if (P["device", wirelink] == nowirelink() | !P["device", wirelink]:entity():isValid()) {
+                out("Device was lost. Trying to find new one.\n")
+                P["state", number] = 2
             }
             break
-        
-        case "w", case "write",
-            if (args() < 4) {
-                out("Usage: devcmd write [type] [varname] [value]\n")
-            }
-            elseif (!S["devcmdd", table]["device", wirelink]) {
-                out("Error: devcmdd don't find device yet.\n")
-            }
-            else {
-                local Type = arg(2)
-                switch (Type) {
-                    case "number", case "n", S["devcmdd", table]["device", wirelink][arg(3), number] = arg(4):toNumber() break
-                    case "string", case "s", S["devcmdd", table]["device", wirelink][arg(3), string] = P["args", array]:concat(" ", 4) break
-                    case "vector", case "v", S["devcmdd", table]["device", wirelink][arg(3), vector] = vec(arg(4):toNumber(), arg(5):toNumber(), arg(6):toNumber()) break
-                    case "vector2", case "v2", S["devcmdd", table]["device", wirelink][arg(3), vector2] = vec2(arg(4):toNumber(), arg(5):toNumber()) break
-                    case "vector4", case "v4", S["devcmdd", table]["device", wirelink][arg(3), vector4] = vec4(arg(4):toNumber(), arg(5):toNumber(), arg(6):toNumber(), arg(7):toNumber()) break
-                    case "entity", case "e", S["devcmdd", table]["device", wirelink][arg(3), entity] = entity(arg(4):toNumber()) break
-                    
-                    default,
-                        out("Error: Unknown type.\n")
-                }
-            }
-            break
-        
-        case "r", case "read",
-            if (args() < 3) {
-                out("Usage: devcmd read [type] [varname]\n")
-            }
-            elseif (!S["devcmdd", table]["device", wirelink]) {
-                out("Error: devcmdd don't find device yet.\n")
-            }
-            else {
-                local Type = arg(2)
-                switch (Type) {
-                    case "number", case "n", out(S["devcmdd", table]["device", wirelink][arg(3), number]:toString() + "\n") break
-                    case "string", case "s", out(S["devcmdd", table]["device", wirelink][arg(3), string] + "\n") break
-                    case "vector", case "v", out(S["devcmdd", table]["device", wirelink][arg(3), vector]:toString() + "\n") break
-                    case "vector2", case "v2", out(S["devcmdd", table]["device", wirelink][arg(3), vector2]:toString() + "\n") break
-                    case "vector4", case "v4", out(S["devcmdd", table]["device", wirelink][arg(3), vector4]:toString() + "\n") break
-                    case "array", case "r", out(S["devcmdd", table]["device", wirelink][arg(3), array]:concat("\n") + "\n") break
-                    case "table", case "t", out(S["devcmdd", table]["device", wirelink][arg(3), table]:toString() + "\n") break
-                    case "entity", case "e", out(S["devcmdd", table]["device", wirelink][arg(3), entity]:toString() + "\n") break
-                    
-                    default,
-                        out("Error: Unknown type.\n")
-                }
-            }
-            break
-        
-        default,
-            out(
-                "Usage: devcmd [command]:\n"
-                + "Commands:\n"
-                + "connect [type]\n"
-                + "disconnect\n"
-                + "inputs\n"
-                + "outputs\n"
-                + "write [type] [varname] [value]\n"
-                + "read [type] [varname]\n"
-            )
     }
-
-    end()
+    
+    if (wait()) {
+        local Args = in():trim():explodeRE(" +")
+        switch (Args[1, string]) {
+            case "c", case "connect",
+                if (Args[2, string] != "") {
+                    deviceReturn()
+                    P["deviceType", string] = Args[2, string]
+                }
+                else {
+                    out("Usage: start [type]\n")
+                }
+                break
+            
+            case "d", case "disconnect",
+                deviceReturn()
+                break
+            
+            case "i", case "inputs",
+                if (P["device", wirelink]) {
+                    out(P["device", wirelink]:inputs():concat("\n") + "\n")
+                }
+                else {
+                    out("Error: Device not found.\n")
+                }
+                break
+            
+            case "o", case "outputs",
+                if (P["device", wirelink]) {
+                    out(P["device", wirelink]:outputs():concat("\n") + "\n")
+                }
+                else {
+                    out("Error: Device not found.\n")
+                }
+                break
+            
+            case "w", case "write",
+                if (Args:count() < 4) {
+                    out("Usage: write [type] [varname] [value]\n")
+                }
+                elseif (!P["device", wirelink]) {
+                    out("Error: Device not found.\n")
+                }
+                else {
+                    local Type = Args[2, string]
+                    switch (Type) {
+                        case "number", case "n", P["device", wirelink][Args[3, string], number] = Args[4, string]:toNumber() break
+                        case "string", case "s", P["device", wirelink][Args[3, string], string] = Args:concat(" ", 4) break
+                        case "vector", case "v", P["device", wirelink][Args[3, string], vector] = vec(Args[4, string]:toNumber(), Args[5, string]:toNumber(), Args[6, string]:toNumber()) break
+                        case "vector2", case "v2", P["device", wirelink][Args[3, string], vector2] = vec2(Args[4, string]:toNumber(), Args[5, string]:toNumber()) break
+                        case "vector4", case "v4", P["device", wirelink][Args[3, string], vector4] = vec4(Args[4, string]:toNumber(), Args[5, string]:toNumber(), Args[6, string]:toNumber(), Args[7, string]:toNumber()) break
+                        case "entity", case "e", P["device", wirelink][Args[3, string], entity] = entity(Args[4, string]:toNumber()) break
+                        
+                        default,
+                            out("Error: Unknown type.\n")
+                    }
+                }
+                break
+            
+            case "r", case "read",
+                if (args() < 3) {
+                    out("Usage: read [type] [varname]\n")
+                }
+                elseif (!P["device", wirelink]) {
+                    out("Error: Device not found.\n")
+                }
+                else {
+                    local Type = Args[2, string]
+                    switch (Type) {
+                        case "number", case "n", out(P["device", wirelink][Args[3, string], number]:toString() + "\n") break
+                        case "string", case "s", out(P["device", wirelink][Args[3, string], string] + "\n") break
+                        case "vector", case "v", out(P["device", wirelink][Args[3, string], vector]:toString() + "\n") break
+                        case "vector2", case "v2", out(P["device", wirelink][Args[3, string], vector2]:toString() + "\n") break
+                        case "vector4", case "v4", out(P["device", wirelink][Args[3, string], vector4]:toString() + "\n") break
+                        case "array", case "r", out(P["device", wirelink][Args[3, string], array]:concat("\n") + "\n") break
+                        case "table", case "t", out(P["device", wirelink][Args[3, string], table]:toString() + "\n") break
+                        case "entity", case "e", out(P["device", wirelink][Args[3, string], entity]:toString() + "\n") break
+                        
+                        default,
+                            out("Error: Unknown type.\n")
+                    }
+                }
+                break
+            
+            case "q", case "quit", case "exit",
+                end()
+                break
+            
+            default,
+                out(
+                    "Command list:\n"
+                    + "connect [type]\n"
+                    + "disconnect\n"
+                    + "inputs\n"
+                    + "outputs\n"
+                    + "write [type] [varname] [value]\n"
+                    + "read [type] [varname]\n"
+                    + "quit\n"
+                )
+        }
+    }
 }

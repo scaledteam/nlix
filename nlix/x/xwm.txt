@@ -21,7 +21,7 @@ function xwm() {
                 P["args", array]:unshiftString(P["name", string])
                 P["name", string] = "xstart"
             }
-            elseif (xcanCreate(4)) {
+            elseif (xcanCreate(3)) {
                 local Res = P["xframe", table]["size", vector2]
                 xcreate("box"):xsize(Res):xcolor(hsv2rgb(150 * 512 / Res[2], 1, 0.7))
                 
@@ -60,14 +60,24 @@ function xwm() {
                 
                 # Clocks
                 if (CmdLength > 30) {
-                    P["clock", table] = xcreate("text"):xsize(CmdHeight):xpos(Res - vec2(0, CmdHeight)):xalign(vec2(2, 0))
+                    P["state", number] = 1
                 }
-                
-                P["state", number] = 1
+                else {
+                    P["state", number] = 2
+                }
+            }
+            break
+        
+        case 1,
+            if (xcanCreate(1)) {
+                local Res = P["xframe", table]["size", vector2]
+                local CmdHeight = P["cmdHeight", number]
+                P["clock", table] = xcreate("text"):xsize(CmdHeight):xpos(Res - vec2(0, CmdHeight)):xalign(vec2(2, 0))
+                P["state", number] = 2
             }
             break
             
-        case 1,
+        case 2,
             # Send cursor to programs
             local Cursor = xcursor()
             
@@ -100,6 +110,11 @@ function xwm() {
                     case "sh",
                         end()
                         exec("sh")
+                        break
+                        
+                    case "poweroff",
+                        P["xdevice", wirelink]:egpClear()
+                        poweroff()
                         break
                     
                     default,
@@ -152,6 +167,9 @@ function xwm() {
                         
                         # set new focus
                         P["focus", number] = Counter
+                        
+                        # test
+                        Program["xframe", table]:xup()
                     }
                     
                     if (Counter == P["focus", number]) {

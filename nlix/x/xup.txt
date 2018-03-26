@@ -2,15 +2,15 @@
 # Created by scaled
 #
 
-@name xremove
+@name xup
 
-P2F["xremove", string] = "xremove"
+P2F["xup", string] = "xup"
 
-function xremove() {
+function xup() {
     switch (P["state", number]) {
         case 0,
             P["counter", number] = 1
-            P["removedObjectsIds", table] = table()
+            P["objects", table] = table()
             P["state", number] = 1
             break
         
@@ -40,6 +40,8 @@ function xremove() {
                         Id = 1
                     }
                     else {
+                        #xprintAll()
+                        #printTable(P["removedObjectsIds", table])
                         P["counter", number] = 1
                         P["state", number] = 2
                         return
@@ -62,7 +64,7 @@ function xremove() {
                         Offset++
                         
                         P["xdevice", wirelink]:egpRemove(P["xobjectsAll", table]:count())
-                        P["xobjectsAll", table]:removeTable(Id)
+                        P["xobjectsAll", table]:removeTable(Id)#:xclear()
                         
                         P["xdevice", wirelink]:egpLine(Id, vec2(), vec2())
                     }
@@ -78,6 +80,7 @@ function xremove() {
                     }
                 }
                 else {
+                    #xprintAll()
                     P["removedObjectsIds", table]:clear()
                     end()
                     return

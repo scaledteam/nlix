@@ -193,8 +193,8 @@ function vector2 xcursor() {
             
             local ScreenPos = Device:entity():pos()
             
-            local User = owner():pos()
-            local Distance = ScreenPos:distance(User)
+            local User = owner()
+            local Distance = ScreenPos:distance(User:pos())
             
             foreach (I, Player:entity = players()) {
                 local TempDistance = ScreenPos:distance(Player:pos())
@@ -263,8 +263,33 @@ function number xxobjectsLeft() {
     return egpMaxObjects() - xxlastObjectId()
 }
 
+function table:xcountOffset(Offset) {
+    #print(This["type", string], This["id", number])
+    
+    #local I = 0
+    while (This:exists("parent")) {
+        if (This["type", string] == "frame") {
+            
+            #I++
+            #print(I, This["id", number], This["count", number], Offset)
+            
+            This["count", number] = This["count", number] + Offset
+        }
+        This = This["parent", table]
+    }
+}
+
 function table xnewObject(Id) {
+    P["xframe", table]:xcountOffset(1)
     return table("id" = Id, "parent" = P["xframe", table], "color" = vec(255))
+}
+
+function xprintAll() {
+    local Text = "xprintAll\n"
+    for (I = 1, P["xobjectsAll", table]:count()) {
+        Text += I + ", " + P["xobjectsAll", table][I, table]["type", string] + "\n"
+    }
+    print(Text)
 }
 
 function number xcanCreate(Count) {
@@ -299,11 +324,10 @@ function number xcanCreate(Count) {
                     local Object = xnewObject(P["xobjectsAll", table]:count() + 1)
                     P["xobjects", table]:pushTable(Object)
                     P["xobjectsAll", table]:pushTable(Object)
-                    
-                    P["xframe", table]["count", number] = P["xframe", table]["count", number] + 1
                 }
                 else {
                     P:remove("xworkerState")
+                    #xprintAll()
                     return 1
                 }
                 break
@@ -355,6 +379,7 @@ function number xcanCreate(Count) {
                     P:remove("xworkerState")
                     P:remove("xcounter")
                     P:remove("xobjectsTemp")
+                    #xprintAll()
                     return 1
                 }
                 break
@@ -366,7 +391,12 @@ function number xcanCreate(Count) {
 function number table:xclear() {
     if (This["id", number] != 0) {
         local Id = This["id", number]
-        This:clear()
+        
+        This:xcountOffset(-1)
+        
+        #This:clear()
+        This["removed", number] = 1
+        
         P["xdevice", wirelink]:egpLine(Id, vec2(), vec2())
         return Id
     }
@@ -375,23 +405,31 @@ function number table:xclear() {
     }
 }
 
-function table:xremove() {
-    This:xclear()
-    
+function xexecRemoveDaemon() {
     if (!P["xremove", table]:isValid()) {
-        local Program = exec("xremove")
-        P["xremove", table] = Program
+        local XRemove = exec("xremove")
+        P["xremove", table] = XRemove
         
-        Program["xobjectsAll", table] = P["xobjectsAll", table]
-        Program["xparam", table] = P["xparam", table]
-        Program["xdevice", wirelink] = P["xdevice", wirelink]
+        XRemove["xobjectsAll", table] = P["xobjectsAll", table]
+        XRemove["xparam", table] = P["xparam", table]
+        XRemove["xdevice", wirelink] = P["xdevice", wirelink]
     }
 }
 
-function xprintAll() {
-    local Text = "xprintAll\n"
-    for (I = 1, P["xobjectsAll", table]:count()) {
-        Text += I + ", " + P["xobjectsAll", table][I, table]["id", number] + ", " + P["xobjectsAll", table][I, table]["type", string] + "\n"
-    }
-    print(Text:sub(1, -2))
+function table:xremove() {
+    This:xclear()
+    
+    xexecRemoveDaemon()
+}
+
+function table:xup() {
+    #[if (!P["xup", table]:isValid()) {
+        local XUp = exec("xup")
+        P["xup", table] = XUp
+        
+        XUp["target", table] = This
+        XUp["xobjectsAll", table] = P["xobjectsAll", table]
+        XUp["xparam", table] = P["xparam", table]
+        XUp["xdevice", wirelink] = P["xdevice", wirelink]
+    }]#
 }
