@@ -15,8 +15,8 @@ function xres() {
                 local Res = P["xframe", table]["size", vector2]
                 local Size = vec2(int(min(Res[1], Res[2]) / 10) * 10)
                 
-                xcreate("box"):xsize(Res):xcolor(vec(255, 127, 63))
-                xcreate("box"):xsize(Size):xcolor(vec(63, 127, 255))
+                xcreate("box"):xsize(Res):xcolor(vec())
+                xcreate("box"):xsize(Size)
                 
                 P["text", table] = xcreate("textLayout"):xsize(Size):xsize(Size[2] / 10):xcolor(vec()):xtext("Res = (" + Res[1] + ", " + Res[2] + ")\nSize = " + Size[1] + "\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10")
                 

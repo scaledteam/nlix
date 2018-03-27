@@ -211,13 +211,13 @@ function vector2 xcursor() {
             Frame["cursorTimer", number] = systime() + 1
         }
         
-        Frame["cursor", vector2] = Device:egpCursor(Frame["cursorUser", entity])
+        Frame["cursor", vector2] = round(Device:egpCursor(Frame["cursorUser", entity]))
         Frame["keyUse", number] = Frame["cursorUser", entity]:keyUse()
     }
     else {
         local Cursor = Frame["parent", table]["cursor", vector2]
         if (Cursor != vec2(-1)) {
-            Frame["cursor", vector2] = Cursor - Device:egpPos(Frame["id", number])
+            Frame["cursor", vector2] = Cursor - Frame["pos", vector2] #Device:egpPos(Frame["id", number])
         }
         else {
             Frame["cursor", vector2] = Cursor
@@ -264,15 +264,8 @@ function number xxobjectsLeft() {
 }
 
 function table:xcountOffset(Offset) {
-    #print(This["type", string], This["id", number])
-    
-    #local I = 0
     while (This:exists("parent")) {
         if (This["type", string] == "frame") {
-            
-            #I++
-            #print(I, This["id", number], This["count", number], Offset)
-            
             This["count", number] = This["count", number] + Offset
         }
         This = This["parent", table]
@@ -392,7 +385,8 @@ function number table:xclear() {
     if (This["id", number] != 0) {
         local Id = This["id", number]
         
-        This:xcountOffset(-1)
+        #This:xcountOffset(-1)
+        This["parent", table]:xcountOffset(-1)
         
         #This:clear()
         This["removed", number] = 1
