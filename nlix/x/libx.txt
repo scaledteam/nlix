@@ -22,8 +22,8 @@ function table xcreate(Type:string) {
         
         local Object = P["xobjects", table]:removeTable(1)
         local Id = Object["id", number]
-        Object["type", string] = Type
         
+        Object["type", string] = Type
         switch (Type) {
             case "box", case "frame", Device:egpBox(Id, vec2(), vec2()) break
             case "circle", Device:egpCircle(Id, vec2(), vec2()) break
@@ -114,6 +114,7 @@ function table:xredraw() {
     }
     
     Device:egpColor(Id, This["color", vector])
+    Device:egpAlpha(Id, This["alpha", number])
     Device:egpParent(Id, This["parent", table]["id", number])
 }
 
@@ -176,6 +177,12 @@ function table table:xverticles(Verticles:array) {
     return This
 }
 
+function table table:xalpha(Alpha) {
+    This["alpha", number] = Alpha
+    P["xdevice", wirelink]:egpAlpha(This["id", number], Alpha)
+    return This
+}
+
 
 function vector2 xcursor() {
     local Frame = P["xframe", table]
@@ -212,7 +219,7 @@ function vector2 xcursor() {
         }
         
         Frame["cursor", vector2] = round(Device:egpCursor(Frame["cursorUser", entity]))
-        Frame["keyUse", number] = Frame["cursorUser", entity]:keyUse()
+        Frame["keyUse", number] = Frame["cursor", vector2] != vec2(-1) & Frame["cursorUser", entity]:keyUse()
     }
     else {
         local Cursor = Frame["parent", table]["cursor", vector2]
@@ -232,35 +239,42 @@ function number xkeyUse() {
     return P["xframe", table]["keyUse", number]
 }
 
-function table xexec(ProgramName:string, Size:vector2) {
-    local Program = exec(ProgramName)
-    
-    Program["xframe", table] = xcreate("frame"):xparent(P["xframe", table])
-    Program["xframe", table]["size", vector2] = Size
-    
-    Program["xparam", table] = P["xparam", table]
-    Program["xobjects", table] = table()
-    Program["xobjectsAll", table] = P["xobjectsAll", table]
-    Program["xdevice", wirelink] = P["xdevice", wirelink]
-    
-    return Program
-}
-
-
-function number table:xxlastObjectId() {
-    return This["id", number] + This["count", number]
-}
 
 function number xxlastObjectId() {
     return P["xobjectsAll", table]:count()
 }
 
-function number table:xxobjectsLeft() {
-    return egpMaxObjects() - This:xxlastObjectId()
+function number table:xxlastObjectId() {
+    if (This:exists("parent")) {
+        return This["id", number] + This["count", number]
+    }
+    else {
+        return P["xobjectsAll", table]:count()
+    }
 }
 
 function number xxobjectsLeft() {
     return egpMaxObjects() - xxlastObjectId()
+}
+
+function table xexec(ProgramName:string, Pos:vector2, Size:vector2) {
+    if (P["xobjects", table]:count() >= 1) {
+        local Program = exec(ProgramName)
+        
+        Program["xframe", table] = xcreate("frame"):xparent(P["xframe", table])
+        Program["xframe", table]["size", vector2] = Size
+        Program["xframe", table]:xpos(Pos)
+        
+        Program["xparam", table] = P["xparam", table]
+        Program["xobjects", table] = table()
+        Program["xobjectsAll", table] = P["xobjectsAll", table]
+        Program["xdevice", wirelink] = P["xdevice", wirelink]
+        
+        return Program
+    }
+    else {
+        return NULL
+    }
 }
 
 function table:xcountOffset(Offset) {
@@ -274,7 +288,7 @@ function table:xcountOffset(Offset) {
 
 function table xnewObject(Id) {
     P["xframe", table]:xcountOffset(1)
-    return table("id" = Id, "parent" = P["xframe", table], "color" = vec(255))
+    return table("id" = Id, "parent" = P["xframe", table], "color" = vec(255), "alpha" = 255)
 }
 
 function xprintAll() {
@@ -285,12 +299,26 @@ function xprintAll() {
     print(Text)
 }
 
+function number xcanDraw() {
+    return !P["xparam", table]["blocked", number]
+}
+
 function number xcanCreate(Count) {
     for (I = 1, Overload) {
         switch (P["xworkerState", number]) {
             case 0,
-                if (!P["xframe", table]:exists("parent")) {
+                if (P["xparam", table]["blocked", number]) {
+                    return 0
+                }
+                elseif (P["xobjects", table]:count() >= Count) {
+                    return 1
+                }
+                elseif (P["xframe", table]["id", number] == 0) {
+                    return 0
+                }
+                elseif (!P["xframe", table]:exists("parent")) {
                     if (xxobjectsLeft() > Count) {
+                        P["xparam", table]["blocked", number] = 1
                         P["xworkerState", number] = 1
                     }
                     else {
@@ -320,7 +348,7 @@ function number xcanCreate(Count) {
                 }
                 else {
                     P:remove("xworkerState")
-                    #xprintAll()
+                    P["xparam", table]["blocked", number] = 0
                     return 1
                 }
                 break
@@ -372,7 +400,7 @@ function number xcanCreate(Count) {
                     P:remove("xworkerState")
                     P:remove("xcounter")
                     P:remove("xobjectsTemp")
-                    #xprintAll()
+                    P["xparam", table]["blocked", number] = 0
                     return 1
                 }
                 break
@@ -385,7 +413,6 @@ function number table:xclear() {
     if (This["id", number] != 0) {
         local Id = This["id", number]
         
-        #This:xcountOffset(-1)
         This["parent", table]:xcountOffset(-1)
         
         #This:clear()
@@ -399,31 +426,52 @@ function number table:xclear() {
     }
 }
 
-function xexecRemoveDaemon() {
+function xxremoveByDaemon(IdStart, IdEnd) {
     if (!P["xremove", table]:isValid()) {
         local XRemove = exec("xremove")
         P["xremove", table] = XRemove
+        XRemove:remove("parent")
         
         XRemove["xobjectsAll", table] = P["xobjectsAll", table]
         XRemove["xparam", table] = P["xparam", table]
         XRemove["xdevice", wirelink] = P["xdevice", wirelink]
+        
+        XRemove["idStart", number] = IdStart
+        XRemove["idEnd", number] = IdEnd
     }
 }
 
 function table:xremove() {
-    This:xclear()
-    
-    xexecRemoveDaemon()
+    if (P["xremove", table]:isValid()) {
+        This:xclear()
+    }
+    else {
+        xxremoveByDaemon(This["id", number], This["id", number] + This["count", number])
+    }
 }
 
-function table:xup() {
-    #[if (!P["xup", table]:isValid()) {
+function xend() {
+    P["xframe", table]:xremove()
+    end()
+}
+
+function xxup(StartId, ObjectLastId, ParentLastId) {
+    if (!P["xup", table]:isValid()) {
         local XUp = exec("xup")
         P["xup", table] = XUp
         
-        XUp["target", table] = This
         XUp["xobjectsAll", table] = P["xobjectsAll", table]
         XUp["xparam", table] = P["xparam", table]
         XUp["xdevice", wirelink] = P["xdevice", wirelink]
-    }]#
+        
+        XUp["idStart", number] = StartId
+        XUp["idObjectLast", number] = ObjectLastId
+        XUp["idParentLast", number] = ParentLastId
+    }
+}
+
+function table:xup() {
+    if (This:xxlastObjectId() < xxlastObjectId()) {
+        xxup(This["id", number], This["id", number] + This["count", number], This:xxlastObjectId())
+    }
 }

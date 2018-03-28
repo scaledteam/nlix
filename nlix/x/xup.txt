@@ -9,86 +9,82 @@ P2F["xup", string] = "xup"
 function xup() {
     switch (P["state", number]) {
         case 0,
-            P["counter", number] = 1
-            P["objects", table] = table()
-            P["state", number] = 1
+            if (!P["xparam", table]["blocked", number]) {
+                P["xparam", table]["blocked", number] = 1
+                P["tempObjects", table] = table()
+                
+                P["counter", number] = P["idObjectLast", number] + 1
+                P["limit", number] = P["idParentLast", number]
+                
+                P["state", number] = 1
+            }
             break
         
+        # Collect objects after parent (will be first objects)
         case 1,
             local Id = P["counter", number]
             
             for (I = 1, Overload) {
-                Id++
-                
-                if (Id <= P["xobjectsAll", table]:count()) {
-                    local Object = P["xobjectsAll", table][Id, table]
-                    
-                    if (!P["removedObjectsIds", table]:exists(Id)) {
-                        if (Object:exists("removed")) {
-                            P["removedObjectsIds", table][Id, number] = 1
-                        }
-                        elseif (Object["parent", table]:exists("removed") & Object:exists("parent")) {
-                            Object:xclear()
-                            P["removedObjectsIds", table][Id, number] = 1
-                            P["removed", number] = P["removed", number] + 1
-                        }
-                    }
+                if (Id <= P["limit", number]) {
+                    P["tempObjects", table]:pushTable(P["xobjectsAll", table][Id, table])
+                    Id++
                 }
                 else {
-                    if (P["removed", number] > 0) {
-                        P["removed", number] = 0
-                        Id = 1
-                    }
-                    else {
-                        #xprintAll()
-                        #printTable(P["removedObjectsIds", table])
-                        P["counter", number] = 1
-                        P["state", number] = 2
-                        return
-                    }
+                    P["counter", number] = P["idStart", number]
+                    P["limit", number] = P["idObjectLast", number]
+                    
+                    P["state", number] = 2
+                    return
                 }
             }
             
             P["counter", number] = Id
             break
         
+        # Collect objects for up (will be last objects)
         case 2,
             local Id = P["counter", number]
-            local Offset = P["offset", number]
             
             for (I = 1, Overload) {
-                if (Id <= P["xobjectsAll", table]:count()) {
-                    #print(Id, Offset, Id + Offset, P["removedObjectsIds", table][Id + Offset, number])
-                    if (P["removedObjectsIds", table][Id + Offset, number]) {
-                        P["removedObjectsIds", table][Id + Offset, number] = 0
-                        Offset++
-                        
-                        P["xdevice", wirelink]:egpRemove(P["xobjectsAll", table]:count())
-                        P["xobjectsAll", table]:removeTable(Id)#:xclear()
-                        
-                        P["xdevice", wirelink]:egpLine(Id, vec2(), vec2())
-                    }
-                    else {
-                        if (Offset != 0) {
-                            local Object = P["xobjectsAll", table][Id, table]
-                            
-                            Object["id", number] = Id
-                            Object:xredraw()
-                        }
-                        
-                        Id++
-                    }
+                if (Id <= P["limit", number]) {
+                    P["tempObjects", table]:pushTable(P["xobjectsAll", table][Id, table])
+                    Id++
                 }
                 else {
-                    #xprintAll()
-                    P["removedObjectsIds", table]:clear()
+                    P["counter", number] = P["idStart", number]
+                    P["limit", number] = P["idParentLast", number]
+                    
+                    P["state", number] = 3
+                    return
+                }
+            }
+            
+            P["counter", number] = Id
+            break
+        
+        # Redraw all collected objects
+        case 3,
+            local Id = P["counter", number]
+            
+            for (I = 1, Overload) {
+                if (Id <= P["limit", number]) {
+                    local Object = P["tempObjects", table]:removeTable(1)
+                    
+                    P["xobjectsAll", table][Id, table] = Object
+                    Object["id", number] = Id
+                    
+                    Object:xredraw()
+                    
+                    Id++
+                }
+                else {
+                    P["xparam", table]["blocked", number] = 0
                     end()
                     return
                 }
             }
             
             P["counter", number] = Id
-            P["offset", number] = Offset
             break
     }
 }

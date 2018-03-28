@@ -142,8 +142,7 @@ function xwm() {
                             vec2(6, -6) + Offset
                         )):xcolor(vec())
                         
-                        local Program = xexec(ProgramName, Size)
-                        Program["xframe", table]:xpos(Pos)
+                        local Program = xexec(ProgramName, Pos, Size)
                         
                         Program["args", array] = CommandExp
                         Program["out", array] = P["out", array]
@@ -162,7 +161,7 @@ function xwm() {
                 P["clockTimer", number] = systime() + 1
             }
             
-            # Programs
+            # Program
             local Program = P["programs", table][P["focus", number], table]
             # Keyboard
             local KbdReal = P["kbd", array]
@@ -186,11 +185,10 @@ function xwm() {
                 }
             }
             
-            # Programs actions
+            # Programs
             local Counter = P["counter", number] + 1
             if (Counter > P["programs", table]:count()) {
-                P["counter", number] = 0
-                break
+                Counter = 1
             }
             P["counter", number] = Counter
             
@@ -198,11 +196,17 @@ function xwm() {
             Program = P["programs", table][Counter, table]
             if (!Program:isValid()) {
                 P["programs", table]:remove(Counter)
-                P["frames", table]:removeTable(Counter):xremove()
-                P["windows", table]:removeTable(Counter):xremove()
+                
+                if (P["xremove", table]:isValid()) {
+                    P["frames", table]:removeTable(Counter):xremove()
+                    P["windows", table]:removeTable(Counter):xremove()
+                }
+                else {
+                    xxremoveByDaemon(P["windows", table]:removeTable(Counter)["id", number], P["frames", table]:removeTable(Counter):xxlastObjectId())
+                }
             }
             # Check focus
-            elseif (P["focus", number] != Counter & inrange(Cursor - Program["xframe", table]["pos", vector2], vec2(0, -20), Program["xframe", table]["size", vector2])) {
+            elseif (P["focus", number] != Counter & xkeyUse() & inrange(Cursor - Program["xframe", table]["pos", vector2], vec2(0, -20), Program["xframe", table]["size", vector2])) {
                 # Clear old data after focus changed
                 local ProgramOld = P["programs", table][P["focus", number], table]
                 ProgramOld["kbd", array]:clear()
@@ -211,7 +215,11 @@ function xwm() {
                 P["focus", number] = Counter
                 
                 # test
-                Program["xframe", table]:xup()
+                local Window = P["windows", table][Counter, table]
+                if (Window:isValid()) {
+                    #Program["xframe", table]:xup()
+                    xxup(Window["id", number], Program["xframe", table]:xxlastObjectId(), P["xframe", table]:xxlastObjectId())
+                }
             }
             break
     }

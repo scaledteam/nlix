@@ -3,8 +3,8 @@
 #
 
 @name nlix
-
 @persist [P2F Ps P]:table KPerf KState PName:string
+@trigger none
 
 if (!tickClk()) {
     if (clk()) {
@@ -77,6 +77,9 @@ if (!tickClk()) {
                 case 68, #include "nlix/x/xradar" break
                 case 69, #include "nlix/x/xclicker" break
                 case 70, #include "nlix/x/xobj" break
+                case 71, #include "nlix/x/xwm2" break
+                case 72, #include "nlix/x/xpanel" break
+                case 73, #include "nlix/x/xmenu" break
                 
                 # Init
                 #case 80, SYSTEM_NAME = "system0" #include "nlix/system/sync" break

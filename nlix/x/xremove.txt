@@ -9,12 +9,41 @@ P2F["xremove", string] = "xremove"
 function xremove() {
     switch (P["state", number]) {
         case 0,
-            P["counter", number] = 1
-            P["removedObjectsIds", table] = table()
-            P["state", number] = 1
+            if (!P["xparam", table]["blocked", number]) {
+                P["xparam", table]["blocked", number] = 1
+                
+                P["removedObjectsIds", table] = table()
+                
+                P["counter", number] = P["idStart", number]
+                P["limit", number] = P["idEnd", number]
+                
+                P["state", number] = 1
+            }
             break
         
         case 1,
+            local Id = P["counter", number]
+            
+            for (I = 1, Overload) {
+                if (Id <= P["limit", number]) {
+                    local Object = P["xobjectsAll", table][Id, table]
+                    
+                    Object:xclear()
+                    P["removedObjectsIds", table][Id, number] = 1
+                    
+                    Id++
+                }
+                else {
+                    P["counter", number] = 1
+                    P["state", number] = 2
+                    return
+                }
+            }
+            
+            P["counter", number] = Id
+            break
+        
+        case 2,
             local Id = P["counter", number]
             
             for (I = 1, Overload) {
@@ -41,7 +70,7 @@ function xremove() {
                     }
                     else {
                         P["counter", number] = 1
-                        P["state", number] = 2
+                        P["state", number] = 3
                         return
                     }
                 }
@@ -50,7 +79,7 @@ function xremove() {
             P["counter", number] = Id
             break
         
-        case 2,
+        case 3,
             local Id = P["counter", number]
             local Offset = P["offset", number]
             
@@ -79,6 +108,7 @@ function xremove() {
                 }
                 else {
                     P["removedObjectsIds", table]:clear()
+                    P["xparam", table]["blocked", number] = 0
                     end()
                     return
                 }

@@ -37,39 +37,41 @@ function xeyes() {
             break
         
         case 1,
-            local CursorPos = xcursor()
-            if (P["cursorPosOld", vector2] != CursorPos) {
-                local Res = P["xframe", table]["size", vector2]
-                
-                if (CursorPos == vec2(-1)) {
-                    P["leftEye", table]:xpos(Res * vec2(0.25, 0.5))
-                    P["rightEye", table]:xpos(Res * vec2(0.75, 0.5))
-                }
-                else {
-                    local RadiusX = Res[1] * 0.45 - P["eyeSize", vector2][1] * 2
-                    local RadiusY = Res[2] * 0.9  - P["eyeSize", vector2][2] * 2
-                    local Aspect = RadiusY / RadiusX
+            if (xcanDraw()) {
+                local CursorPos = xcursor()
+                if (P["cursorPosOld", vector2] != CursorPos) {
+                    local Res = P["xframe", table]["size", vector2]
                     
-                    local Offset1 = Res * vec2(0.25, 0.5)
-                    local Offset2 = Res * vec2(0.75, 0.5)
-                    
-                    local Direction1 = CursorPos - Offset1
-                    local Direction2 = CursorPos - Offset2
-                    
-                    local Eye1Pos = Direction1 / sqrt(Direction1[1] ^ 2 + (Direction1[2] / Aspect) ^ 2) * RadiusX / 2
-                    local Eye2Pos = Direction2 / sqrt(Direction2[1] ^ 2 + (Direction2[2] / Aspect) ^ 2) * RadiusX / 2
-                    
-                    if (Eye1Pos:length() > Direction1:length()) {
-                        Eye1Pos = Direction1
+                    if (CursorPos == vec2(-1)) {
+                        P["leftEye", table]:xpos(Res * vec2(0.25, 0.5))
+                        P["rightEye", table]:xpos(Res * vec2(0.75, 0.5))
                     }
-                    if (Eye2Pos:length() > Direction2:length()) {
-                        Eye2Pos = Direction2
+                    else {
+                        local RadiusX = Res[1] * 0.45 - P["eyeSize", vector2][1] * 2
+                        local RadiusY = Res[2] * 0.9  - P["eyeSize", vector2][2] * 2
+                        local Aspect = RadiusY / RadiusX
+                        
+                        local Offset1 = Res * vec2(0.25, 0.5)
+                        local Offset2 = Res * vec2(0.75, 0.5)
+                        
+                        local Direction1 = CursorPos - Offset1
+                        local Direction2 = CursorPos - Offset2
+                        
+                        local Eye1Pos = Direction1 / sqrt(Direction1[1] ^ 2 + (Direction1[2] / Aspect) ^ 2) * RadiusX / 2
+                        local Eye2Pos = Direction2 / sqrt(Direction2[1] ^ 2 + (Direction2[2] / Aspect) ^ 2) * RadiusX / 2
+                        
+                        if (Eye1Pos:length() > Direction1:length()) {
+                            Eye1Pos = Direction1
+                        }
+                        if (Eye2Pos:length() > Direction2:length()) {
+                            Eye2Pos = Direction2
+                        }
+                        
+                        P["leftEye", table]:xpos(Eye1Pos + Offset1)
+                        P["rightEye", table]:xpos(Eye2Pos + Offset2)
+                        
+                        P["cursorPosOld", vector2] = CursorPos
                     }
-                    
-                    P["leftEye", table]:xpos(Eye1Pos + Offset1)
-                    P["rightEye", table]:xpos(Eye2Pos + Offset2)
-                    
-                    P["cursorPosOld", vector2] = CursorPos
                 }
             }
             break

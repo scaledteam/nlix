@@ -7,9 +7,13 @@
 if (!Ps:isValid()) {
     S["startTime", number] = systime()
     
+    # Daemons
     exec("hotplugd")
     exec("autoperf")
+    
+    # Terminal
     #exec("sh")
-    #exec("xtiles")
-    exec("xwm")
+    
+    # Window manager
+    exec("xwm2")
 }

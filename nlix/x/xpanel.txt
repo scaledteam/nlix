@@ -1,0 +1,65 @@
+#
+# Created by scaled
+#
+
+@name xpanel
+
+P2F["xpanel", string] = "xpanel"
+
+function xpanel() {
+    switch (P["state", number]) {
+        case 0,
+            if (xcanCreate(4)) {
+                local Frame = P["xframe", table]
+                
+                # Panel
+                local Size = vec2(Frame["size", vector2][1], 20)
+                
+                Frame:xpos(Frame["size", vector2] - Size)
+                Frame["size", vector2] = Size
+                
+                xcreate("box"):xsize(Size):xcolor(vec())
+                xcreate("text"):xsize(Size[2]):xtext("Menu")
+                P["clock", table] = xcreate("text"):xsize(Size[2]):xpos(Size:setY(0)):xalign(vec2(2, 0))
+                
+                # Menu
+                P["menuButtonWidth", number] = P["xparam", table]["symbolWidth", number] * 20 * 4
+                
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            # Clock
+            if (systime() > P["clockTimer", number]) {
+                local Date = date()
+                P["clock", table]:xtext(format("%02d:%02d:%02d", Date["hour", number], Date["min", number], Date["sec", number]))
+                
+                P["clockTimer", number] = systime() + 1
+            }
+            
+            local Cursor = xcursor()
+            
+            if (xkeyUse() != P["xkeyUseOld", number]) {
+                P["xkeyUseOld", number] = xkeyUse()
+                
+                if (!P["menu", table]:isValid() & xkeyUse() & inrange(Cursor, vec2(), vec2(P["menuButtonWidth", number], 20))) {
+                    P["state", number] = 2
+                }
+            }
+            break
+        
+        case 2,
+            local Super = P
+            P = P["parent", table]
+            
+            if (xcanCreate(1)) {
+                Super["menu", table] = xexec("xmenu", Super["xframe", table]["pos", vector2], vec2())
+                Super["menu", table]["out", array] = Super["out", array]
+                Super["menuFrame", table] = Super["menu", table]["xframe", table]
+                Super["state", number] = 1
+            }
+            break
+    }
+}
+
