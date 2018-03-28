@@ -49,6 +49,8 @@ function devcmd() {
             
             case "d", case "disconnect",
                 deviceReturn()
+                P["deviceType", string] = ""
+                P["state", number] = 1
                 break
             
             case "i", case "inputs",
@@ -63,6 +65,15 @@ function devcmd() {
             case "o", case "outputs",
                 if (P["device", wirelink]) {
                     out(P["device", wirelink]:outputs():concat("\n") + "\n")
+                }
+                else {
+                    out("Error: Device not found.\n")
+                }
+                break
+            
+            case "e", case "entity",
+                if (P["device", wirelink]) {
+                    out(P["device", wirelink]:entity():toString() + "\n")
                 }
                 else {
                     out("Error: Device not found.\n")
@@ -93,7 +104,7 @@ function devcmd() {
                 break
             
             case "r", case "read",
-                if (args() < 3) {
+                if (Args:count() < 3) {
                     out("Usage: read [type] [varname]\n")
                 }
                 elseif (!P["device", wirelink]) {
@@ -110,6 +121,7 @@ function devcmd() {
                         case "array", case "r", out(P["device", wirelink][Args[3, string], array]:concat("\n") + "\n") break
                         case "table", case "t", out(P["device", wirelink][Args[3, string], table]:toString() + "\n") break
                         case "entity", case "e", out(P["device", wirelink][Args[3, string], entity]:toString() + "\n") break
+                        case "wirelink", case "w", out(P["device", wirelink][Args[3, string], wirelink]:entity():toString() + "\n") break
                         
                         default,
                             out("Error: Unknown type.\n")
@@ -121,7 +133,7 @@ function devcmd() {
                 end()
                 break
             
-            default,
+            case "h", case "help",
                 out(
                     "Command list:\n"
                     + "connect [type]\n"
@@ -131,6 +143,8 @@ function devcmd() {
                     + "write [type] [varname] [value]\n"
                     + "read [type] [varname]\n"
                     + "quit\n"
+                    + "entity\n"
+                    + "help\n"
                 )
         }
     }

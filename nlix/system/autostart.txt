@@ -15,5 +15,5 @@ if (!Ps:isValid()) {
     #exec("sh")
     
     # Window manager
-    exec("xwm2")
+    exec("xwm")
 }

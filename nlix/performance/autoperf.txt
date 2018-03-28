@@ -7,10 +7,6 @@
 P2F["autoperf", string] = "autoperf"
 
 function autoperf() {
-    if (Ps:count() <= 2 & Ps[1, table]["name", string] == "hotplugd") {
-        end()
-    }
-    
     if (P:exists("lastRun")) {
         local DeltaTime = max(tickInterval(), systime() - P["lastRun", number])
         local Speed = 1 / DeltaTime

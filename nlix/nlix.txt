@@ -70,16 +70,17 @@ if (!tickClk()) {
                 case 61, #include "nlix/x/xstart" break
                 case 62, #include "nlix/x/xremove" break
                 case 63, #include "nlix/x/xup" break
-                case 64, #include "nlix/x/xres" break
-                case 65, #include "nlix/x/xeyes" break
-                case 66, #include "nlix/x/xterm" break
-                case 67, #include "nlix/x/xwm" break
-                case 68, #include "nlix/x/xradar" break
-                case 69, #include "nlix/x/xclicker" break
-                case 70, #include "nlix/x/xobj" break
-                case 71, #include "nlix/x/xwm2" break
-                case 72, #include "nlix/x/xpanel" break
-                case 73, #include "nlix/x/xmenu" break
+                
+                case 64, #include "nlix/x/xwm" break
+                case 65, #include "nlix/x/xpanel" break
+                case 66, #include "nlix/x/xmenu" break
+                
+                case 67, #include "nlix/x/xres" break
+                case 68, #include "nlix/x/xeyes" break
+                case 69, #include "nlix/x/xterm" break
+                case 70, #include "nlix/x/xradar" break
+                case 71, #include "nlix/x/xclicker" break
+                case 72, #include "nlix/x/xobj" break
                 
                 # Init
                 #case 80, SYSTEM_NAME = "system0" #include "nlix/system/sync" break

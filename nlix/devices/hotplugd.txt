@@ -5,79 +5,60 @@
 @name hotplugd
 
 @inputs [Port1 Port2 Port3 Port4]:wirelink
-@persist PORTS_COUNT Hotplugd:table
+@persist PORTS_COUNT
+@persist HotplugdPortsOld:array HotplugdCounter
 PORTS_COUNT = 4
 
 P2F["hotplugd", string] = "hotplugd"
 
+S["devices", table] = table(
+    "byId" = table(),
+    "P" = table(),
+    "D" = table()
+)
+
 function hotplugd() {
-    if (Ps:count() == 1) {
-        S:clear()
-        end()
-    }
-
     # hot plug
-    P = Hotplugd
-
-    switch (P["state", number]) {
-        case 0,
-            if (!S:exists("devices")) {
-                S["devices", table] = table()
-                S["devices", table]["byId", table] = table()
-            }
-            P["state", number] = 1
-            break
+    if (KState >= PORTS_COUNT) {
+        HotplugdCounter = 1
+    }
+    else {
+        HotplugdCounter++
+    }
+    
+    local Port = select(HotplugdCounter,
+        Port1,
+        Port2,
+        Port3,
+        Port4
+    )
+    
+    if (Port != HotplugdPortsOld[HotplugdCounter, wirelink]) {
+        HotplugdPortsOld[HotplugdCounter, wirelink] = Port
         
-        case 1,
-            local Counter = P["counter", number] + 1
+        if (Port:isValid()) {
+            # Check if device exists
+            local Type = Port:type()
+            local EntityId = Port:entity():id()
             
-            if (Counter > PORTS_COUNT) {
-                Counter = 1
+            local Devices = S["devices", table]
+            if (!Devices:exists(Type)) {
+                Devices[Type, array] = array(Port)
+                Devices["byId", table][EntityId, wirelink] = Port
             }
-            
-            local Port = select(Counter,
-                Port1,
-                Port2,
-                Port3,
-                Port4
-            )
-            
-            if (Port != P["portOld" + Counter, wirelink]) {
-                P["portOld" + Counter, wirelink] = Port
-                
-                if (Port:isValid()) {
-                    # Check if device exists
-                    local Type = Port:type()
-                    local EntityId = Port:entity():id()
-                    
-                    local Devices = S["devices", table]
-                    if (!Devices:exists(Type)) {
-                        Devices[Type, array] = array(Port)
-                        Devices["byId", table][EntityId, wirelink] = Port
-                    }
-                    elseif (Devices["byId", table][EntityId, wirelink] != Port) {
-                        Devices[Type, array]:pushWirelink(Port)
-                        Devices["byId", table][EntityId, wirelink] = Port
-                    }
-                }
+            elseif (Devices["byId", table][EntityId, wirelink] != Port) {
+                Devices[Type, array]:pushWirelink(Port)
+                Devices["byId", table][EntityId, wirelink] = Port
             }
-            
-            P["counter", number] = Counter
-            break
+        }
     }
 
     # return device from dead app
-    local P = S["devices", table]
-
-    if (!P:exists("P")) {
-        P["P", table] = table()
-        P["D", table] = table()
-    }
-
-    local Programs = P["P", table]
+    local Devices = S["devices", table]
+    local Programs = Devices["P", table]
 
     if (Programs:count() > 0) {
-        local Counter = P["counter", number] + 1
+        local Counter = Devices["counter", number] + 1
         
         if (Counter > Programs:count()) {
             Counter = 1
@@ -85,21 +66,21 @@ function hotplugd() {
         
         if (!Programs[Counter, table]:isValid()) {
             Programs:remove(Counter)
-            local Device = P["D", table]:removeWirelink(Counter)
+            local Device = Devices["D", table]:removeWirelink(Counter)
             
             if (Device:isValid()) {
                 local DeviceType = Device:type()
                 
-                if (P:exists(DeviceType)) {
-                    P[DeviceType, array]:unshiftWirelink(Device)
+                if (Devices:exists(DeviceType)) {
+                    Devices[DeviceType, array]:unshiftWirelink(Device)
                 }
                 else {
-                    P[DeviceType, array] = array(Device)
+                    Devices[DeviceType, array] = array(Device)
                 }
             }
         }
         else {
-            P["counter", number] = Counter
+            Devices["counter", number] = Counter
         }
     }
 }

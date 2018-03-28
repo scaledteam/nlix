@@ -43,17 +43,16 @@ function number deviceGet(Type:string) {
     return 0
 }
 
-function number deviceReturn() {
-    local Device = P["device", wirelink]
+function deviceReturn() {
+    local Device = P:removeWirelink("device")
     if (Device:isValid()) {
         local DeviceType = Device:type()
         
         if (P:exists(DeviceType)) {
-            P[DeviceType, array]:unshiftWirelink(Device)
+            S["devices", table][DeviceType, array]:unshiftWirelink(Device)
         }
         else {
-            P[DeviceType, array] = array(Device)
+            S["devices", table][DeviceType, array] = array(Device)
         }
     }
-    P:remove("device")
 }

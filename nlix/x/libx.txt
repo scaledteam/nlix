@@ -4,7 +4,13 @@
 
 @name libx
 
-S["xmenu", table] = table()
+S["xmenu", table] = table(
+    "shutdown" = array(
+        "poweroff",
+        "reboot",
+        "sh"
+    )
+)
 
 function xregister(Category:string, ProgramName:string) {
     if (S["xmenu", table]:exists(Category)) {
