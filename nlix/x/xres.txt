@@ -6,9 +6,9 @@
 
 xregister("tests", "xres")
 
-P2F["xres", string] = "xres"
+P2F["xres", string] = "xresTest"
 
-function xres() {
+function xresTest() {
     switch (P["state", number]) {
         case 0,
             if (xcanCreate(3)) {

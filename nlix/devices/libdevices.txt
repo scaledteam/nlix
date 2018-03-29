@@ -4,6 +4,12 @@
 
 @name libdevices
 
+S["devices", table] = table(
+    "byId" = table(),
+    "P" = table(),
+    "D" = table()
+)
+
 function number wirelink:isValid() {
     return This != nowirelink() & This:entity():isValid()
 }

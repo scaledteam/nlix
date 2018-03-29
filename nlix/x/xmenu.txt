@@ -10,6 +10,8 @@ function xmenu() {
     switch (P["state", number]) {
         case 0,
             if (xcanCreate(4)) {
+                #P["xframe", table]["pos", vector2] = P["xframe", table]["size", vector2]:setX(0)
+                
                 # Panel
                 local List = S["xmenu", table]:keys()
                 P["categories", array] = List

@@ -1,0 +1,55 @@
+#
+# Created by scaled
+#
+
+@name dremove
+
+P2F["dremove", string] = "dremove"
+
+function dremove() {
+    if (args() > 0) {
+        local Id = arg(1):toNumber()
+        
+        if (Id != 0) {
+            local Entity = entity(Id)
+            
+            local Removed = 0
+            foreach (DeviceType, DeviceList:array = S["devices", table]) {
+                foreach (I, Device:wirelink = DeviceList) {
+                    if (Device:entity() == Entity) {
+                        DeviceList:remove(I)
+                        S["devices", table]["byId", table][Id, wirelink] = nowirelink()
+                        #printTable(S["devices", table]["byId", table])
+                        
+                        if (DeviceList:count() == 0) {
+                            S["devices", table]:remove(DeviceType)
+                        }
+                        
+                        Removed = 1
+                        break
+                    }
+                }
+            }
+            if (!Removed) {
+                out("Error: Device with id " + Id + " is not exists.\n")
+            }
+        }
+        else {
+            local Type = arg(1)
+            if (S["devices", table]:exists(Type)) {
+                local Devices = S["devices", table]:removeArray(Type)
+                while (Devices:count() > 0) {
+                    S["devices", table]["byId", table][Devices:popWirelink():entity():id(), wirelink] = nowirelink()
+                }
+                #S["devices", table]:removeArray(Type):clear()
+            }
+            else {
+                out("Error: Devices with type " + Type + " is not exists.\n")
+            }
+        }
+    }
+    else {
+        out("Usage: dremove [id/type]\n")
+    }
+    end()
+}

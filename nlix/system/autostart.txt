@@ -16,4 +16,7 @@ if (!Ps:isValid()) {
     
     # Window manager
     exec("xwm")
+    
+    #local Xstart2 = exec("xstart2")
+    #Xstart2["args", array] = array("xwm")
 }

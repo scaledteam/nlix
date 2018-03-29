@@ -23,7 +23,7 @@ function xwm() {
             }
             elseif (xcanCreate(1)) {
                 local Res = P["xframe", table]["size", vector2]
-                xcreate("box"):xsize(Res):xcolor(P["xframe", table]:exists("parent") ? hsv2rgb(150 * 512 / Res[2], 1, 0.7) : hsv2rgb(200, 1, 0.7))
+                xcreate("box"):xsize(Res):xcolor(P["xframe", table]:exists("parent") ? hsv2rgb(randint(360), 1, 0.7) : hsv2rgb(205, 1, 0.7))
                 
                 P["in", array] = array("interface xpanel")
                 
@@ -150,7 +150,7 @@ function xwm() {
                         local Size = Res
                         
                         if (IsUsualWindow) {
-                            local Count = 2.2
+                            local Count = 2.1
                             Size = floor((Res - vec2(0, 20 + 20 * Count)) / Count)
                             Pos = randvec2(vec2(0, 20), Res - vec2(0, 20) - Size)
                             

@@ -1,6 +1,8 @@
 #
 # Created by scaled
 #
+# Ported from Windows 10.4
+#
 
 @name xclicker
 
@@ -40,13 +42,19 @@ function xclicker() {
                 }
                 
                 xcreate("textLayout"):xtext(
-                    "First\n50\t+1" + "\n\n" + 
-                    "Third\n2000\t+60"
+                    "Human\n50" + "\n\n" + 
+                    "Machine\n2000" + "\n\n" + 
+                    "Robot\n15000" + "\n\n" + 
+                    "HAAAX!\n200000" + "\n\n" + 
+                    "Developer\n2000000"
                 ):xpos(Res * vec2(1 / 3, 0) + vec2(0, TextSize / 2)):xsize(Res * vec2(1 / 3, 1)):xsize(TextSize):xalign(vec2(1, 0)):xmonospaced(1)
                 
                 xcreate("textLayout"):xtext(
-                    "Second\n500\t+14" + "\n\n" + 
-                    "Last\n6000\t+160"
+                    "Sportsman\n500" + "\n\n" + 
+                    "AK47\n6000" + "\n\n" + 
+                    "Computer\n60000" + "\n\n" + 
+                    "Cheat\n600000" + "\n\n" + 
+                    "Buy win\n6000000"
                 ):xpos(Res * vec2(2 / 3, 0) + vec2(0, TextSize / 2)):xsize(Res * vec2(1 / 3, 1)):xsize(TextSize):xalign(vec2(1, 0))
                 
                 # Algorithm
@@ -54,13 +62,21 @@ function xclicker() {
                 
                 P["costs", array] = array(
                     50, 500,
-                    2000, 6000
+                    2000, 6000,
+                    15000, 60000,
+                    200000, 600000,
+                    2000000, 6000000
                 )
                 
                 P["boosts", array] = array(
-                    1, 7,
-                    30, 80
+                    3, 8,
+                    30, 80,
+                    300, 800,
+                    3000, 8000,
+                    30000, 80000
                 )
+                
+                P["startTime", number] = systime()
                 
                 P["state", number] = 1
             }
@@ -68,45 +84,51 @@ function xclicker() {
         
         case 1,
             if (xcanDraw()) {
-                local DeltaTime = systime() - P["systimeOld", number]
-                P["systimeOld", number] = systime()
-                
-                P["score", number] = P["score", number] + P["speed", number] * DeltaTime
-                
-                P["circlePos", number] = P["circlePos", number] + (DeltaTime * P["speed", number]) ^ 0.5
-                
-                if (P["impulse", number] > 0) {
-                    P["impulse", number] = clamp(P["impulse", number] - 2 * DeltaTime, 0, 1)
-                }
-                
-                P["scopeText", table]:xtext(int(P["score", number]):toString())
-                
-                P["circle", table]:xcolor(hsv2rgb((systime() * 18) % 360, 1, 1))
-                P["circle", table]:xsize(vec2(P["ballSize", number] * min(1, (sin(P["circlePos", number]) + 3 + P["impulse", number]) / 4)))
-                
-                local Cursor = xcursor()
-                if (xkeyUse() != P["egpUseOld", number]) {
-                    P["egpUseOld", number] = xkeyUse()
+                if (P:exists("systimeOld")) {
+                    local DeltaTime = systime() - P["systimeOld", number]
                     
-                    if (xkeyUse()) {
-                        local Res = P["xframe", table]["size", vector2]
+                    P["score", number] = P["score", number] + P["speed", number] * DeltaTime
+                    
+                    P["circlePos", number] = P["circlePos", number] + (DeltaTime * P["speed", number]) ^ 0.5
+                    
+                    if (P["impulse", number] > 0) {
+                        P["impulse", number] = clamp(P["impulse", number] - 2 * DeltaTime, 0, 1)
+                    }
+                    
+                    P["scopeText", table]:xtext(int(P["score", number]):toString())
+                    
+                    P["circle", table]:xcolor(hsv2rgb(((systime() - P["startTime", number]) * 18) % 360, 1, 1))
+                    P["circle", table]:xsize(vec2(P["ballSize", number] * min(1, (sin(P["circlePos", number]) + 3 + P["impulse", number]) / 4)))
+                    
+                    local Cursor = xcursor()
+                    if (xkeyUse() != P["egpUseOld", number]) {
+                        P["egpUseOld", number] = xkeyUse()
                         
-                        if (inrange(Cursor, Res * vec2(1 / 3, 0), Res)) {
-                            local Pos = int(Cursor[1] / Res[1] * 3) + int(Cursor[2] / Res[2] * 5) * 2
+                        if (xkeyUse()) {
+                            local Res = P["xframe", table]["size", vector2]
                             
-                            if (P["score", number] >= P["costs", array][Pos, number]) {
-                                P["score", number] = P["score", number] - P["costs", array][Pos, number]
-                                P["speed", number] = P["speed", number] + P["boosts", array][Pos, number]
+                            if (inrange(Cursor, Res * vec2(1 / 3, 0), Res)) {
+                                local Pos = int(Cursor[1] / Res[1] * 3) + int(Cursor[2] / Res[2] * 5) * 2
+                                
+                                if (P["score", number] >= P["costs", array][Pos, number]) {
+                                    P["score", number] = P["score", number] - P["costs", array][Pos, number]
+                                    P["speed", number] = P["speed", number] + P["boosts", array][Pos, number]
+                                    
+                                    if (Pos == 10) {
+                                        end()
+                                    }
+                                }
                             }
-                        }
-                        
-                        elseif (inrange(Cursor, vec2(0, Res[2] / 5), Res * vec2(1 / 3, 1))) {
-                            P["score", number] = P["score", number] + 1
                             
-                            P["impulse", number] = 1
+                            elseif (inrange(Cursor, vec2(0, Res[2] / 5), Res * vec2(1 / 3, 1))) {
+                                P["score", number] = P["score", number] + 1
+                                
+                                P["impulse", number] = 1
+                            }
                         }
                     }
                 }
+                P["systimeOld", number] = systime()
             }
             break
     }

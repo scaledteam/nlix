@@ -1,0 +1,78 @@
+#
+# Created by scaled
+#
+
+@name xstart2
+
+P2F["xstart2", string] = "xstart2"
+
+function xstart2() {
+    switch (P["state", number]) {
+        case 0,
+            if (args() < 1) {
+                out("Usage: xstart2 [program name]\n")
+                end()
+            }
+            elseif (deviceGet("gmod_wire_egp")) {
+                local Device = P["device", wirelink]
+                
+                Device:egpClear()
+                Device:egpDrawTopLeft(1)
+                Device:egpResolution(vec2(), vec2(512))
+                
+                Device:egpBox(1, vec2(), vec2())
+                
+                P["xdevice", wirelink] = Device
+                P:remove("device")
+                
+                P["NULL", table] = NULL
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            if (P["NULL", table] != NULL) {
+                local Device = P["xdevice", wirelink]
+                
+                local Pos0 = Device:egpToWorld(vec2())
+                local PosX = Device:egpToWorld(vec2(512, 0))
+                local PosY = Device:egpToWorld(vec2(0, 512))
+                
+                local SizeX = Pos0:distance(PosX)
+                local SizeY = Pos0:distance(PosY)
+                
+                local Res = floor(vec2(SizeX, SizeY) / max(SizeX, SizeY) * 512)
+                
+                Device:egpResolution(vec2(), Res)
+                
+                P["xframe", table] = table(
+                    "id" = 1,
+                    "type" = "frame",
+                    "count" = 1,
+                    "size" = Res * vec2(2, 1)
+                )
+                
+                P["xobjectsAll", table] = table(P["xframe", table])
+                
+                P["xparam", table] = table(
+                    "textMultiplier" = 512 / Res[2],
+                    "symbolWidth" = 0.53 * Res[1] / Res[2]
+                )
+                P["xobjects", table] = table()
+                
+                local XCopier = exec("xcopier")
+                XCopier["source", wirelink] = Device
+                XCopier["offset", vector2] = -Res:setY(0)
+                XCopier["xframe", table] = P["xframe", table]
+                
+                P:remove("NULL")
+                P["state", number] = 2
+            }
+            break
+        
+        case 2,
+            P["name", string] = P["args", array]:shiftString()
+            P:remove("state")
+            break
+    }
+}

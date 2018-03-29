@@ -1,0 +1,319 @@
+#
+# Created by scaled
+#
+
+@name hluoix3d
+
+xregister("3d", "hluoix3d")
+
+P2F["hluoix3d", string] = "hluoix3d"
+
+function hluoix3d() {
+    switch (P["state", number]) {
+        case 0,
+            if (xcanCreate(20)) {
+                local Res = P["xframe", table]["size", vector2]
+                
+                P["Size", vector2] = Res
+                
+                P["Fov", number] = 70
+                P["Speed", number] = 10
+                P["Sens", number] = 10
+                P["PlayerHeight", number] = 10
+                
+                P["Alpha", array] = array()
+                P["Split", table] = table()
+                P["Vectors", table] = table()
+                P["Dist", table] = table()
+                P["DistSort", array] = array()
+                P["Keys", array] = array()
+                
+                P["PlayerPos", vector] = vec(150,-70,0)
+                P["PlayerAng", number] = 150
+                if (!P:exists("Area")) {
+                    P["Area", array] = array(
+                        vec(-20, -20, 20),
+                        vec(-20,  20, 20),
+                        vec( 20,  20, 20),
+                        vec( 20, -20, 20),
+                        vec(-20, -20, 20),
+                        vec(-20, -20,  0),
+                        vec( 40, -20,  0),
+                        vec( 40, -20, 25),
+                        vec( 40,  20, 25),
+                        vec( 80,  20, 10),
+                        vec( 80, -20, 10),
+                        vec( 40, -20, 25)
+                    )
+                }
+                
+                Size = Res
+                local PlayerAng2 = 0
+                local Muilti = cot(P["Fov", number]/2)*Size:y()
+                local Tan = clamp(-tan(PlayerAng2)*Muilti,-Size:y()/2,Size:y()/2-15)
+                P[1, table] = xcreate("box"):xsize(Res):xcolor(vec(80,180,255))
+                P[2, table] = xcreate("box"):xpos(Res:setX(0) / 2):xsize(Res * vec2(1, 0.5)):xcolor(vec(0,180,80))
+                
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            local Keys = P["kbd", array]
+            
+            foreach(I, N:number = Keys){
+                #Camera movement
+                switch(N){
+                    case 19, P["PlayerAng", number]=P["PlayerAng", number]+P["Sens", number] break #Left
+                    case 20, P["PlayerAng", number]=P["PlayerAng", number]-P["Sens", number] break #Right
+                    case 17, P["PlayerAng2", number]=clamp(P["PlayerAng2", number]+P["Sens", number]/2,-90,90) break #Up
+                    case 18, P["PlayerAng2", number]=clamp(P["PlayerAng2", number]-P["Sens", number]/2,-90,90) break #Down
+                    case 118, P["Noclip", number]=!P["Noclip", number] break #Noclip
+                }
+                #On ground
+                if(P["onGround", number]){
+                    switch(N){
+                        case 119, P["PlayerVel", vector]=P["PlayerVel", vector]+ang(0,P["PlayerAng", number],0):forward()*P["Speed", number] break #Forward
+                        case 115, P["PlayerVel", vector]=P["PlayerVel", vector]-ang(0,P["PlayerAng", number],0):forward()*P["Speed", number] break #Back
+                        case 100, P["PlayerVel", vector]=P["PlayerVel", vector]+ang(0,P["PlayerAng", number],0):right()*P["Speed", number]  break #Right
+                        case  97, P["PlayerVel", vector]=P["PlayerVel", vector]-ang(0,P["PlayerAng", number],0):right()*P["Speed", number]  break #Left
+                        case  32, P["PlayerVel", vector]=vec(vec2(P["PlayerVel", vector]),10) break #Jump
+                    }
+                }
+                #On noclip
+                if(P["Noclip", number]){
+                    local PlayerAng=ang(-P["PlayerAng2", number],P["PlayerAng", number],0)
+                    switch(N){
+                        case 119, P["PlayerVel", vector]=P["PlayerVel", vector]+PlayerAng:forward()*P["Speed", number] break #Forward
+                        case 115, P["PlayerVel", vector]=P["PlayerVel", vector]-PlayerAng:forward()*P["Speed", number] break #Back
+                        case 100, P["PlayerVel", vector]=P["PlayerVel", vector]+PlayerAng:right()*P["Speed", number]  break #Right
+                        case  97, P["PlayerVel", vector]=P["PlayerVel", vector]-PlayerAng:right()*P["Speed", number]  break #Left
+                        case  32, P["PlayerVel", vector]=P["PlayerVel", vector]+PlayerAng:up()*P["Speed", number]  break #Up
+                        case 154, P["PlayerVel", vector]=P["PlayerVel", vector]-PlayerAng:up()*P["Speed", number]  break #Down
+                    }
+                }
+            }
+            
+            if (xcanDraw()) {
+                #Preparing polygons
+                local Area = P["Area", array]
+                local EGPCount = 20 - 6
+                local AreaCount = clamp(Area:count()-1,0,EGPCount)
+                
+                
+                #Resizeing
+                local Size = P["Size", vector2]
+                local PlayerAng2 = P["PlayerAng2", number]
+                local Muilti = cot(P["Fov", number]/2)*Size:y()
+                
+                if(!P:exists("Render3DFirst")){
+                    local Alpha = P["Alpha", array]
+                    
+                    for(I=1,AreaCount){
+                        P[I+6, table] = xcreate("poly"):xcolor(vec(I/AreaCount*75+50))
+                        Alpha[AreaCount-I+6+1,number] = 0
+                    }
+                    
+                    #[Screen:egpPoly(EGP+7,vec2(),vec2(),vec2())
+                    Screen:egpColor(EGP+7,vec4(vec(1/AreaCount*75+50),255))
+                    Screen:egpParent(EGP+7,EGP)
+                    for(I=2,AreaCount){
+                        Screen:egpCopy(EGP+I+6, EGP+7)
+                        Screen:egpColor(EGP+I+6,vec4(vec(I/AreaCount*75+50),255))
+                        Alpha[EGP+AreaCount-I+6+1,number] = 0
+                    }]#
+                    P["Render3DFirst", number] = 1
+                }
+                
+                #Rendering
+                #Render parametres
+                local Matrix0=matrix(ang(P["PlayerAng", number]-90,0,90))
+                local Matrix1=matrix(ang(0,0,-P["PlayerAng2", number]))
+                local PlayerPos = P["PlayerPos", vector]
+                local PlayerRenderPos=PlayerPos+vec(0,0,P["PlayerHeight", number])
+                
+                
+                #Find bottom vectors and making z-buffer
+                local Vectors = P["Vectors", table]
+                local Dist = P["Dist", table]
+                local Split = P["Split", table]
+                Vectors:clear()
+                Dist:clear()
+                Split:clear()
+                
+                local Vector = vec()
+                local VectorMoreThan0 = 0
+                
+                foreach(I,N:vector=Area){
+                    local OldVector=Vector
+                    Vector = Matrix1*Matrix0*(N*vec(1,1,0)-PlayerRenderPos)
+                    
+                    #Split vector
+                    if(Vector:z()<=0&VectorMoreThan0){
+                        Split[I,number]=1
+                        Vectors[I,vector]=(Vector-OldVector):normalized()*(OldVector:z()-1)+OldVector
+                        Dist[I,number]=PlayerPos:distance((Area[I-1,vector]+Area[I,vector])/2)
+                        VectorMoreThan0=0
+                    }
+                    elseif(Vector:z()>0&!VectorMoreThan0&I!=1){
+                        Split[I,number]=2
+                        Vectors[I,vector]=Vector
+                        Vectors[I-1,vector]=(OldVector-Vector):normalized()*(Vector:z()-1)+Vector
+                        Dist[I,number]=PlayerPos:distance((Area[I-1,vector]+Area[I,vector])/2)
+                        VectorMoreThan0=1
+                    }
+                    
+                    #Write distance
+                    elseif(Vector:z()>0){
+                        Vectors[I,vector]=Vector
+                        if(VectorMoreThan0){
+                            Dist[I,number]=(Vector:z()+OldVector:z())/2
+                        }
+                        VectorMoreThan0=1
+                    }
+                    else{VectorMoreThan0=0}
+                }
+                
+                
+                #Sort z-buffer
+                local DistCache = Dist:clone()
+                local DistCount = Dist:count()
+                
+                local DistSort = P["DistSort", array]
+                DistSort:clear()
+                for(I=1,DistCount){
+                    local DistMaxIndex=DistCache:maxIndex()
+                    DistSort:pushNumber(DistMaxIndex)
+                    DistCache[DistMaxIndex,number]=0
+                }
+            }
+            P["state", number] = 2
+            break
+        
+        case 2,
+            #Preparing polygons
+            local Area = P["Area", array]
+            local EGPCount = 20-6
+            local AreaCount = clamp(Area:count() - 1, 0, EGPCount)
+            
+        
+            #Resizeing
+            local Size = P["Size", vector2]
+            local PlayerAng2 = P["PlayerAng2", number]
+            local Muilti=cot(P["Fov", number]/2)*Size:y()
+            
+            #Update back fields
+            if(changed(PlayerAng2)){
+                local Tan=clamp(-tan(PlayerAng2)*Muilti,-Size:y()/2,Size:y()/2)
+                
+                P[2, table]:xpos(vec2(0,Size:y()/2-Tan)):xsize(vec2(Size:x(),Size:y()/2+Tan))
+            }
+            
+            
+            #Render parametres
+            local Matrix0=matrix(ang(P["PlayerAng", number]-90,0,90))
+            local Matrix1=matrix(ang(0,0,-PlayerAng2))
+            local PlayerRenderPos=P["PlayerPos", vector]+vec(0,0,P["PlayerHeight", number])
+            
+            
+            #Get data from other appThread
+            local Vectors = P["Vectors", table]
+            local Dist = P["Dist", table]
+            local Split = P["Split", table]
+            local DistSort = P["DistSort", array]
+            
+            
+            #Render persist
+            local Rendered = 0
+            local RenderedOld = P["rendered", number]
+            local DistCount = Dist:count()
+            
+            local Render = array()
+            local Alpha = P["Alpha", array]
+            
+            
+            local Offset = Size / 2
+            #Rendering
+            for(I=1,AreaCount){
+                local EGPID = AreaCount - I + 6 + 1
+                local AlphaEGP = Alpha[EGPID,number]
+                if(perf()){
+                    Rendered++
+                    local DistIndex=DistSort[DistCount-I+1,number]
+                    
+                    Render[1,vector]=Vectors[DistIndex-1,vector]
+                    Render[2,vector]=Vectors[DistIndex  ,vector]
+                    if(Render[1,vector]:z()<=0&Render[2,vector]:z()<=0){
+                        if(AlphaEGP){
+                            Alpha[EGPID,number]=0
+                            P[EGPID, table]:xalpha(0)
+                        }
+                        continue
+                    }
+                    Render[3,vector]=Matrix1*Matrix0*(Area[DistIndex  ,vector]-PlayerRenderPos)
+                    Render[4,vector]=Matrix1*Matrix0*(Area[DistIndex-1,vector]-PlayerRenderPos)
+                    if(Split[DistIndex,number]==1){
+                        local Vector=Render[3,vector]
+                        local OldVector=Render[4,vector]
+                        Render[3,vector]=(Vector-OldVector):normalized()*(OldVector:z()-1)+OldVector
+                    }
+                    elseif(Split[DistIndex,number]==2){
+                        local Vector=Render[3,vector]
+                        local OldVector=Render[4,vector]
+                        Render[4,vector]=(OldVector-Vector):normalized()*(Vector:z()-1)+Vector
+                    }
+                    
+                    if(Render[3,vector]:z()>0&Render[4,vector]:z()>0){
+                        foreach(I,N:vector=Render){
+                            Render[I,vector2]=clamp(N:dehomogenized() * Muilti + Offset, vec2(), Size)
+                        }
+                        
+                        P[EGPID, table]:xverticles(Render)
+                        
+                        if(!AlphaEGP){
+                            Alpha[EGPID,number]=1
+                            P[EGPID, table]:xalpha(255)
+                        }
+                    }
+                    elseif(AlphaEGP){
+                        Alpha[EGPID,number]=0
+                        P[EGPID, table]:xalpha(0)
+                    }
+                    
+                }
+                elseif(AlphaEGP&I<=RenderedOld){
+                    Alpha[EGPID,number]=0
+                    P[EGPID, table]:xalpha(0)
+                }
+                else{
+                    break
+                }
+            }
+            P["rendered", number] = Rendered
+            
+            
+            
+            #Player physics
+            local PlayerPos = P["PlayerPos", vector]
+            local PlayerVel = P["PlayerVel", vector]
+            local Noclip = P["Noclip", number]
+            
+            PlayerPos+=PlayerVel 
+            if(Noclip){PlayerVel*=0.5}
+            if(PlayerPos:z()<=-0){
+                PlayerVel*=vec(0.5,0.5,0)
+                PlayerPos[3]=0
+                P["onGround", number] = 1
+            }
+            elseif(!Noclip){
+                PlayerVel-=vec(0,0,2)
+                P["onGround", number] = 0
+            }
+            P["PlayerVel", vector] = PlayerVel
+            P["PlayerPos", vector] = PlayerPos
+            
+            P["state", number] = 1
+            break
+    }
+}
+

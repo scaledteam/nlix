@@ -1,0 +1,235 @@
+#
+# Created by scaled
+#
+
+@name wustdd
+
+xregister("3d", "wustdd")
+
+P2F["wustdd", string] = "wustdd"
+
+function wustdd() {
+    switch (P["state", number]) {
+        case 0,
+            P["count", number] = 50
+            
+            if (xcanCreate(2 + P["count", number])) {
+                P["background", table] = xcreate("box"):xsize(xres()):xcolor(vec(50, 50, 60))
+                
+                P["objects", table] = table()
+                P["map", array] = array()
+                
+                P["Temp_Vectors", array] = array()
+                
+                P["RENDER_SMOOTH", number] = 10
+                P["EMPTY_POLY", array] = array(vec2(), vec2(), vec2())
+                
+                P["playerPos", vector] = vec(0, 2, -4)
+                P["playerAng", vector2] = vec2(0, -20)
+                
+                P["fps", number] = 20
+                
+                P["sens", number] = 100
+                P["speed", number] = 2.5
+                
+                P["counter", number] = 1
+                P["state", number] = 1
+            }
+            break
+        
+        # Prepare objects
+        case 1,
+            if (xcanDraw()) {
+                local Counter = P["counter", number]
+                    
+                for (I = 1, Overload) {
+                    if (Counter <= P["count", number]) {
+                        P[Counter, table] = xcreate("polyOutline"):xcolor(vec(200, 200, 240))#:xparent(P["background", table])
+                        Counter++
+                    }
+                    else {
+                        P["text", table] = xcreate("textLayout"):xsize(14):xsize(xres())
+                        P["counter", number] = 0
+                        P["state", number] = 2
+                        return
+                    }
+                }
+                
+                P["counter", number] = Counter
+            }
+            break
+        
+        # Generate map
+        case 2,
+            local Counter = P["counter", number]
+            
+            local AREA = P["map", array]
+            
+            local Max_Iterations = int(P["count", number] / 2)
+            local Angle_Step = 360 / Max_Iterations
+            
+            for (I = 1, Overload) {
+                Counter++
+                
+                #Generate map
+                local Angle = Counter / Max_Iterations * 360
+                AREA:insertMatrix(2 * Counter - 1, matrix(
+                    sin(Angle), 0, cos(Angle),
+                    sin(Angle), 1, cos(Angle),
+                    sin(Angle + Angle_Step), 0, cos(Angle + Angle_Step)
+                ))
+                AREA:insertMatrix(2 * Counter, matrix(
+                    sin(Angle), 1, cos(Angle),
+                    sin(Angle + Angle_Step), 1, cos(Angle + Angle_Step),
+                    sin(Angle + Angle_Step), 0, cos(Angle + Angle_Step)
+                ))
+                
+                if (Counter == Max_Iterations) {
+                    P["counter", number] = 0
+                    P["state", number] = 3
+                    return
+                }
+            }
+            
+            P["counter", number] = Counter
+            break
+        
+        # Render
+        case 3,
+            if (xcanDraw()) {
+                local Counter = P["counter", number]
+                
+                local AREA = P["map", array]
+                
+                local Render_Pos = P["renderPos", vector]
+                local Render_Ang = P["renderAng", vector2]
+                
+                local Temp_Vectors = P["Temp_Vectors", array]
+                
+                local Res = xres()
+                local Offset = Res / 2
+                local RENDER_MULTIPLIER_VECTOR2 = Res[2] * vec2(1, -1)
+                
+                local RENDER_SMOOTH = P["RENDER_SMOOTH", number]
+                
+                for (I = 1, Overload) {
+                    Counter++
+                    
+                    #Start actions
+                    if (Counter == 1) {
+                        local Player_Pos = P["playerPos", vector]
+                        local Player_Ang = P["playerAng", vector2]
+                        
+                        local Cursor = xcursor()
+                        local Use = xkeyUse()
+                        foreach (I, Key:number = P["kbd", array]) {
+                            switch (Key) {
+                                case 17, # Up
+                                    Player_Ang[2] = Player_Ang[2] + P["sens", number] / P["fps", number]
+                                    break
+                                case 18, # Down
+                                    Player_Ang[2] = Player_Ang[2] - P["sens", number] / P["fps", number]
+                                    break
+                                case 19, # Left
+                                    Player_Ang[1] = Player_Ang[1] + P["sens", number] / P["fps", number]
+                                    break
+                                case 20, # Right
+                                    Player_Ang[1] = Player_Ang[1] - P["sens", number] / P["fps", number]
+                                    break
+                                
+                                case 119, # W
+                                    Player_Pos += vec(sin(-Player_Ang[1]), 0,  cos(-Player_Ang[1])) * P["speed", number] / P["fps", number]
+                                    break
+                                case 115, # S
+                                    Player_Pos -= vec(sin(-Player_Ang[1]), 0,  cos(-Player_Ang[1])) * P["speed", number] / P["fps", number]
+                                    break
+                                case 100, # D
+                                    Player_Pos += vec(cos(-Player_Ang[1]), 0, -sin(-Player_Ang[1])) * P["speed", number] / P["fps", number]
+                                    break
+                                case 97, # A
+                                    Player_Pos -= vec(cos(-Player_Ang[1]), 0, -sin(-Player_Ang[1])) * P["speed", number] / P["fps", number]
+                                    break
+                                
+                                case 32, # Space
+                                    Player_Pos += vec(0, P["speed", number] / P["fps", number], 0)
+                                    break
+                                case 154, # Shift
+                                    Player_Pos -= vec(0, P["speed", number] / P["fps", number], 0)
+                                    break
+                                
+                                case 101, # E
+                                    Use = 1
+                                    break
+                                
+                                default,
+                            }
+                        }
+                        
+                        if (Use & inrange(Cursor, vec2(), Res)) {
+                            if (P:exists("cursorOld")) {
+                                Player_Ang += (Cursor - P["cursorOld", vector2]) * 90 / Res[2]
+                            }
+                            P["cursorOld", vector2] = Cursor
+                        }
+                        elseif (P:exists("cursorOld")) {
+                            P:remove("cursorOld")
+                        }
+                        
+                        P["playerPos", vector] = Player_Pos
+                        P["playerAng", vector2] = Player_Ang
+                        
+                        #Preparing smooth camera
+                        if (P["fps", number] > 10) {
+                            Render_Pos += (Player_Pos - Render_Pos) * RENDER_SMOOTH / P["fps", number]
+                            Render_Ang += (Player_Ang - Render_Ang) * RENDER_SMOOTH / P["fps", number]
+                        }
+                        else {
+                            Render_Pos = Player_Pos
+                            Render_Ang = Player_Ang
+                        }
+                        
+                        P["renderPos", vector] = Render_Pos
+                        P["renderAng", vector2] = Render_Ang
+                        
+                        #Creating matrix
+                        P["Render_Matrix0", matrix] = matrix(ang(Render_Ang[1], 0, 0))
+                        P["Render_Matrix1", matrix] = matrix(ang(0, 0, Render_Ang[2]))
+                    }
+                    
+                    
+                    for (I = 1, 3) {
+                        local Vector = P["Render_Matrix1", matrix] * P["Render_Matrix0", matrix] * (AREA[Counter, matrix]:row(I) - Render_Pos)
+                        if (Vector[3] <= 0) {
+                            P[Counter, table]:xverticles(P["EMPTY_POLY", array])
+                            continue
+                        }
+                        Temp_Vectors[I, vector2] = clamp(Vector:dehomogenized() * RENDER_MULTIPLIER_VECTOR2 + Offset, vec2(), Res)
+                    }
+                    
+                    
+                    P[Counter, table]:xverticles(Temp_Vectors)
+                    
+                    
+                    #End action
+                    if (Counter >= P["count", number]) {
+                        P["framesRendered", number] = P["framesRendered", number] + 1
+                        
+                        Counter = 0
+                        break
+                    }
+                }
+                
+                P["counter", number] = Counter
+                
+                if (systime() > P["textNextUpdate", number]) {
+                    P["fps", number] = P["framesRendered", number]
+                    P["framesRendered", number] = 0
+                    
+                    P["text", table]:xtext("FPS: " + P["fps", number] + "\nOps: " + ops())
+                    
+                    P["textNextUpdate", number] = systime() + 1
+                }
+            }
+            break
+    }
+}

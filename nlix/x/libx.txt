@@ -37,19 +37,25 @@ function table xcreate(Type:string) {
             case "text",
                 Device:egpText(Id, "", vec2())
                 Object["sizeNum", number] = 20
-                Device:egpSize(20 * P["xparam", table]["textMultiplier", number])
+                Device:egpSize(Id, 20 * P["xparam", table]["textMultiplier", number])
                 break
             case "textLayout",
                 Device:egpTextLayout(Id, "", vec2(), vec2())
                 Object["sizeNum", number] = 20
-                Device:egpSize(20 * P["xparam", table]["textMultiplier", number])
+                Device:egpSize(Id, 20 * P["xparam", table]["textMultiplier", number])
                 
                 Object["monospaced", number] = 1
                 Device:egpFont(Id, "Courier New")
                 break
-            case "poly", Device:egpPoly(Id, vec2(), vec2(), vec2(), vec2()) break
-            case "polyOutline", Device:egpPolyOutline(Id, vec2(), vec2(), vec2(), vec2()) break
-            case "lineStrip", Device:egpLineStrip(Id, vec2(), vec2(), vec2()) break
+            case "poly", Device:egpPoly(Id, vec2(), vec2(), vec2()) break
+            case "polyOutline",
+                Device:egpPolyOutline(Id, vec2(), vec2(), vec2())
+                Object["sizeNum", number] = 1
+                break
+            case "lineStrip",
+                Device:egpLineStrip(Id, vec2(), vec2(), vec2())
+                Object["sizeNum", number] = 1
+                break
             default, return NULL
         }
         
@@ -230,13 +236,16 @@ function vector2 xcursor() {
     else {
         local Cursor = Frame["parent", table]["cursor", vector2]
         if (Cursor != vec2(-1)) {
-            Frame["cursor", vector2] = Cursor - Frame["pos", vector2] #Device:egpPos(Frame["id", number])
+            Frame["cursor", vector2] = Cursor - Frame["pos", vector2]
         }
         else {
             Frame["cursor", vector2] = Cursor
         }
         
-        Frame["keyUse", number] = Frame["parent", table]["keyUse", number]
+        #Frame["keyUse", number] = Frame["parent", table]["keyUse", number] & inrange(Frame["cursor", vector2], vec2(), Frame["size", vector2])
+        if (Frame["parent", table]["keyUse", number] >= 0) {
+            Frame["keyUse", number] = Frame["parent", table]["keyUse", number]
+        }
     }
     return Frame["cursor", vector2]
 }
@@ -480,4 +489,8 @@ function table:xup() {
     if (This:xxlastObjectId() < xxlastObjectId()) {
         xxup(This["id", number], This["id", number] + This["count", number], This:xxlastObjectId())
     }
+}
+
+function vector2 xres() {
+    return P["xframe", table]["size", vector2]
 }

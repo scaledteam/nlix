@@ -25,6 +25,7 @@ if (!tickClk()) {
                 case 11, #include "nlix/devices/hotplugd" break
                 case 12, #include "nlix/devices/dlist" break
                 case 13, #include "nlix/devices/devcmd" break
+                case 14, #include "nlix/devices/dremove" break
                 
                 # Terminal
                 case 21, #include "nlix/terminal/term" break
@@ -75,12 +76,18 @@ if (!tickClk()) {
                 case 65, #include "nlix/x/xpanel" break
                 case 66, #include "nlix/x/xmenu" break
                 
-                case 67, #include "nlix/x/xres" break
-                case 68, #include "nlix/x/xeyes" break
-                case 69, #include "nlix/x/xterm" break
+                case 67, #include "nlix/x/xterm" break
+                case 68, #include "nlix/x/xres" break
+                case 69, #include "nlix/x/xeyes" break
                 case 70, #include "nlix/x/xradar" break
                 case 71, #include "nlix/x/xclicker" break
-                case 72, #include "nlix/x/xobj" break
+                
+                #case 72, #include "nlix/x/xstart2" break
+                #case 73, #include "nlix/x/xcopier" break
+                
+                case 74, #include "nlix/3d/xobj" break
+                case 75, #include "nlix/3d/hluoix3d" break
+                case 76, #include "nlix/3d/wustdd" break
                 
                 # Init
                 #case 80, SYSTEM_NAME = "system0" #include "nlix/system/sync" break

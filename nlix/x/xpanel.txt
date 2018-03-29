@@ -43,7 +43,7 @@ function xpanel() {
             if (xkeyUse() != P["xkeyUseOld", number]) {
                 P["xkeyUseOld", number] = xkeyUse()
                 
-                if (!P["menu", table]:isValid() & xkeyUse() & inrange(Cursor, vec2(), vec2(P["menuButtonWidth", number], 20))) {
+                if (!P["menu", table]:isValid() & !xkeyUse() & inrange(Cursor, vec2(), vec2(P["menuButtonWidth", number], 20))) {
                     P["state", number] = 2
                 }
             }

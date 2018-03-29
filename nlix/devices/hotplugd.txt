@@ -6,40 +6,30 @@
 
 @inputs [Port1 Port2 Port3 Port4]:wirelink
 @persist PORTS_COUNT
-@persist HotplugdPortsOld:array HotplugdCounter
+@persist [HotplugdPortsOld]:array HotplugdCounter
 PORTS_COUNT = 4
 
 P2F["hotplugd", string] = "hotplugd"
 
-S["devices", table] = table(
-    "byId" = table(),
-    "P" = table(),
-    "D" = table()
-)
-
 function hotplugd() {
     # hot plug
-    if (KState >= PORTS_COUNT) {
+    if (HotplugdCounter >= PORTS_COUNT) {
         HotplugdCounter = 1
     }
     else {
         HotplugdCounter++
     }
     
-    local Port = select(HotplugdCounter,
-        Port1,
-        Port2,
-        Port3,
-        Port4
-    )
+    local Port = select(HotplugdCounter, Port1, Port2, Port3, Port4)
+    local PortEntity = Port:entity()
     
-    if (Port != HotplugdPortsOld[HotplugdCounter, wirelink]) {
-        HotplugdPortsOld[HotplugdCounter, wirelink] = Port
+    if (PortEntity:id() != HotplugdPortsOld[HotplugdCounter, number]) {
+        HotplugdPortsOld[HotplugdCounter, number] = PortEntity:id()
         
-        if (Port:isValid()) {
+        if (PortEntity:isValid()) {
             # Check if device exists
             local Type = Port:type()
-            local EntityId = Port:entity():id()
+            local EntityId = PortEntity:id()
             
             local Devices = S["devices", table]
             if (!Devices:exists(Type)) {
@@ -52,7 +42,7 @@ function hotplugd() {
             }
         }
     }
-
+    
     # return device from dead app
     local Devices = S["devices", table]
     local Programs = Devices["P", table]

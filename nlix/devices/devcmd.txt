@@ -146,6 +146,9 @@ function devcmd() {
                     + "entity\n"
                     + "help\n"
                 )
+            
+            default,
+                out("Error: Unknown command.\n")
         }
     }
 }

@@ -80,7 +80,6 @@ function skbd() {
             if (Keys:count() > 0) {
                 for (I = 1, Keys:count()) {
                     local Key = Keys[I, number]
-                    #if (Key != KeysOld[I, number]) {
                     if (P["kbdTable", table][Key, number] > P["kbdTableOld", table][Key, number]) {
                         switch (Key) {
                             # Enter
