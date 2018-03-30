@@ -59,8 +59,10 @@ function hluoix3d() {
             break
         
         case 1,
-            local Keys = P["kbd", array]
+            local Cursor = xcursor()
+            local Use = xkeyUse()
             
+            local Keys = P["kbd", array]
             foreach(I, N:number = Keys){
                 #Camera movement
                 switch(N){
@@ -69,6 +71,7 @@ function hluoix3d() {
                     case 17, P["PlayerAng2", number]=clamp(P["PlayerAng2", number]+P["Sens", number]/2,-90,90) break #Up
                     case 18, P["PlayerAng2", number]=clamp(P["PlayerAng2", number]-P["Sens", number]/2,-90,90) break #Down
                     case 118, P["Noclip", number]=!P["Noclip", number] break #Noclip
+                    case 101, Use = 1 break # Key use
                 }
                 #On ground
                 if(P["onGround", number]){
@@ -92,6 +95,20 @@ function hluoix3d() {
                         case 154, P["PlayerVel", vector]=P["PlayerVel", vector]-PlayerAng:up()*P["Speed", number]  break #Down
                     }
                 }
+            }
+            
+            local Res = xres()
+            if (Use & inrange(Cursor, vec2(), Res)) {
+                if (P:exists("cursorOld")) {
+                    local Move = (Cursor - P["cursorOld", vector2]) * 90 / Res[2]
+                    
+                    P["PlayerAng", number] = P["PlayerAng", number] + Move[1]
+                    P["PlayerAng2", number] = P["PlayerAng2", number] + Move[2]
+                }
+                P["cursorOld", vector2] = Cursor
+            }
+            elseif (P:exists("cursorOld")) {
+                P:remove("cursorOld")
             }
             
             if (xcanDraw()) {

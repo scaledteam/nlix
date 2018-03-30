@@ -242,9 +242,8 @@ function vector2 xcursor() {
             Frame["cursor", vector2] = Cursor
         }
         
-        #Frame["keyUse", number] = Frame["parent", table]["keyUse", number] & inrange(Frame["cursor", vector2], vec2(), Frame["size", vector2])
         if (Frame["parent", table]["keyUse", number] >= 0) {
-            Frame["keyUse", number] = Frame["parent", table]["keyUse", number]
+            Frame["keyUse", number] = Frame["parent", table]["keyUse", number] #& inrange(Frame["cursor", vector2], vec2(), Frame["size", vector2])
         }
     }
     return Frame["cursor", vector2]
@@ -457,11 +456,13 @@ function xxremoveByDaemon(IdStart, IdEnd) {
 }
 
 function table:xremove() {
-    if (P["xremove", table]:isValid()) {
-        This:xclear()
-    }
-    else {
-        xxremoveByDaemon(This["id", number], This["id", number] + This["count", number])
+    if (!This:exists("removed")) {
+        if (P["xremove", table]:isValid()) {
+            This:xclear()
+        }
+        else {
+            xxremoveByDaemon(This["id", number], This["id", number] + This["count", number])
+        }
     }
 }
 

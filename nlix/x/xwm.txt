@@ -44,6 +44,8 @@ function xwm() {
             if (xcanDraw()) {
                 # Send cursor to programs
                 local Cursor = xcursor()
+                local Use = xkeyUse()
+                #P["xframe", table]["keyUse", number] = -1
                 
                 # Program
                 local Program = P["programs", table][P["focus", number], table]
@@ -58,7 +60,7 @@ function xwm() {
                 
                 # Moving windows
                 local Window = P["windows", table][P["focus", number], table]
-                if (Window:isValid() & xkeyUse() & (Window:exists("moveMode") | inrange(Cursor - Window["pos", vector2], vec2(), Window["size", vector2]))) {
+                if (Window:isValid() & Use & (Window:exists("moveMode") | inrange(Cursor - Window["pos", vector2], vec2(), Window["size", vector2]))) {
                     if (!Window:exists("moveMode") & (Cursor[1] > Window["pos", vector2][1] + Window["size", vector2][1] - 20)) {
                         Program:clear()
                     }
@@ -88,16 +90,18 @@ function xwm() {
                     if (!Program:isValid()) {
                         P["programs", table]:remove(Counter)
                         
-                        if (P["xremove", table]:isValid()) {
-                            P["frames", table]:removeTable(Counter):xremove()
-                            P["windows", table]:removeTable(Counter):xremove()
-                        }
-                        else {
-                            xxremoveByDaemon(P["windows", table]:removeTable(Counter)["id", number], P["frames", table]:removeTable(Counter):xxlastObjectId())
+                        if (!P["frames", table][Counter, table]:exists("removed")) {
+                            if (P["xremove", table]:isValid()) {
+                                P["frames", table]:removeTable(Counter):xremove()
+                                P["windows", table]:removeTable(Counter):xremove()
+                            }
+                            else {
+                                xxremoveByDaemon(P["windows", table]:removeTable(Counter)["id", number], P["frames", table]:removeTable(Counter):xxlastObjectId())
+                            }
                         }
                     }
                     # Check focus
-                    elseif (P["focus", number] != Counter & xkeyUse() & inrange(Cursor - Program["xframe", table]["pos", vector2], vec2(0, -20), Program["xframe", table]["size", vector2])) {
+                    elseif (P["focus", number] != Counter & Use & inrange(Cursor - Program["xframe", table]["pos", vector2], vec2(0, -20), Program["xframe", table]["size", vector2])) {
                         # Clear old data after focus changed
                         local ProgramOld = P["programs", table][P["focus", number], table]
                         ProgramOld["kbd", array]:clear()

@@ -8,7 +8,7 @@ P2F["perf", string] = "setperf"
 
 function setperf() {
     if (args() < 1) {
-        out("Usage: perf [number]")
+        out(KPerf + "\n")
     }
     else {
         local Arg = arg(1):toNumber()

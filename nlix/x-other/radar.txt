@@ -2,14 +2,14 @@
 # Created by scaled
 #
 
-@name xradar
+@name radar
 
 #ifdef findInSphere(vector, number)
-xregister("real", "xradar")
+xregister("real", "radar")
 
-P2F["xradar", string] = "xradar"
+P2F["radar", string] = "radar"
 
-function xradar() {
+function radar() {
     switch (P["state", number]) {
         case 0,
             if (xcanCreate(11)) {

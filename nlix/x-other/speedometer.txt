@@ -1,0 +1,33 @@
+#
+# Created by scaled
+#
+
+@name speedometer
+
+xregister("real", "speedometer")
+
+P2F["speedometer", string] = "speedometer"
+
+function speedometer() {
+    switch (P["state", number]) {
+        case 0,
+            if (xcanCreate(4)) {
+                local Res = P["xframe", table]["size", vector2]
+                # Background
+                xcreate("box"):xsize(Res)
+                
+                local TextSize = min(Res[1] / P["xparam", table]["symbolWidth", number] / 16, Res[2] / 4)
+                P["text", table] = xcreate("textLayout"):xcolor(vec()):xsize(Res):xsize(TextSize):xalign(vec2(1))
+                
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            if (xcanDraw()) {
+                local Speed = P["xdevice", wirelink]:entity():vel()
+                P["text", table]:xtext(round(Speed:length()) + " u/s\n" + round(toUnit("km/h", Speed:length())) + " km/h\n" + round(Speed))
+            }
+            break
+    }
+}

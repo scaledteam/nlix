@@ -11,7 +11,7 @@ P2F["wustdd", string] = "wustdd"
 function wustdd() {
     switch (P["state", number]) {
         case 0,
-            P["count", number] = 50
+            P["count", number] = 40
             
             if (xcanCreate(2 + P["count", number])) {
                 P["background", table] = xcreate("box"):xsize(xres()):xcolor(vec(50, 50, 60))
@@ -21,13 +21,13 @@ function wustdd() {
                 
                 P["Temp_Vectors", array] = array()
                 
-                P["RENDER_SMOOTH", number] = 10
+                P["RENDER_SMOOTH", number] = 5
                 P["EMPTY_POLY", array] = array(vec2(), vec2(), vec2())
                 
                 P["playerPos", vector] = vec(0, 2, -4)
                 P["playerAng", vector2] = vec2(0, -20)
                 
-                P["fps", number] = 20
+                P["fps", number] = 1 / tickInterval()
                 
                 P["sens", number] = 100
                 P["speed", number] = 2.5
@@ -138,16 +138,16 @@ function wustdd() {
                                     break
                                 
                                 case 119, # W
-                                    Player_Pos += vec(sin(-Player_Ang[1]), 0,  cos(-Player_Ang[1])) * P["speed", number] / P["fps", number]
+                                    Player_Pos += vec(sin(-Player_Ang[1]) * cos(Player_Ang[2]), sin(Player_Ang[2]),  cos(-Player_Ang[1]) * cos(Player_Ang[2])) * P["speed", number] / P["fps", number]
                                     break
                                 case 115, # S
-                                    Player_Pos -= vec(sin(-Player_Ang[1]), 0,  cos(-Player_Ang[1])) * P["speed", number] / P["fps", number]
+                                    Player_Pos -= vec(sin(-Player_Ang[1]) * cos(Player_Ang[2]), sin(Player_Ang[2]),  cos(-Player_Ang[1]) * cos(Player_Ang[2])) * P["speed", number] / P["fps", number]
                                     break
                                 case 100, # D
-                                    Player_Pos += vec(cos(-Player_Ang[1]), 0, -sin(-Player_Ang[1])) * P["speed", number] / P["fps", number]
+                                    Player_Pos += vec(cos(-Player_Ang[1]) * cos(Player_Ang[2]), sin(Player_Ang[2]), -sin(-Player_Ang[1]) * cos(Player_Ang[2])) * P["speed", number] / P["fps", number]
                                     break
                                 case 97, # A
-                                    Player_Pos -= vec(cos(-Player_Ang[1]), 0, -sin(-Player_Ang[1])) * P["speed", number] / P["fps", number]
+                                    Player_Pos -= vec(cos(-Player_Ang[1]) * cos(Player_Ang[2]), sin(Player_Ang[2]), -sin(-Player_Ang[1]) * cos(Player_Ang[2])) * P["speed", number] / P["fps", number]
                                     break
                                 
                                 case 32, # Space

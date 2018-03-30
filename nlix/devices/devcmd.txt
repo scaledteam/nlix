@@ -28,7 +28,7 @@ function devcmd() {
         
         case 3,
             if (P["device", wirelink] == nowirelink() | !P["device", wirelink]:entity():isValid()) {
-                out("Device was lost. Trying to find new one.\n")
+                out("Device lost. Trying to find new one.\n")
                 P["state", number] = 2
             }
             break
