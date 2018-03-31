@@ -4,13 +4,13 @@
 # Ported from Windows 10.4
 #
 
-@name xclicker
+@name clicker
 
-xregister("games", "xclicker")
+xregister("games", "clicker")
 
-P2F["xclicker", string] = "xclicker"
+P2F["clicker", string] = "clicker"
 
-function xclicker() {
+function clicker() {
     switch (P["state", number]) {
         case 0,
             if (xcanCreate(17)) {

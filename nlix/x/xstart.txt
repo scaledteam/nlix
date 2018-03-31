@@ -48,16 +48,30 @@ function xstart() {
                 P["xframe", table] = table(
                     "id" = 1,
                     "type" = "frame",
-                    "count" = 1,
-                    "size" = Res
+                    "size" = Res,
+                    "count" = 1
                 )
                 
                 P["xobjectsAll", table] = table(P["xframe", table])
                 
+                local DeviceEntity = Device:entity()
                 P["xparam", table] = table(
                     "textMultiplier" = 512 / Res[2],
-                    "symbolWidth" = 0.53 * Res[1] / Res[2]
+                    "symbolWidth" = 0.53 * Res[1] / Res[2],
+                    "x" = DeviceEntity:toLocalAxis(PosX - Pos0):normalized(),
+                    "y" = DeviceEntity:toLocalAxis(PosY - Pos0):normalized(),
+                    "z" = DeviceEntity:toLocalAxis((PosY - Pos0):cross(PosX - Pos0)):normalized(),
+                    "0" = DeviceEntity:toLocal(Pos0),
+                    "dpu" = 512 / SizeX
                 )
+                
+                #[holoCreate(1, Device:entity():toWorld(P["xparam", table]["x", vector] * 512 / P["xparam", table]["dpu", number] + P["xparam", table]["0", vector]), vec(1 / 12))
+                holoCreate(2, Device:entity():toWorld(P["xparam", table]["y", vector] * 512 * 3 / 4 / P["xparam", table]["dpu", number] + P["xparam", table]["0", vector]), vec(1 / 12))
+                holoCreate(3, Device:entity():toWorld(P["xparam", table]["z", vector] * 10 + P["xparam", table]["0", vector]), vec(1 / 12))
+                holoColor(1, vec(255, 0, 0))
+                holoColor(2, vec(0, 255, 0))
+                holoColor(3, vec(0, 0, 255))]#
+                
                 P["xobjects", table] = table()
                 
                 P:remove("NULL")

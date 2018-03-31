@@ -132,66 +132,86 @@ function table:xredraw() {
 
 function table table:xpos(Pos:vector2) {
     This["pos", vector2] = Pos
-    P["xdevice", wirelink]:egpPos(This["id", number], Pos)
+    if (This["id", number] > 0) {
+        P["xdevice", wirelink]:egpPos(This["id", number], Pos)
+    }
     return This
 }
 
 function table table:xsize(Size:vector2) {
     This["size", vector2] = Size
-    P["xdevice", wirelink]:egpSize(This["id", number], Size)
+    if (This["id", number] > 0) {
+        P["xdevice", wirelink]:egpSize(This["id", number], Size)
+    }
     return This
 }
 
 function table table:xsize(Size) {
     This["sizeNum", number] = Size
-    P["xdevice", wirelink]:egpSize(This["id", number], Size * P["xparam", table]["textMultiplier", number])
+    if (This["id", number] > 0) {
+        P["xdevice", wirelink]:egpSize(This["id", number], Size * P["xparam", table]["textMultiplier", number])
+    }
     return This
 }
 
 function table table:xtext(Text:string) {
     This["text", string] = Text
-    P["xdevice", wirelink]:egpSetText(This["id", number], Text)
+    if (This["id", number] > 0) {
+        P["xdevice", wirelink]:egpSetText(This["id", number], Text)
+    }
     return This
 }
 
 function table table:xcolor(Color:vector) {
     This["color", vector] = Color
-    P["xdevice", wirelink]:egpColor(This["id", number], Color)
+    if (This["id", number] > 0) {
+        P["xdevice", wirelink]:egpColor(This["id", number], Color)
+    }
     return This
 }
 
 function table table:xalign(Align:vector2) {
     This["align", vector2] = Align
-    P["xdevice", wirelink]:egpAlign(This["id", number], Align[1], Align[2])
+    if (This["id", number] > 0) {
+        P["xdevice", wirelink]:egpAlign(This["id", number], Align[1], Align[2])
+    }
     return This
 }
 
 function table table:xmonospaced(Monospaced) {
     This["monospaced", number] = Monospaced
-    P["xdevice", wirelink]:egpFont(This["id", number], Monospaced ? "Courier New" : "")
+    if (This["id", number] > 0) {
+        P["xdevice", wirelink]:egpFont(This["id", number], Monospaced ? "Courier New" : "")
+    }
     return This
 }
 
 function table table:xparent(Parent:table) {
     This["parent", table] = Parent
-    P["xdevice", wirelink]:egpParent(This["id", number], Parent["id", number])
+    if (This["id", number] > 0) {
+        P["xdevice", wirelink]:egpParent(This["id", number], Parent["id", number])
+    }
     return This
 }
 
 function table table:xverticles(Verticles:array) {
     This["verticles", array] = Verticles
-    switch (This["type", string]) {
-        case "poly", P["xdevice", wirelink]:egpPoly(This["id", number], Verticles) break
-        case "polyOutline", P["xdevice", wirelink]:egpPolyOutline(This["id", number], Verticles) break
-        case "lineStrip", P["xdevice", wirelink]:egpLineStrip(This["id", number], Verticles) break
-        default,
+    if (This["id", number] > 0) {
+        switch (This["type", string]) {
+            case "poly", P["xdevice", wirelink]:egpPoly(This["id", number], Verticles) break
+            case "polyOutline", P["xdevice", wirelink]:egpPolyOutline(This["id", number], Verticles) break
+            case "lineStrip", P["xdevice", wirelink]:egpLineStrip(This["id", number], Verticles) break
+            default,
+        }
     }
     return This
 }
 
 function table table:xalpha(Alpha) {
     This["alpha", number] = Alpha
-    P["xdevice", wirelink]:egpAlpha(This["id", number], Alpha)
+    if (This["id", number] > 0) {
+        P["xdevice", wirelink]:egpAlpha(This["id", number], Alpha)
+    }
     return This
 }
 

@@ -1,0 +1,72 @@
+#
+# Created by scaled
+#
+
+@name spirit-level
+
+xregister("real", "spirit-level")
+
+P2F["spirit-level", string] = "spiritlevel"
+
+function spiritlevel() {
+    switch (P["state", number]) {
+        case 0,
+            if (xcanCreate(6)) {
+                local Res = xres()
+                local Size = vec2(min(Res[1], Res[2]))
+                
+                local Background = xcreate("box"):xsize(Res):xcolor(vec())
+                
+                local CircleSize = Size[1] / 10
+                P["multiplier", number] = min(Res[1], Res[2]) / 2 - CircleSize
+                P["circle", table] = xcreate("circle"):xsize(vec2(CircleSize))
+                
+                xcreate("polyOutline"):xparent(Background):xverticles(array(
+                    Size * vec2(-0.5,-0.5),
+                    Size * vec2(0.5,-0.5),
+                    Size * vec2(0.5,-0.3),
+                    Size * vec2(-0.5,-0.3),
+                    Size * vec2(-0.5,-0.1),
+                    Size * vec2(0.5,-0.1),
+                    Size * vec2(0.5,0.1),
+                  	 Size * vec2(-0.5,0.1),
+                    Size * vec2(-0.5,0.3),
+                    Size * vec2(0.5,0.3),
+                    Size * vec2(0.5,0.5),
+                    Size * vec2(-0.5,0.5),
+                    Size * vec2(-0.5,-0.5),
+                    Size * vec2(-0.5,0.5),
+                    Size * vec2(-0.3,0.5),
+                    Size * vec2(-0.3,-0.5),
+                    Size * vec2(-0.1,-0.5),
+                    Size * vec2(-0.1,0.5),
+                    Size * vec2(0.1,0.5),
+                    Size * vec2(0.1,-0.5),
+                    Size * vec2(0.3,-0.5),
+                    Size * vec2(0.3,0.5),
+                    Size * vec2(0.5,0.5),
+                    Size * vec2(0.5,-0.5)
+                ))
+                
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            if (xcanDraw()) {
+                local Res = xres()
+                
+                local Offset = Res / 2
+                
+                local Screen = P["xdevice", wirelink]:entity()
+                local X = Screen:toWorldAxis(P["xparam", table]["x", vector])
+                local Y = Screen:toWorldAxis(P["xparam", table]["y", vector])
+                local Z = Screen:toWorldAxis(P["xparam", table]["z", vector])
+                
+                local Pos = vec2(vec2(Z):dot(vec2(Y):rotate(90)), vec2(Z):dot(vec2(X):rotate(-90))) * P["multiplier", number]
+                
+                P["circle", table]:xpos(Offset + Pos)
+            }
+            break
+    }
+}

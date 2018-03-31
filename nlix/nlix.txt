@@ -79,7 +79,6 @@ if (!tickClk()) {
                 case 67, #include "nlix/x/xterm" break
                 case 68, #include "nlix/x/xres" break
                 case 69, #include "nlix/x/xeyes" break
-                case 71, #include "nlix/x/xclicker" break
                 
                 case 72, #include "nlix/3d/xobj" break
                 case 73, #include "nlix/3d/hluoix3d" break
@@ -88,6 +87,8 @@ if (!tickClk()) {
                 # Other for X
                 case 80, #include "nlix/x-other/speedometer" break
                 case 81, #include "nlix/x-other/radar" break
+                case 82, #include "nlix/x-other/clicker" break
+                case 83, #include "nlix/x-other/spirit-level" break
                 
                 # Init
                 #case 90, SYSTEM_NAME = "system0" #include "nlix/system/sync" break

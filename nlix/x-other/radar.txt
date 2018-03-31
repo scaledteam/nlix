@@ -12,54 +12,57 @@ P2F["radar", string] = "radar"
 function radar() {
     switch (P["state", number]) {
         case 0,
-            if (xcanCreate(11)) {
-                local Res = P["xframe", table]["size", vector2]
+            P["count", number] = 10
+            if (xcanCreate(1 + P["count", number])) {
+                local Res = xres()
                 
                 xcreate("box"):xsize(Res):xcolor(vec())
                 
                 P["texts", table] = table()
-                for (I = 1, 10) {
+                for (I = 1, P["count", number]) {
                     P["texts", table]:pushTable(xcreate("text"):xsize(12))
                 }
                 
-                findByClass("player")
-                local Distance = 2000
-                for (I = 1, min(10, findCount())) {
-                    local TargetDistance = entity():pos():distance(find():pos())
-                    if (TargetDistance > Distance) {
-                        Distance = TargetDistance
-                    }
-                }
+                P["class", string] = "player"
+                #P["class", string] = "prop_physics"
                 
-                P["distance", number] = Distance * sqrt(2)
-                P["multiplier", number] = min(Res[1], Res[2]) / P["distance", number] / 2 * sqrt(2)
+                local Pos = P["xdevice", wirelink]:entity():boxCenterW()
+                
+                findByClass(P["class", string])
+                findSortByDistance(Pos)
+                
+                local Targets = findToArray()
+                local Acpect = sqrt(max(Res[1] / Res[2], Res[2] / Res[1]) ^ 2 + 1)
+                local Distance = max(500, Pos:distance(Targets[min(Targets:count(), P["count", number]), entity]:pos()))
+                
+                P["findDistance", number] = Distance * Acpect
+                P["multiplier", number] = min(Res[1], Res[2]) / Distance / 2
                 
                 P["state", number] = 1
             }
             break
         
         case 1,
-            if (systime() > P["nextUpdate", number]) {
-                #local Entity = P["device", wirelink]:entity()
-                local Entity = entity()
-                local Pos = Entity:pos()
+            if (xcanDraw() & systime() > P["nextUpdate", number]) {
+                local XScreen = P["xdevice", wirelink]:entity()
+                local Pos = XScreen:boxCenterW()
                 
-                findIncludeClass("player")
-                    findInSphere(Pos, P["distance", number])
+                findIncludeClass(P["class", string])
+                findInSphere(Pos, P["findDistance", number])
+                findSortByDistance(Pos)
                 findClearWhiteClassList()
                 
-                findSortByDistance(Pos)
-                
-                local Res = P["xframe", table]["size", vector2]
+                local Res = xres()
                 local Offset = Res / 2
                 
                 local FindToArray = findToArray()
-                local Count = min(FindToArray:count(), 10)
+                local Count = min(FindToArray:count(), P["count", number])
                 for (I = 1, Count) {
                     local Object = P["texts", table][I, table]
                     
-                    #Object:xpos(clamp(vec2(FindToArray[I, entity]:pos() - Pos):rotate(90 - Entity:angles()[2]) * vec2(-1, 1) * P["multiplier", number] + Offset, vec2(), Res - vec2(0, 12)))
-                    Object:xpos(clamp(shift(vec2(entity():toLocal(FindToArray[I, entity]:pos()))) * P["multiplier", number] + Offset, vec2(), Res - vec2(0, 12)))
+                    Object:xpos(clamp(
+                        shift(vec2(FindToArray[I, entity]:pos() - Pos):rotate(-vec2(XScreen:toWorldAxis(P["xparam", table]["y", vector])):toAngle())) * P["multiplier", number] + Offset,
+                    vec2(), Res - vec2(0, 12)))
                     
                     if (Object["pos", vector2][1] > Offset[1]) {
                         Object:xtext(FindToArray[I, entity]:name() + " '")

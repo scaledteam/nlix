@@ -21,9 +21,40 @@ function xwm() {
                 P["args", array]:unshiftString(P["name", string])
                 P["name", string] = "xstart"
             }
-            elseif (xcanCreate(1)) {
+            elseif (xcanCreate(2)) {
                 local Res = P["xframe", table]["size", vector2]
-                xcreate("box"):xsize(Res):xcolor(P["xframe", table]:exists("parent") ? hsv2rgb(randint(360), 1, 0.7) : hsv2rgb(205, 1, 0.7))
+                local Background = xcreate("box"):xsize(Res):xcolor(P["xframe", table]:exists("parent") ? hsv2rgb(randint(360), 1, 0.7) : hsv2rgb(205, 1, 0.7))
+                
+                #local Offset = Res / 2 - vec2(5)
+                local Multiplier = min(Res[1], Res[2]) / 2 * 0.3
+                
+                local Poses = array(
+                    Multiplier * vec2(-1, 1),
+                    Multiplier * vec2(-1),
+                    Multiplier * vec2(-1) + vec2(0, 5),
+                    Multiplier * vec2(1, 0.5),
+                    Multiplier * vec2(1),
+                    Multiplier * vec2(1, -1)
+                )
+                
+                xcreate("lineStrip"):xparent(Background):xverticles(Poses):xsize(10):xcolor(vec(127))
+                
+                #[local Poses = array(
+                    Offset + Multiplier * vec2(-1, 1),
+                    Offset + Multiplier * vec2(-1, 0.333),
+                    Offset + Multiplier * vec2(-1, -0.333),
+                    Offset + Multiplier * vec2(-1),
+                    Offset + Multiplier * vec2(-0.333, -0.75),
+                    Offset + Multiplier * vec2(0.333, -0.25),
+                    Offset + Multiplier * vec2(1),
+                    Offset + Multiplier * vec2(1, 0.333),
+                    Offset + Multiplier * vec2(1, -0.333),
+                    Offset + Multiplier * vec2(1, -1)
+                )
+                
+                foreach (I, Pos:vector2 = Poses) {
+                    xcreate("box"):xsize(vec2(Multiplier / 2)):xpos(Pos):xcolor(vec())
+                }]#
                 
                 P["in", array] = array("interface xpanel")
                 
