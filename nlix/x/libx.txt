@@ -8,7 +8,8 @@ S["xmenu", table] = table(
     "shutdown" = array(
         "poweroff",
         "reboot",
-        "sh"
+        "sh",
+        "exit"
     )
 )
 
@@ -191,6 +192,9 @@ function table table:xparent(Parent:table) {
     if (This["id", number] > 0) {
         P["xdevice", wirelink]:egpParent(This["id", number], Parent["id", number])
     }
+    if (Parent["type", string] == "frame") {
+        Parent["count", number] = Parent["count", number] + 1
+    }
     return This
 }
 
@@ -250,7 +254,8 @@ function vector2 xcursor() {
             Frame["cursorTimer", number] = systime() + 1
         }
         
-        Frame["cursor", vector2] = round(Device:egpCursor(Frame["cursorUser", entity]))
+        #Frame["cursor", vector2] = round(Device:egpCursor(Frame["cursorUser", entity]))
+        Frame["cursor", vector2] = Device:egpCursor(Frame["cursorUser", entity])
         Frame["keyUse", number] = Frame["cursor", vector2] != vec2(-1) & Frame["cursorUser", entity]:keyUse()
     }
     else {
@@ -291,20 +296,26 @@ function number xxobjectsLeft() {
     return egpMaxObjects() - xxlastObjectId()
 }
 
+function table table:xexec(ProgramName:string) {
+    local Program = exec(ProgramName)
+    
+    Program["xframe", table] = This
+    
+    Program["xparam", table] = P["xparam", table]
+    Program["xobjects", table] = table()
+    Program["xobjectsAll", table] = P["xobjectsAll", table]
+    Program["xdevice", wirelink] = P["xdevice", wirelink]
+    
+    return Program
+}
+
 function table xexec(ProgramName:string, Pos:vector2, Size:vector2) {
     if (P["xobjects", table]:count() >= 1) {
-        local Program = exec(ProgramName)
+        local Frame = xcreate("frame"):xparent(P["xframe", table])
+        Frame["size", vector2] = Size
+        Frame:xpos(Pos)
         
-        Program["xframe", table] = xcreate("frame"):xparent(P["xframe", table])
-        Program["xframe", table]["size", vector2] = Size
-        Program["xframe", table]:xpos(Pos)
-        
-        Program["xparam", table] = P["xparam", table]
-        Program["xobjects", table] = table()
-        Program["xobjectsAll", table] = P["xobjectsAll", table]
-        Program["xdevice", wirelink] = P["xdevice", wirelink]
-        
-        return Program
+        return Frame:xexec(ProgramName)
     }
     else {
         return NULL
@@ -507,8 +518,8 @@ function xxup(StartId, ObjectLastId, ParentLastId) {
 }
 
 function table:xup() {
-    if (This:xxlastObjectId() < xxlastObjectId()) {
-        xxup(This["id", number], This["id", number] + This["count", number], This:xxlastObjectId())
+    if (This:xxlastObjectId() < P["xframe", table]:xxlastObjectId()) {
+        xxup(This["id", number], This["id", number] + This["count", number], P["xframe", table]:xxlastObjectId())
     }
 }
 

@@ -10,8 +10,6 @@ function xmenu() {
     switch (P["state", number]) {
         case 0,
             if (xcanCreate(4)) {
-                P["xframe", table]["pos", vector2] = vec2(0, P["xframe", table]["size", vector2][2] - 20)
-                
                 # Panel
                 local List = S["xmenu", table]:keys()
                 P["categories", array] = List
@@ -24,15 +22,16 @@ function xmenu() {
                     }
                 }
                 local MenuSize = vec2(P["xparam", table]["symbolWidth", number] * MenuWidth, List:count()) * 20
-                P["xframe", table]["size", vector2] = MenuSize
                 
-                P["xframe", table]:xpos(P["xframe", table]["pos", vector2] - MenuSize:setX(0))
+                P["pos", vector2] = vec2(0, P["xframe", table]["size", vector2][2] - 20 - MenuSize[2])
                 
-                P["menu", table] = xcreate("box"):xsize(MenuSize):xcolor(vec(63))
-                P["menuText", table] = xcreate("textLayout"):xsize(MenuSize):xtext(List:concat("\n")):xsize(20)
+                P["menu", table] = xcreate("box"):xsize(MenuSize):xcolor(vec(63)):xpos(P["pos", vector2])
+                P["menuText", table] = xcreate("textLayout"):xsize(MenuSize):xtext(List:concat("\n")):xsize(20):xpos(P["pos", vector2])
                 
                 P["submenu", table] = xcreate("box"):xalpha(0):xcolor(vec(63))
                 P["submenuText", table] = xcreate("textLayout"):xalpha(0):xsize(20)
+                
+                P["xframe", table]["parent", table]["xmenu", table] = P
                 
                 P["state", number] = 1
             }
@@ -42,9 +41,9 @@ function xmenu() {
             if (xcanDraw()) {
                 local Cursor = xcursor()
                 
-                local PosN = int(Cursor[2] / 20) + 1
+                local PosN = int((Cursor[2] - P["pos", vector2][2]) / 20) + 1
                 
-                if (PosN != P["posNOld", number] & inrange(Cursor, vec2(), P["menu", table]["size", vector2] + vec2(0, 20))) {
+                if (PosN != P["posNOld", number] & inrange(Cursor - P["pos", vector2], vec2(), P["menu", table]["size", vector2] + vec2(0, 20))) {
                     P["posNOld", number] = PosN
                     
                     local List = S["xmenu", table][P["categories", array][PosN, string], array]
@@ -60,13 +59,13 @@ function xmenu() {
                     
                     local MenuSize = vec2(P["xparam", table]["symbolWidth", number] * MenuWidth, List:count()) * 20
                     
-                    local Pos = vec2(P["menu", table]["size", vector2][1], -MenuSize[2] + PosN * 20)
+                    local Pos = vec2(P["menu", table]["size", vector2][1], -MenuSize[2] + PosN * 20) + P["pos", vector2]
                     P["submenu", table]:xsize(MenuSize):xalpha(255):xpos(Pos)
                     P["submenuText", table]:xsize(MenuSize):xtext(List:concat("\n")):xalpha(255):xpos(Pos)
                 }
                 
                 if (xkeyUse()) {
-                    if (inrange(Cursor, vec2(), P["menu", table]["size", vector2] + vec2(0, 20))) {
+                    if (inrange(Cursor - P["pos", vector2], vec2(), P["menu", table]["size", vector2] + vec2(0, 20))) {
                     }
                     elseif (inrange(Cursor - P["submenu", table]["pos", vector2], vec2(), P["submenu", table]["size", vector2])) {
                         local PosN = int((Cursor[2] - P["submenu", table]["pos", vector2][2]) / 20) + 1

@@ -40,27 +40,15 @@ function xpanel() {
                 }
                 
                 local Cursor = xcursor()
+                local Use = P["xframe", table]["parent", table]["interfaceUse", number]
                 
-                if (xkeyUse() != P["xkeyUseOld", number]) {
-                    P["xkeyUseOld", number] = xkeyUse()
+                if (Use != P["xkeyUseOld", number]) {
+                    P["xkeyUseOld", number] = Use
                     
-                    if (!P["menu", table]:isValid() & !xkeyUse() & inrange(Cursor, vec2(), vec2(P["menuButtonWidth", number], 20))) {
-                        #P["state", number] = 2
+                    if (!P["xframe", table]["parent", table]["xmenu", table]:isValid() & !Use & inrange(Cursor, vec2(), vec2(P["menuButtonWidth", number], 20))) {
                         out("interface xmenu")
                     }
                 }
-            }
-            break
-        
-        case 2,
-            local Super = P
-            P = P["parent", table]
-            
-            if (xcanCreate(1)) {
-                Super["menu", table] = xexec("xmenu", Super["xframe", table]["pos", vector2], vec2())
-                Super["menu", table]["out", array] = Super["out", array]
-                Super["menuFrame", table] = Super["menu", table]["xframe", table]
-                Super["state", number] = 1
             }
             break
     }
