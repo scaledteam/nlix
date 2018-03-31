@@ -30,6 +30,7 @@ function wustdd() {
                 P["fps", number] = 1 / tickInterval()
                 
                 P["sens", number] = 100
+                P["sensMouse", number] = 2
                 P["speed", number] = 2.5
                 
                 P["counter", number] = 1
@@ -144,10 +145,10 @@ function wustdd() {
                                     Player_Pos -= vec(sin(-Player_Ang[1]) * cos(Player_Ang[2]), sin(Player_Ang[2]),  cos(-Player_Ang[1]) * cos(Player_Ang[2])) * P["speed", number] / P["fps", number]
                                     break
                                 case 100, # D
-                                    Player_Pos += vec(cos(-Player_Ang[1]) * cos(Player_Ang[2]), sin(Player_Ang[2]), -sin(-Player_Ang[1]) * cos(Player_Ang[2])) * P["speed", number] / P["fps", number]
+                                    Player_Pos += vec(cos(-Player_Ang[1]), 0, -sin(-Player_Ang[1])) * P["speed", number] / P["fps", number]
                                     break
                                 case 97, # A
-                                    Player_Pos -= vec(cos(-Player_Ang[1]) * cos(Player_Ang[2]), sin(Player_Ang[2]), -sin(-Player_Ang[1]) * cos(Player_Ang[2])) * P["speed", number] / P["fps", number]
+                                    Player_Pos -= vec(cos(-Player_Ang[1]), 0, -sin(-Player_Ang[1])) * P["speed", number] / P["fps", number]
                                     break
                                 
                                 case 32, # Space
@@ -167,7 +168,7 @@ function wustdd() {
                         
                         if (Use & inrange(Cursor, vec2(), Res)) {
                             if (P:exists("cursorOld")) {
-                                Player_Ang += (Cursor - P["cursorOld", vector2]) * 90 / Res[2]
+                                Player_Ang += (Cursor - P["cursorOld", vector2]) * 90 / Res[2] * P["sensMouse", number]
                             }
                             P["cursorOld", vector2] = Cursor
                         }

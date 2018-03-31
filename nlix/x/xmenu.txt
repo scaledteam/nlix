@@ -10,7 +10,7 @@ function xmenu() {
     switch (P["state", number]) {
         case 0,
             if (xcanCreate(4)) {
-                #P["xframe", table]["pos", vector2] = vec2(0, P["xframe", table]["size", vector2][2] - 20)
+                P["xframe", table]["pos", vector2] = vec2(0, P["xframe", table]["size", vector2][2] - 20)
                 
                 # Panel
                 local List = S["xmenu", table]:keys()
@@ -39,14 +39,14 @@ function xmenu() {
             break
         
         case 1,
-            local Cursor = xcursor()
-            
-            local PosN = int(Cursor[2] / 20) + 1
-            
-            if (PosN != P["posNOld", number]) {
-                P["posNOld", number] = PosN
+            if (xcanDraw()) {
+                local Cursor = xcursor()
                 
-                if (inrange(Cursor, vec2(), P["menu", table]["size", vector2] + vec2(0, 20))) {
+                local PosN = int(Cursor[2] / 20) + 1
+                
+                if (PosN != P["posNOld", number] & inrange(Cursor, vec2(), P["menu", table]["size", vector2] + vec2(0, 20))) {
+                    P["posNOld", number] = PosN
+                    
                     local List = S["xmenu", table][P["categories", array][PosN, string], array]
                     P["programList", array] = List
                     
@@ -64,19 +64,19 @@ function xmenu() {
                     P["submenu", table]:xsize(MenuSize):xalpha(255):xpos(Pos)
                     P["submenuText", table]:xsize(MenuSize):xtext(List:concat("\n")):xalpha(255):xpos(Pos)
                 }
-            }
-            
-            if (xkeyUse()) {
-                if (inrange(Cursor, vec2(), P["menu", table]["size", vector2] + vec2(0, 20))) {
-                }
-                elseif (inrange(Cursor - P["submenu", table]["pos", vector2], vec2(), P["submenu", table]["size", vector2])) {
-                    local PosN = int((Cursor[2] - P["submenu", table]["pos", vector2][2]) / 20) + 1
-                    
-                    out(P["programList", array][PosN, string])
-                    xend()
-                }
-                else {
-                    xend()
+                
+                if (xkeyUse()) {
+                    if (inrange(Cursor, vec2(), P["menu", table]["size", vector2] + vec2(0, 20))) {
+                    }
+                    elseif (inrange(Cursor - P["submenu", table]["pos", vector2], vec2(), P["submenu", table]["size", vector2])) {
+                        local PosN = int((Cursor[2] - P["submenu", table]["pos", vector2][2]) / 20) + 1
+                        
+                        out(P["programList", array][PosN, string])
+                        end()
+                    }
+                    else {
+                        end()
+                    }
                 }
             }
             break

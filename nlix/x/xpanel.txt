@@ -30,21 +30,24 @@ function xpanel() {
             break
         
         case 1,
-            # Clock
-            if (systime() > P["clockTimer", number]) {
-                local Date = date()
-                P["clock", table]:xtext(format("%02d:%02d:%02d", Date["hour", number], Date["min", number], Date["sec", number]))
+            if (xcanDraw()) {
+                # Clock
+                if (systime() > P["clockTimer", number]) {
+                    local Date = date()
+                    P["clock", table]:xtext(format("%02d:%02d:%02d", Date["hour", number], Date["min", number], Date["sec", number]))
+                    
+                    P["clockTimer", number] = systime() + 1
+                }
                 
-                P["clockTimer", number] = systime() + 1
-            }
-            
-            local Cursor = xcursor()
-            
-            if (xkeyUse() != P["xkeyUseOld", number]) {
-                P["xkeyUseOld", number] = xkeyUse()
+                local Cursor = xcursor()
                 
-                if (!P["menu", table]:isValid() & !xkeyUse() & inrange(Cursor, vec2(), vec2(P["menuButtonWidth", number], 20))) {
-                    P["state", number] = 2
+                if (xkeyUse() != P["xkeyUseOld", number]) {
+                    P["xkeyUseOld", number] = xkeyUse()
+                    
+                    if (!P["menu", table]:isValid() & !xkeyUse() & inrange(Cursor, vec2(), vec2(P["menuButtonWidth", number], 20))) {
+                        #P["state", number] = 2
+                        out("interface xmenu")
+                    }
                 }
             }
             break

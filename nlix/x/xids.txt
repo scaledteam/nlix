@@ -1,0 +1,44 @@
+#
+# Created by scaled
+#
+
+@name xids
+
+xregister("tests", "xids")
+
+P2F["xids", string] = "xids"
+
+function xids() {
+    switch (P["state", number]) {
+        case 0,
+            if (xcanCreate(2)) {
+                P["indicator", table] = xcreate("box"):xsize(xres())
+                P["indicatorText", table] = xcreate("text"):xalign(vec2(1)):xsize(xres()[2] / 5):xparent(P["indicator", table])
+                
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            if (xcanDraw()) {
+                local Cursor = xcursor()
+                
+                if (xkeyUse() != P["xkeyUseOld", number]) {
+                    P["xkeyUseOld", number] = xkeyUse()
+                    
+                    if (xkeyUse() & inrange(Cursor, vec2(), P["indicator", table]["size", vector2])) {
+                        xprintAll()
+                    }
+                }
+                
+                local Count = P["xobjectsAll", table]:count()
+                if (Count != P["xobjectsAllCountOld", number]) {
+                    P["xobjectsAllCountOld", number] = Count
+                    
+                    P["indicator", table]:xcolor(hsv2rgb(Count * 360 / egpMaxObjects(), 1, 1))
+                    P["indicatorText", table]:xtext(Count:toString())
+                }
+            }
+            break
+    }
+}

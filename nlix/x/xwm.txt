@@ -25,36 +25,18 @@ function xwm() {
                 local Res = P["xframe", table]["size", vector2]
                 local Background = xcreate("box"):xsize(Res):xcolor(P["xframe", table]:exists("parent") ? hsv2rgb(randint(360), 1, 0.7) : hsv2rgb(205, 1, 0.7))
                 
-                #local Offset = Res / 2 - vec2(5)
                 local Multiplier = min(Res[1], Res[2]) / 2 * 0.3
                 
                 local Poses = array(
                     Multiplier * vec2(-1, 1),
                     Multiplier * vec2(-1),
-                    Multiplier * vec2(-1) + vec2(0, 5),
+                    Multiplier * vec2(-1, -0.9),
                     Multiplier * vec2(1, 0.5),
                     Multiplier * vec2(1),
                     Multiplier * vec2(1, -1)
                 )
                 
-                xcreate("lineStrip"):xparent(Background):xverticles(Poses):xsize(10):xcolor(vec(127))
-                
-                #[local Poses = array(
-                    Offset + Multiplier * vec2(-1, 1),
-                    Offset + Multiplier * vec2(-1, 0.333),
-                    Offset + Multiplier * vec2(-1, -0.333),
-                    Offset + Multiplier * vec2(-1),
-                    Offset + Multiplier * vec2(-0.333, -0.75),
-                    Offset + Multiplier * vec2(0.333, -0.25),
-                    Offset + Multiplier * vec2(1),
-                    Offset + Multiplier * vec2(1, 0.333),
-                    Offset + Multiplier * vec2(1, -0.333),
-                    Offset + Multiplier * vec2(1, -1)
-                )
-                
-                foreach (I, Pos:vector2 = Poses) {
-                    xcreate("box"):xsize(vec2(Multiplier / 2)):xpos(Pos):xcolor(vec())
-                }]#
+                xcreate("lineStrip"):xparent(Background):xverticles(Poses):xsize(Multiplier * 0.2):xcolor(vec(127))
                 
                 P["in", array] = array("interface xpanel")
                 
@@ -121,14 +103,24 @@ function xwm() {
                     if (!Program:isValid()) {
                         P["programs", table]:remove(Counter)
                         
-                        if (!P["frames", table][Counter, table]:exists("removed")) {
-                            if (P["xremove", table]:isValid()) {
-                                P["frames", table]:removeTable(Counter):xremove()
-                                P["windows", table]:removeTable(Counter):xremove()
+                        if (P["windows", table][Counter, table]:isValid()) {
+                            if (!P["frames", table][Counter, table]:exists("removed")) {
+                                if (P["xremove", table]:isValid()) {
+                                    P["frames", table]:removeTable(Counter):xremove()
+                                    P["windows", table]:removeTable(Counter):xremove()
+                                }
+                                else {
+                                    xxremoveByDaemon(P["windows", table]:removeTable(Counter)["id", number], P["frames", table]:removeTable(Counter):xxlastObjectId())
+                                }
                             }
-                            else {
-                                xxremoveByDaemon(P["windows", table]:removeTable(Counter)["id", number], P["frames", table]:removeTable(Counter):xxlastObjectId())
-                            }
+                        }
+                        else {
+                            P["frames", table]:removeTable(Counter):xremove()
+                            P["windows", table]:remove(Counter)
+                        }
+                        
+                        if (Counter == P["focus", number]) {
+                            P["focus", number] = P["focus", number] - 1
                         }
                     }
                     # Check focus
@@ -140,12 +132,10 @@ function xwm() {
                         # set new focus
                         P["focus", number] = Counter
                         
-                        # test
+                        # up program
                         local Window = P["windows", table][Counter, table]
                         if (Window:isValid()) {
-                            #Program["xframe", table]:xup()
                             xxup(Window["id", number], Program["xframe", table]:xxlastObjectId(), P["xframe", table]:xxlastObjectId())
-                            #xprintAll()
                         }
                     }
                 }

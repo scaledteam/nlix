@@ -1,0 +1,66 @@
+#
+# Created by scaled
+#
+
+@name help
+
+P2F["help", string] = "help"
+
+function help() {
+    switch (P["state", number]) {
+        case 0,
+            P["programList", array] = P2F:keys()
+            
+            out(
+                "This system created by scaled.\n"
+                +"You can follow this project and get help using repository of Nlix on github:\n"
+                +"https://github.com/scaledtm/nlix/\n"
+                +"Now you can see list of all programs of this system.\n"
+            )
+            
+            P["tabWidth", number] = 10
+            
+            local String = ""
+            for (I = 1, P["tabWidth", number]) {
+                String += " "
+            }
+            P["tabString", string] = String
+            
+            P["state", number] = 1
+            break
+        
+        case 1,
+            local Counter = P["counter", number]
+            local Out = ""
+            
+            local TabWidth = P["tabWidth", number]
+            local TabString = P["tabString", string]
+        
+            for (J = 1, Overload) {
+                for (I = 1, 3) {
+                    Counter++
+                    
+                    local ProgramName = P["programList", array][Counter, string]
+                    if (I != 3) {
+                        local Length = ProgramName:length() + TabWidth
+                        
+                        ProgramName = (ProgramName + TabString):sub(1, Length - Length % TabWidth)
+                    }
+                    
+                    Out += ProgramName
+                    
+                    if (Counter >= P["programList", array]:count()) {
+                        out(Out + "\n")
+                        end()
+                        return
+                    }
+                }
+                
+                Out += "\n"
+            }
+            
+            out(Out)
+            P["counter", number] = Counter
+            break
+    }
+}

@@ -64,6 +64,7 @@ function spiritlevel() {
                 local Z = Screen:toWorldAxis(P["xparam", table]["z", vector])
                 
                 local Pos = vec2(vec2(Z):dot(vec2(Y):rotate(90)), vec2(Z):dot(vec2(X):rotate(-90))) * P["multiplier", number]
+                #local Pos = vec2(vec2(Z):dot(shift(vec2(Y))), vec2(Z):dot(shift(vec2(X)))) * P["multiplier", number]
                 
                 P["circle", table]:xpos(Offset + Pos)
             }
