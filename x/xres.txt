@@ -1,0 +1,43 @@
+#
+# Created by scaled
+#
+
+@name xres
+
+xregister("tests", "xres")
+
+P2F["xres", string] = "xresTest"
+
+function xresTest() {
+    switch (P["state", number]) {
+        case 0,
+            if (xcanCreate(3)) {
+                local Res = P["xframe", table]["size", vector2]
+                local Size = vec2(int(min(Res[1], Res[2]) / 10) * 10)
+                
+                xcreate("box"):xsize(Res):xcolor(vec(127))
+                xcreate("box"):xsize(Size)
+                
+                local Parented = P["xframe", table]:exists("parent")
+                
+                P["text", table] = xcreate("textLayout"):xsize(Size):xsize(Size[2] / 10):xcolor(vec()):xtext(
+                    "Res = (" + Res[1] + ", " + Res[2] + ")\n"
+                    +"Size = " + Size[1] + "\n"
+                    +(Parented ? "Res = (" + P["xframe", table]["parent", table]["size", vector2][1] + ", " + P["xframe", table]["parent", table]["size", vector2][2] + ")\n" : "Line 3\n")
+                    +"Line 4\n"
+                    +"Line 5\n"
+                    +"Line 6\n"
+                    +"Line 7\n"
+                    +"Line 8\n"
+                    +"Line 9\n"
+                    +"Line 10"
+                )
+                
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            break
+    }
+}

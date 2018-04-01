@@ -168,6 +168,7 @@ function term() {
                                 local NewText2 = NewTextExp:shiftString()
                                 
                                 if (NewText2:length() >= Width) {
+                                    print(NewText2)
                                     for (I = 0, NewText2:length() / Width) {
                                         TextR:pushString(NewText2:sub(I * Width, (I + 1) * Width - 1))
                                     }
@@ -176,7 +177,8 @@ function term() {
                                     while (TextR:count() > P["resolution", vector2][2]) {
                                         TextR:shift()
                                     }
-                                    Text = TextR:concat("")
+                                    #Text = TextR:concat("")
+                                    Text = TextR:concat("\n"):replace("\n\n", "\n")
                                 }
                                 else {
                                     Text += In
@@ -185,7 +187,6 @@ function term() {
                             }
                             elseif (NewTextExpCount > P["resolution", vector2][2]) {
                                 TextR:clear()
-                                #NewTextExp = NewTextExp:concat("\n", NewTextExpCount - P["resolution", vector2][2] + 1):explode("\n")
                                 NewTextExp = NewTextExp:concat("\n\t", NewTextExpCount - P["resolution", vector2][2] + 1):explode("\t")
                                 
                                 foreach (I, NewText2:string = NewTextExp) {
@@ -198,7 +199,8 @@ function term() {
                                 while (TextR:count() > P["resolution", vector2][2]) {
                                     TextR:shift()
                                 }
-                                Text = TextR:concat("")
+                                #Text = TextR:concat("")
+                                Text = TextR:concat("\n"):replace("\n\n", "\n")
                             }
                             else {
                                 NewTextExp = NewTextExp:concat("\n\t"):explode("\t")
@@ -213,7 +215,8 @@ function term() {
                                 while (TextR:count() > P["resolution", vector2][2]) {
                                     TextR:shift()
                                 }
-                                Text = TextR:concat("")
+                                #Text = TextR:concat("")
+                                Text = TextR:concat("\n"):replace("\n\n", "\n")
                             }
                             
                             P["text", string] = Text
