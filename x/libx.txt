@@ -198,7 +198,7 @@ function table table:xparent(Parent:table) {
     return This
 }
 
-function table table:xverticles(Verticles:array) {
+function table table:xvertices(Verticles:array) {
     This["verticles", array] = Verticles
     if (This["id", number] > 0) {
         switch (This["type", string]) {
@@ -238,7 +238,7 @@ function vector2 xcursor() {
             #ifdef findByClass(string)
             
             findByClass("player")
-            findSortByDistance(Device:entity():pos() - (owner():shootPos() - owner():pos()))
+            findSortByDistance(Device:entity():pos() - vec(0, 0, 64))
             Frame["user", entity] = find()
             
             #else
@@ -249,7 +249,7 @@ function vector2 xcursor() {
             local Distance = ScreenPos:distance(User:pos())
             
             foreach (I, Player:entity = players()) {
-                local TempDistance = ScreenPos:distance(Player:pos())
+                local TempDistance = ScreenPos:distance(Player:pos() + vec(0, 0, 64))
                 if (TempDistance < Distance) {
                     Distance = TempDistance
                     User = Player
@@ -443,7 +443,7 @@ function number xcanCreate(Count) {
             case 4,
                 P["xcounter", number] = P["xcounter", number] + 1
                 
-                if (P["xobjectsTemp", table]:count() > 0) {
+                if (P["xobjectsTemp", table]) {
                     local Object = P["xobjectsTemp", table]:removeTable(1)
                     local Id = P["xcounter", number] + P["xshiftStart", number] + Count
                     
@@ -483,7 +483,7 @@ function number table:xclear() {
 }
 
 function xxremoveByDaemon(IdStart, IdEnd) {
-    if (!P["xremove", table]:isValid()) {
+    if (!P["xremove", table]) {
         local XRemove = exec("xremove")
         P["xremove", table] = XRemove
         XRemove:remove("parent")
@@ -499,7 +499,7 @@ function xxremoveByDaemon(IdStart, IdEnd) {
 
 function table:xremove() {
     if (!This:exists("removed")) {
-        if (P["xremove", table]:isValid()) {
+        if (P["xremove", table]) {
             This:xclear()
         }
         else {
@@ -514,7 +514,7 @@ function xend() {
 }
 
 function xxup(StartId, ObjectLastId, ParentLastId) {
-    if (!P["xup", table]:isValid()) {
+    if (!P["xup", table]) {
         local XUp = exec("xup")
         P["xup", table] = XUp
         

@@ -10,10 +10,6 @@ S["devices", table] = table(
     "D" = table()
 )
 
-function number wirelink:isValid() {
-    return This != nowirelink() & This:entity():isValid()
-}
-
 function string wirelink:type() {
     local Name = This:entity():type()
     
@@ -25,12 +21,12 @@ function string wirelink:type() {
 }
 
 function number deviceGet(Type:string) {
-    if (S["devices", table]:exists(Type) & !P["device", wirelink]:isValid()) {
+    if (S["devices", table]:exists(Type) & !P["device", wirelink]) {
         local Devices = S["devices", table][Type, array]
         
         if (Devices:count() > 0) {
             local Device = Devices:shiftWirelink()
-            if (Device:isValid()) {
+            if (Device) {
                 P["device", wirelink] = Device
                 S["devices", table]["P", table]:pushTable(P)
                 S["devices", table]["D", table]:pushWirelink(Device)
@@ -51,7 +47,7 @@ function number deviceGet(Type:string) {
 
 function deviceReturn() {
     local Device = P:removeWirelink("device")
-    if (Device:isValid()) {
+    if (Device) {
         local DeviceType = Device:type()
         
         if (P:exists(DeviceType)) {

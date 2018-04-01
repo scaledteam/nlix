@@ -110,11 +110,11 @@ function sh() {
             break
         
         case 3,
-            if (!P["program", table]:isValid()) {
+            if (!P["program", table]) {
                 P["state", number] = 1
             }
             
-            if (P:exists("kbd") & P["kbd", array][1, number] == 158) {
+            elseif (P:exists("kbd") & P["kbd", array][1, number] == 158) {
                 switch (toChar(P["kbd", array][2, number])) {
                     case "c",
                         P["program", table]:clear()

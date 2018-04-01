@@ -8,20 +8,16 @@ P2F["kill", string] = "kill"
 
 function kill() {
     if (args() < 1) {
-        out("Usage: kill [id] [end id]\n")
+        out("Usage: kill [id]\n")
     }
     else {
-        if (args() < 2) {
-            Ps:removeTable(arg(1):toNumber()):clear()
+        local Id = arg(1):toNumber()
+        
+        if (Id < 0) {
+            out("Entered value is incorrect.\n")
         }
         else {
-            local Arg1 = arg(1):toNumber()
-            local Arg2 = arg(2):toNumber()
-            
-            while (Arg2 >= Arg1) {
-                Ps:removeTable(Arg1):clear()
-                Arg2--
-            }
+            Ps:removeTable(Id):clear()
         }
     }
     end()

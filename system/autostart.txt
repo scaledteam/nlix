@@ -4,7 +4,7 @@
 
 @name autostart
 
-if (!Ps:isValid()) {
+if (!Ps) {
     S["startTime", number] = systime()
     
     # Daemons

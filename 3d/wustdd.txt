@@ -201,14 +201,14 @@ function wustdd() {
                     for (I = 1, 3) {
                         local Vector = P["Render_Matrix1", matrix] * P["Render_Matrix0", matrix] * (AREA[Counter, matrix]:row(I) - Render_Pos)
                         if (Vector[3] <= 0) {
-                            P[Counter, table]:xverticles(P["EMPTY_POLY", array])
+                            P[Counter, table]:xvertices(P["EMPTY_POLY", array])
                             continue
                         }
                         Temp_Vectors[I, vector2] = clamp(Vector:dehomogenized() * RENDER_MULTIPLIER_VECTOR2 + Offset, vec2(), Res)
                     }
                     
                     
-                    P[Counter, table]:xverticles(Temp_Vectors)
+                    P[Counter, table]:xvertices(Temp_Vectors)
                     
                     
                     #End action

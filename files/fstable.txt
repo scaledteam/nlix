@@ -42,7 +42,7 @@ function fstable() {
                     }
                 }
                 
-                if (P:isValid()) {
+                if (P) {
                     #out(Dir:keys():concat("\n") + "\n")
                     
                     local Out = ""
@@ -164,7 +164,7 @@ function fstable() {
                         }
                     }
                     
-                    if (P:isValid()) {
+                    if (P) {
                         out("ok\n")
                         end()
                     }
@@ -197,7 +197,7 @@ function fstable() {
                     }
                 }
                 
-                if (P:isValid()) {
+                if (P) {
                     out("ok\n")
                     end()
                 }

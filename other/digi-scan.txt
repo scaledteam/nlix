@@ -102,15 +102,13 @@ function digiscan() {
                     if (Counter >= Count) {
                         out("Time remaining: " + int(100 * (systime() - P["startTime", number])) / 100 + "\n")
                         end()
-                        break
+                        return
                     }
                     else {
                         Counter++
                     }
                 }
-                if (P:isValid()) {
-                    P["counter", number] = Counter
-                }
+                P["counter", number] = Counter
             }
             else {
                 out("Error: screen was lost.\n")

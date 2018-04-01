@@ -283,7 +283,7 @@ function hluoix3d() {
                                 Render[I,vector2]=clamp(N:dehomogenized() * Muilti + Offset, vec2(), Size)
                             }
                             
-                            P[EGPID, table]:xverticles(Render)
+                            P[EGPID, table]:xvertices(Render)
                             
                             if(!AlphaEGP){
                                 Alpha[EGPID,number]=1

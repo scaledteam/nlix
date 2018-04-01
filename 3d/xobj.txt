@@ -139,7 +139,7 @@ function xobj() {
                     return
                 }
                 
-                xcreate("polyOutline"):xverticles(array(
+                xcreate("polyOutline"):xvertices(array(
                     clamp(Scale * vec2(Matrix * P["model", table]["v", array][P["model", table]["f", table][Counter, table]["v", array][1, number], vector]) + Offset, vec2(), Res),
                     clamp(Scale * vec2(Matrix * P["model", table]["v", array][P["model", table]["f", table][Counter, table]["v", array][2, number], vector]) + Offset, vec2(), Res),
                     clamp(Scale * vec2(Matrix * P["model", table]["v", array][P["model", table]["f", table][Counter, table]["v", array][3, number], vector]) + Offset, vec2(), Res),

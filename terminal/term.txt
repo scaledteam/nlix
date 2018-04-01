@@ -39,7 +39,7 @@ function term() {
                 Device["String", string] = P["text", string]
                 
                 #P["resolution", vector2] = vec2(40, 21)
-                P["resolution", vector2] = vec2(38, 21)
+                P["resolution", vector2] = vec2(39, 21)
                 P["deviceType", string] = "gmod_wire_textscreen"
                 
                 P["state", number] = 2
@@ -127,7 +127,8 @@ function term() {
                                 }
                             }
                             
-                            Text = TextR:concat("")
+                            #Text = TextR:concat("")
+                            Text = TextR:concat("\n"):replace("\n\n", "\n")
                             break
                         
                         #[case EXIT,

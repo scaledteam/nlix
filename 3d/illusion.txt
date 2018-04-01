@@ -20,14 +20,14 @@ function illusion() {
         case 0,
             if (xcanCreate(14)) {
                 P["Dots", array] = array(
-                    vec(-25, -25, -25),
-                    vec(-25,  25, -25),
-                    vec( 25,  25, -25),
-                    vec( 25, -25, -25),
-                    vec(-25, -25,  25),
-                    vec(-25,  25,  25),
-                    vec( 25,  25,  25),
-                    vec( 25, -25,  25)
+                    vec(-1, -1, -1),
+                    vec(-1,  1, -1),
+                    vec( 1,  1, -1),
+                    vec( 1, -1, -1),
+                    vec(-1, -1,  1),
+                    vec(-1,  1,  1),
+                    vec( 1,  1,  1),
+                    vec( 1, -1,  1)
                 )
                 
                 P["Edg", array] = array(
@@ -62,6 +62,8 @@ function illusion() {
                     P["mainFrame", table] = P["xframe", table]["parent", table]
                 }
                 
+                P["multiplier", number] = min(Res[1], Res[2]) / 2 / 16 / 1.5
+                
                 P["state", number] = 1
             }
             break
@@ -77,10 +79,11 @@ function illusion() {
                     local Poses = array()
                     local Scr = P["xdevice", wirelink]:entity()
                     
-                    local Multiplier = 0.1
+                    local Multiplier = P["multiplier", number]
+                    local DPU = P["xparam", table]["dpu", number]
                     
                     local WindowCenter = P["xframe", table]["pos", vector2] + Res / 2
-                    local LocalCenter = P["xparam", table]["0", vector] + (P["xparam", table]["x", vector] * WindowCenter[1] + P["xparam", table]["y", vector] * WindowCenter[2]) / P["xparam", table]["dpu", number]
+                    local LocalCenter = P["xparam", table]["0", vector] + (P["xparam", table]["x", vector] * WindowCenter[1] + P["xparam", table]["y", vector] * WindowCenter[2]) / DPU
                     local GlobalCenter = Scr:toWorld(LocalCenter)
                     
                     local Offset2 = Res / 2
@@ -90,17 +93,17 @@ function illusion() {
                     local GZ = Scr:toWorldAxis(P["xparam", table]["z", vector])
                     
                     local Martix = matrix(GX, GY, GZ)
-                    local Offset = -GZ * 35 * Multiplier
+                    local Offset = -GZ * 2 * Multiplier
                     
                     local A = Scr:toWorld(LocalCenter)
                     foreach (I, Dot:vector = P["Dots", array]) {
                         local Pos = rayPlaneIntersection(Ply:shootPos(), Martix * (Dot * Multiplier) + Offset + GlobalCenter - Ply:shootPos(), GlobalCenter, GZ) - GlobalCenter
                         
-                        Poses:pushVector2(vec2(Pos:dot(GX), Pos:dot(GY)) * P["xparam", table]["dpu", number] + Offset2)
+                        Poses:pushVector2(vec2(Pos:dot(GX), Pos:dot(GY)) * DPU + Offset2)
                     }
                     
                     local Pos = rayPlaneIntersection(Ply:shootPos(), Ply:aimPos() - Ply:shootPos(), GlobalCenter, GZ) - GlobalCenter
-                    P["circle", table]:xpos(clamp(vec2(Pos:dot(GX), Pos:dot(GY)) * P["xparam", table]["dpu", number] + Offset2, vec2(), Res))
+                    P["circle", table]:xpos(clamp(vec2(Pos:dot(GX), Pos:dot(GY)) * DPU + Offset2, vec2(2), Res - vec2(2)))
                     
                     foreach(I, Edge:vector2 = P["Edg", array]){
                         P[I, table]:xline(clamp(Poses[Edge[1], vector2], vec2(), Res), clamp(Poses[Edge[2], vector2], vec2(), Res))

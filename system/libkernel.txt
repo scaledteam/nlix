@@ -4,8 +4,10 @@
 
 @name libkernel
 
+NULL = table()
+
 function table exec(Name:string) {
-    if (P:isValid()) {
+    if (P) {
         Program = table("name" = Name, "parent" = P)
     }
     else {

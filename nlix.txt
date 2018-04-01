@@ -11,14 +11,11 @@ if (!tickClk()) {
         while (perf(KPerf)) {
             KState++
             switch (KState) {
-                # Kernel
-                case 1, #include "nlix/kernel/libobject" break
-                case 2, #include "nlix/kernel/libkernel" break
-                
                 # System
-                case 3, #include "nlix/system/libio" break
-                case 4, #include "nlix/system/liboverload" break
-                case 5, #include "nlix/system/system-memory" break
+                case 1, #include "nlix/system/libkernel" break
+                case 2, #include "nlix/system/libio" break
+                case 3, #include "nlix/system/liboverload" break
+                case 4, #include "nlix/system/system-memory" break
                 
                 # Devices
                 case 10, #include "nlix/devices/libdevices" break
@@ -65,6 +62,8 @@ if (!tickClk()) {
                 case 51, #include "nlix/other/surl" break
                 case 52, #include "nlix/other/digi-scan" break
                 case 53, #include "nlix/other/wget" break
+                
+                # Place for your first program
                 
                 # X
                 case 59, #include "nlix/x/kbd" break
@@ -126,7 +125,7 @@ else {
         P = Ps[KState, table]
         
         # Clear if parent killed
-        if (P["parent", table]:count() == 0 & P:exists("parent")) {
+        if (!P["parent", table] & P:exists("parent")) {
             end()
             continue
         }
@@ -139,9 +138,9 @@ else {
             P2F[PName, string]()
         }
         # If program is not valid
-        elseif (P:count() == 0) {
+        elseif (!P) {
             # If all programs is not valid
-            if (Ps:count() == 0) {
+            if (!Ps) {
                 runOnTick(0)
                 break
             }

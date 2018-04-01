@@ -51,7 +51,7 @@ function xterm() {
             if (wait() & xcanDraw()) {
                 P["text", table]:xtext(in())
             }
-            elseif (!P["sh", table]:isValid()) {
+            elseif (!P["sh", table]) {
                 end()
             }
             break

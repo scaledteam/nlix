@@ -36,8 +36,8 @@ function xwm() {
                     Multiplier * vec2(1, -1)
                 )
                 
-                xcreate("lineStrip"):xparent(Background):xverticles(Poses):xsize(Multiplier * 0.3):xcolor(vec())
-                xcreate("lineStrip"):xparent(Background):xverticles(Poses):xsize(Multiplier * 0.2):xcolor(vec(191))
+                xcreate("lineStrip"):xparent(Background):xvertices(Poses):xsize(Multiplier * 0.3):xcolor(vec())
+                xcreate("lineStrip"):xparent(Background):xvertices(Poses):xsize(Multiplier * 0.2):xcolor(vec(191))
                 
                 P["in", array] = array("interface xpanel")
                 
@@ -102,7 +102,7 @@ function xwm() {
                 Frame["keyUse", number] = Use
                 
                 # Check if program is dead
-                if (!Program:isValid()) {
+                if (!Program) {
                     P["programs", table]:remove(1)
                     P["frames", table]:removeTable(1):xremove()
                 }
@@ -162,7 +162,7 @@ function xwm() {
                     Program = P["programs", table][Counter, table]
                     
                     # Check if program is dead
-                    if (!Program:isValid()) {
+                    if (!Program) {
                         P["programs", table]:remove(Counter)
                         P["frames", table]:removeTable(Counter):xremove()
                     }
@@ -196,7 +196,7 @@ function xwm() {
             break
         
         case 2,
-            if (xcanCreate(4)) {
+            if (xcanCreate(1)) {
                 CommandExp = P:removeArray("CommandExp")
                 
                 local IsUsualWindow = 1
@@ -205,57 +205,71 @@ function xwm() {
                     IsUsualWindow = 0
                 }
                 
-                local ProgramName = CommandExp:shiftString()
+                P["tempProgramName", string] = CommandExp:shiftString()
                 
-                local Frame = xcreate("frame"):xparent(P["xframe", table])
+                local Frame = xcreate("frame")
+                Frame["size", vector2] = xres()
                 
-                local Res = xres()
-                
-                local Pos = vec2()
-                local Size = Res 
+                P["tempFrame", table] = Frame
                 
                 if (IsUsualWindow) {
-                    local Count = 2.1
-                    Size = floor((Res - vec2(0, 20 + 20 * Count)) / Count)
-                    
-                    Frame:xpos(randvec2(vec2(0, 20), Res - vec2(0, 20) - Size))
-                    
-                    local WindowPos = vec2(0, -20)
-                    local WindowSize = vec2(Size[1], 20)
-                    
-                    xcreate("box"):xparent(Frame):xpos(WindowPos):xsize(vec2(Size[1], 20))
-                    
-                    xcreate("text"):xparent(Frame):xpos(WindowPos):xtext(ProgramName):xsize(20):xcolor(vec())
-                    
-                    local Offset = vec2(WindowSize[1] - 10, -10)
-                    xcreate("lineStrip"):xparent(Frame):xsize(2):xverticles(array(
-                        vec2(-6) + Offset,
-                        vec2(6) + Offset,
-                        vec2() + Offset,
-                        vec2(-6, 6) + Offset,
-                        vec2(6, -6) + Offset
-                    )):xcolor(vec())
+                    P["state", number] = 3
                 }
+                else {
+                    Frame["interface", number] = 1
+                    P["state", number] = 4
+                }
+            }
+            break
+        
+        case 3,
+            if (xcanCreate(3)) {
+                local Frame = P["tempFrame", table]
+                
+                local Count = 2.1
+                local Res = xres()
+                local Size = floor((Res - vec2(0, 20 + 20 * Count)) / Count)
                 
                 Frame["size", vector2] = Size
+                Frame:xpos(randvec2(vec2(0, 20), Res - vec2(0, 20) - Size))
                 
-                local Program = Frame:xexec(ProgramName)
-                P["programs", table]:unshiftTable(Program)
-                P["frames", table]:unshiftTable(Program["xframe", table])
+                local WindowPos = vec2(0, -20)
+                local WindowSize = vec2(Size[1], 20)
                 
-                Program["args", array] = CommandExp
-                Program["out", array] = P["out", array]
-                Program["kbd", array] = array()
+                xcreate("box"):xparent(Frame):xpos(WindowPos):xsize(vec2(Size[1], 20))
                 
-                if (!IsUsualWindow) {
-                    Frame["interface", number] = 1
-                    Program["out", array] = P["in", array]
-                }
+                xcreate("text"):xparent(Frame):xpos(WindowPos):xtext(P["tempProgramName", string]):xsize(20):xcolor(vec())
                 
-                P["focus", number] = P["programs", table]:count()
+                local Offset = vec2(WindowSize[1] - 10, -10)
+                xcreate("lineStrip"):xparent(Frame):xsize(2):xvertices(array(
+                    vec2(-6) + Offset,
+                    vec2(6) + Offset,
+                    vec2() + Offset,
+                    vec2(-6, 6) + Offset,
+                    vec2(6, -6) + Offset
+                )):xcolor(vec())
                 
-                P["state", number] = 1
+                P["state", number] = 4
             }
+        
+        case 4,
+            local Frame = P["tempFrame", table]
+            
+            local Program = Frame:xexec(P["tempProgramName", string])
+            P["programs", table]:unshiftTable(Program)
+            P["frames", table]:unshiftTable(Program["xframe", table])
+            
+            Program["args", array] = CommandExp
+            Program["out", array] = P["out", array]
+            Program["kbd", array] = array()
+            
+            if (Frame["interface", number]) {
+                Program["out", array] = P["in", array]
+            }
+            
+            P["focus", number] = P["programs", table]:count()
+            
+            P["state", number] = 1
             break
     }
 }
