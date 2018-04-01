@@ -85,7 +85,6 @@ function xremove() {
             
             for (I = 1, Overload) {
                 if (Id <= P["xobjectsAll", table]:count()) {
-                    #print(Id, Offset, Id + Offset, P["removedObjectsIds", table][Id + Offset, number])
                     if (P["removedObjectsIds", table][Id + Offset, number]) {
                         P["removedObjectsIds", table][Id + Offset, number] = 0
                         Offset++

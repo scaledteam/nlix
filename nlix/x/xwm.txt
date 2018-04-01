@@ -21,7 +21,7 @@ function xwm() {
                 P["args", array]:unshiftString(P["name", string])
                 P["name", string] = "xstart"
             }
-            elseif (xcanCreate(2)) {
+            elseif (xcanCreate(3)) {
                 local Res = P["xframe", table]["size", vector2]
                 local Background = xcreate("box"):xsize(Res):xcolor(P["xframe", table]:exists("parent") ? hsv2rgb(randint(360), 1, 0.7) : hsv2rgb(205, 1, 0.7))
                 
@@ -31,12 +31,13 @@ function xwm() {
                     Multiplier * vec2(-1, 1),
                     Multiplier * vec2(-1),
                     Multiplier * vec2(-1, -0.9),
-                    Multiplier * vec2(1, 0.5),
+                    Multiplier * vec2(1, 0.25),
                     Multiplier * vec2(1),
                     Multiplier * vec2(1, -1)
                 )
                 
-                xcreate("lineStrip"):xparent(Background):xverticles(Poses):xsize(Multiplier * 0.2):xcolor(vec(127))
+                xcreate("lineStrip"):xparent(Background):xverticles(Poses):xsize(Multiplier * 0.3):xcolor(vec())
+                xcreate("lineStrip"):xparent(Background):xverticles(Poses):xsize(Multiplier * 0.2):xcolor(vec(191))
                 
                 P["in", array] = array("interface xpanel")
                 
@@ -100,10 +101,16 @@ function xwm() {
                 # Send key use
                 Frame["keyUse", number] = Use
                 
+                # Check if program is dead
+                if (!Program:isValid()) {
+                    P["programs", table]:remove(1)
+                    P["frames", table]:removeTable(1):xremove()
+                }
+                
                 # Action for change focus
                 if (!P["focusUse", number]) {
-                    if (!inrange(Cursor - Frame["pos", vector2], vec2(0, -20), Frame["size", vector2])) {
-                        P["focusUse", number] = Use
+                    if (Use & !inrange(Cursor - Frame["pos", vector2], vec2(0, -20), Frame["size", vector2])) {
+                        P["focusUse", number] = 1
                         P["focusCounter", number] = 2
                     }
                 }
@@ -158,10 +165,6 @@ function xwm() {
                     if (!Program:isValid()) {
                         P["programs", table]:remove(Counter)
                         P["frames", table]:removeTable(Counter):xremove()
-                        
-                        if (Counter == P["focus", number]) {
-                            P["focus", number] = P["focus", number] - 1
-                        }
                     }
                 }
                 

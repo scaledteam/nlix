@@ -219,6 +219,15 @@ function table table:xalpha(Alpha) {
     return This
 }
 
+function table table:xline(Pos1:vector2, Pos2:vector2) {
+    This["pos", vector2] = Pos1
+    This["size", vector2] = Pos2
+    if (This["id", number] > 0) {
+        P["xdevice", wirelink]:egpLine(This["id", number], Pos1, Pos2)
+    }
+    return This
+}
+
 
 function vector2 xcursor() {
     local Frame = P["xframe", table]
@@ -229,8 +238,8 @@ function vector2 xcursor() {
             #ifdef findByClass(string)
             
             findByClass("player")
-            findSortByDistance(Device:entity():pos())
-            Frame["cursorUser", entity] = find()
+            findSortByDistance(Device:entity():pos() - (owner():shootPos() - owner():pos()))
+            Frame["user", entity] = find()
             
             #else
             
@@ -247,16 +256,16 @@ function vector2 xcursor() {
                 }
             }
             
-            Frame["cursorUser", entity] = User
+            Frame["user", entity] = User
             
             #endif
             
             Frame["cursorTimer", number] = systime() + 1
         }
         
-        #Frame["cursor", vector2] = round(Device:egpCursor(Frame["cursorUser", entity]))
-        Frame["cursor", vector2] = Device:egpCursor(Frame["cursorUser", entity])
-        Frame["keyUse", number] = Frame["cursor", vector2] != vec2(-1) & Frame["cursorUser", entity]:keyUse()
+        #Frame["cursor", vector2] = round(Device:egpCursor(Frame["user", entity]))
+        Frame["cursor", vector2] = Device:egpCursor(Frame["user", entity])
+        Frame["keyUse", number] = Frame["cursor", vector2] != vec2(-1) & Frame["user", entity]:keyUse()
     }
     else {
         local Cursor = Frame["parent", table]["cursor", vector2]
@@ -268,7 +277,7 @@ function vector2 xcursor() {
         }
         
         if (Frame["parent", table]["keyUse", number] >= 0) {
-            Frame["keyUse", number] = Frame["parent", table]["keyUse", number] #& inrange(Frame["cursor", vector2], vec2(), Frame["size", vector2])
+            Frame["keyUse", number] = Frame["parent", table]["keyUse", number] & inrange(Frame["cursor", vector2], vec2(), Frame["size", vector2])
         }
     }
     return Frame["cursor", vector2]
@@ -404,7 +413,9 @@ function number xcanCreate(Count) {
                 
                 if (P["xcounter", number] <= P["xobjectsAll", table]:count()) {
                     local Id = P["xcounter", number]
-                    P["xobjectsTemp", table]:pushTable(P["xobjectsAll", table][Id, table])
+                    local Object = P["xobjectsAll", table][Id, table]
+                    Object["id", number] = 0
+                    P["xobjectsTemp", table]:pushTable(Object)
                 }
                 else {
                     P["xcounter", number] = 0

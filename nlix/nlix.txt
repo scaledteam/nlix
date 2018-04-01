@@ -86,6 +86,7 @@ if (!tickClk()) {
                 case 72, #include "nlix/3d/xobj" break
                 case 73, #include "nlix/3d/hluoix3d" break
                 case 74, #include "nlix/3d/wustdd" break
+                case 75, #include "nlix/3d/illusion" break
                 
                 # Other for X
                 case 80, #include "nlix/x-other/speedometer" break

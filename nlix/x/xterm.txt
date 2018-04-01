@@ -48,7 +48,7 @@ function xterm() {
             break
         
         case 2,
-            if (wait()) {
+            if (wait() & xcanDraw()) {
                 P["text", table]:xtext(in())
             }
             elseif (!P["sh", table]:isValid()) {

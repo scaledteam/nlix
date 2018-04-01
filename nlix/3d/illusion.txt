@@ -1,0 +1,112 @@
+#
+# Created by scaled
+#
+
+@name illusion
+
+xregister("3d", "illusion")
+
+P2F["illusion", string] = "illusion"
+
+
+#ifndef rayPlaneIntersection(vector,vector,vector,vector)
+function vector rayPlaneIntersection(Start:vector, Dir:vector, Pos:vector, Normal:vector){
+    return Start + Dir * Normal:dot(Pos - Start) / Normal:dot(Dir)
+}
+#endif
+
+function illusion() {
+    switch (P["state", number]) {
+        case 0,
+            if (xcanCreate(14)) {
+                P["Dots", array] = array(
+                    vec(-25, -25, -25),
+                    vec(-25,  25, -25),
+                    vec( 25,  25, -25),
+                    vec( 25, -25, -25),
+                    vec(-25, -25,  25),
+                    vec(-25,  25,  25),
+                    vec( 25,  25,  25),
+                    vec( 25, -25,  25)
+                )
+                
+                P["Edg", array] = array(
+                    vec2(1,2),
+                    vec2(2,3),
+                    vec2(3,4),
+                    vec2(4,1),
+                    
+                    vec2(5,6),
+                    vec2(6,7),
+                    vec2(7,8),
+                    vec2(8,5),
+                    
+                    vec2(1,5),
+                    vec2(2,6),
+                    vec2(3,7),
+                    vec2(4,8)
+                )
+                
+                local Res = xres()
+                
+                local Background = xcreate("box"):xsize(Res):xcolor(vec(63))
+                
+                P["circle", table] = xcreate("circle"):xsize(vec2(4))
+                
+                for (I = 1, P["Edg", array]:count()) {
+                    P[I, table] = xcreate("line")
+                }
+                
+                P["mainFrame", table] = P["xframe", table]
+                while (P["mainFrame", table]:exists("parent")) {
+                    P["mainFrame", table] = P["xframe", table]["parent", table]
+                }
+                
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            if (xcanDraw()) {
+                xcursor()
+                
+                local Ply = P["mainFrame", table]["user", entity]
+                if (Ply) {
+                    local Res = xres()
+                    
+                    local Poses = array()
+                    local Scr = P["xdevice", wirelink]:entity()
+                    
+                    local Multiplier = 0.1
+                    
+                    local WindowCenter = P["xframe", table]["pos", vector2] + Res / 2
+                    local LocalCenter = P["xparam", table]["0", vector] + (P["xparam", table]["x", vector] * WindowCenter[1] + P["xparam", table]["y", vector] * WindowCenter[2]) / P["xparam", table]["dpu", number]
+                    local GlobalCenter = Scr:toWorld(LocalCenter)
+                    
+                    local Offset2 = Res / 2
+                    
+                    local GX = Scr:toWorldAxis(P["xparam", table]["x", vector])
+                    local GY = Scr:toWorldAxis(P["xparam", table]["y", vector])
+                    local GZ = Scr:toWorldAxis(P["xparam", table]["z", vector])
+                    
+                    local Martix = matrix(GX, GY, GZ)
+                    local Offset = -GZ * 35 * Multiplier
+                    
+                    local A = Scr:toWorld(LocalCenter)
+                    foreach (I, Dot:vector = P["Dots", array]) {
+                        local Pos = rayPlaneIntersection(Ply:shootPos(), Martix * (Dot * Multiplier) + Offset + GlobalCenter - Ply:shootPos(), GlobalCenter, GZ) - GlobalCenter
+                        
+                        Poses:pushVector2(vec2(Pos:dot(GX), Pos:dot(GY)) * P["xparam", table]["dpu", number] + Offset2)
+                    }
+                    
+                    local Pos = rayPlaneIntersection(Ply:shootPos(), Ply:aimPos() - Ply:shootPos(), GlobalCenter, GZ) - GlobalCenter
+                    P["circle", table]:xpos(clamp(vec2(Pos:dot(GX), Pos:dot(GY)) * P["xparam", table]["dpu", number] + Offset2, vec2(), Res))
+                    
+                    foreach(I, Edge:vector2 = P["Edg", array]){
+                        P[I, table]:xline(clamp(Poses[Edge[1], vector2], vec2(), Res), clamp(Poses[Edge[2], vector2], vec2(), Res))
+                    }
+                }
+            }
+            break
+    }
+}
