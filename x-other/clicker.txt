@@ -13,7 +13,7 @@ P2F["clicker", string] = "clicker"
 function clicker() {
     switch (P["state", number]) {
         case 0,
-            if (xcanCreate(17)) {
+            if (xcanCreate(15)) {
                 # Graphics
                 local Res = P["xframe", table]["size", vector2]
                 local TextSize = Res[2] / 15

@@ -1,0 +1,64 @@
+#
+# Created by scaled
+#
+
+@name wc
+
+#ifdef entity:wirelink()
+P2F["wc", string] = "wc"
+
+function wc() {
+    local Arg = arg(1)
+    switch (Arg) {
+        case "s", case "scan",
+            local Radius = arg(2):toNumber()
+            
+            if (Radius == 0) {
+                Radius = 1000
+            }
+            
+            findInSphere(entity():pos(), Radius)
+            
+            local FindToArray = findToArray()
+            local List = ""
+            for (I = 1, min(FindToArray:count(), 15)) {
+                List += FindToArray[I, entity]:id() + ", " + FindToArray[I, entity]:type() + "\n"
+            }
+            out(List)
+            break
+            
+        case "c", case "connect",
+            if (args() < 2) {
+                out("Usage: wc scan [radius]\n")
+            }
+            else {
+                local Id = arg(2):toNumber()
+                local Device = entity(Id):wirelink()
+                
+                if (Device) {
+                    local Type = Device:type()
+                    if (S["devices", table]:exists(Type)) {
+                        S["devices", table][Type, array]:pushWirelink(Device)
+                    }
+                    else {
+                        S["devices", table][Type, array] = array(Device)
+                    }
+                }
+                else {
+                    out("Error: incorrect id.\n")
+                }
+            }
+            break
+        
+        default,
+            out(
+                "Usage: wc [command]\n"
+                + "Commands:\n"
+                + "scan [radius]\n"
+                + "connect [id]\n"
+            )
+    }
+
+    end()
+}
+#endif

@@ -17,12 +17,17 @@ if (!tickClk()) {
                 case 3, #include "nlix/system/liboverload" break
                 case 4, #include "nlix/system/system-memory" break
                 
+                # Init
+                #case 5, SYSTEM_NAME = "system0" #include "nlix/system/sync" break
+                case 6, #include "nlix/system/autostart" break
+                
                 # Devices
                 case 10, #include "nlix/devices/libdevices" break
                 case 11, #include "nlix/devices/hotplugd" break
                 case 12, #include "nlix/devices/dlist" break
                 case 13, #include "nlix/devices/devcmd" break
                 case 14, #include "nlix/devices/dremove" break
+                case 15, #include "nlix/devices/wc" break
                 
                 # Terminal
                 case 20, #include "nlix/terminal/term" break
@@ -63,8 +68,6 @@ if (!tickClk()) {
                 case 52, #include "nlix/other/digi-scan" break
                 case 53, #include "nlix/other/wget" break
                 
-                # Place for your first program
-                
                 # X
                 case 59, #include "nlix/x/kbd" break
                 case 60, #include "nlix/x/libx" break
@@ -93,12 +96,11 @@ if (!tickClk()) {
                 case 82, #include "nlix/x-other/clicker" break
                 case 83, #include "nlix/x-other/spirit-level" break
                 
-                # Init
-                #case 90, SYSTEM_NAME = "system0" #include "nlix/system/sync" break
-                case 91, #include "nlix/system/autostart" break
+                # Place for your first program
+                #case 85, #include "nlix/other/myprogram" break
                 
-                # End
-                case 92, KState = 1 runOnTick(1) exit() break
+                # Move to execute state
+                case 99, KState = 1 runOnTick(1) exit() break
                 default,
             }
         }

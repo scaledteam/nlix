@@ -41,8 +41,12 @@ function xstart() {
                 local SizeX = Pos0:distance(PosX)
                 local SizeY = Pos0:distance(PosY)
                 
-                local Res = floor(vec2(SizeX, SizeY) / max(SizeX, SizeY) * 512)
+                local Width = 512
+                if (Device:type() == "gmod_wire_egp_emitter") {
+                    Width = 1024
+                }
                 
+                local Res = floor(vec2(SizeX, SizeY) / max(SizeX, SizeY) * Width)
                 Device:egpResolution(vec2(), Res)
                 
                 P["xframe", table] = table(
@@ -57,7 +61,6 @@ function xstart() {
                 local DeviceEntity = Device:entity()
                 P["xparam", table] = table(
                     "textMultiplier" = 512 / Res[2],
-                    #"symbolWidth" = 0.53 * Res[1] / Res[2],
                     "symbolWidth" = 0.54 * Res[1] / Res[2],
                     "x" = DeviceEntity:toLocalAxis(PosX - Pos0):normalized(),
                     "y" = DeviceEntity:toLocalAxis(PosY - Pos0):normalized(),

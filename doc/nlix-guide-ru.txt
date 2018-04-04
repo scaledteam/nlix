@@ -21,18 +21,18 @@ Nlix не накладывает ограничений на место хран
 В выбранном вами месте нужно разместить код программы. Это будет выглядеть следующим образом:
 
 # Place for your first program
-case 55, #include "nlix/other/myprogram" break
+case 85, #include "nlix/other/myprogram" break
 
-Обратите внимание на то, что цифра 55 рядом с оператором case больше, чем у предыдущей описанной программы, но меньше, чем у следующей.
+Обратите внимание на то, что цифра 85 рядом с оператором case больше, чем у предыдущей описанной программы, но меньше, чем у следующей.
 
 ...
-case 53, #include "nlix/other/wget" break
+case 83, #include "nlix/x-other/spirit-level" break
 
 # Place for your first program
-case 55, #include "nlix/other/myprogram" break
+case 85, #include "nlix/other/myprogram" break
 
-# X
-case 59, #include "nlix/x/kbd" break
+# Move to execute state
+case 99, KState = 1 runOnTick(1) exit() break
 ...
 
 Важно сохранить последовательность всех цифр рядом с оператором case, иначе код вашего или любого другого приложения не загрузится в память системы.
