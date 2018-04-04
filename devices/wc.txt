@@ -17,35 +17,55 @@ function wc() {
                 Radius = 1000
             }
             
+            findExcludeClass("player")
+            findExcludeClass("prop_physics")
+            findExcludeClass("gmod_camera")
+            findExcludeClass("gmod_tool")
+            findExcludeClass("weapon*")
+            findExcludeClass("trigger*")
             findInSphere(entity():pos(), Radius)
+            findSortByDistance(entity():pos())
+            findClearBlackClassList()
             
             local FindToArray = findToArray()
             local List = ""
-            for (I = 1, min(FindToArray:count(), 15)) {
-                List += FindToArray[I, entity]:id() + ", " + FindToArray[I, entity]:type() + "\n"
+            for (I = 1, min(FindToArray:count(), 10)) {
+                local Type = FindToArray[I, entity]:type()
+                
+                if (Type == "gmod_wire_expression2" | Type == "expadv_gate") {
+                    Type = FindToArray[I, entity]:getName()
+                }
+                
+                List += FindToArray[I, entity]:id() + ", " + Type + "\n"
             }
             out(List)
             break
             
         case "c", case "connect",
             if (args() < 2) {
-                out("Usage: wc scan [radius]\n")
+                out("Usage: wc connect [id]\n")
             }
             else {
                 local Id = arg(2):toNumber()
-                local Device = entity(Id):wirelink()
                 
-                if (Device) {
-                    local Type = Device:type()
-                    if (S["devices", table]:exists(Type)) {
-                        S["devices", table][Type, array]:pushWirelink(Device)
+                if (!S["devices", table]["byId", table][Id, wirelink]) {
+                    local Device = entity(Id):wirelink()
+                    
+                    if (Device) {
+                        local Type = Device:type()
+                        if (S["devices", table]:exists(Type)) {
+                            S["devices", table][Type, array]:pushWirelink(Device)
+                        }
+                        else {
+                            S["devices", table][Type, array] = array(Device)
+                        }
                     }
                     else {
-                        S["devices", table][Type, array] = array(Device)
+                        out("Error: Incorrect id.\n")
                     }
                 }
                 else {
-                    out("Error: incorrect id.\n")
+                    out("Error: Device already exists in this system.\n")
                 }
             }
             break

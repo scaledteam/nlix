@@ -49,6 +49,9 @@ function xwm() {
                 
                 P["kbd", array] = Kbd["out", array] = array()
                 
+                local Count = 2.1
+                P["windowSize", vector2] = floor((Res - vec2(0, 20 + 20 * Count)) / Count)
+                
                 P["state", number] = 1
             }
             break
@@ -226,9 +229,8 @@ function xwm() {
             if (xcanCreate(3)) {
                 local Frame = P["tempFrame", table]
                 
-                local Count = 2.1
                 local Res = xres()
-                local Size = floor((Res - vec2(0, 20 + 20 * Count)) / Count)
+                local Size = P["windowSize", vector2]
                 
                 Frame["size", vector2] = Size
                 Frame:xpos(randvec2(vec2(0, 20), Res - vec2(0, 20) - Size))
