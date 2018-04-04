@@ -8,7 +8,7 @@ P2F["rund", string] = "rund"
 
 function rund() { 
     if (args() < 1) {
-        out("Usage: rund [program]")
+        out("Usage: rund [program]\n")
     }
     else {
         local Args = P["args", array]
@@ -17,7 +17,6 @@ function rund() {
             Program["args", array] = Args
         }
         
-        #Program["in", array] = P["in", array]
         Program["out", array] = P["out", array]
         
         Program:remove("parent")

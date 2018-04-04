@@ -169,7 +169,6 @@ function term() {
                                 local NewText2 = NewTextExp:shiftString()
                                 
                                 if (NewText2:length() >= Width) {
-                                    print(NewText2)
                                     for (I = 0, NewText2:length() / Width) {
                                         TextR:pushString(NewText2:sub(I * Width, (I + 1) * Width - 1))
                                     }

@@ -58,7 +58,7 @@ if (!tickClk()) {
                 case 48, #include "nlix/files/cp" break
                 
                 # Other
-                case 50, #include "nlix/other/bc" break
+                case 50, #include "nlix/other/calc" break
                 case 51, #include "nlix/other/surl" break
                 case 52, #include "nlix/other/digi-scan" break
                 case 53, #include "nlix/other/wget" break

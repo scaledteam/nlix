@@ -2,11 +2,11 @@
 # Created by scaled
 #
 
-@name bc
+@name calc
 
-P2F["bc", string] = "bc"
+P2F["calc", string] = "calc"
 
-function bc() { 
+function calc() { 
     switch (P["state", number]) {
         case 0,
             P["parts", array] = array()
@@ -14,7 +14,7 @@ function bc() {
             P["partsPoses", array] = array()
             
             if (!wait()) {
-                out("bc shell mode.\n")
+                out("Calculator shell.\n")
             }
             else {
                 P["shell", number] = 1

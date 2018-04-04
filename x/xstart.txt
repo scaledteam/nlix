@@ -13,7 +13,7 @@ function xstart() {
                 out("Usage: xstart [program name]\n")
                 end()
             }
-            elseif (deviceGet("gmod_wire_egp")) {
+            elseif (deviceGet("gmod_wire_egp") | deviceGet("gmod_wire_egp_emitter")) {
                 local Device = P["device", wirelink]
                 
                 Device:egpClear()
@@ -65,13 +65,6 @@ function xstart() {
                     "0" = DeviceEntity:toLocal(Pos0),
                     "dpu" = 512 / SizeX
                 )
-                
-                #[holoCreate(1, Device:entity():toWorld(P["xparam", table]["x", vector] * 512 / P["xparam", table]["dpu", number] + P["xparam", table]["0", vector]), vec(1 / 12))
-                holoCreate(2, Device:entity():toWorld(P["xparam", table]["y", vector] * 512 * 3 / 4 / P["xparam", table]["dpu", number] + P["xparam", table]["0", vector]), vec(1 / 12))
-                holoCreate(3, Device:entity():toWorld(P["xparam", table]["z", vector] * 10 + P["xparam", table]["0", vector]), vec(1 / 12))
-                holoColor(1, vec(255, 0, 0))
-                holoColor(2, vec(0, 255, 0))
-                holoColor(3, vec(0, 0, 255))]#
                 
                 P["xobjects", table] = table()
                 
