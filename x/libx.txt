@@ -120,10 +120,9 @@ function table:xredraw() {
             Device:egpSize(Id, This["sizeNum", number])
             break
         
-        case "",
+        default,
             Device:egpLine(Id, vec2(), vec2())
             break
-        default,
     }
     
     Device:egpColor(Id, This["color", vector])
@@ -342,15 +341,16 @@ function table:xcountOffset(Offset) {
 
 function table xnewObject(Id) {
     P["xframe", table]:xcountOffset(1)
+    P["xdevice", wirelink]:egpLine(Id, vec2(), vec2())
     return table("id" = Id, "parent" = P["xframe", table], "color" = vec(255), "alpha" = 255)
 }
 
 function xprintAll() {
-    local Text = "xprintAll\n"
+    local Text = "xprintAll start\n"
     for (I = 1, P["xobjectsAll", table]:count()) {
-        Text += I + ", " + P["xobjectsAll", table][I, table]["type", string] + "\n"
+        Text += I + "\t" + P["xobjectsAll", table][I, table]["type", string] + "\n"
     }
-    print(Text)
+    print(Text + "xprintAll end\n")
 }
 
 function number xcanDraw() {
@@ -465,7 +465,7 @@ function number xcanCreate(Count) {
     return 0
 }
 
-function number table:xclear() {
+function table:xclear() {
     if (This["id", number] != 0) {
         local Id = This["id", number]
         
@@ -475,10 +475,6 @@ function number table:xclear() {
         This["removed", number] = 1
         
         P["xdevice", wirelink]:egpLine(Id, vec2(), vec2())
-        return Id
-    }
-    else {
-        return 0
     }
 }
 

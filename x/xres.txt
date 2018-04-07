@@ -12,7 +12,7 @@ function xresTest() {
     switch (P["state", number]) {
         case 0,
             if (xcanCreate(3)) {
-                local Res = P["xframe", table]["size", vector2]
+                local Res = xres()
                 local Size = vec2(int(min(Res[1], Res[2]) / 10) * 10)
                 
                 xcreate("box"):xsize(Res):xcolor(vec(127))
