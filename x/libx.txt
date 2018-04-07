@@ -483,18 +483,16 @@ function number table:xclear() {
 }
 
 function xxremoveByDaemon(IdStart, IdEnd) {
-    if (!P["xremove", table]) {
-        local XRemove = exec("xremove")
-        P["xremove", table] = XRemove
-        XRemove:remove("parent")
-        
-        XRemove["xobjectsAll", table] = P["xobjectsAll", table]
-        XRemove["xparam", table] = P["xparam", table]
-        XRemove["xdevice", wirelink] = P["xdevice", wirelink]
-        
-        XRemove["idStart", number] = IdStart
-        XRemove["idEnd", number] = IdEnd
-    }
+    local XRemove = exec("xremove")
+    P["xremove", table] = XRemove
+    XRemove:remove("parent")
+    
+    XRemove["xobjectsAll", table] = P["xobjectsAll", table]
+    XRemove["xparam", table] = P["xparam", table]
+    XRemove["xdevice", wirelink] = P["xdevice", wirelink]
+    
+    XRemove["idStart", number] = IdStart
+    XRemove["idEnd", number] = IdEnd
 }
 
 function table:xremove() {
@@ -514,18 +512,15 @@ function xend() {
 }
 
 function xxup(StartId, ObjectLastId, ParentLastId) {
-    if (!P["xup", table]) {
-        local XUp = exec("xup")
-        P["xup", table] = XUp
-        
-        XUp["xobjectsAll", table] = P["xobjectsAll", table]
-        XUp["xparam", table] = P["xparam", table]
-        XUp["xdevice", wirelink] = P["xdevice", wirelink]
-        
-        XUp["idStart", number] = StartId
-        XUp["idObjectLast", number] = ObjectLastId
-        XUp["idParentLast", number] = ParentLastId
-    }
+    local XUp = exec("xup")
+    
+    XUp["xobjectsAll", table] = P["xobjectsAll", table]
+    XUp["xparam", table] = P["xparam", table]
+    XUp["xdevice", wirelink] = P["xdevice", wirelink]
+    
+    XUp["idStart", number] = StartId
+    XUp["idObjectLast", number] = ObjectLastId
+    XUp["idParentLast", number] = ParentLastId
 }
 
 function table:xup() {

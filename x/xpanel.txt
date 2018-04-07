@@ -9,7 +9,7 @@ P2F["xpanel", string] = "xpanel"
 function xpanel() {
     switch (P["state", number]) {
         case 0,
-            if (xcanCreate(4)) {
+            if (xcanCreate(3)) {
                 local Frame = P["xframe", table]
                 
                 # Panel

@@ -58,104 +58,112 @@ function xwm() {
             
         case 1,
             if (xcanDraw()) {
-                # Send cursor to programs
-                local Cursor = xcursor()
-                local Use = xkeyUse()
-                P["xframe", table]["keyUse", number] = -1
-                P["xframe", table]["interfaceUse", number] = Use
-                
-                # Program
-                local Program = P["programs", table][1, table]
-                
-                # Keyboard
-                local KbdReal = P["kbd", array]
-                local KbdInsideProgram = Program["kbd", array]
-                
-                KbdInsideProgram:clear()
-                for (I = 1, KbdReal:count()) {
-                    KbdInsideProgram[I, number] = KbdReal[I, number]
-                }
-                
-                # Moving windows
-                local Frame = P["frames", table][1, table]
-                if (
-                    !Frame["interface", number]
-                    & Use
-                    & (
-                        Frame:exists("moveMode")
-                        | inrange(Cursor - Frame["pos", vector2], vec2(0, -20), Frame["size", vector2]:setY(0))
-                    )
-                ) {
-                    if (!Frame:exists("moveMode") & (Cursor[1] > Frame["pos", vector2][1] + Frame["size", vector2][1] - 20)) {
-                        Program:clear()
+                if (P["programs", table]:count() > 0) {
+                    # Send cursor to programs
+                    local Cursor = xcursor()
+                    local Use = xkeyUse()
+                    P["xframe", table]["keyUse", number] = -1
+                    P["xframe", table]["interfaceUse", number] = Use
+                    
+                    # Program
+                    local Program = P["programs", table][1, table]
+                    
+                    # Check if program is dead
+                    if (!Program) {
+                        P["programs", table]:remove(1)
+                        P["frames", table]:removeTable(1):xremove()
                     }
                     else {
-                        local NewPos = round(clamp(Cursor - vec2(Frame["size", vector2][1] / 2, -10), vec2(0, 20), P["xframe", table]["size", vector2] - vec2(0, 20) - Program["xframe", table]["size", vector2]))
-                        Frame:xpos(NewPos)
+                        local Frame = P["frames", table][1, table]
                         
-                        Frame["moveMode", number] = 1
-                        return
+                        # Send key use
+                        Frame["keyUse", number] = Use
+                        
+                        # Keyboard
+                        local KbdReal = P["kbd", array]
+                        local KbdInsideProgram = Program["kbd", array]
+                        
+                        KbdInsideProgram:clear()
+                        for (I = 1, KbdReal:count()) {
+                            KbdInsideProgram[I, number] = KbdReal[I, number]
+                        }
+                        
+                        # Moving windows
+                        if (
+                            !Frame["interface", number]
+                            &
+                            Use
+                            &
+                            (
+                                Frame:exists("moveMode")
+                                |
+                                inrange(Cursor - Frame["pos", vector2], vec2(0, -20), Frame["size", vector2]:setY(0))
+                            )
+                        ) {
+                            if (!Frame:exists("moveMode") & (Cursor[1] > Frame["pos", vector2][1] + Frame["size", vector2][1] - 20)) {
+                                Program:clear()
+                            }
+                            else {
+                                local NewPos = round(clamp(Cursor - vec2(Frame["size", vector2][1] / 2, -10), vec2(0, 20), P["xframe", table]["size", vector2] - vec2(0, 20) - Program["xframe", table]["size", vector2]))
+                                Frame:xpos(NewPos)
+                                
+                                Frame["moveMode", number] = 1
+                                return
+                            }
+                        }
+                        elseif (Frame:exists("moveMode")) {
+                            Frame:remove("moveMode")
+                        }
+                        
+                        # Action for change focus
+                        if (!P["focusUse", number]) {
+                            if (Use & !inrange(Cursor - Frame["pos", vector2], vec2(0, -20), Frame["size", vector2])) {
+                                P["focusUse", number] = 1
+                                P["focusCounter", number] = 2
+                            }
+                        }
                     }
-                }
-                elseif (Frame:exists("moveMode")) {
-                    Frame:remove("moveMode")
-                }
-                
-                # Send key use
-                Frame["keyUse", number] = Use
-                
-                # Check if program is dead
-                if (!Program) {
-                    P["programs", table]:remove(1)
-                    P["frames", table]:removeTable(1):xremove()
-                }
-                
-                # Action for change focus
-                if (!P["focusUse", number]) {
-                    if (Use & !inrange(Cursor - Frame["pos", vector2], vec2(0, -20), Frame["size", vector2])) {
-                        P["focusUse", number] = 1
-                        P["focusCounter", number] = 2
-                    }
-                }
-                
-                if (P["focusUse", number]) {
-                    local Counter = P["focusCounter", number]
                     
-                    for (I = 1, Overload) {
-                        if (Counter <= P["programs", table]:count()) {
-                            local Frame = P["frames", table][Counter, table]
-                            
-                            if (inrange(Cursor - Frame["pos", vector2], vec2(0, -20), Frame["size", vector2])) {
-                                # Clear old data after focus changed
-                                P["programs", table][1, table]["kbd", array]:clear()
-                                P["frames", table][1, table]["keyUse", number] = 0
+                    # Focus
+                    if (P["focusUse", number]) {
+                        local Counter = P["focusCounter", number]
+                        
+                        for (I = 1, Overload) {
+                            if (Counter <= P["programs", table]:count()) {
+                                local Frame = P["frames", table][Counter, table]
                                 
-                                # Up window
-                                if (!Frame["interface", number]) {
-                                    Frame:xup()
+                                if (inrange(Cursor - Frame["pos", vector2], vec2(0, -20), Frame["size", vector2])) {
+                                    # Clear old data after focus changed
+                                    P["programs", table][1, table]["kbd", array]:clear()
+                                    P["frames", table][1, table]["keyUse", number] = 0
                                     
-                                    P["frames", table]:unshiftTable(P["frames", table]:removeTable(Counter))
-                                    P["programs", table]:unshiftTable(P["programs", table]:removeTable(Counter))
+                                    # Up window
+                                    if (!Frame["interface", number]) {
+                                        Frame:xup()
+                                        
+                                        P["frames", table]:unshiftTable(P["frames", table]:removeTable(Counter))
+                                        P["programs", table]:unshiftTable(P["programs", table]:removeTable(Counter))
+                                    }
+                                    
+                                    P["focusUse", number] = 0
+                                    break
                                 }
-                                
+                                else {
+                                    Counter++
+                                }
+                            }
+                            else {
                                 P["focusUse", number] = 0
                                 break
                             }
-                            else {
-                                Counter++
-                            }
                         }
-                        else {
-                            P["focusUse", number] = 0
-                            break
-                        }
+                        
+                        P["focusCounter", number] = Counter
                     }
                     
-                    P["focusCounter", number] = Counter
-                }
-                
-                # Infinity cycle
-                if (P["programs", table]:count() > 0) {
+                    
+                    
+                    # Infinity cycle
                     local Counter = P["counter", number] + 1
                     if (Counter > P["programs", table]:count()) {
                         Counter = 1
@@ -191,8 +199,10 @@ function xwm() {
                             break
                         
                         default,
-                            P["state", number] = 2
                             P["CommandExp", array] = CommandExp
+                            
+                            P["state", number] = 2
+                            return
                     }
                 }
             }
@@ -255,23 +265,25 @@ function xwm() {
             }
         
         case 4,
-            local Frame = P["tempFrame", table]
-            
-            local Program = Frame:xexec(P["tempProgramName", string])
-            P["programs", table]:unshiftTable(Program)
-            P["frames", table]:unshiftTable(Program["xframe", table])
-            
-            Program["args", array] = CommandExp
-            Program["out", array] = P["out", array]
-            Program["kbd", array] = array()
-            
-            if (Frame["interface", number]) {
-                Program["out", array] = P["in", array]
+            if (xcanDraw()) {
+                local Frame = P["tempFrame", table]
+                
+                local Program = Frame:xexec(P["tempProgramName", string])
+                P["programs", table]:unshiftTable(Program)
+                P["frames", table]:unshiftTable(Program["xframe", table])
+                
+                Program["args", array] = CommandExp
+                Program["out", array] = P["out", array]
+                Program["kbd", array] = array()
+                
+                if (Frame["interface", number]) {
+                    Program["out", array] = P["in", array]
+                }
+                
+                P["focus", number] = P["programs", table]:count()
+                
+                P["state", number] = 1
             }
-            
-            P["focus", number] = P["programs", table]:count()
-            
-            P["state", number] = 1
             break
     }
 }
