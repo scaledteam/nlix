@@ -1,0 +1,116 @@
+#
+# Created by scaled
+#
+
+@name xedit
+
+xregister("editors", "xedit")
+
+P2F["xedit", string] = "xedit"
+
+function xedit() {
+    switch (P["state", number]) {
+        case 0,
+            if (xcanCreate(4)) {
+                local Res = xres()
+                local Size = Res * vec2(1, 0.4)
+                
+                local TextSize = 10
+                xcreate("box"):xsize(Size):xcolor(vec())
+                P["cmd", table] = xcreate("textLayout"):xsize(Size):xsize(TextSize)
+                
+                local Pos = Size:setX(0)
+                xcreate("box"):xsize(Res - Pos):xpos(Pos)
+                P["text", table] = xcreate("textLayout"):xsize(Res - Pos):xpos(Pos):xsize(TextSize):xcolor(vec())
+                
+                local Skbd = exec("skbd")
+                local Term = exec("term")
+                programUp()
+                
+                P["term", table] = Term
+                
+                Term["resolution", vector2] = floor(vec2(Size[1] / (TextSize * P["xparam", table]["symbolWidth", number]), Size[2] / TextSize))
+                
+                # input output
+                if (P:exists("kbd")) {
+                    Skbd["in", array] = P["kbd", array]
+                }
+                
+                P["in", array] = Skbd["out", array] = array()
+                P["out", array] = Skbd["term", array] = Term["in", array] = array()
+                
+                P["term", array] = Term["out", array] = array()
+                
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            if (P["term", array]:count() > 0) {
+                P["cmd", table]:xtext(P["term", array]:shiftString())
+            }
+            
+            if (wait()) {
+                local In = in():explode(" ")
+                
+                switch (In[1, string]) {
+                    case "w", case "write",
+                        local Touch = exec("touch")
+                        Touch["args", array] = array(In[2, string])
+                        Touch["in", array] = array(P["text", table]["text", string])
+                        break
+                    
+                    case "r", case "read",
+                        local Touch = exec("cat")
+                        Touch["args", array] = array(In[2, string])
+                        P["fileStream", array] = Touch["out", array] = array()
+                        break
+                    
+                    case "a", case "add",
+                        P["text", table]:xtext(P["text", table]["text", string] + "\n" + In:concat(" ", 2))
+                        break
+                    
+                    case "e", case "edit",
+                        local TextExplode = P["text", table]["text", string]:explode("\n")
+                        local Line = In[2, string]:toNumber()
+                        
+                        P["text", table]:xtext(TextExplode:concat("\n", 1, Line - 1) + "\n" + In:concat(" ", 3) + "\n" + TextExplode:concat("\n", Line + 1))
+                        break
+                    
+                    case "d", case "delete",
+                        local TextExplode = P["text", table]["text", string]:explode("\n")
+                        local Line = In[2, string]:toNumber()
+                        
+                        P["text", table]:xtext(TextExplode:concat("\n", 1, Line - 1) + "\n" + TextExplode:concat("\n", Line + 1))
+                        break
+                    
+                    case "q", case "quit", case "exit",
+                        end()
+                        break
+                    
+                    case "h", case "help",
+                        out(
+                            "Commands:\n"
+                            +"write [path]\n"
+                            +"read [path]\n"
+                            +"add [string]\n"
+                            +"edit [line] [string]\n"
+                            +"delete [line]\n"
+                            +"quit\n"
+                        )
+                        break
+                    
+                    case "",
+                        break
+                    
+                    default,
+                        out("Unknown command.\n")
+                }
+            }
+            
+            if (P["fileStream", array]:count() > 0) {
+                P["text", table]:xtext(P["fileStream", array]:shiftString():sub(1, -2))
+            }
+            break
+    }
+}

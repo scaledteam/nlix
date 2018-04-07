@@ -354,7 +354,8 @@ function xprintAll() {
 }
 
 function number xcanDraw() {
-    return !P["xparam", table]["blocked", number]
+    #return !P["xparam", table]["blocked", number]
+    return 1
 }
 
 function number xcanCreate(Count) {
@@ -403,7 +404,9 @@ function number xcanCreate(Count) {
                 else {
                     P:remove("xworkerState")
                     P["xparam", table]["blocked", number] = 0
-                    return 1
+                    #return 1
+                    # make delay
+                    return 0
                 }
                 break
             
@@ -418,7 +421,7 @@ function number xcanCreate(Count) {
                     P["xobjectsTemp", table]:pushTable(Object)
                 }
                 else {
-                    P["xcounter", number] = 0
+                    P["xcounter", number] = P["xshiftStart", number]
                     P["xworkerState", number] = 3
                 }
                 break
@@ -426,8 +429,8 @@ function number xcanCreate(Count) {
             case 3,
                 P["xcounter", number] = P["xcounter", number] + 1
                 
-                if (P["xcounter", number] <= Count) {
-                    local Id = P["xcounter", number] + P["xshiftStart", number]
+                if (P["xobjects", table]:count() < Count) {
+                    local Id = P["xcounter", number]
                     local Object = xnewObject(Id)
                     Object:xredraw()
                     
@@ -435,7 +438,7 @@ function number xcanCreate(Count) {
                     P["xobjects", table]:pushTable(Object)
                 }
                 else {
-                    P["xcounter", number] = 0
+                    P["xcounter", number] = P["xshiftStart", number]
                     P["xworkerState", number] = 4
                 }
                 break
@@ -445,7 +448,7 @@ function number xcanCreate(Count) {
                 
                 if (P["xobjectsTemp", table]) {
                     local Object = P["xobjectsTemp", table]:removeTable(1)
-                    local Id = P["xcounter", number] + P["xshiftStart", number] + Count
+                    local Id = P["xcounter", number] + Count
                     
                     Object["id", number] = Id
                     P["xobjectsAll", table][Id, table] = Object
@@ -457,7 +460,9 @@ function number xcanCreate(Count) {
                     P:remove("xcounter")
                     P:remove("xobjectsTemp")
                     P["xparam", table]["blocked", number] = 0
-                    return 1
+                    #return 1
+                    # make delay
+                    return 0
                 }
                 break
         }

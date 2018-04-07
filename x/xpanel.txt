@@ -50,6 +50,15 @@ function xpanel() {
                     }
                 }
             }
+            
+            #[local Test = owner():keyPressed("b") & (P["xframe", table]["parent", table]["id", number] != 1)
+            if (Test != P["test", number]) {
+                P["test", number] = Test
+                
+                if (Test) {
+                    out("xres")
+                }
+            }]#
             break
     }
 }
