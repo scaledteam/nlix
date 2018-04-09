@@ -67,6 +67,7 @@ if (!tickClk()) {
                 case 51, #include "nlix/other/surl" break
                 case 52, #include "nlix/other/digi-scan" break
                 case 53, #include "nlix/other/wget" break
+                case 54, #include "nlix/other/calc2" break
                 
                 # X
                 case 59, #include "nlix/x/kbd" break

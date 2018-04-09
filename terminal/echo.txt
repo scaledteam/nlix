@@ -7,6 +7,6 @@
 P2F["echo", string] = "echo"
 
 function echo() {
-    out(P["args", array]:concat("\n") + "\n")
+    out(P["args", array]:concat(" ") + "\n")
     end()
 }

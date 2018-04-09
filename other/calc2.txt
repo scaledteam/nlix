@@ -1,0 +1,237 @@
+#
+# Created by scaled
+#
+
+@name calc2
+
+P2F["calc2", string] = "calc2"
+
+function calc2() { 
+    switch (P["state", number]) {
+        case 0,
+            out("Calculator shell.\n")
+            
+            P["input", array] = array()
+            
+            P["vars", array] = array()
+            P["order", array] = array()
+            
+            P["stack0", array] = array()
+            P["stack1", array] = array()
+            
+            P["priority", table] = table(
+                "+" = 0,
+                "-" = 0,
+                "*" = 1,
+                "/" = 1,
+                "^" = 2
+            )
+            
+            P["state", number] = 1
+            break
+        
+        case 1,
+            if (wait()) {
+                P["inputString", string] = in():replace(" ", "")
+                P["inputLength", number] = P["inputString", string]:length()
+                P["state", number] = 2
+            }
+            break
+        
+        case 2,
+            local InputString = P["inputString", string]
+            
+            local Counter = P["counter", number]
+            
+            for (I = 1, Overload) {
+                if (Counter < P["inputLength", number]) {
+                    Counter++
+                    
+                    local Char = InputString[Counter]
+                    
+                    switch (Char) {
+                        case "+", case "-", case "*", case "/", case "^", case "(", case ")",
+                            P["input", array]:pushString(InputString:sub(P["lastDivider", number] + 1, Counter - 1))
+                            P["input", array]:pushString(Char)
+                            P["lastDivider", number] = Counter
+                            break
+                        
+                        default, break
+                    }
+                }
+                else {
+                    P["input", array]:pushString(InputString:sub(P["lastDivider", number] + 1))
+                    
+                    P:remove("lastDivider")
+                    P:remove("inputString")
+                    P:remove("inputLength")
+                    
+                    P["state", number] = 3
+                    return
+                }
+            }
+            
+            P["counter", number] = Counter
+            break
+        
+        case 3,
+            local Input = P["input", array]
+            
+            local Counter = P["counter", number]
+            
+            for (I = 1, Overload) {
+                if (Input:count() > 0) {
+                    local Value = Input:shiftString()
+                    
+                    switch (Value) {
+                        case "+", case "-", case "*", case "/", case "^",
+                            local Priority = P["priority", table][Value, number]
+                            
+                            if (Priority > P["lastPriority", number]) {
+                                #local PrevValue = P["stack0", array]:popNumber()
+                                local PrevValue = P["stack0", array]:popString()
+                                
+                                while (Priority > P["lastPriority", number]) {
+                                    P["stack0", array]:pushString("(")
+                                    P["lastPriority", number] = P["lastPriority", number] + 1
+                                }
+                                
+                                #P["stack0", array]:pushNumber(PrevValue)
+                                P["stack0", array]:pushString(PrevValue)
+                                P["stack0", array]:pushString(Value)
+                            }
+                            elseif (Priority < P["lastPriority", number]) {
+                                while (Priority < P["lastPriority", number]) {
+                                    P["stack0", array]:pushString(")")
+                                    P["lastPriority", number] = P["lastPriority", number] - 1
+                                }
+                                
+                                P["stack0", array]:pushString(Value)
+                            }
+                            else {
+                                P["stack0", array]:pushString(Value)
+                            }
+                            break
+                        
+                        case "(",
+                            P["stack0", array]:pushString(Value)
+                            
+                            P["lastPriorities", array]:pushNumber(P["lastPriority", number])
+                            P["lastPriority", number] = 0
+                            break
+                        
+                        case ")",
+                            P["stack0", array]:pushString(Value)
+                            
+                            while (P["lastPriority", number] > 0) {
+                                P["stack0", array]:pushString(")")
+                                P["lastPriority", number] = P["lastPriority", number] - 1
+                            }
+                            
+                            P["lastPriority", number] = P["lastPriorities", array]:popNumber()
+                            break
+                        
+                        default,
+                            #P["stack0", array]:pushNumber(Value:toNumber())
+                            P["stack0", array]:pushString(Value)
+                            break
+                    }
+                }
+                else {
+                    P["input", array]:clear()
+                    while (P["lastPriority", number] > 0) {
+                        P["stack0", array]:pushString(")")
+                        P["lastPriority", number] = P["lastPriority", number] - 1
+                    }
+                    P:remove("lastPriority")
+                    
+                    P["input", array]:clear()
+                    
+                    P["state", number] = 4
+                    return
+                }
+            }
+            break
+        
+        case 4,
+            #[printTable(P["stack0", array])
+            P["stack0", array]:clear()
+            P["state", number] = 1]#
+            
+            local Stack0 = P["stack0", array]
+            local Stack1 = P["stack1", array]
+            
+            for (I = 1, Overload) {
+                if (Stack0:count() > 1) {
+                    local In0 = Stack0:shiftString()
+                    
+                    if (In0 != "(") {
+                        local In1 = Stack0:shiftString()
+                        
+                        switch (In1) {
+                            case "(",
+                                out("Error: \"2(\" expressions not supported.\n")
+                                P["state", number] = 1
+                                break
+                            
+                            case ")",
+                                local In2 = Stack1:popString()
+                                if (In2 != "") {
+                                    Stack0:unshiftString(In2)
+                                    Stack0:unshiftString(Stack1:popString())
+                                    Stack0:unshiftString(In0)
+                                }
+                                else {
+                                    Stack0:unshiftString(In0)
+                                }
+                                break
+                            
+                            case "+", case "-", case "*", case "/", case "^",
+                                local In2 = Stack0:shiftString()
+                                
+                                switch (In2) {
+                                    case "(",
+                                        Stack1:pushString(In1)
+                                        Stack1:pushString(In0)
+                                        break
+                                    
+                                    case ")",
+                                        out("Error: \"" + In1 + ")\" invalid expression.\n")
+                                        P["state", number] = 1
+                                        break
+                                    
+                                    case "+", case "-", case "*", case "/", case "^",
+                                        out("Error: \"" + In1 + In2 + "\" invalid expression.\n")
+                                        P["state", number] = 1
+                                        break
+                                    
+                                    default,
+                                        switch (In1) {
+                                            case "+", Stack0:unshiftString((In0:toNumber() + In2:toNumber()):toString()) break
+                                            case "-", Stack0:unshiftString((In0:toNumber() - In2:toNumber()):toString()) break
+                                            case "*", Stack0:unshiftString((In0:toNumber() * In2:toNumber()):toString()) break
+                                            case "/", Stack0:unshiftString((In0:toNumber() / In2:toNumber()):toString()) break
+                                            case "^", Stack0:unshiftString((In0:toNumber() ^ In2:toNumber()):toString()) break
+                                        }
+                                }
+                                break
+                            
+                            default,
+                                out("Internal error: Exploding error.\n")
+                                out(In0 + ", " + In1 + "\n")
+                                P["state", number] = 1
+                        }
+                    }
+                    else {
+                        Stack1:pushString("")
+                    }
+                }
+                else {
+                    out(Stack0:shiftString() + "\n")
+                    P["state", number] = 1
+                    break
+                }
+            }
+            break
+    }
+}
