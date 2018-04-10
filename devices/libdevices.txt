@@ -13,11 +13,12 @@ S["devices", table] = table(
 function string wirelink:type() {
     local Name = This:entity():type()
     
-    if (Name == "gmod_wire_expression2" | Name == "expadv_gate") {
-        Name = This:entity():getName()
+    if (Name == "gmod_wire_expression2") {
+        return This:entity():getName()
     }
-    
-    return Name
+    else {
+        return Name
+    }
 }
 
 function number deviceGet(Type:string) {

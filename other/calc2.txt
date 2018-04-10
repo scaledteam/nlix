@@ -51,7 +51,10 @@ function calc2() {
                     
                     switch (Char) {
                         case "+", case "-", case "*", case "/", case "^", case "(", case ")",
-                            P["input", array]:pushString(InputString:sub(P["lastDivider", number] + 1, Counter - 1))
+                            local String = InputString:sub(P["lastDivider", number] + 1, Counter - 1)
+                            if (String != "") {
+                                P["input", array]:pushString(String)
+                            }
                             P["input", array]:pushString(Char)
                             P["lastDivider", number] = Counter
                             break
@@ -60,11 +63,17 @@ function calc2() {
                     }
                 }
                 else {
-                    P["input", array]:pushString(InputString:sub(P["lastDivider", number] + 1))
+                    local String = InputString:sub(P["lastDivider", number] + 1)
+                    if (String != "") {
+                        P["input", array]:pushString(String)
+                    }
                     
                     P:remove("lastDivider")
                     P:remove("inputString")
                     P:remove("inputLength")
+                    
+                    P["stack0", array]:clear()
+                    P["stack1", array]:clear()
                     
                     P["state", number] = 3
                     return
@@ -138,34 +147,43 @@ function calc2() {
                     }
                 }
                 else {
-                    P["input", array]:clear()
                     while (P["lastPriority", number] > 0) {
                         P["stack0", array]:pushString(")")
                         P["lastPriority", number] = P["lastPriority", number] - 1
                     }
                     P:remove("lastPriority")
                     
-                    P["input", array]:clear()
+                    #out(P["stack0", array]:concat(",") + "\n")
+                    out(P["stack0", array]:concat() + "\n")
                     
                     P["state", number] = 4
-                    return
+                    break
                 }
             }
             break
         
         case 4,
-            #[printTable(P["stack0", array])
-            P["stack0", array]:clear()
-            P["state", number] = 1]#
-            
             local Stack0 = P["stack0", array]
             local Stack1 = P["stack1", array]
             
             for (I = 1, Overload) {
+                if (P["state", number] != 4) {
+                    break
+                }
+                
                 if (Stack0:count() > 1) {
                     local In0 = Stack0:shiftString()
+                    print("\"" + In0 + "\"")
                     
-                    if (In0 != "(") {
+                    if (In0 == "") {
+                        out("Internal error: Stack0 contains \"\".\n")
+                        break
+                    }
+                    
+                    if (In0 == "(") {
+                        Stack1:pushString("")
+                    }
+                    else {
                         local In1 = Stack0:shiftString()
                         
                         switch (In1) {
@@ -220,16 +238,14 @@ function calc2() {
                                 out("Internal error: Exploding error.\n")
                                 out(In0 + ", " + In1 + "\n")
                                 P["state", number] = 1
+                                break
                         }
-                    }
-                    else {
-                        Stack1:pushString("")
                     }
                 }
                 else {
                     out(Stack0:shiftString() + "\n")
                     P["state", number] = 1
-                    break
+                    return
                 }
             }
             break

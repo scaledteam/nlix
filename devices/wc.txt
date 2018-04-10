@@ -17,7 +17,7 @@ function wc() {
                 Radius = 1000
             }
             
-            findExcludeClass("player")
+            #[findExcludeClass("player")
             findExcludeClass("prop_physics")
             findExcludeClass("gmod_camera")
             findExcludeClass("gmod_tool")
@@ -25,7 +25,12 @@ function wc() {
             findExcludeClass("trigger*")
             findInSphere(entity():pos(), Radius)
             findSortByDistance(entity():pos())
-            findClearBlackClassList()
+            findClearBlackClassList()]#
+            
+            findIncludeClass("gmod_wire_*")
+            findInSphere(entity():pos(), Radius)
+            findSortByDistance(entity():pos())
+            findClearWhiteClassList()
             
             local FindToArray = findToArray()
             local List = ""
