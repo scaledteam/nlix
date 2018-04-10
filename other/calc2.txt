@@ -173,7 +173,6 @@ function calc2() {
                 
                 if (Stack0:count() > 1) {
                     local In0 = Stack0:shiftString()
-                    print("\"" + In0 + "\"")
                     
                     if (In0 == "") {
                         out("Internal error: Stack0 contains \"\".\n")
