@@ -1,0 +1,41 @@
+#
+# Created by scaled
+#
+
+@name auto-ws
+
+P2F["auto-ws", string] = "autows"
+
+function autows() {
+    if (P2F:exists("xwm")) {
+        if (S["devices", table]:exists("gmod_wire_egp")) {
+            local Program = exec("xwm")
+            Program:remove("parent")
+            end()
+            return
+        }
+    }
+    
+    if (P2F:exists("sh")) {
+        if (
+            (
+                S["devices", table]:exists("gmod_wire_textscreen")
+                |
+                S["devices", table]:exists("gmod_wire_egp")
+                |
+                S["devices", table]:exists("gmod_wire_consolescreen")
+            )
+            &
+            (
+                S["devices", table]:exists("gmod_wire_keyboard")
+                |
+                S["devices", table]:exists("gmod_wire_textentry")
+            )
+        ) {
+            local Program = exec("sh")
+            Program:remove("parent")
+            end()
+            return
+        }
+    }
+}

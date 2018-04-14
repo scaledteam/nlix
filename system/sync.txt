@@ -7,7 +7,7 @@
 
 local Gtable = gTable("nlix")
 
-if (Gtable[SYSTEM_NAME, table]["S", table]:isValid()) {
+if (Gtable[SYSTEM_NAME, table]["S", table]) {
     S = Gtable[SYSTEM_NAME, table]["S", table]
     Ps = Gtable[SYSTEM_NAME, table]["Ps", table]
 }

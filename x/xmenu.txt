@@ -46,7 +46,7 @@ function xmenu() {
                 if (PosN != P["posNOld", number] & inrange(Cursor - P["pos", vector2], vec2(), P["menu", table]["size", vector2] + vec2(0, 20))) {
                     P["posNOld", number] = PosN
                     
-                    local List = S["xmenu", table][P["categories", array][PosN, string], array]
+                    local List = S["xmenu", table][P["categories", array][PosN, string], table]:keys()
                     P["programList", array] = List
                     
                     local MenuWidth = 0

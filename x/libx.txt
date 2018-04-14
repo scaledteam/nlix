@@ -5,20 +5,21 @@
 @name libx
 
 S["xmenu", table] = table(
-    "shutdown" = array(
-        "poweroff",
-        "reboot",
-        "sh",
-        "exit"
+    "shutdown" = table(
+        "poweroff" = 1,
+        "reboot" = 1,
+        "sh" = 1,
+        "exit" = 1
     )
 )
 
 function xregister(Category:string, ProgramName:string) {
     if (S["xmenu", table]:exists(Category)) {
-        S["xmenu", table][Category, array]:pushString(ProgramName)
+        S["xmenu", table][Category, table][ProgramName, number] = 1
     }
     else {
-        S["xmenu", table][Category, array] = array(ProgramName)
+        S["xmenu", table][Category, table] = table()
+        S["xmenu", table][Category, table][ProgramName, number] = 1
     }
 }
 
@@ -319,7 +320,7 @@ function table table:xexec(ProgramName:string) {
 
 function table xexec(ProgramName:string, Pos:vector2, Size:vector2) {
     if (P["xobjects", table]:count() >= 1) {
-        local Frame = xcreate("frame"):xparent(P["xframe", table])
+        local Frame = xcreate("frame")
         Frame["size", vector2] = Size
         Frame:xpos(Pos)
         
@@ -354,8 +355,7 @@ function xprintAll() {
 }
 
 function number xcanDraw() {
-    #return !P["xparam", table]["blocked", number]
-    return 1
+    return !P["xparam", table]["blocked", number]
 }
 
 function number xcanCreate(Count) {

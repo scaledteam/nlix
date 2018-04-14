@@ -46,7 +46,6 @@ function xwm() {
                 
                 P["programs", table] = table()
                 P["frames", table] = table()
-                P["windows", table] = table()
                 
                 local Kbd = exec("kbd")
                 programUp()
@@ -61,7 +60,7 @@ function xwm() {
             break
             
         case 1,
-            if (!P["xparam", table]["blocked", number]) {
+            if (xcanDraw()) {
                 if (P["programs", table]) {
                     # Send cursor to programs
                     local Cursor = xcursor()
@@ -76,7 +75,6 @@ function xwm() {
                     if (!Program) {
                         P["programs", table]:remove(1)
                         P["frames", table]:removeTable(1):xremove()
-                        P["windows", table]:remove(1)
                     }
                     else {
                         local Frame = P["frames", table][1, table]
@@ -148,7 +146,6 @@ function xwm() {
                                         
                                         P["frames", table]:unshiftTable(P["frames", table]:removeTable(Counter))
                                         P["programs", table]:unshiftTable(P["programs", table]:removeTable(Counter))
-                                        P["windows", table]:unshiftTable(P["windows", table]:removeTable(Counter))
                                     }
                                     
                                     P["focusUse", number] = 0
@@ -238,7 +235,6 @@ function xwm() {
                 }
                 else {
                     Frame["interface", number] = 1
-                    P["windows", table]:unshiftTable(table())
                     P["state", number] = 4
                 }
             }
@@ -257,7 +253,7 @@ function xwm() {
                 local WindowPos = vec2(0, -20)
                 local WindowSize = vec2(Size[1], 20)
                 
-                P["windows", table]:unshiftTable(xcreate("box"):xparent(Frame):xpos(WindowPos):xsize(vec2(Size[1], 20)))
+                xcreate("box"):xparent(Frame):xpos(WindowPos):xsize(vec2(Size[1], 20))
                 
                 xcreate("text"):xparent(Frame):xpos(WindowPos):xtext(P["tempProgramName", string]):xsize(20):xcolor(vec())
                 
@@ -276,11 +272,11 @@ function xwm() {
         
         case 4,
             if (xcanDraw()) {
-                local Frame = P["tempFrame", table]
+                local Frame = P:removeTable("tempFrame")
                 
                 local Program = Frame:xexec(P["tempProgramName", string])
                 P["programs", table]:unshiftTable(Program)
-                P["frames", table]:unshiftTable(Program["xframe", table])
+                P["frames", table]:unshiftTable(Frame)
                 
                 Program["args", array] = P:removeArray("CommandExp")
                 Program["out", array] = P["out", array]

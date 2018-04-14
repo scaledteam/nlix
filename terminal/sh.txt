@@ -57,12 +57,6 @@ function sh() {
                         end()
                         break
                     
-                    case "sh",
-                        local Sh = exec("sh")
-                        Sh:remove("parent")
-                        P["state", number] = 1
-                        break
-                    
                     case "stress",
                         local P1 = exec("ls") P1["args", array] = array("rdir")
                         local P2 = exec("ls") P2["args", array] = array("e2shared")

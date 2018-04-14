@@ -19,7 +19,6 @@ function dremove() {
                     if (Device:entity() == Entity) {
                         DeviceList:remove(I)
                         S["devices", table]["byId", table][Id, wirelink] = nowirelink()
-                        #printTable(S["devices", table]["byId", table])
                         
                         if (DeviceList:count() == 0) {
                             S["devices", table]:remove(DeviceType)

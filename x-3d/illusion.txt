@@ -57,7 +57,7 @@ function illusion() {
                 
                 P["mainFrame", table] = P["xframe", table]
                 while (P["mainFrame", table]:exists("parent")) {
-                    P["mainFrame", table] = P["xframe", table]["parent", table]
+                    P["mainFrame", table] = P["mainFrame", table]["parent", table]
                 }
                 
                 P["multiplier", number] = min(Res[1], Res[2]) / 2 / 16 / 1.5

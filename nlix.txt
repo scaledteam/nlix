@@ -11,8 +11,10 @@ if (!tickClk()) {
         while (perf(KPerf)) {
             KState++
             switch (KState) {
+            	# Kernel lib
+                case 1, #include "nlix/kernel/libkernel" break
+                
                 # System
-                case 1, #include "nlix/system/libkernel" break
                 case 2, #include "nlix/system/libio" break
                 case 3, #include "nlix/system/liboverload" break
                 case 4, #include "nlix/system/system-memory" break
@@ -28,6 +30,7 @@ if (!tickClk()) {
                 case 13, #include "nlix/devices/devcmd" break
                 case 14, #include "nlix/devices/dremove" break
                 case 15, #include "nlix/devices/wc" break
+                case 16, #include "nlix/devices/auto-ws" break
                 
                 # Terminal
                 case 20, #include "nlix/terminal/term" break
@@ -35,13 +38,14 @@ if (!tickClk()) {
                 case 22, #include "nlix/terminal/sh" break
                 
                 case 23, #include "nlix/terminal/echo" break
-                case 24, #include "nlix/terminal/plist" break
-                case 25, #include "nlix/terminal/help" break
+                case 24, #include "nlix/terminal/help" break
+                case 25, #include "nlix/terminal/rund" break
                 
-                case 26, #include "nlix/terminal/rund" break
-                case 27, #include "nlix/terminal/kill" break
-                case 28, #include "nlix/terminal/reboot" break
-                case 29, #include "nlix/terminal/poweroff" break
+                # Kernel tools
+                case 26, #include "nlix/kernel/kill" break
+                case 27, #include "nlix/kernel/reboot" break
+                case 28, #include "nlix/kernel/poweroff" break
+                case 29, #include "nlix/kernel/plist" break
                 
                 # Performance
                 case 30, #include "nlix/performance/autoperf" break
@@ -87,10 +91,10 @@ if (!tickClk()) {
                 case 71, #include "nlix/x/xedit" break
                 
                 # 3D
-                case 73, #include "nlix/3d/xobj" break
-                case 74, #include "nlix/3d/hluoix3d" break
-                case 75, #include "nlix/3d/wustdd" break
-                case 76, #include "nlix/3d/illusion" break
+                case 73, #include "nlix/x-3d/xobj" break
+                case 74, #include "nlix/x-3d/hluoix3d" break
+                case 75, #include "nlix/x-3d/wustdd" break
+                case 76, #include "nlix/x-3d/illusion" break
                 
                 # Other for X
                 case 80, #include "nlix/x-other/speedometer" break
