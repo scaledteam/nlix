@@ -4,7 +4,7 @@
 
 @name xwm
 
-xregister("wm's", "xwm")
+xregister("system", "xwm")
 
 P2F["xwm", string] = "xwm"
 
@@ -47,10 +47,12 @@ function xwm() {
                 P["programs", table] = table()
                 P["frames", table] = table()
                 
-                local Kbd = exec("kbd")
-                programUp()
-                
-                P["kbd", array] = Kbd["out", array] = array()
+                if (!P:exists("kbd")) {
+                    local Kbd = exec("kbd")
+                    programUp()
+                    
+                    P["kbd", array] = Kbd["out", array] = array()
+                }
                 
                 local Count = 2.1
                 P["windowSize", vector2] = floor((Res - vec2(0, 20 + 20 * Count)) / Count)
@@ -93,7 +95,7 @@ function xwm() {
                         
                         # Moving windows
                         if (
-                            !Frame["interface", number]
+                            Frame["window", table]
                             &
                             Use
                             &
@@ -141,7 +143,7 @@ function xwm() {
                                     P["frames", table][1, table]["keyUse", number] = 0
                                     
                                     # Up window
-                                    if (!Frame["interface", number]) {
+                                    if (Frame["window", table]) {
                                         Frame:xup()
                                         
                                         P["frames", table]:unshiftTable(P["frames", table]:removeTable(Counter))
@@ -180,6 +182,20 @@ function xwm() {
                         P["programs", table]:remove(Counter)
                         P["frames", table]:removeTable(Counter):xremove()
                     }
+                    # check frame size
+                    elseif (Program["xframe", table]["size", vector2][1] != Program["xframe", table]["window", table]["size", vector2][1]) {
+                        local Width = Program["xframe", table]["size", vector2][1]
+                        Program["xframe", table]["window", table]:xsize(vec2(Width, 20))
+                        
+                        local Offset = vec2(Width - 10, -10)
+                        Program["xframe", table]["closeButton", table]:xvertices(array(
+                            vec2(-6) + Offset,
+                            vec2(6) + Offset,
+                            vec2() + Offset,
+                            vec2(-6, 6) + Offset,
+                            vec2(6, -6) + Offset
+                        ))
+                    }
                 }
                 
                 # Commands
@@ -188,18 +204,27 @@ function xwm() {
                     
                     switch (CommandExp[1, string]) {
                         case "exit",
-                            P["xdevice", wirelink]:egpClear()
+                            if (!P["xframe", table]:exists("parent")) {
+                                P["xdevice", wirelink]:egpClear()
+                            }
                             end()
                             break
                             
                         case "sh",
-                            P["xdevice", wirelink]:egpClear()
-                            end()
-                            exec("sh")
+                            if (!P["xframe", table]:exists("parent")) {
+                                P["xdevice", wirelink]:egpClear()
+                                end()
+                                exec("sh")
+                            }
+                            else {
+                                end()
+                            }
                             break
                             
                         case "poweroff",
-                            P["xdevice", wirelink]:egpClear()
+                            if (!P["xframe", table]:exists("parent")) {
+                                P["xdevice", wirelink]:egpClear()
+                            }
                             poweroff()
                             break
                         
@@ -234,7 +259,6 @@ function xwm() {
                     P["state", number] = 3
                 }
                 else {
-                    Frame["interface", number] = 1
                     P["state", number] = 4
                 }
             }
@@ -253,12 +277,12 @@ function xwm() {
                 local WindowPos = vec2(0, -20)
                 local WindowSize = vec2(Size[1], 20)
                 
-                xcreate("box"):xparent(Frame):xpos(WindowPos):xsize(vec2(Size[1], 20))
+                Frame["window", table] = xcreate("box"):xparent(Frame):xpos(WindowPos):xsize(vec2(Size[1], 20))
                 
                 xcreate("text"):xparent(Frame):xpos(WindowPos):xtext(P["tempProgramName", string]):xsize(20):xcolor(vec())
                 
                 local Offset = vec2(WindowSize[1] - 10, -10)
-                xcreate("lineStrip"):xparent(Frame):xsize(2):xvertices(array(
+                Frame["closeButton", table] = xcreate("lineStrip"):xparent(Frame):xsize(2):xvertices(array(
                     vec2(-6) + Offset,
                     vec2(6) + Offset,
                     vec2() + Offset,
@@ -282,7 +306,7 @@ function xwm() {
                 Program["out", array] = P["out", array]
                 Program["kbd", array] = array()
                 
-                if (Frame["interface", number]) {
+                if (!Frame["window", table]) {
                     Program["out", array] = P["in", array]
                 }
                 

@@ -3,4 +3,9 @@
 #
 
 @name system-memory
-@persist S:table
+
+# Loal
+#@persist S:table
+
+# Shared
+@outputs S:table

@@ -35,7 +35,7 @@ function xids() {
                 if (Count != P["xobjectsAllCountOld", number]) {
                     P["xobjectsAllCountOld", number] = Count
                     
-                    P["indicator", table]:xcolor(hsv2rgb(Count * 360 / egpMaxObjects(), 1, 1))
+                    P["indicator", table]:xcolor(hsv2rgb(120 * (1 - Count / egpMaxObjects()), 1, 1))
                     P["indicatorText", table]:xtext(Count:toString())
                 }
             }

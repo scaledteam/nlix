@@ -1,0 +1,46 @@
+#
+# Created by scaled
+#
+
+@name xvnc
+
+xregister("system", "xvnc")
+
+P2F["xvnc", string] = "xvnc"
+
+function xvnc() {
+    switch (P["state", number]) {
+        case 0,
+            if (deviceGet("nlix")) {
+                local Program = table("name" = "xwm")
+                P["program", table] = Program
+                
+                Program["xframe", table] = P["xframe", table]
+                Program["xparam", table] = P["xparam", table]
+                Program["xdevice", wirelink] = P["xdevice", wirelink]
+                Program["xobjects", table] = P["xobjects", table]
+                Program["xobjectsAll", table] = P["xobjectsAll", table]
+                Program["kbd", array] = P["kbd", array]
+                
+                P["device", wirelink]["S", table]["Ps", table]:pushTable(Program)
+                
+                P["state", number] = 1
+            }
+            else {
+                out("Error: nlix chip is not connected.\n")
+                end()
+            }
+            break
+        
+        case 1,
+            if (!P["program", table]) {
+                out("Session terminated.\n")
+                end()
+            }
+            if (!P["device", wirelink]) {
+                out("Error: Connection lost.\n")
+                end()
+            }
+            break
+    }
+}

@@ -9,13 +9,12 @@ P2F["autoperf", string] = "autoperf"
 function autoperf() {
     if (P:exists("lastRun")) {
         local DeltaTime = max(tickInterval(), systime() - P["lastRun", number])
-        local Speed = 1 / DeltaTime
         
-        if (Speed > 15) {
-            KPerf = max(KPerf - 20 * DeltaTime, 2)
+        if (DeltaTime < 0.0667) {
+            KPerf = max(KPerf - 1, 2)
         }
-        elseif (Speed < 15) {
-            KPerf = min(KPerf + 20 * DeltaTime, 100 - min(Overload, 50))
+        elseif (DeltaTime > 0.0667) {
+            KPerf = min(KPerf + 1, 100 - min(Overload, 50))
         }
     }
     P["lastRun", number] = systime()

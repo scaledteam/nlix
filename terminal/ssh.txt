@@ -1,0 +1,41 @@
+#
+# Created by scaled
+#
+
+@name ssh
+
+P2F["ssh", string] = "ssh"
+
+function ssh() {
+    switch (P["state", number]) {
+        case 0,
+            if (deviceGet("nlix")) {
+                local Program = table("name" = "sh")
+                P["program", table] = Program
+                
+                Program["in", array] = P["in", array]
+                Program["out", array] = P["out", array]
+                Program["parent", table] = P
+                
+                P["device", wirelink]["S", table]["Ps", table]:pushTable(Program)
+                
+                P["state", number] = 1
+            }
+            else {
+                out("Error: nlix chip is not connected.\n")
+                end()
+            }
+            break
+        
+        case 1,
+            if (!P["program", table]) {
+                out("Session terminated.\n")
+                end()
+            }
+            if (!P["device", wirelink]) {
+                out("Error: Connection lost.\n")
+                end()
+            }
+            break
+    }
+}

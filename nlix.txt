@@ -41,72 +41,77 @@ if (!tickClk()) {
                 case 24, #include "nlix/terminal/help" break
                 case 25, #include "nlix/terminal/rund" break
                 
+                case 26, #include "nlix/terminal/ssh" break
+                
                 # Kernel tools
-                case 26, #include "nlix/kernel/kill" break
-                case 27, #include "nlix/kernel/reboot" break
-                case 28, #include "nlix/kernel/poweroff" break
-                case 29, #include "nlix/kernel/plist" break
+                case 30, #include "nlix/kernel/kill" break
+                case 31, #include "nlix/kernel/reboot" break
+                case 32, #include "nlix/kernel/poweroff" break
+                case 33, #include "nlix/kernel/plist" break
                 
                 # Performance
-                case 30, #include "nlix/performance/autoperf" break
-                case 31, #include "nlix/performance/perf" break
-                case 32, #include "nlix/performance/overload" break
-                case 33, #include "nlix/performance/uptime" break
-                case 34, #include "nlix/performance/print-pi" break
+                case 40, #include "nlix/performance/autoperf" break
+                case 41, #include "nlix/performance/perf" break
+                case 42, #include "nlix/performance/overload" break
+                case 43, #include "nlix/performance/uptime" break
+                case 44, #include "nlix/performance/print-pi" break
                 
                 # Files
-                case 40, #include "nlix/files/libfs" break
-                case 41, #include "nlix/files/fstab" break
-                case 42, #include "nlix/files/fstable" break
-                case 43, #include "nlix/files/fsreal" break
+                case 50, #include "nlix/files/libfs" break
+                case 51, #include "nlix/files/fstab" break
+                case 52, #include "nlix/files/fstable" break
+                case 53, #include "nlix/files/fsreal" break
                 
-                case 44, #include "nlix/files/ls" break
-                case 45, #include "nlix/files/cat" break
-                case 46, #include "nlix/files/touch" break
-                case 47, #include "nlix/files/rm" break
-                case 48, #include "nlix/files/cp" break
+                case 54, #include "nlix/files/ls" break
+                case 55, #include "nlix/files/cat" break
+                case 56, #include "nlix/files/touch" break
+                case 57, #include "nlix/files/rm" break
+                case 58, #include "nlix/files/cp" break
                 
                 # Other
-                case 50, #include "nlix/other/calc" break
-                case 51, #include "nlix/other/surl" break
-                case 52, #include "nlix/other/digi-scan" break
-                case 53, #include "nlix/other/wget" break
-                case 54, #include "nlix/other/calc2" break
+                case 60, #include "nlix/other/calc" break
+                case 61, #include "nlix/other/surl" break
+                case 62, #include "nlix/other/digi-scan" break
+                case 63, #include "nlix/other/wget" break
+                case 64, #include "nlix/other/calc2" break
                 
                 # X
-                case 59, #include "nlix/x/kbd" break
-                case 60, #include "nlix/x/libx" break
-                case 61, #include "nlix/x/xstart" break
-                case 62, #include "nlix/x/xremove" break
-                case 63, #include "nlix/x/xup" break
+                case 70, #include "nlix/x/kbd" break
+                case 71, #include "nlix/x/libx" break
+                case 72, #include "nlix/x/xstart" break
+                case 73, #include "nlix/x/xremove" break
+                case 74, #include "nlix/x/xup" break
+                case 75, #include "nlix/x/xcreate" break
                 
-                case 64, #include "nlix/x/xwm" break
-                case 65, #include "nlix/x/xpanel" break
-                case 66, #include "nlix/x/xmenu" break
+                case 76, #include "nlix/x/xwm" break
+                case 77, #include "nlix/x/xpanel" break
+                case 78, #include "nlix/x/xmenu" break
                 
-                case 67, #include "nlix/x/xterm" break
-                case 68, #include "nlix/x/xres" break
-                case 69, #include "nlix/x/xeyes" break
-                case 70, #include "nlix/x/xids" break
-                case 71, #include "nlix/x/xedit" break
+                case 79, #include "nlix/x/xterm" break
+                case 80, #include "nlix/x/xres" break
+                case 81, #include "nlix/x/xeyes" break
+                case 82, #include "nlix/x/xids" break
+                case 83, #include "nlix/x/xedit" break
+                
+                case 84, #include "nlix/x/xvnc" break
                 
                 # 3D
-                case 73, #include "nlix/x-3d/xobj" break
-                case 74, #include "nlix/x-3d/hluoix3d" break
-                case 75, #include "nlix/x-3d/wustdd" break
-                case 76, #include "nlix/x-3d/illusion" break
+                case 90, #include "nlix/x-3d/xobj" break
+                case 91, #include "nlix/x-3d/hluoix3d" break
+                case 92, #include "nlix/x-3d/wustdd" break
+                case 93, #include "nlix/x-3d/illusion" break
                 
                 # Other for X
-                case 80, #include "nlix/x-other/speedometer" break
-                case 81, #include "nlix/x-other/radar" break
-                case 82, #include "nlix/x-other/clicker" break
-                case 83, #include "nlix/x-other/spirit-level" break
+                case 100, #include "nlix/x-other/speedometer" break
+                case 101, #include "nlix/x-other/radar" break
+                case 102, #include "nlix/x-other/clicker" break
+                case 103, #include "nlix/x-other/spirit-level" break
                 
-                # Place for your first program
-                #case 85, #include "nlix/other/myprogram" break
+                # Place for your first programs
+                #case 110, #include "nlix/other/myprogram" break
                 
                 # Move to execute state
-                case 99, KState = 1 runOnTick(1) exit() break
+                case 120, KState = 1 runOnTick(1) exit() break
                 default,
             }
         }

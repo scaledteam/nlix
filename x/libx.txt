@@ -359,114 +359,71 @@ function number xcanDraw() {
 }
 
 function number xcanCreate(Count) {
-    for (I = 1, Overload) {
-        switch (P["xworkerState", number]) {
-            case 0,
-                if (P["xparam", table]["blocked", number]) {
-                    return 0
-                }
-                elseif (P["xobjects", table]:count() >= Count) {
-                    return 1
-                }
-                elseif (P["xframe", table]["id", number] == 0) {
-                    return 0
-                }
-                elseif (!P["xframe", table]:exists("parent")) {
-                    if (xxobjectsLeft() > Count) {
-                        P["xparam", table]["blocked", number] = 1
-                        P["xworkerState", number] = 1
-                    }
-                    else {
-                        return 0
-                    }
-                }
-                else {
-                    if (P["xframe", table]:xxlastObjectId() >= xxlastObjectId()) {
-                        P["xworkerState", number] = 1
-                    }
-                    else {
-                        P["xshiftStart", number] = P["xframe", table]:xxlastObjectId()
-                        P["xobjectsTemp", table] = table()
-                        
-                        P["xcounter", number] = P["xshiftStart", number]
-                        P["xworkerState", number] = 2
-                    }
-                }
-                break
-            
-            # For last objects
-            case 1,
-                if (P["xobjects", table]:count() < Count) {
-                    local Object = xnewObject(P["xobjectsAll", table]:count() + 1)
-                    P["xobjects", table]:pushTable(Object)
-                    P["xobjectsAll", table]:pushTable(Object)
-                }
-                else {
-                    P:remove("xworkerState")
-                    P["xparam", table]["blocked", number] = 0
-                    #return 1
-                    # make delay
-                    return 0
-                }
-                break
-            
-            # For middle objects
-            case 2,
-                P["xcounter", number] = P["xcounter", number] + 1
+    if (P["xparam", table]["blocked", number]) {
+        return 0
+    }
+    if (P["xobjects", table]:count() >= Count) {
+        return 1
+    }
+    if (P["xframe", table]["id", number] == 0) {
+        return 0
+    }
+    if (!P["xcreate", table]) {
+        if (!P["xframe", table]:exists("parent")) {
+            if (xxobjectsLeft() > Count) {
+                P["xparam", table]["blocked", number] = 1
                 
-                if (P["xcounter", number] <= P["xobjectsAll", table]:count()) {
-                    local Id = P["xcounter", number]
-                    local Object = P["xobjectsAll", table][Id, table]
-                    Object["id", number] = 0
-                    P["xobjectsTemp", table]:pushTable(Object)
-                }
-                else {
-                    P["xcounter", number] = P["xshiftStart", number]
-                    P["xworkerState", number] = 3
-                }
-                break
-            
-            case 3,
-                P["xcounter", number] = P["xcounter", number] + 1
+                local Program = exec("xcreate")
+                P["xcreate", table] = Program
                 
-                if (P["xobjects", table]:count() < Count) {
-                    local Id = P["xcounter", number]
-                    local Object = xnewObject(Id)
-                    Object:xredraw()
-                    
-                    P["xobjectsAll", table][Id, table] = Object
-                    P["xobjects", table]:pushTable(Object)
-                }
-                else {
-                    P["xcounter", number] = P["xshiftStart", number]
-                    P["xworkerState", number] = 4
-                }
-                break
-            
-            case 4,
-                P["xcounter", number] = P["xcounter", number] + 1
+                Program["state", number] = 1
+                Program["count", number] = Count
                 
-                if (P["xobjectsTemp", table]) {
-                    local Object = P["xobjectsTemp", table]:removeTable(1)
-                    local Id = P["xcounter", number] + Count
-                    
-                    Object["id", number] = Id
-                    P["xobjectsAll", table][Id, table] = Object
-                    
-                    Object:xredraw()
-                }
-                else {
-                    P:remove("xworkerState")
-                    P:remove("xcounter")
-                    P:remove("xobjectsTemp")
-                    P["xparam", table]["blocked", number] = 0
-                    #return 1
-                    # make delay
-                    return 0
-                }
-                break
+                Program["xframe", table] = P["xframe", table]
+                Program["xparam", table] = P["xparam", table]
+                Program["xdevice", wirelink] = P["xdevice", wirelink]
+                Program["xobjects", table] = P["xobjects", table]
+                Program["xobjectsAll", table] = P["xobjectsAll", table]
+            }
+            else {
+                return 0
+            }
+        }
+        else {
+            if (P["xframe", table]:xxlastObjectId() >= xxlastObjectId()) {
+                local Program = exec("xcreate")
+                P["xcreate", table] = Program
+                
+                Program["state", number] = 1
+                Program["count", number] = Count
+                
+                Program["xframe", table] = P["xframe", table]
+                Program["xparam", table] = P["xparam", table]
+                Program["xdevice", wirelink] = P["xdevice", wirelink]
+                Program["xobjects", table] = P["xobjects", table]
+                Program["xobjectsAll", table] = P["xobjectsAll", table]
+            }
+            else {
+                local Program = exec("xcreate")
+                P["xcreate", table] = Program
+                
+                Program["state", number] = 2
+                Program["count", number] = Count
+                
+                Program["xshiftStart", number] = P["xframe", table]:xxlastObjectId()
+                Program["xobjectsTemp", table] = table()
+                
+                Program["counter", number] = Program["xshiftStart", number]
+                
+                Program["xframe", table] = P["xframe", table]
+                Program["xparam", table] = P["xparam", table]
+                Program["xdevice", wirelink] = P["xdevice", wirelink]
+                Program["xobjects", table] = P["xobjects", table]
+                Program["xobjectsAll", table] = P["xobjectsAll", table]
+            }
         }
     }
+    
     return 0
 }
 
@@ -484,16 +441,16 @@ function table:xclear() {
 }
 
 function xxremoveByDaemon(IdStart, IdEnd) {
-    local XRemove = exec("xremove")
-    P["xremove", table] = XRemove
-    XRemove:remove("parent")
+    local Program = exec("xremove")
+    P["xremove", table] = Program
+    Program:remove("parent")
     
-    XRemove["xobjectsAll", table] = P["xobjectsAll", table]
-    XRemove["xparam", table] = P["xparam", table]
-    XRemove["xdevice", wirelink] = P["xdevice", wirelink]
+    Program["xobjectsAll", table] = P["xobjectsAll", table]
+    Program["xparam", table] = P["xparam", table]
+    Program["xdevice", wirelink] = P["xdevice", wirelink]
     
-    XRemove["idStart", number] = IdStart
-    XRemove["idEnd", number] = IdEnd
+    Program["idStart", number] = IdStart
+    Program["idEnd", number] = IdEnd
 }
 
 function table:xremove() {
@@ -513,15 +470,15 @@ function xend() {
 }
 
 function xxup(StartId, ObjectLastId, ParentLastId) {
-    local XUp = exec("xup")
+    local Program = exec("xup")
     
-    XUp["xobjectsAll", table] = P["xobjectsAll", table]
-    XUp["xparam", table] = P["xparam", table]
-    XUp["xdevice", wirelink] = P["xdevice", wirelink]
+    Program["xobjectsAll", table] = P["xobjectsAll", table]
+    Program["xparam", table] = P["xparam", table]
+    Program["xdevice", wirelink] = P["xdevice", wirelink]
     
-    XUp["idStart", number] = StartId
-    XUp["idObjectLast", number] = ObjectLastId
-    XUp["idParentLast", number] = ParentLastId
+    Program["idStart", number] = StartId
+    Program["idObjectLast", number] = ObjectLastId
+    Program["idParentLast", number] = ParentLastId
 }
 
 function table:xup() {
