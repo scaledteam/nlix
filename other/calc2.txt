@@ -32,9 +32,22 @@ function calc2() {
         
         case 1,
             if (wait()) {
-                P["inputString", string] = in():replace(" ", "")
-                P["inputLength", number] = P["inputString", string]:length()
-                P["state", number] = 2
+                local In = in()
+                
+                switch (In) {
+                    case "q", case "quit", case "exit",
+                        end()
+                        break
+                    
+                    case "h", case "help",
+                        out("Just write here your formula.\nExample: \"2+2*2\"\n")
+                        break
+                    
+                    default,
+                        P["inputString", string] = In:replace(" ", "")
+                        P["inputLength", number] = P["inputString", string]:length()
+                        P["state", number] = 2
+                }
             }
             break
         

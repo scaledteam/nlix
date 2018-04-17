@@ -13,17 +13,15 @@ function xresTest() {
         case 0,
             if (xcanCreate(3)) {
                 local Res = xres()
-                local Size = vec2(int(min(Res[1], Res[2]) / 10) * 10)
+                local Size = vec2(min(Res[1], Res[2]))
                 
-                xcreate("box"):xsize(Res):xcolor(vec(127))
-                xcreate("box"):xsize(Size)
+                P[1, table] = xcreate("box"):xsize(Res):xcolor(vec(127))
+                P[2, table] = xcreate("box"):xsize(Size)
                 
-                local Parented = P["xframe", table]:exists("parent")
-                
-                P["text", table] = xcreate("textLayout"):xsize(Size):xsize(Size[2] / 10):xcolor(vec()):xtext(
+                P[3, table] = xcreate("textLayout"):xsize(Res):xsize(Size[2] / 10):xcolor(vec()):xtext(
                     "Res = (" + Res[1] + ", " + Res[2] + ")\n"
                     +"Size = " + Size[1] + "\n"
-                    +(Parented ? "Res = (" + P["xframe", table]["parent", table]["size", vector2][1] + ", " + P["xframe", table]["parent", table]["size", vector2][2] + ")\n" : "Line 3\n")
+                    +(P["xframe", table]:exists("parent") ? "Res = (" + P["xframe", table]["parent", table]["size", vector2][1] + ", " + P["xframe", table]["parent", table]["size", vector2][2] + ")\n" : "Line 3\n")
                     +"Line 4\n"
                     +"Line 5\n"
                     +"Line 6\n"
@@ -38,6 +36,39 @@ function xresTest() {
             break
         
         case 1,
+            local Cursor = xcursor()
+            local Use = xkeyUse()
+            
+            if (Use != P["useOld", number]) {
+                P["useOld", number] = Use
+                
+                if (Use) {
+                    P["cursorOld", vector2] = Cursor
+                }
+            }
+            
+            if (Use & Cursor != P["cursorOld", vector2] & inrange(Cursor, vec2(), P["xframe", table]["size", vector2])) {
+                P["xframe", table]["size", vector2] = round(P["xframe", table]["size", vector2] + (Cursor - P["cursorOld", vector2]))
+                P["cursorOld", vector2] = Cursor
+                
+                local Res = xres()
+                local Size = vec2(min(Res[1], Res[2]))
+                
+                P[1, table]:xsize(Res)
+                P[2, table]:xsize(Size)
+                P[3, table]:xsize(Res):xsize(Size[2] / 10):xtext(
+                    "Res = (" + Res[1] + ", " + Res[2] + ")\n"
+                    +"Size = " + Size[1] + "\n"
+                    +(P["xframe", table]:exists("parent") ? "Res = (" + P["xframe", table]["parent", table]["size", vector2][1] + ", " + P["xframe", table]["parent", table]["size", vector2][2] + ")\n" : "Line 3\n")
+                    +"Line 4\n"
+                    +"Line 5\n"
+                    +"Line 6\n"
+                    +"Line 7\n"
+                    +"Line 8\n"
+                    +"Line 9\n"
+                    +"Line 10"
+                )
+            }
             break
     }
 }

@@ -10,6 +10,8 @@ function xpanel() {
     switch (P["state", number]) {
         case 0,
             if (xcanCreate(3)) {
+                P["out", array] = P["parent", table]["in", array]
+                
                 local Frame = P["xframe", table]
                 
                 # Panel

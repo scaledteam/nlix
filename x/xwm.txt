@@ -81,9 +81,6 @@ function xwm() {
                     else {
                         local Frame = P["frames", table][1, table]
                         
-                        # Send key use
-                        Frame["keyUse", number] = Use
-                        
                         # Keyboard
                         local KbdReal = P["kbd", array]
                         local KbdInsideProgram = Program["kbd", array]
@@ -113,11 +110,16 @@ function xwm() {
                                 Frame:xpos(NewPos)
                                 
                                 Frame["moveMode", number] = 1
+                                Frame["keyUse", number] = 0
                                 return
                             }
                         }
                         elseif (Frame:exists("moveMode")) {
                             Frame:remove("moveMode")
+                        }
+                        else {
+                            # Send key use
+                            Frame["keyUse", number] = Use
                         }
                         
                         # Action for change focus
@@ -305,10 +307,6 @@ function xwm() {
                 Program["args", array] = P:removeArray("CommandExp")
                 Program["out", array] = P["out", array]
                 Program["kbd", array] = array()
-                
-                if (!Frame["window", table]) {
-                    Program["out", array] = P["in", array]
-                }
                 
                 P["focus", number] = P["programs", table]:count()
                 

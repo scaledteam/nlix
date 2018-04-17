@@ -24,8 +24,13 @@ function xterm() {
             break
         
         case 1,
+            local ProgramName = "sh"
+            if (args() >= 1) {
+                ProgramName = arg(1)
+            }
+            
             local Skbd = exec("skbd")
-            local Sh = exec("sh")
+            local Sh = exec(ProgramName)
             local Term = exec("term")
             programUp()
             

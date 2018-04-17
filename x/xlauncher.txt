@@ -1,0 +1,52 @@
+#
+# Created by scaled
+#
+
+@name xlauncher
+
+xregister("system", "xlauncher")
+
+P2F["xlauncher", string] = "xlauncher"
+
+function xlauncher() {
+    switch (P["state", number]) {
+        case 0,
+            if (xcanCreate(2)) {
+            	P["xframe", table]["size", vector2][2] = 20
+            	
+                local Res = xres()
+                
+                xcreate("box"):xsize(Res)
+                P["text", table] = xcreate("textLayout"):xsize(Res):xtext("> "):xcolor(vec())
+                
+                local Skbd = exec("skbd")
+                programUp()
+                
+                Skbd["in", array] = P["kbd", array]
+                P["in", array] = Skbd["term", array] = array()
+                Skbd["out", array] = P["parent", table]["in", array]
+                
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            if (wait()) {
+                local In = in()
+                if (In == TERM_ERASE1) {
+                    P["text", table]:xtext(P["text", table]["text", string]:sub(1, -2))
+                }
+                elseif (In == "\n") {
+                    #P["text", table]:xtext("> ")
+                    end()
+                }
+                elseif (In == TERM_ERASE) {
+                    P["text", table]:xtext(P["text", table]["text", string]:sub(1, -1 - P["term", array]:shiftNumber()))
+                }
+                else {
+                    P["text", table]:xtext(P["text", table]["text", string] + In)
+                }
+            }
+            break
+    }
+}

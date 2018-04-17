@@ -26,11 +26,11 @@ if (!tickClk()) {
                 # Devices
                 case 10, #include "nlix/devices/libdevices" break
                 case 11, #include "nlix/devices/hotplugd" break
-                case 12, #include "nlix/devices/dlist" break
-                case 13, #include "nlix/devices/devcmd" break
-                case 14, #include "nlix/devices/dremove" break
-                case 15, #include "nlix/devices/wc" break
-                case 16, #include "nlix/devices/auto-ws" break
+                case 12, #include "nlix/devices/auto-ws" break
+                case 13, #include "nlix/devices/dlist" break
+                case 14, #include "nlix/devices/devcmd" break
+                case 15, #include "nlix/devices/dremove" break
+                case 16, #include "nlix/devices/wc" break
                 
                 # Terminal
                 case 20, #include "nlix/terminal/term" break
@@ -44,10 +44,10 @@ if (!tickClk()) {
                 case 26, #include "nlix/terminal/ssh" break
                 
                 # Kernel tools
-                case 30, #include "nlix/kernel/kill" break
-                case 31, #include "nlix/kernel/reboot" break
-                case 32, #include "nlix/kernel/poweroff" break
-                case 33, #include "nlix/kernel/plist" break
+                case 30, #include "nlix/kernel/plist" break
+                case 31, #include "nlix/kernel/kill" break
+                case 32, #include "nlix/kernel/reboot" break
+                case 33, #include "nlix/kernel/poweroff" break
                 
                 # Performance
                 case 40, #include "nlix/performance/autoperf" break
@@ -94,6 +94,7 @@ if (!tickClk()) {
                 case 83, #include "nlix/x/xedit" break
                 
                 case 84, #include "nlix/x/xvnc" break
+                case 85, #include "nlix/x/xlauncher" break
                 
                 # 3D
                 case 90, #include "nlix/x-3d/xobj" break
@@ -106,6 +107,7 @@ if (!tickClk()) {
                 case 101, #include "nlix/x-other/radar" break
                 case 102, #include "nlix/x-other/clicker" break
                 case 103, #include "nlix/x-other/spirit-level" break
+                case 104, #include "nlix/x-other/xcommander" break
                 
                 # Place for your first programs
                 #case 110, #include "nlix/other/myprogram" break

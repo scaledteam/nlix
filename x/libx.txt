@@ -5,7 +5,7 @@
 @name libx
 
 S["xmenu", table] = table(
-    "shutdown" = table(
+    "exit" = table(
         "poweroff" = 1,
         "reboot" = 1,
         "sh" = 1,

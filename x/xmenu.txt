@@ -10,6 +10,8 @@ function xmenu() {
     switch (P["state", number]) {
         case 0,
             if (xcanCreate(4)) {
+                P["out", array] = P["parent", table]["in", array]
+                
                 # Panel
                 local List = S["xmenu", table]:keys()
                 P["categories", array] = List
