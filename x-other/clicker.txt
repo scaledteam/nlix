@@ -6,7 +6,7 @@
 
 @name clicker
 
-xregister("games", "clicker")
+xmenuAdd("games", "clicker")
 
 P2F["clicker", string] = "clicker"
 

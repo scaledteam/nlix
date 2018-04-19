@@ -4,7 +4,7 @@
 
 @name xres
 
-xregister("tests", "xres")
+xmenuAdd("tests", "xres")
 
 P2F["xres", string] = "xresTest"
 

@@ -4,7 +4,7 @@
 
 @name speedometer
 
-xregister("real", "speedometer")
+xmenuAdd("real", "speedometer")
 
 P2F["speedometer", string] = "speedometer"
 

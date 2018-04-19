@@ -4,26 +4,6 @@
 
 @name libx
 
-S["xmenu", table] = table(
-    "exit" = table(
-        "poweroff" = 1,
-        "reboot" = 1,
-        "sh" = 1,
-        "exit" = 1
-    )
-)
-
-function xregister(Category:string, ProgramName:string) {
-    if (S["xmenu", table]:exists(Category)) {
-        S["xmenu", table][Category, table][ProgramName, number] = 1
-    }
-    else {
-        S["xmenu", table][Category, table] = table()
-        S["xmenu", table][Category, table][ProgramName, number] = 1
-    }
-}
-
-
 function table xcreate(Type:string) {
     if (P["xobjects", table]:count() > 0) {
         local Device = P["xdevice", wirelink]
@@ -435,6 +415,7 @@ function table:xclear() {
         
         #This:clear()
         This["removed", number] = 1
+        This["id", number] = 0
         
         P["xdevice", wirelink]:egpLine(Id, vec2(), vec2())
     }

@@ -4,7 +4,7 @@
 
 @name spirit-level
 
-xregister("real", "spirit-level")
+xmenuAdd("real", "spirit-level")
 
 P2F["spirit-level", string] = "spiritlevel"
 

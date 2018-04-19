@@ -2,22 +2,22 @@
 # Created by scaled
 #
 
-@name xlauncher
+@name xwm-cmd
 
-xregister("system", "xlauncher")
+xmenuAdd("xwm", "xwm-cmd")
 
-P2F["xlauncher", string] = "xlauncher"
+P2F["xwm-cmd", string] = "xwmcmd"
 
-function xlauncher() {
+function xwmcmd() {
     switch (P["state", number]) {
         case 0,
             if (xcanCreate(2)) {
-            	P["xframe", table]["size", vector2][2] = 20
-            	
+                P["xframe", table]["size", vector2] = P["xframe", table]["size", vector2]:setY(20)
+                
                 local Res = xres()
                 
                 xcreate("box"):xsize(Res)
-                P["text", table] = xcreate("textLayout"):xsize(Res):xtext("> "):xcolor(vec())
+                P["text", table] = xcreate("text"):xtext("> "):xcolor(vec())
                 
                 local Skbd = exec("skbd")
                 programUp()
@@ -41,7 +41,7 @@ function xlauncher() {
                     end()
                 }
                 elseif (In == TERM_ERASE) {
-                    P["text", table]:xtext(P["text", table]["text", string]:sub(1, -1 - P["term", array]:shiftNumber()))
+                    P["text", table]:xtext(P["text", table]["text", string]:sub(1, -1 - P["in", array]:shiftNumber()))
                 }
                 else {
                     P["text", table]:xtext(P["text", table]["text", string] + In)

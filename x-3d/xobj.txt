@@ -4,7 +4,7 @@
 
 @name xobj
 
-xregister("3d", "xobj")
+xmenuAdd("3d", "xobj")
 
 P2F["xobj", string] = "xobj"
 

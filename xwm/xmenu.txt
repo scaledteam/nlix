@@ -4,6 +4,27 @@
 
 @name xmenu
 
+if (!S:exists("xmenu")) {
+    S["xmenu", table] = table(
+        "exit" = table(
+            "poweroff" = 1,
+            "reboot" = 1,
+            "sh" = 1,
+            "exit" = 1
+        )
+    )
+}
+
+function xmenuAdd(Category:string, ProgramName:string) {
+    if (S["xmenu", table]:exists(Category)) {
+        S["xmenu", table][Category, table][ProgramName, number] = 1
+    }
+    else {
+        S["xmenu", table][Category, table] = table()
+        S["xmenu", table][Category, table][ProgramName, number] = 1
+    }
+}
+
 P2F["xmenu", string] = "xmenu"
 
 function xmenu() {

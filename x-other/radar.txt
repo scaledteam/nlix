@@ -5,7 +5,7 @@
 @name radar
 
 #ifdef findInSphere(vector, number)
-xregister("real", "radar")
+xmenuAdd("real", "radar")
 
 P2F["radar", string] = "radar"
 

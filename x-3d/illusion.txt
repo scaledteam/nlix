@@ -4,7 +4,7 @@
 
 @name illusion
 
-xregister("3d", "illusion")
+xmenuAdd("3d", "illusion")
 
 P2F["illusion", string] = "illusion"
 

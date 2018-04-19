@@ -4,7 +4,7 @@
 
 @name xwm
 
-xregister("system", "xwm")
+xmenuAdd("xwm", "xwm")
 
 P2F["xwm", string] = "xwm"
 

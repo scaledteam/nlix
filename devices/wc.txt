@@ -17,10 +17,13 @@ function wc() {
                 Radius = 1000
             }
             
-            findIncludeClass("gmod_wire_*")
+            #[findIncludeClass("gmod_wire_*")
                 findInSphere(entity():pos(), Radius)
                 findSortByDistance(entity():pos())
-            findClearWhiteClassList()
+            findClearWhiteClassList()]#
+            
+            findByClass("gmod_wire_*")
+            findSortByDistance(entity():pos())
             
             local FindToArray = findToArray()
             local List = ""
@@ -47,13 +50,14 @@ function wc() {
                     local Device = entity(Id):wirelink()
                     
                     if (Device) {
-                        local Type = Device:type()
+                        #[local Type = Device:type()
                         if (S["devices", table]:exists(Type)) {
                             S["devices", table][Type, array]:pushWirelink(Device)
                         }
                         else {
                             S["devices", table][Type, array] = array(Device)
-                        }
+                        }]#
+                        deviceNew(Device)
                     }
                     else {
                         out("Error: Incorrect id.\n")

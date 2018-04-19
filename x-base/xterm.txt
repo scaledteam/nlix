@@ -4,7 +4,7 @@
 
 @name xterm
 
-xregister("system", "xterm")
+xmenuAdd("base", "xterm")
 
 P2F["xterm", string] = "xterm"
 

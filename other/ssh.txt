@@ -2,25 +2,20 @@
 # Created by scaled
 #
 
-@name xvnc
+@name ssh
 
-xregister("system", "xvnc")
+P2F["ssh", string] = "ssh"
 
-P2F["xvnc", string] = "xvnc"
-
-function xvnc() {
+function ssh() {
     switch (P["state", number]) {
         case 0,
             if (deviceGet("nlix")) {
-                local Program = table("name" = "xwm")
+                local Program = table("name" = "sh")
                 P["program", table] = Program
+                Program["parent", table] = P
                 
-                Program["xframe", table] = P["xframe", table]
-                Program["xparam", table] = P["xparam", table]
-                Program["xdevice", wirelink] = P["xdevice", wirelink]
-                Program["xobjects", table] = P["xobjects", table]
-                Program["xobjectsAll", table] = P["xobjectsAll", table]
-                Program["kbd", array] = P["kbd", array]
+                Program["in", array] = P["in", array]
+                Program["out", array] = P["out", array]
                 
                 P["device", wirelink]["S", table]["Ps", table]:pushTable(Program)
                 

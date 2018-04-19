@@ -4,7 +4,7 @@
 
 @name xeyes
 
-xregister("tests", "xeyes")
+xmenuAdd("tests", "xeyes")
 
 P2F["xeyes", string] = "xeyes"
 

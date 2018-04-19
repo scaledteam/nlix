@@ -2,13 +2,13 @@
 # Created by scaled
 #
 
-@name xcommander
+@name xfilemngr
 
-xregister("system", "xcommander")
+xmenuAdd("base", "xfilemngr")
 
-P2F["xcommander", string] = "xcommander"
+P2F["xfilemngr", string] = "xfilemngr"
 
-function xcommander() {
+function xfilemngr() {
     switch (P["state", number]) {
         case 0,
             if (xcanCreate(10)) {

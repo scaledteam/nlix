@@ -26,7 +26,7 @@ function hotplugd() {
     if (PortEntity:id() != HotplugdPortsOld[HotplugdCounter, number]) {
         HotplugdPortsOld[HotplugdCounter, number] = PortEntity:id()
         
-        if (PortEntity) {
+        #[if (PortEntity) {
             # Check if device exists
             local Type = Port:type()
             local EntityId = PortEntity:id()
@@ -40,7 +40,8 @@ function hotplugd() {
                 Devices[Type, array]:pushWirelink(Port)
                 Devices["byId", table][EntityId, wirelink] = Port
             }
-        }
+        }]#
+        deviceNew(Port)
     }
     
     # return device from dead app

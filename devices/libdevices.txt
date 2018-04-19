@@ -59,3 +59,26 @@ function deviceReturn() {
         }
     }
 }
+
+function number deviceNew(Port:wirelink) {
+    local PortEntity = Port:entity()
+    
+    if (PortEntity) {
+        # Check if device exists
+        local Type = Port:type()
+        local Id = PortEntity:id()
+        
+        local Devices = S["devices", table]
+        if (!Devices:exists(Type)) {
+            Devices[Type, array] = array(Port)
+            Devices["byId", table][Id, wirelink] = Port
+            return 1
+        }
+        elseif (Devices["byId", table][Id, wirelink] != Port) {
+            Devices[Type, array]:pushWirelink(Port)
+            Devices["byId", table][Id, wirelink] = Port
+            return 1
+        }
+    }
+    return 0
+}

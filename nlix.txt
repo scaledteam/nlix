@@ -41,8 +41,6 @@ if (!tickClk()) {
                 case 24, #include "nlix/terminal/help" break
                 case 25, #include "nlix/terminal/rund" break
                 
-                case 26, #include "nlix/terminal/ssh" break
-                
                 # Kernel tools
                 case 30, #include "nlix/kernel/plist" break
                 case 31, #include "nlix/kernel/kill" break
@@ -74,6 +72,7 @@ if (!tickClk()) {
                 case 62, #include "nlix/other/digi-scan" break
                 case 63, #include "nlix/other/wget" break
                 case 64, #include "nlix/other/calc2" break
+                case 65, #include "nlix/other/ssh" break
                 
                 # X
                 case 70, #include "nlix/x/kbd" break
@@ -83,31 +82,34 @@ if (!tickClk()) {
                 case 74, #include "nlix/x/xup" break
                 case 75, #include "nlix/x/xcreate" break
                 
-                case 76, #include "nlix/x/xwm" break
-                case 77, #include "nlix/x/xpanel" break
-                case 78, #include "nlix/x/xmenu" break
+                # xwm
+                case 80, #include "nlix/xwm/xmenu" break
+                case 81, #include "nlix/xwm/xwm" break
+                case 82, #include "nlix/xwm/xpanel" break
+                case 83, #include "nlix/xwm/xwm-cmd" break
                 
-                case 79, #include "nlix/x/xterm" break
-                case 80, #include "nlix/x/xres" break
-                case 81, #include "nlix/x/xeyes" break
-                case 82, #include "nlix/x/xids" break
-                case 83, #include "nlix/x/xedit" break
+                # x tests
+                case 85, #include "nlix/x-tests/xres" break
+                case 86, #include "nlix/x-tests/xeyes" break
+                case 87, #include "nlix/x-tests/xids" break
                 
-                case 84, #include "nlix/x/xvnc" break
-                case 85, #include "nlix/x/xlauncher" break
+                # x base
+                case 90, #include "nlix/x-base/xfilemngr" break
+                case 91, #include "nlix/x-base/xedit" break
+                case 92, #include "nlix/x-base/xterm" break
                 
                 # 3D
-                case 90, #include "nlix/x-3d/xobj" break
-                case 91, #include "nlix/x-3d/hluoix3d" break
-                case 92, #include "nlix/x-3d/wustdd" break
-                case 93, #include "nlix/x-3d/illusion" break
+                case 95, #include "nlix/x-3d/xobj" break
+                case 96, #include "nlix/x-3d/hluoix3d" break
+                case 97, #include "nlix/x-3d/wustdd" break
+                case 98, #include "nlix/x-3d/illusion" break
                 
                 # Other for X
                 case 100, #include "nlix/x-other/speedometer" break
                 case 101, #include "nlix/x-other/radar" break
                 case 102, #include "nlix/x-other/clicker" break
                 case 103, #include "nlix/x-other/spirit-level" break
-                case 104, #include "nlix/x-other/xcommander" break
+                case 105, #include "nlix/x-other/xvnc" break
                 
                 # Place for your first programs
                 #case 110, #include "nlix/other/myprogram" break
