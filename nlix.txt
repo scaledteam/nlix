@@ -86,17 +86,19 @@ if (!tickClk()) {
                 case 80, #include "nlix/xwm/xmenu" break
                 case 81, #include "nlix/xwm/xwm" break
                 case 82, #include "nlix/xwm/xpanel" break
-                case 83, #include "nlix/xwm/xwm-cmd" break
-                
-                # x tests
-                case 85, #include "nlix/x-tests/xres" break
-                case 86, #include "nlix/x-tests/xeyes" break
-                case 87, #include "nlix/x-tests/xids" break
+                case 83, #include "nlix/xwm/xmsg" break
+                case 84, #include "nlix/xwm/xwm-cmd" break
                 
                 # x base
-                case 90, #include "nlix/x-base/xfilemngr" break
-                case 91, #include "nlix/x-base/xedit" break
-                case 92, #include "nlix/x-base/xterm" break
+                case 85, #include "nlix/x-base/xfilemngr" break
+                case 86, #include "nlix/x-base/xedit" break
+                case 87, #include "nlix/x-base/xterm" break
+                case 88, #include "nlix/x-base/xfilechooser" break
+                
+                # x tests
+                case 90, #include "nlix/x-tests/xres" break
+                case 91, #include "nlix/x-tests/xeyes" break
+                case 92, #include "nlix/x-tests/xids" break
                 
                 # 3D
                 case 95, #include "nlix/x-3d/xobj" break

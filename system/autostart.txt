@@ -5,14 +5,7 @@
 @name autostart
 
 if (!Ps) {
-    S["startTime", number] = systime()
-    
-    # Daemons
     exec("hotplugd")
     exec("autoperf")
-    
-    # Terminal
-    #exec("sh")
-    
     exec("auto-ws")
 }

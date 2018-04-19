@@ -1,0 +1,28 @@
+#
+# Created by scaled
+#
+
+@name xmsg
+
+P2F["xmsg", string] = "xmsg"
+
+function xmsg() {
+    switch (P["state", number]) {
+        case 0,
+            if (xcanCreate(2)) {
+                local Res = vec2(250, 50)
+                
+                P["xframe", table]["size", vector2] = Res
+                
+                xcreate("box"):xsize(Res):xcolor(vec(63))
+                xcreate("textLayout"):xsize(Res):xmonospaced(0):xsize(15):xalign(vec2(1)):xtext(P["args", array]:concat(" "))
+                
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            break
+    }
+}
+

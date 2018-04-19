@@ -57,6 +57,8 @@ function xwm() {
                 local Count = 2.1
                 P["windowSize", vector2] = floor((Res - vec2(0, 20 + 20 * Count)) / Count)
                 
+                P["xmsg", array] = array()
+                
                 P["state", number] = 1
             }
             break
@@ -200,6 +202,11 @@ function xwm() {
                     }
                 }
                 
+                # Messages
+                if (P["xmsg", array]:count() > 0) {
+                    P["in", array]:pushString("xmsg " + P["xmsg", array]:shiftString())
+                }
+                
                 # Commands
                 if (wait()) {
                     local CommandExp = in():trim():explodeRE(" +")
@@ -305,7 +312,7 @@ function xwm() {
                 P["frames", table]:unshiftTable(Frame)
                 
                 Program["args", array] = P:removeArray("CommandExp")
-                Program["out", array] = P["out", array]
+                Program["out", array] = P["xmsg", array]
                 Program["kbd", array] = array()
                 
                 P["focus", number] = P["programs", table]:count()

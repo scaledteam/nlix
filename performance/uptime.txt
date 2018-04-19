@@ -4,6 +4,8 @@
 
 @name uptime
 
+S["startTime", number] = systime()
+
 P2F["uptime", string] = "uptime"
 
 function uptime() {

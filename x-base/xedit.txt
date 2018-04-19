@@ -11,105 +11,109 @@ P2F["xedit", string] = "xedit"
 function xedit() {
     switch (P["state", number]) {
         case 0,
-            if (xcanCreate(4)) {
+            if (xcanCreate(6)) {
                 local Res = xres()
-                local Size = Res * vec2(1, 0.4)
                 
-                local TextSize = 10
-                xcreate("box"):xsize(Size):xcolor(vec())
-                P["cmd", table] = xcreate("textLayout"):xsize(Size):xsize(TextSize)
+                xcreate("box"):xsize(Res)
                 
-                local Pos = Size:setX(0)
-                xcreate("box"):xsize(Res - Pos):xpos(Pos)
-                P["text", table] = xcreate("textLayout"):xsize(Res - Pos):xpos(Pos):xsize(TextSize):xcolor(vec())
+                local Size = vec2(Res[1] / 2, 10)
                 
-                local Skbd = exec("skbd")
-                local Term = exec("term")
-                programUp()
+                P["button-load", table] = xcreate("box"):xsize(Size):xcolor(vec(191))
+                xcreate("text"):xparent(P["button-load", table]):xalign(vec2(1)):xsize(10):xtext("load"):xcolor(vec())
                 
-                P["term", table] = Term
+                P["button-save", table] = xcreate("box"):xsize(Size):xcolor(vec(191)):xpos(Size:setY(0))
+                xcreate("text"):xparent(P["button-save", table]):xalign(vec2(1)):xsize(10):xtext("save"):xcolor(vec())
                 
-                Term["resolution", vector2] = floor(vec2(Size[1] / (TextSize * P["xparam", table]["symbolWidth", number]), Size[2] / TextSize))
+                P["text", table] = xcreate("textLayout"):xsize(Res - vec2(0, 10)):xpos(vec2(0, 10)):xsize(10):xcolor(vec())
                 
-                # input output
-                if (P:exists("kbd")) {
-                    Skbd["in", array] = P["kbd", array]
+                if (!P:exists("in")) {
+                    P["in", array] = array()
                 }
-                
-                P["in", array] = Skbd["out", array] = array()
-                P["out", array] = Skbd["term", array] = Term["in", array] = array()
-                
-                P["term", array] = Term["out", array] = array()
                 
                 P["state", number] = 1
             }
             break
         
         case 1,
-            if (P["term", array]:count() > 0) {
-                P["cmd", table]:xtext(P["term", array]:shiftString())
-            }
+            xcursor()
+            local Use = xkeyUse()
             
-            if (wait()) {
-                local In = in():explode(" ")
+            if (Use != P["useOld", number]) {
+                P["useOld", number] = Use
                 
-                switch (In[1, string]) {
-                    case "w", case "write",
-                        local Touch = exec("touch")
-                        Touch["args", array] = array(In[2, string])
-                        Touch["in", array] = array(P["text", table]["text", string])
-                        break
-                    
-                    case "r", case "read",
-                        local Touch = exec("cat")
-                        Touch["args", array] = array(In[2, string])
-                        P["fileStream", array] = Touch["out", array] = array()
-                        break
-                    
-                    case "a", case "add",
-                        P["text", table]:xtext(P["text", table]["text", string] + "\n" + In:concat(" ", 2))
-                        break
-                    
-                    case "e", case "edit",
-                        local TextExplode = P["text", table]["text", string]:explode("\n")
-                        local Line = In[2, string]:toNumber()
-                        
-                        P["text", table]:xtext(TextExplode:concat("\n", 1, Line - 1) + "\n" + In:concat(" ", 3) + "\n" + TextExplode:concat("\n", Line + 1))
-                        break
-                    
-                    case "d", case "delete",
-                        local TextExplode = P["text", table]["text", string]:explode("\n")
-                        local Line = In[2, string]:toNumber()
-                        
-                        P["text", table]:xtext(TextExplode:concat("\n", 1, Line - 1) + "\n" + TextExplode:concat("\n", Line + 1))
-                        break
-                    
-                    case "q", case "quit", case "exit",
-                        end()
-                        break
-                    
-                    case "h", case "help",
-                        out(
-                            "Commands:\n"
-                            +"write [path]\n"
-                            +"read [path]\n"
-                            +"add [string]\n"
-                            +"edit [line] [string]\n"
-                            +"delete [line]\n"
-                            +"quit\n"
-                        )
-                        break
-                    
-                    case "",
-                        break
-                    
-                    default,
-                        out("Unknown command.\n")
+                if (Use) {
+                    if (P["button-load", table]:xinrange()) {
+                        P["parent", table]["in", array]:pushString("xfilechooser")
+                        P["state", number] = 2
+                    }
+                    elseif (P["button-save", table]:xinrange()) {
+                        P["parent", table]["in", array]:pushString("xfilechooser")
+                        P["state", number] = 5
+                    }
                 }
             }
-            
-            if (P["fileStream", array]:count() > 0) {
-                P["text", table]:xtext(P["fileStream", array]:shiftString():sub(1, -2))
+            break
+        
+        # load
+        case 2,
+            if (P["parent", table]["programs", table][1, table]["name", string] == "xfilechooser") {
+                P["xfilechooser", table] = P["parent", table]["programs", table][1, table]
+                P["xfilechooser", table]["out", array] = P["in", array]
+                
+                P["state", number] = 3
+            }
+            break
+        
+        case 3,
+            if (wait()) {
+                local Cat = exec("cat")
+                Cat["args", array] = array(in())
+                Cat["out", array] = P["in", array]
+                P["state", number] = 4
+            }
+            elseif (!P["xfilechooser", table]) {
+                P["state", number] = 1
+            }
+            break
+        
+        case 4,
+            if (wait()) {
+                P["text", table]:xtext(in():sub(1, -2))
+                P["state", number] = 1
+            }
+            break
+        
+        # save
+        case 5,
+            if (P["parent", table]["programs", table][1, table]["name", string] == "xfilechooser") {
+                P["xfilechooser", table] = P["parent", table]["programs", table][1, table]
+                P["xfilechooser", table]["out", array] = P["in", array]
+                
+                P["state", number] = 6
+            }
+            break
+        
+        case 6,
+            if (wait()) {
+                local Touch = exec("touch")
+                Touch["args", array] = array(in())
+                Touch["in", array] = array(P["text", table]["text", string])
+                Touch["out", array] = P["in", array]
+                
+                P["state", number] = 7
+            }
+            elseif (!P["xfilechooser", table]) {
+                P["state", number] = 1
+            }
+            break
+        
+        case 7,
+            if (wait()) {
+                local In = in()
+                if (In != "ok\n") {
+                    out(In)
+                }
+                P["state", number] = 1
             }
             break
     }

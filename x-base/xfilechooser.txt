@@ -1,0 +1,99 @@
+#
+# Created by scaled
+#
+
+@name xfilechooser
+
+P2F["xfilechooser", string] = "xfilechooser"
+
+function xfilechooser() {
+    switch (P["state", number]) {
+        case 0,
+            if (xcanCreate(4)) {
+                local Res = xres()
+                
+                # Background
+                xcreate("box"):xsize(Res)
+                
+                # Choose indicator
+                P["chooseBox", table] = xcreate("box"):xsize(vec2(Res[1], 10)):xcolor(vec(63, 63, 255)):xalpha(0)
+                
+                P["list", table] = xcreate("textLayout"):xsize(Res - vec2(0, 20)):xsize(10):xcolor(vec())
+                
+                xcreate("text"):xpos(vec2(0, Res[2] - 20)):xcolor(vec()):xtext("Ok")
+                
+                P["path", string] = "/"
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            if (P:exists("pathOk")) {
+                P:remove("pathOk")
+                P["chooseBox", table]:xalpha(0)
+            }
+            
+            local Ls = exec("ls")
+            Ls["args", array] = array(P["path", string])
+            P["in", array] = Ls["out", array] = array()
+            P["state", number] = 2
+            break
+        
+        case 2,
+            if (wait()) {
+                P["list", table]:xtext(P["path", string] == "/" ? in() : "..\n" + in())
+                P["state", number] = 3
+            }
+        
+        case 3,
+            if (xcanDraw()) {
+                local Cursor = xcursor()
+                local Use = xkeyUse()
+                
+                if (inrange(Cursor, vec2(), xres())) {
+                    if (Use != P["useOld", number]) {
+                        P["useOld", number] = Use
+                        
+                        if (Use) {
+                            local List = P["list", table]
+                            if (inrange(Cursor, vec2(), List["size", vector2])) {
+                                local Pos = int(Cursor[2] / 10)
+                                
+                                local Choose = List["text", string]:explode("\n")[Pos + 1, string]
+                                
+                                if (Choose == "..") {
+                                    local PathExplode = P["path", string]:explode("/")
+                                    PathExplode:pop()
+                                    PathExplode:pop()
+                                    
+                                    P["path", string] = PathExplode:concat("/") + "/"
+                                    P["state", number] = 1
+                                }
+                                elseif (Choose:right(1) != "/") {
+                                    if ((P["path", string] + Choose) != P["pathOk", string]) {
+                                        P["chooseBox", table]:xalpha(255):xpos(vec2(0, Pos * 10))
+                                        P["pathOk", string] = P["path", string] + Choose
+                                    }
+                                }
+                                else {
+                                    P["path", string] = P["path", string] + Choose
+                                    P["state", number] = 1
+                                }
+                            }
+                            else {
+                                if (P:exists("pathOk")) {
+                                    out(P["pathOk", string])
+                                    end()
+                                }
+                                elseif (P["folder", number]) {
+                                    out(P["path", string])
+                                    end()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            break
+    }
+}

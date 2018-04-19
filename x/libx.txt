@@ -468,6 +468,13 @@ function table:xup() {
     }
 }
 
+
+
+# For lib simple
 function vector2 xres() {
     return P["xframe", table]["size", vector2]
+}
+
+function number table:xinrange() {
+    return inrange(P["xframe", table]["cursor", vector2] - This["pos", vector2], vec2(), This["size", vector2])
 }
