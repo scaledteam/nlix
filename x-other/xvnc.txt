@@ -28,18 +28,18 @@ function xvnc() {
                 P["state", number] = 1
             }
             else {
-                out("Error: nlix chip is not connected.\n")
+                out("Error: nlix chip is not connected.")
                 end()
             }
             break
         
         case 1,
             if (!P["program", table]) {
-                out("Session terminated.\n")
+                out("Session terminated.")
                 end()
             }
             if (!P["device", wirelink]) {
-                out("Error: Connection lost.\n")
+                out("Error: Connection lost.")
                 end()
             }
             break

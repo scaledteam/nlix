@@ -16,7 +16,7 @@ function xfilechooser() {
                 xcreate("box"):xsize(Res)
                 
                 # Choose indicator
-                P["chooseBox", table] = xcreate("box"):xsize(vec2(Res[1], 10)):xcolor(vec(63, 63, 255)):xalpha(0)
+                P["chooseBox", table] = xcreate("box"):xsize(vec2(Res[1], 10)):xcolor(vec(127, 127, 255)):xalpha(0)
                 
                 P["list", table] = xcreate("textLayout"):xsize(Res - vec2(0, 20)):xsize(10):xcolor(vec())
                 

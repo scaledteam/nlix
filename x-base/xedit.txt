@@ -52,6 +52,51 @@ function xedit() {
                     }
                 }
             }
+            
+            # input
+            local Keys = P["kbd", array]
+            
+            if (Keys:count() > 0 | P["kbdTableOld", table]:count() > 0) {
+                local KbdTableOld = P["kbdTableOld", table]
+                KbdTableOld:clear()
+                P["kbdTableOld", table] = P["kbdTable", table]
+                P["kbdTable", table] = KbdTableOld
+            }
+            
+            foreach (I, Key:number = Keys) {
+                P["kbdTable", table][Key, number] = 1
+            }
+            
+            if (Keys:count() > 0) {
+                for (I = 1, Keys:count()) {
+                    local Key = Keys[I, number]
+                    if (P["kbdTable", table][Key, number] > P["kbdTableOld", table][Key, number]) {
+                        switch (Key) {
+                            # Enter
+                            case 10, case 13, case 142,
+                                P["text", table]:xtext(P["text", table]["text", string] + "\n")
+                                break
+                            
+                            # Backspace
+                            case 127,
+                                P["text", table]:xtext(P["text", table]["text", string]:sub(1, -2))
+                                break
+                            
+                            # Delete
+                            case 148,
+                                break
+                            
+                            # Normal key
+                            default,
+                                if (inrange(Key, 32, 127)) {
+                                    local Char = toChar(Key)
+                                    
+                                    P["text", table]:xtext(P["text", table]["text", string] + Char)
+                                }
+                        }
+                    }
+                }
+            }
             break
         
         # load

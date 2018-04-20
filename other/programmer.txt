@@ -1,0 +1,45 @@
+#
+# Created by scaled
+#
+
+@name programmer
+
+#ifdef entity:remoteSetCode(string)
+P2F["programmer", string] = "programmer"
+
+function programmer() {
+    switch (P["state", number]) {
+        case 0,
+            if (args() < 1) {
+                out("Usage: programmer [filename] [chipname]\n")
+                end()
+            }
+            else {
+                local Program = exec("cat")
+                Program["args", array] = array(arg(1))
+                Program["out", array] = P["in", array]
+                
+                P["chipName", string] = args() >= 2 ? arg(1) : "generic"
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            if (wait()) {
+                P["data", string] = in()
+                P["state", number] = 2
+            }
+            break
+        
+        case 2,
+            if (deviceGet(P["chipName", string])) {
+                P["device", wirelink]:entity():remoteSetCode(P["data", string])
+            }
+            else {
+                out("Error: can't find e2 chip.\n")
+            }
+            end()
+            break
+    }
+}
+#endif
