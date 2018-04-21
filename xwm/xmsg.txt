@@ -10,7 +10,7 @@ function xmsg() {
     switch (P["state", number]) {
         case 0,
             if (xcanCreate(2)) {
-                local Res = vec2(250, 50)
+                local Res = clamp(vec2(250, 50), vec2(), P["xframe", table]["size", vector2])
                 
                 P["xframe", table]["size", vector2] = Res
                 

@@ -7,7 +7,8 @@
 P2F["xcreate", string] = "xcreate"
 
 function xcreate() {
-    switch (P["state", number]) {
+    for (I = 1, Overload) {
+        switch (P["state", number]) {
             case 0,
                 out("Error: no command.\n")
                 end()
@@ -15,78 +16,68 @@ function xcreate() {
             
             # For last objects
             case 1,
-                for (I = 1, Overload) {
-                    if (P["xobjects", table]:count() < P["count", number]) {
-                        local Object = xnewObject(P["xobjectsAll", table]:count() + 1)
-                        P["xobjects", table]:pushTable(Object)
-                        P["xobjectsAll", table]:pushTable(Object)
-                    }
-                    else {
-                        P["xparam", table]["blocked", number] = 0
-                        end()
-                        break
-                    }
+                if (P["xobjects", table]:count() < P["count", number]) {
+                    local Object = xnewObject(P["xobjectsAll", table]:count() + 1)
+                    P["xobjects", table]:pushTable(Object)
+                    P["xobjectsAll", table]:pushTable(Object)
+                    break
                 }
-                break
+                else {
+                    P["xparam", table]["blocked", number] = 0
+                    end()
+                    return
+                }
             
             # For middle objects
             case 2,
-                for (I = 1, Overload) {
-                    P["counter", number] = P["counter", number] + 1
-                    
-                    if (P["counter", number] <= P["xobjectsAll", table]:count()) {
-                        local Id = P["counter", number]
-                        local Object = P["xobjectsAll", table][Id, table]
-                        Object["id", number] = 0
-                        P["xobjectsTemp", table]:pushTable(Object)
-                    }
-                    else {
-                        P["counter", number] = P["xshiftStart", number]
-                        P["state", number] = 3
-                        break
-                    }
+                P["counter", number] = P["counter", number] + 1
+                
+                if (P["counter", number] <= P["xobjectsAll", table]:count()) {
+                    local Id = P["counter", number]
+                    local Object = P["xobjectsAll", table][Id, table]
+                    Object["id", number] = 0
+                    P["xobjectsTemp", table]:pushTable(Object)
+                    break
                 }
-                break
+                else {
+                    P["counter", number] = P["xshiftStart", number]
+                    P["state", number] = 3
+                }
             
             case 3,
-                for (I = 1, Overload) {
-                    P["counter", number] = P["counter", number] + 1
+                P["counter", number] = P["counter", number] + 1
+                
+                if (P["xobjects", table]:count() < P["count", number]) {
+                    local Id = P["counter", number]
+                    local Object = xnewObject(Id)
                     
-                    if (P["xobjects", table]:count() < P["count", number]) {
-                        local Id = P["counter", number]
-                        local Object = xnewObject(Id)
-                        #Object:xredraw()
-                        
-                        P["xobjectsAll", table][Id, table] = Object
-                        P["xobjects", table]:pushTable(Object)
-                    }
-                    else {
-                        P["counter", number] = P["xshiftStart", number]
-                        P["state", number] = 4
-                        break
-                    }
+                    P["xobjectsAll", table][Id, table] = Object
+                    P["xobjects", table]:pushTable(Object)
+                    break
                 }
-                break
+                else {
+                    P["counter", number] = P["xshiftStart", number]
+                    P["state", number] = 4
+                }
             
             case 4,
-                for (I = 1, Overload) {
-                    P["counter", number] = P["counter", number] + 1
+                P["counter", number] = P["counter", number] + 1
+                
+                if (P["xobjectsTemp", table]) {
+                    local Object = P["xobjectsTemp", table]:removeTable(1)
+                    local Id = P["counter", number] + P["count", number]
                     
-                    if (P["xobjectsTemp", table]) {
-                        local Object = P["xobjectsTemp", table]:removeTable(1)
-                        local Id = P["counter", number] + P["count", number]
-                        
-                        Object["id", number] = Id
-                        P["xobjectsAll", table][Id, table] = Object
-                        
-                        Object:xredraw()
-                    }
-                    else {
-                        P["xparam", table]["blocked", number] = 0
-                        end()
-                        break
-                    }
+                    Object["id", number] = Id
+                    P["xobjectsAll", table][Id, table] = Object
+                    
+                    Object:xredraw()
+                    break
                 }
-                break
+                else {
+                    P["xparam", table]["blocked", number] = 0
+                    end()
+                    return
+                }
+        }
     }
 }

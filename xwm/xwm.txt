@@ -26,7 +26,7 @@ function xwm() {
             }
             elseif (xcanCreate(3)) {
                 local Res = P["xframe", table]["size", vector2]
-                local Background = xcreate("box"):xsize(Res):xcolor(P["xframe", table]:exists("parent") ? hsv2rgb(randint(360), 1, 0.7) : hsv2rgb(205, 1, 0.7))
+                local Background = xcreate("box"):xsize(Res):xcolor(P["xframe", table]:exists("parent") ? hsv2rgb(randint(360), 1, 0.7) : hsv2rgb(entity():id() * 20, 1, 0.7)) #hsv2rgb(205, 1, 0.7))
                 
                 local Multiplier = min(Res[1], Res[2]) / 2 * 0.3
                 

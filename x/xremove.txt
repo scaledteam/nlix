@@ -7,24 +7,26 @@
 P2F["xremove", string] = "xremove"
 
 function xremove() {
-    switch (P["state", number]) {
-        case 0,
-            if (!P["xparam", table]["blocked", number]) {
-                P["xparam", table]["blocked", number] = 1
-                
-                P["removedObjectsIds", table] = table()
-                
-                P["counter", number] = P["idStart", number]
-                P["limit", number] = P["idEnd", number]
-                
-                P["state", number] = 1
-            }
-            break
-        
-        case 1,
-            local Id = P["counter", number]
+    for (I = 1, Overload) {
+        switch (P["state", number]) {
+            case 0,
+                if (!P["xparam", table]["blocked", number]) {
+                    P["xparam", table]["blocked", number] = 1
+                    
+                    P["removedObjectsIds", table] = table()
+                    
+                    P["counter", number] = P["idStart", number]
+                    P["limit", number] = P["idEnd", number]
+                    
+                    P["state", number] = 1
+                }
+                else {
+                    return
+                }
             
-            for (I = 1, Overload) {
+            case 1,
+                local Id = P["counter", number]
+                
                 if (Id <= P["limit", number]) {
                     local Object = P["xobjectsAll", table][Id, table]
                     
@@ -32,22 +34,18 @@ function xremove() {
                     P["removedObjectsIds", table][Id, number] = 1
                     
                     Id++
+                    
+                    P["counter", number] = Id
+                    break
                 }
                 else {
                     P["counter", number] = 1
                     P["state", number] = 2
-                    return
                 }
-            }
             
-            P["counter", number] = Id
-            break
-        
-        case 2,
-            local Id = P["counter", number]
-            
-            for (I = 1, Overload) {
-                Id++
+            case 2,
+                P["counter", number] = P["counter", number] + 1
+                local Id = P["counter", number]
                 
                 if (Id <= P["xobjectsAll", table]:count()) {
                     local Object = P["xobjectsAll", table][Id, table]
@@ -62,60 +60,56 @@ function xremove() {
                             P["removed", number] = P["removed", number] + 1
                         }
                     }
+                    break
                 }
                 else {
                     if (P["removed", number] > 0) {
                         P["removed", number] = 0
-                        Id = 1
+                        P["counter", number] = 1
+                        break
                     }
                     else {
                         P["counter", number] = 1
                         P["state", number] = 3
+                    }
+                }
+            
+            case 3,
+                local Id = P["counter", number]
+                local Offset = P["offset", number]
+                local XobjectsAll = P["xobjectsAll", table]
+                
+                for (I = 1, Overload) {
+                    if (Id <= XobjectsAll:count()) {
+                        if (P["removedObjectsIds", table][Id + Offset, number]) {
+                            P["removedObjectsIds", table][Id + Offset, number] = 0
+                            P["offset", number] = P["offset", number] + 1
+                            
+                            P["xdevice", wirelink]:egpRemove(XobjectsAll:count())
+                            XobjectsAll:remove(Id)
+                            
+                            P["xdevice", wirelink]:egpLine(Id, vec2(), vec2())
+                        }
+                        else {
+                            if (Offset != 0) {
+                                local Object = XobjectsAll[Id, table]
+                                
+                                Object["id", number] = Id
+                                Object:xredraw()
+                            }
+                            
+                            P["counter", number] = P["counter", number] + 1
+                        }
+                        break
+                    }
+                    else {
+                        P["removedObjectsIds", table]:clear()
+                        P["xparam", table]["blocked", number] = 0
+                        end()
                         return
                     }
                 }
-            }
-            
-            P["counter", number] = Id
-            break
-        
-        case 3,
-            local Id = P["counter", number]
-            local Offset = P["offset", number]
-            local XobjectsAll = P["xobjectsAll", table]
-            
-            for (I = 1, Overload) {
-                if (Id <= XobjectsAll:count()) {
-                    if (P["removedObjectsIds", table][Id + Offset, number]) {
-                        P["removedObjectsIds", table][Id + Offset, number] = 0
-                        Offset++
-                        
-                        P["xdevice", wirelink]:egpRemove(XobjectsAll:count())
-                        XobjectsAll:remove(Id)
-                        
-                        P["xdevice", wirelink]:egpLine(Id, vec2(), vec2())
-                    }
-                    else {
-                        if (Offset != 0) {
-                            local Object = XobjectsAll[Id, table]
-                            
-                            Object["id", number] = Id
-                            Object:xredraw()
-                        }
-                        
-                        Id++
-                    }
-                }
-                else {
-                    P["removedObjectsIds", table]:clear()
-                    P["xparam", table]["blocked", number] = 0
-                    end()
-                    return
-                }
-            }
-            
-            P["counter", number] = Id
-            P["offset", number] = Offset
-            break
+                break
+        }
     }
 }

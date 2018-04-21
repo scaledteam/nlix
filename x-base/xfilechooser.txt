@@ -22,6 +22,9 @@ function xfilechooser() {
                 
                 xcreate("text"):xpos(vec2(0, Res[2] - 20)):xcolor(vec()):xtext("Ok")
                 
+                if (!P:exists("in")) {
+                    P["in", array] = array()
+                }
                 P["path", string] = "/"
                 P["state", number] = 1
             }
@@ -35,7 +38,7 @@ function xfilechooser() {
             
             local Ls = exec("ls")
             Ls["args", array] = array(P["path", string])
-            P["in", array] = Ls["out", array] = array()
+            Ls["out", array] = P["in", array]
             P["state", number] = 2
             break
         

@@ -7,70 +7,64 @@
 P2F["xup", string] = "xup"
 
 function xup() {
-    switch (P["state", number]) {
-        case 0,
-            if (!P["xparam", table]["blocked", number]) {
-                P["xparam", table]["blocked", number] = 1
-                P["tempObjects", table] = table()
-                
-                P["counter", number] = P["idObjectLast", number] + 1
-                P["limit", number] = P["idParentLast", number]
-                
-                P["state", number] = 1
-            }
-            break
-        
-        # Collect objects after parent (will be first objects)
-        case 1,
-            local Id = P["counter", number]
+    for (I = 1, Overload) {
+        switch (P["state", number]) {
+            case 0,
+                if (!P["xparam", table]["blocked", number]) {
+                    P["xparam", table]["blocked", number] = 1
+                    P["tempObjects", table] = table()
+                    
+                    P["counter", number] = P["idObjectLast", number] + 1
+                    P["limit", number] = P["idParentLast", number]
+                    
+                    P["state", number] = 1
+                }
+                else {
+                    return
+                }
             
-            for (I = 1, Overload) {
+            # Collect objects after parent (will be first objects)
+            case 1,
+                local Id = P["counter", number]
+                
                 if (Id <= P["limit", number]) {
                     local Object = P["xobjectsAll", table][Id, table]
                     Object["id", number] = 0
                     P["tempObjects", table]:pushTable(Object)
-                    Id++
+                    P["counter", number] = P["counter", number] + 1
+                    break
                 }
                 else {
                     P["counter", number] = P["idStart", number]
                     P["limit", number] = P["idObjectLast", number]
                     
                     P["state", number] = 2
-                    return
                 }
-            }
             
-            P["counter", number] = Id
-            break
-        
-        # Collect objects for up (will be last objects)
-        case 2,
-            local Id = P["counter", number]
-            
-            for (I = 1, Overload) {
+            # Collect objects for up (will be last objects)
+            case 2,
+                local Id = P["counter", number]
+                
                 if (Id <= P["limit", number]) {
                     local Object = P["xobjectsAll", table][Id, table]
                     Object["id", number] = 0
                     P["tempObjects", table]:pushTable(Object)
-                    Id++
+                    
+                    P["counter", number] = P["counter", number] + 1
+                    break
                 }
                 else {
                     P["counter", number] = P["idStart", number]
                     P["limit", number] = P["idParentLast", number]
                     
                     P["state", number] = 3
-                    return
                 }
-            }
+                break
             
-            P["counter", number] = Id
-            break
-        
-        # Redraw all collected objects
-        case 3,
-            local Id = P["counter", number]
-            
-            for (I = 1, Overload) {
+            # Redraw all collected objects
+            case 3,
+                local Id = P["counter", number]
+                
                 if (Id <= P["limit", number]) {
                     local Object = P["tempObjects", table]:removeTable(1)
                     
@@ -79,16 +73,14 @@ function xup() {
                     
                     Object:xredraw()
                     
-                    Id++
+                    P["counter", number] = P["counter", number] + 1
+                    break
                 }
                 else {
                     P["xparam", table]["blocked", number] = 0
                     end()
                     return
                 }
-            }
-            
-            P["counter", number] = Id
-            break
+        }
     }
 }

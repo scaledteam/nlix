@@ -27,6 +27,9 @@ function xfilemngr() {
                 Pos = vec2(0, Res[2] - 20)
                 xcreate("text"):xpos(Pos):xtext("place for buttons")
                 
+                if (!P:exists("in")) {
+                    P["in", array] = array()
+                }
                 P["state", number] = 1
             }
             break
@@ -34,7 +37,7 @@ function xfilemngr() {
         case 1,
             local Ls = exec("ls")
             Ls["args", array] = array(P[P["focus", number], table]["path", string])
-            P["in", array] = Ls["out", array] = array()
+            Ls["out", array] = P["in", array]
             P["state", number] = 2
             break
         

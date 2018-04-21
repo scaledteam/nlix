@@ -133,6 +133,11 @@ function devcmd() {
                 end()
                 break
             
+            case "l", case "list",
+                local Program = exec("dlist")
+                Program["out", array] = P["out", array]
+                break
+            
             case "h", case "help",
                 out(
                     "Command list:\n"
@@ -144,6 +149,7 @@ function devcmd() {
                     + "read [type] [varname]\n"
                     + "quit\n"
                     + "entity\n"
+                    + "list\n"
                     + "help\n"
                 )
                 break
