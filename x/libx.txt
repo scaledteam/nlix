@@ -356,7 +356,6 @@ function number xcanCreate(Count) {
                 local Program = exec("xcreate")
                 P["xcreate", table] = Program
                 
-                Program["state", number] = 1
                 Program["count", number] = Count
                 
                 Program["xframe", table] = P["xframe", table]
@@ -364,6 +363,8 @@ function number xcanCreate(Count) {
                 Program["xdevice", wirelink] = P["xdevice", wirelink]
                 Program["xobjects", table] = P["xobjects", table]
                 Program["xobjectsAll", table] = P["xobjectsAll", table]
+                
+                Program:execNow()
             }
             else {
                 return 0
@@ -374,7 +375,6 @@ function number xcanCreate(Count) {
                 local Program = exec("xcreate")
                 P["xcreate", table] = Program
                 
-                Program["state", number] = 1
                 Program["count", number] = Count
                 
                 Program["xframe", table] = P["xframe", table]
@@ -382,12 +382,14 @@ function number xcanCreate(Count) {
                 Program["xdevice", wirelink] = P["xdevice", wirelink]
                 Program["xobjects", table] = P["xobjects", table]
                 Program["xobjectsAll", table] = P["xobjectsAll", table]
+                
+                Program:execNow()
             }
             else {
                 local Program = exec("xcreate")
                 P["xcreate", table] = Program
                 
-                Program["state", number] = 2
+                Program["state", number] = 1
                 Program["count", number] = Count
                 
                 Program["xshiftStart", number] = P["xframe", table]:xxlastObjectId()
@@ -400,6 +402,8 @@ function number xcanCreate(Count) {
                 Program["xdevice", wirelink] = P["xdevice", wirelink]
                 Program["xobjects", table] = P["xobjects", table]
                 Program["xobjectsAll", table] = P["xobjectsAll", table]
+                
+                Program:execNow()
             }
         }
     }
@@ -432,6 +436,8 @@ function xxremoveByDaemon(IdStart, IdEnd) {
     
     Program["idStart", number] = IdStart
     Program["idEnd", number] = IdEnd
+    
+    Program:execNow()
 }
 
 function table:xremove() {
@@ -460,6 +466,8 @@ function xxup(StartId, ObjectLastId, ParentLastId) {
     Program["idStart", number] = StartId
     Program["idObjectLast", number] = ObjectLastId
     Program["idParentLast", number] = ParentLastId
+    
+    Program:execNow()
 }
 
 function table:xup() {

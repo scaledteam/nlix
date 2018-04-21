@@ -38,3 +38,9 @@ function programUp() {
     }
 }
 
+function table:execNow() {
+    local Super = P
+    P = Program
+    P2F[P["name", string], string]()
+    P = Super
+}

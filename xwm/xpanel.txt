@@ -47,8 +47,13 @@ function xpanel() {
                 if (Use != P["xkeyUseOld", number]) {
                     P["xkeyUseOld", number] = Use
                     
-                    if (!P["xframe", table]["parent", table]["xmenu", table] & !Use & inrange(Cursor, vec2(), vec2(P["menuButtonWidth", number], 20))) {
-                        out("interface xmenu")
+                    if (Use & inrange(Cursor, vec2(), vec2(P["menuButtonWidth", number], 20))) {
+                        if (!P["xframe", table]["parent", table]["xmenu", table]) {
+                            out("interface xmenu")
+                        }
+                        else {
+                            P["xframe", table]["parent", table]["xmenu", table]:clear()
+                        }
                     }
                 }
             }

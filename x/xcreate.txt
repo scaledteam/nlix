@@ -9,13 +9,8 @@ P2F["xcreate", string] = "xcreate"
 function xcreate() {
     for (I = 1, Overload) {
         switch (P["state", number]) {
-            case 0,
-                out("Error: no command.\n")
-                end()
-                break
-            
             # For last objects
-            case 1,
+            case 0,
                 if (P["xobjects", table]:count() < P["count", number]) {
                     local Object = xnewObject(P["xobjectsAll", table]:count() + 1)
                     P["xobjects", table]:pushTable(Object)
@@ -29,7 +24,7 @@ function xcreate() {
                 }
             
             # For middle objects
-            case 2,
+            case 1,
                 P["counter", number] = P["counter", number] + 1
                 
                 if (P["counter", number] <= P["xobjectsAll", table]:count()) {
@@ -44,7 +39,7 @@ function xcreate() {
                     P["state", number] = 3
                 }
             
-            case 3,
+            case 2,
                 P["counter", number] = P["counter", number] + 1
                 
                 if (P["xobjects", table]:count() < P["count", number]) {
@@ -60,7 +55,7 @@ function xcreate() {
                     P["state", number] = 4
                 }
             
-            case 4,
+            case 3,
                 P["counter", number] = P["counter", number] + 1
                 
                 if (P["xobjectsTemp", table]) {

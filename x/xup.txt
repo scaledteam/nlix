@@ -20,7 +20,7 @@ function xup() {
                     P["state", number] = 1
                 }
                 else {
-                    return
+                    break
                 }
             
             # Collect objects after parent (will be first objects)
@@ -59,7 +59,6 @@ function xup() {
                     
                     P["state", number] = 3
                 }
-                break
             
             # Redraw all collected objects
             case 3,

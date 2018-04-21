@@ -72,13 +72,10 @@ function xstart() {
                 P["xobjects", table] = table()
                 
                 P:remove("NULL")
-                P["state", number] = 2
+                P:remove("state")
+                
+                P["name", string] = P["args", array]:shiftString()
             }
-            break
-        
-        case 2,
-            P["name", string] = P["args", array]:shiftString()
-            P:remove("state")
             break
     }
 }

@@ -126,7 +126,7 @@ if (!tickClk()) {
         interval(0)
     }
     elseif (first()) {
-        KPerf = 5
+        KPerf = 20
         
         interval(0)
     }

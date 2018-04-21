@@ -27,6 +27,8 @@ function calc2() {
                 "^" = 2
             )
             
+            P["lastPriorities", array] = array()
+            
             P["state", number] = 1
             break
         
@@ -110,7 +112,6 @@ function calc2() {
                             local Priority = P["priority", table][Value, number]
                             
                             if (Priority > P["lastPriority", number]) {
-                                #local PrevValue = P["stack0", array]:popNumber()
                                 local PrevValue = P["stack0", array]:popString()
                                 
                                 while (Priority > P["lastPriority", number]) {
@@ -118,7 +119,6 @@ function calc2() {
                                     P["lastPriority", number] = P["lastPriority", number] + 1
                                 }
                                 
-                                #P["stack0", array]:pushNumber(PrevValue)
                                 P["stack0", array]:pushString(PrevValue)
                                 P["stack0", array]:pushString(Value)
                             }
@@ -138,7 +138,6 @@ function calc2() {
                         case "(",
                             P["stack0", array]:pushString(Value)
                             
-                            print("(", P["lastPriority", number])
                             P["lastPriorities", array]:pushNumber(P["lastPriority", number])
                             P["lastPriority", number] = 0
                             break
@@ -146,7 +145,6 @@ function calc2() {
                         case ")",
                             P["stack0", array]:pushString(Value)
                             
-                            print(")", P["lastPriority", number])
                             while (P["lastPriority", number] > 0) {
                                 P["stack0", array]:pushString(")")
                                 P["lastPriority", number] = P["lastPriority", number] - 1
@@ -156,14 +154,11 @@ function calc2() {
                             break
                         
                         default,
-                            #P["stack0", array]:pushNumber(Value:toNumber())
                             P["stack0", array]:pushString(Value)
                             break
                     }
                 }
                 else {
-                    print("endN ", P["lastPriority", number])
-                    print("endR ", P["lastPriorities", array])
                     if (P["lastPriority", number] > 0) {
                         P["stack0", array]:pushString(")")
                         P["lastPriority", number] = P["lastPriority", number] - 1
@@ -174,7 +169,6 @@ function calc2() {
                     else {
                         P:remove("lastPriority")
                         
-                        #out(P["stack0", array]:concat(",") + "\n")
                         out(P["stack0", array]:concat() + "\n")
                         
                         P["state", number] = 4
@@ -209,7 +203,7 @@ function calc2() {
                         
                         switch (In1) {
                             case "(",
-                                out("Error: \"2(\" expressions not supported.\n")
+                                out("Error: \"" + In0 + "(\" expressions not supported.\n")
                                 P["state", number] = 1
                                 break
                             

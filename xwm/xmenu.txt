@@ -66,7 +66,7 @@ function xmenu() {
                 
                 local PosN = int((Cursor[2] - P["pos", vector2][2]) / 20) + 1
                 
-                if (PosN != P["posNOld", number] & inrange(Cursor - P["pos", vector2], vec2(), P["menu", table]["size", vector2] + vec2(0, 20))) {
+                if (inrange(Cursor - P["pos", vector2], vec2(), P["menu", table]["size", vector2]) & PosN != P["posNOld", number]) {
                     P["posNOld", number] = PosN
                     
                     local List = S["xmenu", table][P["categories", array][PosN, string], table]:keys()

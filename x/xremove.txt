@@ -21,7 +21,7 @@ function xremove() {
                     P["state", number] = 1
                 }
                 else {
-                    return
+                    break
                 }
             
             case 1,

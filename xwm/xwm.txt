@@ -23,10 +23,31 @@ function xwm() {
                     P["args", array] = array(P["name", string])
                 }
                 P["name", string] = "xstart"
+                break
             }
-            elseif (xcanCreate(3)) {
+            else {
+                if (!P:exists("kbd")) {
+                    local Kbd = exec("kbd")
+                    programUp()
+                    
+                    P["kbd", array] = Kbd["out", array] = array()
+                }
+                
+                P["in", array] = array("interface xpanel")
+                
+                P["programs", table] = table()
+                P["frames", table] = table()
+                
+                P["xmsg", array] = array()
+                
+                P["state", number] = 1
+            }
+        
+        case 1,
+            if (xcanCreate(3)) {
                 local Res = P["xframe", table]["size", vector2]
-                local Background = xcreate("box"):xsize(Res):xcolor(P["xframe", table]:exists("parent") ? hsv2rgb(randint(360), 1, 0.7) : hsv2rgb(entity():id() * 20, 1, 0.7)) #hsv2rgb(205, 1, 0.7))
+                
+                local Background = xcreate("box"):xsize(Res):xcolor(P["xframe", table]:exists("parent") ? hsv2rgb(randint(360), 1, 0.7) : hsv2rgb(entity():id() * 20 % 360, 1, 0.7)) #hsv2rgb(205, 1, 0.7))
                 
                 local Multiplier = min(Res[1], Res[2]) / 2 * 0.3
                 
@@ -42,28 +63,14 @@ function xwm() {
                 xcreate("lineStrip"):xparent(Background):xvertices(Poses):xsize(Multiplier * 0.3):xcolor(vec())
                 xcreate("lineStrip"):xparent(Background):xvertices(Poses):xsize(Multiplier * 0.2):xcolor(vec(191))
                 
-                P["in", array] = array("interface xpanel")
-                
-                P["programs", table] = table()
-                P["frames", table] = table()
-                
-                if (!P:exists("kbd")) {
-                    local Kbd = exec("kbd")
-                    programUp()
-                    
-                    P["kbd", array] = Kbd["out", array] = array()
-                }
-                
                 local Count = 2.1
                 P["windowSize", vector2] = floor((Res - vec2(0, 20 + 20 * Count)) / Count)
                 
-                P["xmsg", array] = array()
-                
-                P["state", number] = 1
+                P["state", number] = 2
             }
             break
             
-        case 1,
+        case 2,
             if (xcanDraw()) {
                 if (P["programs", table]) {
                     # Send cursor to programs
@@ -238,55 +245,56 @@ function xwm() {
                             break
                         
                         default,
-                            P["CommandExp", array] = CommandExp
+                            P["commandExp", array] = CommandExp
                             
-                            P["state", number] = 2
-                            return
+                            P["state", number] = 3
+                            break
                     }
                 }
             }
             break
         
-        case 2,
+        case 3,
             if (xcanCreate(1)) {
-                local CommandExp = P["CommandExp", array]
+                P["tempProgramName", string] = P["commandExp", array]:shiftString()
                 
-                local IsUsualWindow = 1
-                if (CommandExp[1, string] == "interface") {
-                    CommandExp:shift()
-                    IsUsualWindow = 0
-                }
+                P["tempFrame", table] = xcreate("frame")
+                P["tempFrame", table]["size", vector2] = xres()
                 
-                P["tempProgramName", string] = CommandExp:shiftString()
-                
-                local Frame = xcreate("frame")
-                Frame["size", vector2] = xres()
-                
-                P["tempFrame", table] = Frame
-                
-                if (IsUsualWindow) {
-                    P["state", number] = 3
+                if (P["tempProgramName", string] == "interface") {
+                    P["tempProgramName", string] = P["commandExp", array]:shiftString()
+                    P["state", number] = 5
+                    break
                 }
                 else {
                     P["state", number] = 4
                 }
             }
-            break
+            else {
+                break
+            }
         
-        case 3,
+        case 4,
             if (xcanCreate(3)) {
                 local Frame = P["tempFrame", table]
                 
                 local Res = xres()
                 local Size = P["windowSize", vector2]
+                local Pos = randvec2(vec2(0, 20), Res - vec2(0, 20) - Size)
+                
+                if (P["tempProgramName", string] == "big") {
+                    P["tempProgramName", string] = P["commandExp", array]:shiftString()
+                    Pos = vec2(0, 20)
+                    Size = Res - vec2(0, 40)
+                }
                 
                 Frame["size", vector2] = Size
-                Frame:xpos(randvec2(vec2(0, 20), Res - vec2(0, 20) - Size))
+                Frame:xpos(Pos)
                 
                 local WindowPos = vec2(0, -20)
                 local WindowSize = vec2(Size[1], 20)
                 
-                Frame["window", table] = xcreate("box"):xparent(Frame):xpos(WindowPos):xsize(vec2(Size[1], 20))
+                Frame["window", table] = xcreate("box"):xparent(Frame):xpos(WindowPos):xsize(WindowSize)
                 
                 xcreate("text"):xparent(Frame):xpos(WindowPos):xtext(P["tempProgramName", string]):xsize(20):xcolor(vec())
                 
@@ -299,11 +307,13 @@ function xwm() {
                     vec2(6, -6) + Offset
                 )):xcolor(vec())
                 
-                P["state", number] = 4
+                P["state", number] = 5
             }
-            break
+            else {
+                break
+            }
         
-        case 4,
+        case 5,
             if (xcanDraw()) {
                 local Frame = P:removeTable("tempFrame")
                 
@@ -311,15 +321,17 @@ function xwm() {
                 P["programs", table]:unshiftTable(Program)
                 P["frames", table]:unshiftTable(Frame)
                 
-                Program["args", array] = P:removeArray("CommandExp")
+                Program["args", array] = P:removeArray("commandExp")
                 Program["out", array] = P["xmsg", array]
                 Program["kbd", array] = array()
                 
                 P["focus", number] = P["programs", table]:count()
                 
-                P["state", number] = 1
+                P["state", number] = 2
             }
-            break
+            else {
+                break
+            }
     }
 }
 
