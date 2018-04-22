@@ -112,7 +112,8 @@ if (!tickClk()) {
                 case 101, #include "nlix/x-other/radar" break
                 case 102, #include "nlix/x-other/clicker" break
                 case 103, #include "nlix/x-other/spirit-level" break
-                case 105, #include "nlix/x-other/xvnc" break
+                case 104, #include "nlix/x-other/xvnc" break
+                case 105, #include "nlix/x-other/tic-tac-toe" break
                 
                 # Place for your first programs
                 #case 110, #include "nlix/other/myprogram" break

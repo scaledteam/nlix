@@ -29,13 +29,18 @@ function table xcreate(Type:string) {
                 Object["monospaced", number] = 1
                 Device:egpFont(Id, "Courier New")
                 break
-            case "poly", Device:egpPoly(Id, vec2(), vec2(), vec2()) break
+            case "poly",
+                Device:egpPoly(Id, vec2(), vec2(), vec2())
+                Object["verticles", array] = array(vec2(), vec2(), vec2())
+                break
             case "polyOutline",
                 Device:egpPolyOutline(Id, vec2(), vec2(), vec2())
+                Object["verticles", array] = array(vec2(), vec2(), vec2())
                 Object["sizeNum", number] = 1
                 break
             case "lineStrip",
                 Device:egpLineStrip(Id, vec2(), vec2(), vec2())
+                Object["verticles", array] = array(vec2(), vec2(), vec2())
                 Object["sizeNum", number] = 1
                 break
             default, return NULL
@@ -338,6 +343,16 @@ function number xcanDraw() {
     return !P["xparam", table]["blocked", number]
 }
 
+function table xxdaemon(Name:string) {
+    local Program = exec(Name)
+    
+    Program["xparam", table] = P["xparam", table]
+    Program["xdevice", wirelink] = P["xdevice", wirelink]
+    Program["xobjectsAll", table] = P["xobjectsAll", table]
+    
+    return Program
+}
+
 function number xcanCreate(Count) {
     if (P["xparam", table]["blocked", number]) {
         return 0
@@ -353,16 +368,13 @@ function number xcanCreate(Count) {
             if (xxobjectsLeft() > Count) {
                 P["xparam", table]["blocked", number] = 1
                 
-                local Program = exec("xcreate")
+                local Program = xxdaemon("xcreate")
+                Program["xobjects", table] = P["xobjects", table]
+                Program["xframe", table] = P["xframe", table]
+                
                 P["xcreate", table] = Program
                 
                 Program["count", number] = Count
-                
-                Program["xframe", table] = P["xframe", table]
-                Program["xparam", table] = P["xparam", table]
-                Program["xdevice", wirelink] = P["xdevice", wirelink]
-                Program["xobjects", table] = P["xobjects", table]
-                Program["xobjectsAll", table] = P["xobjectsAll", table]
                 
                 Program:execNow()
             }
@@ -372,21 +384,21 @@ function number xcanCreate(Count) {
         }
         else {
             if (P["xframe", table]:xxlastObjectId() >= xxlastObjectId()) {
-                local Program = exec("xcreate")
+                local Program = xxdaemon("xcreate")
+                Program["xobjects", table] = P["xobjects", table]
+                Program["xframe", table] = P["xframe", table]
+                
                 P["xcreate", table] = Program
                 
                 Program["count", number] = Count
                 
-                Program["xframe", table] = P["xframe", table]
-                Program["xparam", table] = P["xparam", table]
-                Program["xdevice", wirelink] = P["xdevice", wirelink]
-                Program["xobjects", table] = P["xobjects", table]
-                Program["xobjectsAll", table] = P["xobjectsAll", table]
-                
                 Program:execNow()
             }
             else {
-                local Program = exec("xcreate")
+                local Program = xxdaemon("xcreate")
+                Program["xobjects", table] = P["xobjects", table]
+                Program["xframe", table] = P["xframe", table]
+                
                 P["xcreate", table] = Program
                 
                 Program["state", number] = 1
@@ -396,12 +408,6 @@ function number xcanCreate(Count) {
                 Program["xobjectsTemp", table] = table()
                 
                 Program["counter", number] = Program["xshiftStart", number]
-                
-                Program["xframe", table] = P["xframe", table]
-                Program["xparam", table] = P["xparam", table]
-                Program["xdevice", wirelink] = P["xdevice", wirelink]
-                Program["xobjects", table] = P["xobjects", table]
-                Program["xobjectsAll", table] = P["xobjectsAll", table]
                 
                 Program:execNow()
             }
@@ -426,13 +432,9 @@ function table:xclear() {
 }
 
 function xxremoveByDaemon(IdStart, IdEnd) {
-    local Program = exec("xremove")
+    local Program = xxdaemon("xremove")
     P["xremove", table] = Program
     Program:remove("parent")
-    
-    Program["xobjectsAll", table] = P["xobjectsAll", table]
-    Program["xparam", table] = P["xparam", table]
-    Program["xdevice", wirelink] = P["xdevice", wirelink]
     
     Program["idStart", number] = IdStart
     Program["idEnd", number] = IdEnd
@@ -457,11 +459,7 @@ function xend() {
 }
 
 function xxup(StartId, ObjectLastId, ParentLastId) {
-    local Program = exec("xup")
-    
-    Program["xobjectsAll", table] = P["xobjectsAll", table]
-    Program["xparam", table] = P["xparam", table]
-    Program["xdevice", wirelink] = P["xdevice", wirelink]
+    local Program = xxdaemon("xup")
     
     Program["idStart", number] = StartId
     Program["idObjectLast", number] = ObjectLastId

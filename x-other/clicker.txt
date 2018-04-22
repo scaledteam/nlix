@@ -124,6 +124,7 @@ function clicker() {
                                     P["speed", number] = P["speed", number] + P["boosts", array][Pos, number]
                                     
                                     if (Pos == 10) {
+                                        out("Congradulation with win!")
                                         end()
                                     }
                                 }

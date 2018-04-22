@@ -22,11 +22,12 @@ function xids() {
         case 1,
             if (xcanDraw()) {
                 local Cursor = xcursor()
+                local Use = xkeyUse()
                 
-                if (xkeyUse() != P["xkeyUseOld", number]) {
-                    P["xkeyUseOld", number] = xkeyUse()
+                if (Use != P["xkeyUseOld", number]) {
+                    P["xkeyUseOld", number] = Use
                     
-                    if (xkeyUse() & inrange(Cursor, vec2(), P["indicator", table]["size", vector2])) {
+                    if (Use & inrange(Cursor, vec2(), P["indicator", table]["size", vector2])) {
                         xprintAll()
                     }
                 }

@@ -47,7 +47,7 @@ function xwm() {
             if (xcanCreate(3)) {
                 local Res = P["xframe", table]["size", vector2]
                 
-                local Background = xcreate("box"):xsize(Res):xcolor(P["xframe", table]:exists("parent") ? hsv2rgb(randint(360), 1, 0.7) : hsv2rgb(entity():id() * 20 % 360, 1, 0.7)) #hsv2rgb(205, 1, 0.7))
+                local Background = xcreate("box"):xsize(Res):xcolor(P["xframe", table]:exists("parent") ? hsv2rgb(randint(360), 1, 0.7) : hsv2rgb(entity():id() * 20 % 240, 1, 0.7)) #hsv2rgb(205, 1, 0.7))
                 
                 local Multiplier = min(Res[1], Res[2]) / 2 * 0.3
                 
@@ -106,25 +106,30 @@ function xwm() {
                             Use
                             &
                             (
-                                Frame:exists("moveMode")
+                                Frame:exists("moveOffset")
                                 |
                                 inrange(Cursor - Frame["pos", vector2], vec2(0, -20), Frame["size", vector2]:setY(0))
                             )
                         ) {
-                            if (!Frame:exists("moveMode") & (Cursor[1] > Frame["pos", vector2][1] + Frame["size", vector2][1] - 20)) {
+                            if (!Frame:exists("moveOffset") & (Cursor[1] > Frame["pos", vector2][1] + Frame["size", vector2][1] - 20)) {
                                 Program:clear()
                             }
                             else {
-                                local NewPos = round(clamp(Cursor - vec2(Frame["size", vector2][1] / 2, -10), vec2(0, 20), P["xframe", table]["size", vector2] - vec2(0, 20) - Program["xframe", table]["size", vector2]))
-                                Frame:xpos(NewPos)
+                                local NewPos = round(clamp(Cursor + Frame["moveOffset", vector2], vec2(0, 20), P["xframe", table]["size", vector2] - vec2(0, 20) - Program["xframe", table]["size", vector2]))
                                 
-                                Frame["moveMode", number] = 1
+                                if (Frame:exists("moveOffset")) {
+                                    Frame:xpos(NewPos)
+                                }
+                                else {
+                                    Frame["moveOffset", vector2] = Frame["pos", vector2] - Cursor
+                                }
+                                
                                 Frame["keyUse", number] = 0
                                 return
                             }
                         }
-                        elseif (Frame:exists("moveMode")) {
-                            Frame:remove("moveMode")
+                        elseif (Frame:exists("moveOffset")) {
+                            Frame:remove("moveOffset")
                         }
                         else {
                             # Send key use
@@ -241,7 +246,7 @@ function xwm() {
                             if (!P["xframe", table]:exists("parent")) {
                                 P["xdevice", wirelink]:egpClear()
                             }
-                            poweroff()
+                            exec("poweroff"):execNow()
                             break
                         
                         default,

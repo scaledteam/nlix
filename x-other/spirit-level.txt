@@ -12,40 +12,40 @@ function spiritlevel() {
     switch (P["state", number]) {
         case 0,
             if (xcanCreate(6)) {
-                local Res = xres()
-                local Size = vec2(min(Res[1], Res[2]))
+                local Res = vec2(min(xres()[1], xres()[2]))
+                P["xframe", table]["size", vector2] = Res
                 
                 local Background = xcreate("box"):xsize(Res):xcolor(vec())
                 
-                local CircleSize = Size[1] / 10
-                P["multiplier", number] = min(Res[1], Res[2]) / 2 - CircleSize
+                local CircleSize = Res[1] / 10
+                P["multiplier", number] = Res[1] / 2 - CircleSize
                 P["circle", table] = xcreate("circle"):xsize(vec2(CircleSize))
                 
                 xcreate("polyOutline"):xparent(Background):xvertices(array(
-                    Size * vec2(-0.5,-0.5),
-                    Size * vec2(0.5,-0.5),
-                    Size * vec2(0.5,-0.3),
-                    Size * vec2(-0.5,-0.3),
-                    Size * vec2(-0.5,-0.1),
-                    Size * vec2(0.5,-0.1),
-                    Size * vec2(0.5,0.1),
-                  	 Size * vec2(-0.5,0.1),
-                    Size * vec2(-0.5,0.3),
-                    Size * vec2(0.5,0.3),
-                    Size * vec2(0.5,0.5),
-                    Size * vec2(-0.5,0.5),
-                    Size * vec2(-0.5,-0.5),
-                    Size * vec2(-0.5,0.5),
-                    Size * vec2(-0.3,0.5),
-                    Size * vec2(-0.3,-0.5),
-                    Size * vec2(-0.1,-0.5),
-                    Size * vec2(-0.1,0.5),
-                    Size * vec2(0.1,0.5),
-                    Size * vec2(0.1,-0.5),
-                    Size * vec2(0.3,-0.5),
-                    Size * vec2(0.3,0.5),
-                    Size * vec2(0.5,0.5),
-                    Size * vec2(0.5,-0.5)
+                    Res * vec2(-0.5, -0.5),
+                    Res * vec2( 0.5, -0.5),
+                    Res * vec2( 0.5, -0.3),
+                    Res * vec2(-0.5, -0.3),
+                    Res * vec2(-0.5, -0.1),
+                    Res * vec2( 0.5, -0.1),
+                    Res * vec2( 0.5,  0.1),
+                  	 Res * vec2(-0.5,  0.1),
+                    Res * vec2(-0.5,  0.3),
+                    Res * vec2( 0.5,  0.3),
+                    Res * vec2( 0.5,  0.5),
+                    Res * vec2(-0.5,  0.5),
+                    Res * vec2(-0.5, -0.5),
+                    Res * vec2(-0.5,  0.5),
+                    Res * vec2(-0.3,  0.5),
+                    Res * vec2(-0.3, -0.5),
+                    Res * vec2(-0.1, -0.5),
+                    Res * vec2(-0.1,  0.5),
+                    Res * vec2( 0.1,  0.5),
+                    Res * vec2( 0.1, -0.5),
+                    Res * vec2( 0.3, -0.5),
+                    Res * vec2( 0.3,  0.5),
+                    Res * vec2( 0.5,  0.5),
+                    Res * vec2( 0.5, -0.5)
                 ))
                 
                 P["state", number] = 1

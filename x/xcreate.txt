@@ -29,8 +29,10 @@ function xcreate() {
                 
                 if (P["counter", number] <= P["xobjectsAll", table]:count()) {
                     local Id = P["counter", number]
+                    
                     local Object = P["xobjectsAll", table][Id, table]
                     Object["id", number] = 0
+                    
                     P["xobjectsTemp", table]:pushTable(Object)
                     break
                 }
