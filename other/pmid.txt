@@ -15,10 +15,15 @@ function pmid() {
     switch (P["state", number]) {
         case 0,
             local Program = exec("cat")
-            Program["args", array] = array("/e2shared/mid/bach-bourree.mid")
-            #Program["args", array] = array("/e2shared/mid/castle-complete")
-            #Program["args", array] = array("/e2shared/mid/game-over.mid")
-            #Program["args", array] = array("/e2shared/mid/your-reality.mid")
+            if (args() < 1) {
+                Program["args", array] = array("/e2shared/mid/bach-bourree.mid")
+                #Program["args", array] = array("/e2shared/mid/castle-complete")
+                #Program["args", array] = array("/e2shared/mid/game-over.mid")
+                #Program["args", array] = array("/e2shared/mid/your-reality.mid")
+            }
+            else {
+                Program["args", array] = array(arg(1))
+            }
             Program["out", array] = P["in", array] = array()
             
             P["state", number] = 1
@@ -41,7 +46,7 @@ function pmid() {
                     
                     ## The Pulses Per Quarter Note
                     #Data[5] Data[6]
-                    P["interval", number] = tickInterval() / 10
+                    P["interval", number] = 0.002
                     
                     Data = Data:sub(7)
                     
@@ -91,19 +96,18 @@ function pmid() {
         case 3,
             local Data = P["data", string]
             
-            local I = 1
             local Time = 0
             
-            local Input = toByte(Data[I])
-            while (Input >> 7) {
+            for (I = 1, 4) {
+                local Input = toByte(Data[I])
+                
                 Time = (Time << 7) + (Input && 0x7F)
                 
-                I++
-                Input = toByte(Data[I])
+                if ((Input >> 7) == 0) {
+                    Data = Data:sub(1 + I)
+                    break
+                }
             }
-            Time = (Time << 7) + (Input && 0x7F)
-            
-            Data = Data:sub(1 + I)
             
             if (Time < 500) {
                 P["nextStep", number] = systime() + Time * P["interval", number]
@@ -127,7 +131,8 @@ function pmid() {
                     case 0x8,
                         local Note = toByte(Data[1])
                         local Dynamic = toByte(Data[2])
-                        soundFreq(Channel + (Note << 4), 100, Note * 3)
+                        soundFreq((Channel << 8) + (Note << 16), 100, ((Note - 30) * 0.3) ^ 2 * 1.2)
+                        #out(((Channel << 8) + (Note << 16)) + "\n")
                         
                         Data = Data:sub(3)
                         break
@@ -137,7 +142,7 @@ function pmid() {
                         local Note = toByte(Data[1])
                         local Dynamic = toByte(Data[2])
                         
-                        soundStop(Channel + (Note << 4))
+                        soundStop((Channel << 8) + (Note << 16))
                         
                         Data = Data:sub(3)
                         break
