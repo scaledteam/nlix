@@ -26,9 +26,7 @@ function xedit() {
                 
                 P["text", table] = xcreate("textLayout"):xsize(Res - vec2(0, 10)):xpos(vec2(0, 10)):xsize(10):xcolor(vec())
                 
-                if (!P:exists("in")) {
-                    P["in", array] = array()
-                }
+                P["in", array] = array()
                 
                 P["state", number] = 1
             }

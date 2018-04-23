@@ -27,9 +27,8 @@ function xfilemngr() {
                 Pos = vec2(0, Res[2] - 20)
                 xcreate("text"):xpos(Pos):xtext("place for buttons")
                 
-                if (!P:exists("in")) {
-                    P["in", array] = array()
-                }
+                P["in", array] = array()
+                
                 P["state", number] = 1
             }
             break

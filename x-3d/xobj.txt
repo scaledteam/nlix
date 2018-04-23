@@ -22,13 +22,14 @@ function xobj() {
             else {
                 Program["args", array] = array(arg(1))
             }
-            P["file", array] = Program["out", array] = array()
+            
+            Program["out", array] = P["in", array] = array()
             P["state", number] = 1
             break
         
         case 1,
-            if (P["file", array]:count() > 0) {
-                P["file", array] = P["file", array]:shiftString():explode("\n")
+            if (wait()) {
+                P["file", array] = in():explode("\n")
                 
                 P["model", table] = table(
                     "v" = array(),  #Vertices

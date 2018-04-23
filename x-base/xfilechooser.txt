@@ -22,9 +22,8 @@ function xfilechooser() {
                 
                 xcreate("text"):xpos(vec2(0, Res[2] - 20)):xcolor(vec()):xtext("Ok")
                 
-                if (!P:exists("in")) {
-                    P["in", array] = array()
-                }
+                P["in", array] = array()
+                
                 P["path", string] = "/"
                 P["state", number] = 1
             }
