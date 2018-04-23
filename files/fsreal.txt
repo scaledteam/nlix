@@ -8,64 +8,76 @@
 P2F["fsreal", string] = "fsreal"
 
 function fsreal() {
-    if (P["fs", table]:exists("path")) {
-        switch (P["mode", string]) {
-            case "list",
-                switch (P["state", number]) {
-                    case 0,
-                        if (fileCanList()) {
-                            fileList(P["fs", table]["path", string] + P["path", string] + "/")
-                            P["state", number] = 1
-                        }
+    switch (P["state", number]) {
+        case 0,
+            if (P["fs", table]:exists("path")) {
+                switch (P["mode", string]) {
+                    case "list",
+                        P["state", number] = 1
                         break
                     
-                    case 1,
-                        if (fileLoadedList()) {
-                            out((fileReadList():concat("\n") + "\n"):replace(".txt\n", "\n"))
-                            end()
-                        }
-                        break
-                }
-                break
-            
-            case "read",
-                switch (P["state", number]) {
-                    case 0,
-                        if (fileCanLoad()) {
-                            fileLoad(P["fs", table]["path", string] + P["path", string] + ".txt")
-                            
-                            P["timeout", number] = systime() + 5
-                            P["state", number] = 1
-                        }
+                    case "read",
+                        P["state", number] = 3
                         break
                     
-                    case 1,
-                        if (fileLoaded()) {
-                            out(fileRead() + "\n")
-                            end()
-                        }
-                        elseif (systime() > P["timeout", number]) {
-                            out("Error: Timeout.\n")
-                            end()
-                        }
+                    case "write",
+                        P["state", number] = 5
                         break
+                    
+                    default,
+                        out("Error: Unsupported action.\n")
+                        end()
                 }
-                break
-            
-            case "write",
-                if (fileCanWrite() & wait()) {
-                    fileWrite(P["fs", table]["path", string] + P["path", string] + ".txt", in())
-                    out("ok\n")
-                    end()
-                }
-            
-            default,
-                out("Error: Unsupported action.\n")
+            }
+            else {
+                out("Error: No path in fstab\n")
                 end()
-        }
-    }
-    else {
-        out("Error: No path in fstab\n")
-        end()
+            }
+            break
+        
+        # List
+        case 1,
+            if (fileCanList()) {
+                fileList(P["fs", table]["path", string] + P["path", string] + "/")
+                P["state", number] = 2
+            }
+            break
+        
+        case 2,
+            if (fileLoadedList()) {
+                out((fileReadList():concat("\n") + "\n"):replace(".txt\n", "\n"))
+                end()
+            }
+            break
+        
+        # Read
+        case 3,
+            if (fileCanLoad()) {
+                fileLoad(P["fs", table]["path", string] + P["path", string] + ".txt")
+                
+                P["timeout", number] = systime() + 5
+                P["state", number] = 4
+            }
+            break
+        
+        case 4,
+            if (fileLoaded()) {
+                out(fileRead() + "\n")
+                end()
+            }
+            elseif (systime() > P["timeout", number]) {
+                out("Error: Timeout.\n")
+                end()
+            }
+            break
+        
+        # Write
+        case 5,
+            if (fileCanWrite() & wait()) {
+                fileWrite(P["fs", table]["path", string] + P["path", string] + ".txt", in())
+                out("ok\n")
+                end()
+            }
+            break
     }
 }

@@ -13,7 +13,9 @@ function plist() {
     for (I = 1, Overload) {
         Counter++
         
-        Out += Counter + ": " + Ps[Counter, table]["name", string] + "\n"
+        if (args() == 0 | Ps[Counter, table]["name", string] == arg(1)) {
+            Out += Counter + ": " + Ps[Counter, table]["name", string] + "\n"
+        }
         
         if (Counter >= (Ps:count() - 1)) {
             out(Out)

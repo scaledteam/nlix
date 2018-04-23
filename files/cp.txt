@@ -14,27 +14,43 @@ function cp() {
                 end()
             }
             else {
-                local PathFrom = arg(1)
+                P["pathFrom", string] = arg(1)
                 
-                if (PathFrom:right(1) == "/") {
-                    local Program = exec("ls")
-                    Program["args", array] = array(PathFrom)
-                    P["in", array] = Program["out", array] = array()
-                    P["state", number] = 3
-                }
-                else {
+                if (P["pathFrom", string]:right(1) != "/") {
+                    P["pathTo", string] = arg(2)
+                    
+                    if (P["pathTo", string]:right(1) == "/") {
+                        P["pathTo", string] = P["pathTo", string] + P["pathFrom", string]:explode("/"):popString()
+                    }
+                    
                     local Program = exec("cat")
-                    Program["args", array] = array(PathFrom)
+                    Program["args", array] = array(P["pathFrom", string])
                     P["in", array] = Program["out", array] = array()
                     P["state", number] = 1
+                }
+                else {
+                    P["pathTo", string] = arg(2)
+                    
+                    if (P["pathTo", string]:right(1) == "/") {
+                        local Program = exec("ls")
+                        Program["args", array] = array(P["pathFrom", string])
+                        P["in", array] = Program["out", array] = array()
+                        
+                        P["childrens", table] = table()
+                        P["state", number] = 3
+                    }
+                    else {
+                        out("Error: Can't copy directory into file.\n")
+                    }
                 }
             }
             break
         
+        # one object
         case 1,
             if (wait()) {
                 local Program = exec("touch")
-                Program["args", array] = array(arg(2))
+                Program["args", array] = array(P["pathTo", string])
                 Program["in", array] = array(in():sub(1, -2))
                 
                 P["in", array] = Program["out", array] = array()
@@ -49,10 +65,38 @@ function cp() {
             }
             break
         
-        # ls
+        # recursive
         case 3,
             if (wait()) {
                 P["list", array] = in():explode("\n")
+                P["list", array]:pop()
+                
+                P["state", number] = 4
+            }
+            break
+        
+        case 4,
+            if (P["list", array]:count() > 0) {
+                local ListEntry = P["list", array]:shiftString()
+                
+                local Program = exec("cp")
+                Program["args", array] = array(P["pathFrom", string] + ListEntry, P["pathTo", string] + ListEntry)
+                Program["out", array] = P["out", array]
+                
+                P["childrens", table]:pushTable(Program)
+            }
+            else {
+                P["state", number] = 4
+            }
+            break
+        
+        case 5,
+            if (P["childrens", table]) {
+                if (!P["childrens", table][1, table]) {
+                    P["childrens", table]:remove(1)
+                }
+            }
+            else {
                 end()
             }
             break

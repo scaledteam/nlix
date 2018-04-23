@@ -48,3 +48,6 @@ $steamdir/steamapps/common/GarrysMod/garrysmod/data/expression2/nlix/nlix.txt
 https://github.com/scaledtm/nlix-accessories/
 
 Набор аксессуаров содержит ноутбук, принтер и проектор для advanced duplicator 2, а также инструменты, позволяющие их собрать вручную.
+
+## Скриншоты
+http://steamcommunity.com/id/scaled/screenshots/
