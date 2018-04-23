@@ -6,13 +6,19 @@
 
 P2F["pmid", string] = "pmid"
 
+function soundFreq(Id, Duration, Frequensy) {
+    soundPlay(Id, Duration, "synth/square_1760.wav")
+    soundPitch(Id, Frequensy / 1760 * 128)
+}
+
 function pmid() {
     switch (P["state", number]) {
         case 0,
             local Program = exec("cat")
-            #Program["args", array] = array("/e2shared/bach-bourree.mid.txt")
-            Program["args", array] = array("/e2shared/castle-complete.mid.txt")
-            #Program["args", array] = array("/e2shared/game-over.mid.txt")
+            Program["args", array] = array("/e2shared/mid/bach-bourree.mid")
+            #Program["args", array] = array("/e2shared/mid/castle-complete")
+            #Program["args", array] = array("/e2shared/mid/game-over.mid")
+            #Program["args", array] = array("/e2shared/mid/your-reality.mid")
             Program["out", array] = P["in", array] = array()
             
             P["state", number] = 1
@@ -84,119 +90,136 @@ function pmid() {
         
         case 3,
             local Data = P["data", string]
-            #for (I = 1, Overload) {
+            
+            local I = 1
+            local Time = 0
+            
+            local Input = toByte(Data[I])
+            while (Input >> 7) {
+                Time = (Time << 7) + (Input && 0x7F)
+                
+                I++
+                Input = toByte(Data[I])
+            }
+            Time = (Time << 7) + (Input && 0x7F)
+            
+            Data = Data:sub(1 + I)
+            
+            if (Time < 500) {
+                P["nextStep", number] = systime() + Time * P["interval", number]
+            }
+            
+            P["data", string] = Data
+            P["state", number] = 4
+                
+        case 4,
+            local Data = P["data", string]
             if (systime() > P["nextStep", number]) {
-                if (P["state", number] == 3) {
-                    local I = 1
-                    local Time = 0
-                    
-                    local Input = toByte(Data[I])
-                    while (Input >> 7) {
-                        Time = (Time << 7) + (Input && 0x7F)
+                local Command = toByte(Data[1])
+                Data = Data:sub(2)
+                
+                local Event = Command >> 4
+                local Channel = Command && 0xF
+                
+                switch (Event) {
+                    # 1-level event 
+                    ## Up note
+                    case 0x8,
+                        local Note = toByte(Data[1])
+                        local Dynamic = toByte(Data[2])
+                        soundFreq(Channel + (Note << 4), 100, Note * 3)
                         
-                        I++
-                        Input = toByte(Data[I])
-                    }
-                    Time = (Time << 7) + (Input && 0x7F)
+                        Data = Data:sub(3)
+                        break
                     
-                    if (Time < 500) {
-                        P["nextStep", number] = systime() + Time * P["interval", number]
-                    }
+                    ## Down note
+                    case 0x9,
+                        local Note = toByte(Data[1])
+                        local Dynamic = toByte(Data[2])
+                        
+                        soundStop(Channel + (Note << 4))
+                        
+                        Data = Data:sub(3)
+                        break
                     
-                    Data = Data:sub(1 + I)
+                    # Change
+                    case 0xA,
+                        local Note = toByte(Data[1])
+                        local Dynamic = toByte(Data[2])
+                        Data = Data:sub(3)
+                        # Ignore
+                        break
                     
-                    local Command = toByte(Data[1])
-                    Data = Data:sub(2)
+                    # 2-level event
+                    case 0xB,
+                        Data = Data:sub(3)
+                        # Ignore
+                        break
                     
-                    local Event = Command >> 4
-                    local Channel = Command && 0xF
+                    # Change program
+                    case 0xC,
+                        Data = Data:sub(2)
+                        # Ignore
+                        break
                     
-                    switch (Event) {
-                        # 1-level event 
-                        ## Up note
-                        case 0x8,
-                            local Note = toByte(Data[1])
-                            local Dynamic = toByte(Data[2])
-                            soundPlay(Channel + (Note << 4), 100, "synth/square_1760.wav")
-                            soundPitch(Channel + (Note << 4), Note * 1.5)
+                    # Change canal force
+                    case 0xD,
+                        Data = Data:sub(2)
+                        # Ignore
+                        break
+                    
+                    # Rotating of some wheel
+                    case 0xE,
+                        Data = Data:sub(3)
+                        # Ignore
+                        break
+                    
+                    # Meta
+                    case 0xF,
+                        if (Channel == 0xF) {
+                            local Mode = toByte(Data[1])
                             
-                            Data = Data:sub(3)
-                            break
-                        
-                        ## Down note
-                        case 0x9,
-                            local Note = toByte(Data[1])
-                            local Dynamic = toByte(Data[2])
-                            
-                            soundStop(Channel + (Note << 4))
-                            
-                            Data = Data:sub(3)
-                            break
-                        
-                        # Change
-                        case 0xA,
-                            local Note = toByte(Data[1])
-                            local Dynamic = toByte(Data[2])
-                            Data = Data:sub(3)
-                            # Ignore
-                            break
-                        
-                        # 2-level event
-                        case 0xB,
-                            Data = Data:sub(3)
-                            # Ignore
-                            break
-                        
-                        # Meta
-                        case 0xF,
-                            if (Channel == 0xF) {
-                                local Mode = toByte(Data[1])
-                                
-                                if (inrange(Mode, 0x00, 0x07)) {
-                                    Data = Data:sub(3 + toByte(Data[2]))
-                                }
-                                else {
-                                    switch (Mode) {
-                                        case 0x20, case 0x21,
-                                            Data = Data:sub(4)
-                                            break
+                            if (inrange(Mode, 0x00, 0x07)) {
+                                Data = Data:sub(3 + toByte(Data[2]))
+                            }
+                            else {
+                                switch (Mode) {
+                                    case 0x20, case 0x21,
+                                        Data = Data:sub(4)
+                                        break
+                                    
+                                    case 0x51, case 0x59,
+                                        Data = Data:sub(5)
+                                        break
+                                    
+                                    case 0x54,
+                                        Data = Data:sub(8)
+                                        break
+                                    
+                                    case 0x58,
+                                        Data = Data:sub(7)
+                                        break
+                                    
+                                    case 0x2F,
+                                        Data = Data:sub(3)
+                                        out("End of block.\n")
                                         
-                                        case 0x51, case 0x59,
-                                            Data = Data:sub(5)
-                                            break
-                                        
-                                        case 0x54,
-                                            Data = Data:sub(8)
-                                            break
-                                        
-                                        case 0x58,
-                                            Data = Data:sub(7)
-                                            break
-                                        
-                                        case 0x2F,
-                                            Data = Data:sub(3)
-                                            out("End of block.\n")
-                                            
-                                            soundPurge()
-                                            P["state", number] = 2
-                                            break
-                                        
-                                        default,
-                                            out("Unknown command " + Command:toString(16) + "\n")
-                                    }
+                                        soundPurge()
+                                        P["state", number] = 2
+                                        break
+                                    
+                                    default,
+                                        out("Unknown command " + Command:toString(16) + "\n")
                                 }
                             }
-                            break
-                        
-                        default,
-                            out("Unknown command " + Command:toString(16) + "\n")
-                    }
+                        }
+                        break
                     
-                    P["blockLength", number] = P["blockLength", number] - 1
+                    default,
+                        out("Unknown command " + Command:toString(16) + "\n")
                 }
-                else {
-                    break
-                }
+                
+                P["state", number] = 3
             }
             P["data", string] = Data
             break

@@ -21,7 +21,7 @@ function fsreal() {
                     
                     case 1,
                         if (fileLoadedList()) {
-                            out(fileReadList():concat("\n") + "\n")
+                            out((fileReadList():concat("\n") + "\n"):replace(".txt\n", "\n"))
                             end()
                         }
                         break
@@ -31,25 +31,15 @@ function fsreal() {
             case "read",
                 switch (P["state", number]) {
                     case 0,
-                        if (P["path", string]:right(4) == ".txt") {
+                        if (fileCanLoad()) {
+                            fileLoad(P["fs", table]["path", string] + P["path", string] + ".txt")
+                            
+                            P["timeout", number] = systime() + 5
                             P["state", number] = 1
-                        }
-                        else {
-                            out("Error: Missing \".txt\"\n")
-                            end()
                         }
                         break
                     
                     case 1,
-                        if (fileCanLoad()) {
-                            fileLoad(P["fs", table]["path", string] + P["path", string])
-                            
-                            P["timeout", number] = systime() + 5
-                            P["state", number] = 2
-                        }
-                        break
-                    
-                    case 2,
                         if (fileLoaded()) {
                             out(fileRead() + "\n")
                             end()
@@ -63,26 +53,11 @@ function fsreal() {
                 break
             
             case "write",
-                switch (P["state", number]) {
-                    case 0,
-                        if (P["path", string]:right(4) == ".txt") {
-                            P["state", number] = 1
-                        }
-                        else {
-                            out("Error: Missing \".txt\"\n")
-                            end()
-                        }
-                        break
-                    
-                    case 1,
-                        if (fileCanWrite() & wait()) {
-                            fileWrite(P["fs", table]["path", string] + P["path", string], in())
-                            out("ok\n")
-                            end()
-                        }
-                        break
+                if (fileCanWrite() & wait()) {
+                    fileWrite(P["fs", table]["path", string] + P["path", string] + ".txt", in())
+                    out("ok\n")
+                    end()
                 }
-                break
             
             default,
                 out("Error: Unsupported action.\n")

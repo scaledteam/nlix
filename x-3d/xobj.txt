@@ -15,9 +15,9 @@ function xobj() {
             
             local Program = exec("cat")
             if (args() < 1) {
-                Program["args", array] = array("/e2shared/cube.obj.txt")
-                #Program["args", array] = array("/e2shared/testfileigor.obj.txt")
-                #Program["args", array] = array("/e2shared/raritywet.obj.txt")
+                Program["args", array] = array("/e2shared/obj/cube.obj")
+                #Program["args", array] = array("/e2shared/obj/testfileigor.obj")
+                #Program["args", array] = array("/e2shared/obj/raritywet.obj")
             }
             else {
                 Program["args", array] = array(arg(1))
