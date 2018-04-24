@@ -11,7 +11,7 @@ P2F["tic-tac-toe", string] = "tictactoe"
 function tictactoe() {
     switch (P["state", number]) {
         case 0,
-            if (xcanCreate(14)) {
+            if (xcanCreate(13)) {
                 local Res = vec2(min(xres()[1], xres()[2]))
                 P["xframe", table]["size", vector2] = Res
                 

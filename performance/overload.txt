@@ -6,7 +6,7 @@
 
 P2F["overload", string] = "overload"
 
-function setperf() {
+function overload() {
     if (args() < 1) {
         out(Overload + "\n")
     }

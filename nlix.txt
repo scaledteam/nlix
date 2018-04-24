@@ -148,7 +148,9 @@ else {
         
         # Clear if parent killed
         if (!P["parent", table] & P:exists("parent")) {
-            end()
+            P:clear()
+            Ps:remove(KState)
+            KState--
             continue
         }
         
@@ -168,13 +170,16 @@ else {
             }
             # If one program is not valid
             else {
-                end()
+                Ps:remove(KState)
+                KState--
             }
         }
         # If wrong name
         else {
             out("Program \"" + PName + "\" is not exist.\n")
-            end()
+            P:clear()
+            Ps:remove(KState)
+            KState--
         }
     }
 }
