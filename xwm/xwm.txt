@@ -71,17 +71,17 @@ function xwm() {
             break
             
         case 2,
+            #[if (owner():keyPressed("b")) {
+                xprintAll()
+            }]#
+            
             if (xcanDraw()) {
                 if (P["programs", table]) {
                     # Send cursor to programs
                     local Cursor = xcursor()
-                    local Use = xkeyUse()
+                    local Use = max(xkeyUse(), 0)
                     P["xframe", table]["keyUse", number] = -1
                     P["xframe", table]["interfaceUse", number] = Use
-                    
-                    #[if (P:exists("parent")) {
-                        print(Use)
-                    }]#
                     
                     # Program
                     local Program = P["programs", table][1, table]

@@ -260,11 +260,6 @@ function vector2 xcursor() {
         }
         Frame["cursor", vector2] = Cursor
         
-        if (Frame["keyUse", number] < 0) {
-            #print(Frame["parent", table]["keyUse", number])
-            Frame["keyUse", number] = 0
-        }
-        
         if (Frame["parent", table]["keyUse", number] >= 0) {
             Frame["keyUse", number] = Frame["parent", table]["keyUse", number] & inrange(Cursor, vec2(), Frame["size", vector2])
         }
@@ -441,7 +436,7 @@ function xxremoveByDaemon(IdStart, IdEnd) {
     P["xremove", table] = Program
     Program:remove("parent")
     
-    Program["idStart", number] = IdStart
+    Program["id", number] = IdStart
     Program["idEnd", number] = IdEnd
     
     Program:execNow()

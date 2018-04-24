@@ -15,6 +15,7 @@ if (!S:exists("fstab")) {
     )
     
     S["Ps", table] = Ps
+    S["P2F", table] = P2F
     
     #ifdef fileRead()
     S["rdir", table] = table()

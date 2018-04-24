@@ -15,9 +15,6 @@ function xremove() {
                     
                     P["removedObjectsIds", table] = table()
                     
-                    P["counter", number] = P["idStart", number]
-                    P["limit", number] = P["idEnd", number]
-                    
                     P["state", number] = 1
                 }
                 else {
@@ -25,9 +22,9 @@ function xremove() {
                 }
             
             case 1,
-                local Id = P["counter", number]
+                local Id = P["id", number]
                 
-                if (Id <= P["limit", number]) {
+                if (Id <= P["idEnd", number]) {
                     local Object = P["xobjectsAll", table][Id, table]
                     
                     Object:xclear()
@@ -35,17 +32,17 @@ function xremove() {
                     
                     Id++
                     
-                    P["counter", number] = Id
+                    P["id", number] = Id
                     break
                 }
                 else {
-                    P["counter", number] = 1
+                    P["id", number] = 1
                     P["state", number] = 2
                 }
             
             case 2,
-                P["counter", number] = P["counter", number] + 1
-                local Id = P["counter", number]
+                P["id", number] = P["id", number] + 1
+                local Id = P["id", number]
                 
                 if (Id <= P["xobjectsAll", table]:count()) {
                     local Object = P["xobjectsAll", table][Id, table]
@@ -65,49 +62,47 @@ function xremove() {
                 else {
                     if (P["removed", number] > 0) {
                         P["removed", number] = 0
-                        P["counter", number] = 1
+                        P["id", number] = 1
                         break
                     }
                     else {
-                        P["counter", number] = 1
+                        P["id", number] = 1
                         P["state", number] = 3
                     }
                 }
             
             case 3,
-                local Id = P["counter", number]
-                local Offset = P["offset", number]
                 local XobjectsAll = P["xobjectsAll", table]
                 
-                for (I = 1, Overload) {
-                    if (Id <= XobjectsAll:count()) {
-                        if (P["removedObjectsIds", table][Id + Offset, number]) {
-                            P["removedObjectsIds", table][Id + Offset, number] = 0
-                            P["offset", number] = P["offset", number] + 1
-                            
-                            P["xdevice", wirelink]:egpRemove(XobjectsAll:count())
-                            XobjectsAll:remove(Id)
-                            
-                            P["xdevice", wirelink]:egpLine(Id, vec2(), vec2())
-                        }
-                        else {
-                            if (Offset != 0) {
-                                local Object = XobjectsAll[Id, table]
-                                
-                                Object["id", number] = Id
-                                Object:xredraw()
-                            }
-                            
-                            P["counter", number] = P["counter", number] + 1
-                        }
-                        break
+                local Id = P["id", number]
+                local Offset = P["offset", number]
+                
+                if (Id <= XobjectsAll:count()) {
+                    if (P["removedObjectsIds", table][Id + Offset, number]) {
+                        P["removedObjectsIds", table][Id + Offset, number] = 0
+                        P["offset", number] = Offset + 1
+                        
+                        P["xdevice", wirelink]:egpRemove(XobjectsAll:count())
+                        #P["xdevice", wirelink]:egpLine(XobjectsAll:count(), vec2(), vec2())
+                        XobjectsAll:remove(Id)
                     }
                     else {
-                        P["removedObjectsIds", table]:clear()
-                        P["xparam", table]["blocked", number] = 0
-                        end()
-                        return
+                        if (Offset != 0) {
+                            local Object = XobjectsAll[Id, table]
+                            
+                            Object["id", number] = Id
+                            Object:xredraw()
+                        }
+                        
+                        P["id", number] = Id + 1
                     }
+                    break
+                }
+                else {
+                    P["removedObjectsIds", table]:clear()
+                    P["xparam", table]["blocked", number] = 0
+                    end()
+                    return
                 }
                 break
         }

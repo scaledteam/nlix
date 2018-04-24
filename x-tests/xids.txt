@@ -21,7 +21,7 @@ function xids() {
         
         case 1,
             if (xcanDraw()) {
-                local Cursor = xcursor()
+                #[local Cursor = xcursor()
                 local Use = xkeyUse()
                 
                 if (Use != P["xkeyUseOld", number]) {
@@ -30,7 +30,7 @@ function xids() {
                     if (Use & inrange(Cursor, vec2(), P["indicator", table]["size", vector2])) {
                         xprintAll()
                     }
-                }
+                }]#
                 
                 local Count = P["xobjectsAll", table]:count()
                 if (Count != P["xobjectsAllCountOld", number]) {
