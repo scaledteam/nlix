@@ -248,24 +248,29 @@ function vector2 xcursor() {
             Frame["cursorTimer", number] = systime() + 1
         }
         
-        #Frame["cursor", vector2] = round(Device:egpCursor(Frame["user", entity]))
         Frame["cursor", vector2] = Device:egpCursor(Frame["user", entity])
         Frame["keyUse", number] = Frame["cursor", vector2] != vec2(-1) & Frame["user", entity]:keyUse()
+        
+        return Frame["cursor", vector2]
     }
     else {
         local Cursor = Frame["parent", table]["cursor", vector2]
         if (Cursor != vec2(-1)) {
-            Frame["cursor", vector2] = Cursor - Frame["pos", vector2]
+            Cursor -= Frame["pos", vector2]
         }
-        else {
-            Frame["cursor", vector2] = Cursor
+        Frame["cursor", vector2] = Cursor
+        
+        if (Frame["keyUse", number] < 0) {
+            #print(Frame["parent", table]["keyUse", number])
+            Frame["keyUse", number] = 0
         }
         
         if (Frame["parent", table]["keyUse", number] >= 0) {
-            Frame["keyUse", number] = Frame["parent", table]["keyUse", number] & inrange(Frame["cursor", vector2], vec2(), Frame["size", vector2])
+            Frame["keyUse", number] = Frame["parent", table]["keyUse", number] & inrange(Cursor, vec2(), Frame["size", vector2])
         }
+        
+        return Cursor
     }
-    return Frame["cursor", vector2]
 }
 
 function number xkeyUse() {

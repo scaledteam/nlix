@@ -6,9 +6,9 @@
 
 P2F["overload", string] = "overload"
 
-function overload() {
+function setperf() {
     if (args() < 1) {
-        out("Usage: overload [number]")
+        out(Overload + "\n")
     }
     else {
         local Arg = arg(1):toNumber()
@@ -21,3 +21,4 @@ function overload() {
     }
     end()
 }
+
