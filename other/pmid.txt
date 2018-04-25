@@ -14,20 +14,17 @@ function soundFreq(Id, Duration, Frequensy) {
 function pmid() {
     switch (P["state", number]) {
         case 0,
-            local Program = exec("cat")
             if (args() < 1) {
-                Program["args", array] = array("/e2shared/mid/bach-bourree.mid")
-                #Program["args", array] = array("/e2shared/mid/castle-complete.mid")
-                #Program["args", array] = array("/e2shared/mid/game-over.mid")
-                #Program["args", array] = array("/e2shared/mid/your-reality.mid")
-                #Program["args", array] = array("/e2shared/mid/4tact_4_4.mid")
+                out("Usage: pmid [filename]\n")
+                end()
             }
             else {
+                local Program = exec("cat")
                 Program["args", array] = array(arg(1))
+                Program["out", array] = P["in", array] = array()
+                
+                P["state", number] = 1
             }
-            Program["out", array] = P["in", array] = array()
-            
-            P["state", number] = 1
             break
         
         case 1,
@@ -46,7 +43,7 @@ function pmid() {
                     out("blocks count: " + P["blocksCount", number] + "\n")
                     
                     ## The Pulses Per Quarter Note
-                    P["interval", number] = 1 / ((toByte(Data[5]) << 8) + toByte(Data[6]))
+                    P["interval", number] = 0.5 / ((toByte(Data[5]) << 8) + toByte(Data[6]))
                     
                     Data = Data:sub(7)
                     

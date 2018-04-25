@@ -96,6 +96,7 @@ if (!tickClk()) {
                 case 86, #include "nlix/x-base/xedit" break
                 case 87, #include "nlix/x-base/xterm" break
                 case 88, #include "nlix/x-base/xfilechooser" break
+                case 89, #include "nlix/x-base/xfileframe" break
                 
                 # x tests
                 case 90, #include "nlix/x-tests/xres" break

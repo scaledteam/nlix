@@ -38,7 +38,7 @@ function xcreate() {
                 }
                 else {
                     P["counter", number] = P["xshiftStart", number]
-                    P["state", number] = 3
+                    P["state", number] = 2
                 }
             
             case 2,
@@ -54,7 +54,7 @@ function xcreate() {
                 }
                 else {
                     P["counter", number] = P["xshiftStart", number]
-                    P["state", number] = 4
+                    P["state", number] = 3
                 }
             
             case 3,

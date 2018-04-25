@@ -290,24 +290,34 @@ function number xxobjectsLeft() {
     return egpMaxObjects() - xxlastObjectId()
 }
 
+
+function table xxdaemon(Name:string) {
+    local Program = exec(Name)
+    
+    Program["xparam", table] = P["xparam", table]
+    Program["xdevice", wirelink] = P["xdevice", wirelink]
+    Program["xobjectsAll", table] = P["xobjectsAll", table]
+    
+    return Program
+}
+
 function table table:xexec(ProgramName:string) {
     local Program = exec(ProgramName)
     
-    Program["xframe", table] = This
-    
     Program["xparam", table] = P["xparam", table]
-    Program["xobjects", table] = table()
-    Program["xobjectsAll", table] = P["xobjectsAll", table]
     Program["xdevice", wirelink] = P["xdevice", wirelink]
+    Program["xobjectsAll", table] = P["xobjectsAll", table]
+    
+    Program["xframe", table] = This
+    Program["xobjects", table] = table()
     
     return Program
 }
 
 function table xexec(ProgramName:string, Pos:vector2, Size:vector2) {
-    if (P["xobjects", table]:count() >= 1) {
-        local Frame = xcreate("frame")
+    if (P["xobjects", table]:count() > 0) {
+        local Frame = xcreate("frame"):xpos(Pos)
         Frame["size", vector2] = Size
-        Frame:xpos(Pos)
         
         return Frame:xexec(ProgramName)
     }
@@ -315,6 +325,7 @@ function table xexec(ProgramName:string, Pos:vector2, Size:vector2) {
         return NULL
     }
 }
+
 
 function table:xcountOffset(Offset) {
     while (This:exists("parent")) {
@@ -343,74 +354,58 @@ function number xcanDraw() {
     return !P["xparam", table]["blocked", number]
 }
 
-function table xxdaemon(Name:string) {
-    local Program = exec(Name)
-    
-    Program["xparam", table] = P["xparam", table]
-    Program["xdevice", wirelink] = P["xdevice", wirelink]
-    Program["xobjectsAll", table] = P["xobjectsAll", table]
-    
-    return Program
-}
-
 function number xcanCreate(Count) {
     if (P["xparam", table]["blocked", number]) {
+        return 0
+    }
+    if (P["xframe", table]["id", number] == 0) {
         return 0
     }
     if (P["xobjects", table]:count() >= Count) {
         return 1
     }
-    if (P["xframe", table]["id", number] == 0) {
-        return 0
+    
+    if (!P["xframe", table]:exists("parent")) {
+        if (xxobjectsLeft() > Count) {
+            P["xparam", table]["blocked", number] = 1
+            
+            local Program = xxdaemon("xcreate")
+            Program["xobjects", table] = P["xobjects", table]
+            Program["xframe", table] = P["xframe", table]
+            
+            Program["count", number] = Count
+            
+            Program:execNow()
+        }
     }
-    if (!P["xcreate", table]) {
-        if (!P["xframe", table]:exists("parent")) {
-            if (xxobjectsLeft() > Count) {
-                P["xparam", table]["blocked", number] = 1
-                
-                local Program = xxdaemon("xcreate")
-                Program["xobjects", table] = P["xobjects", table]
-                Program["xframe", table] = P["xframe", table]
-                
-                P["xcreate", table] = Program
-                
-                Program["count", number] = Count
-                
-                Program:execNow()
-            }
-            else {
-                return 0
-            }
+    else {
+        if (P["xframe", table]:xxlastObjectId() >= xxlastObjectId()) {
+            P["xparam", table]["blocked", number] = 1
+            
+            local Program = xxdaemon("xcreate")
+            Program["xobjects", table] = P["xobjects", table]
+            Program["xframe", table] = P["xframe", table]
+            
+            Program["count", number] = Count
+            
+            Program:execNow()
         }
         else {
-            if (P["xframe", table]:xxlastObjectId() >= xxlastObjectId()) {
-                local Program = xxdaemon("xcreate")
-                Program["xobjects", table] = P["xobjects", table]
-                Program["xframe", table] = P["xframe", table]
-                
-                P["xcreate", table] = Program
-                
-                Program["count", number] = Count
-                
-                Program:execNow()
-            }
-            else {
-                local Program = xxdaemon("xcreate")
-                Program["xobjects", table] = P["xobjects", table]
-                Program["xframe", table] = P["xframe", table]
-                
-                P["xcreate", table] = Program
-                
-                Program["state", number] = 1
-                Program["count", number] = Count
-                
-                Program["xshiftStart", number] = P["xframe", table]:xxlastObjectId()
-                Program["xobjectsTemp", table] = table()
-                
-                Program["counter", number] = Program["xshiftStart", number]
-                
-                Program:execNow()
-            }
+            P["xparam", table]["blocked", number] = 1
+            
+            local Program = xxdaemon("xcreate")
+            Program["xobjects", table] = P["xobjects", table]
+            Program["xframe", table] = P["xframe", table]
+            
+            Program["state", number] = 1
+            Program["count", number] = Count
+            
+            Program["xshiftStart", number] = P["xframe", table]:xxlastObjectId()
+            Program["xobjectsTemp", table] = table()
+            
+            Program["counter", number] = Program["xshiftStart", number]
+            
+            Program:execNow()
         }
     }
     

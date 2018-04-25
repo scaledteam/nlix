@@ -1,0 +1,113 @@
+#
+# Created by scaled
+#
+
+@name xfileframe
+
+P2F["xfileframe", string] = "xfileframe"
+
+function xfileframe() {
+    switch (P["state", number]) {
+        case 0,
+            if (xcanCreate(5)) {
+                local Res = xres()
+                
+                # Background
+                xcreate("box"):xsize(Res)
+                
+                # Choose indicator
+                P["chooseBox", table] = xcreate("box"):xsize(vec2(Res[1] - 10, 10)):xcolor(vec(127, 127, 255)):xalpha(0)
+                
+                P["list", table] = xcreate("textLayout"):xsize(Res - vec2(10, 0)):xsize(10):xcolor(vec())
+                
+                P["scrollBase", table] = xcreate("box"):xsize(vec2(10, Res[2])):xpos(vec2(Res[1] - 10, 0)):xcolor(vec(127)):xalpha(127)
+                P["scroll", table] = xcreate("box"):xsize(vec2(10, 20)):xpos(vec2(Res[1] - 10, 0)):xcolor(vec(127))
+                P["linesCount", number] = int(Res[2] / 10)
+                
+                P["in", array] = array()
+                
+                P["path", string] = "/"
+                P["state", number] = 1
+            }
+            break
+        
+        case 1,
+            if (P:exists("pathOk")) {
+                P:remove("pathOk")
+                P["chooseBox", table]:xalpha(0)
+            }
+            
+            local Ls = exec("ls")
+            Ls["args", array] = array(P["path", string])
+            Ls["out", array] = P["in", array]
+            P["state", number] = 2
+            break
+        
+        case 2,
+            if (wait()) {
+                local ListString = (P["path", string] == "/" ? in() : "..\n" + in()):sub(1, -2)
+                
+                P["listArray", array] = ListString:explode("\n")
+                P["list", table]:xtext(ListString)
+                
+                P["offset", number] = 1
+                P["scroll", table]:xpos(P["scrollBase", table]["pos", vector2])
+                
+                P["state", number] = 3
+            }
+            else {
+                break
+            }
+        
+        case 3,
+            if (xcanDraw()) {
+                local Cursor = xcursor()
+                local Use = xkeyUse()
+                
+                if (Use & P["scrollBase", table]:xinrange() & P["listArray", array]:count() > P["linesCount", number]) {
+                    P["offset", number] = int((P["listArray", array]:count() - P["linesCount", number]) * clamp((Cursor[2] - 10) / (xres()[2] - 20), 0, 1)) + 1
+                    P["list", table]:xtext(P["listArray", array]:concat("\n", P["offset", number], P["offset", number] + P["linesCount", number]))
+                    
+                    P["scroll", table]:xpos(vec2(P["scrollBase", table]["pos", vector2][1], clamp(Cursor[2] - 10, 0, xres()[2] - 20)))
+                    
+                    if (P:exists("pathOk")) {
+                        P:remove("pathOk")
+                        P["chooseBox", table]:xalpha(0)
+                    }
+                }
+                
+                elseif (Use != P["useOld", number]) {
+                    P["useOld", number] = Use
+                    
+                    if (Use & P["list", table]:xinrange()) {
+                        local Pos = int(Cursor[2] / 10)
+                        
+                        if (Pos < P["listArray", array]:count()) {
+                            P["listArray", array]:count()
+                            local Choose = P["listArray", array][Pos + P["offset", number], string]
+                            
+                            if (Choose == "..") {
+                                local PathExplode = P["path", string]:explode("/")
+                                PathExplode:pop()
+                                PathExplode:pop()
+                                
+                                P["path", string] = PathExplode:concat("/") + "/"
+                                P["state", number] = 1
+                            }
+                            elseif (Choose:right(1) != "/") {
+                                if ((P["path", string] + Choose) != P["pathOk", string]) {
+                                    P["chooseBox", table]:xalpha(255):xpos(vec2(0, Pos * 10))
+                                    P["pathOk", string] = P["path", string] + Choose
+                                }
+                            }
+                            else {
+                                P["path", string] = P["path", string] + Choose
+                                P["state", number] = 1
+                            }
+                        }
+                    }
+                }
+            }
+            break
+    }
+}
