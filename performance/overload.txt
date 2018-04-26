@@ -4,7 +4,7 @@
 
 @name overload
 
-P2F["overload", string] = "overload"
+PEnabled["overload", number] = 1
 
 function overload() {
     if (args() < 1) {

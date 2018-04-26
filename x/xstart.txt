@@ -4,7 +4,7 @@
 
 @name xstart
 
-P2F["xstart", string] = "xstart"
+PEnabled["xstart", number] = 1
 
 function xstart() {
     switch (P["state", number]) {
@@ -25,13 +25,13 @@ function xstart() {
                 P["xdevice", wirelink] = Device
                 P:remove("device")
                 
-                P["NULL", table] = NULL
+                P["update", number] = systime() + tickInterval()
                 P["state", number] = 1
             }
             break
         
         case 1,
-            if (P["NULL", table] != NULL) {
+            if (systime() > P["update", number]) {
                 local Device = P["xdevice", wirelink]
                 
                 local Pos0 = Device:egpToWorld(vec2())
@@ -71,10 +71,15 @@ function xstart() {
                 
                 P["xobjects", table] = table()
                 
-                P:remove("NULL")
+                P:remove("update")
                 P:remove("state")
                 
                 P["name", string] = P["args", array]:shiftString()
+                
+                if (!PEnabled[P["name", string], number]) {
+                    out("Error: Program \"" + P["name", string] + "\" is not exist.\n")
+                    end()
+                }
             }
             break
     }

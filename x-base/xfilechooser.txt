@@ -4,7 +4,7 @@
 
 @name xfilechooser
 
-P2F["xfilechooser", string] = "xfilechooser"
+PEnabled["xfilechooser", number] = 1
 
 function xfilechooser() {
     switch (P["state", number]) {

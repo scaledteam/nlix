@@ -4,7 +4,7 @@
 
 @name pmid
 
-P2F["pmid", string] = "pmid"
+PEnabled["pmid", number] = 1
 
 function pmid() {
     switch (P["state", number]) {
@@ -13,10 +13,14 @@ function pmid() {
                 out("Usage: pmid [filename]\n")
                 end()
             }
+            elseif (arg(1) == "stop") {
+                soundPurge()
+                end()
+            }
             else {
                 local Program = exec("cat")
                 Program["args", array] = array(arg(1))
-                Program["out", array] = P["in", array] = array()
+                Program["out", array] = P["fileIn", array] = array()
                 
                 P["state", number] = 1
             }
@@ -29,14 +33,14 @@ function pmid() {
             #Program["args", array] = array("/e2shared/mid/your-reality.mid")
             #Program["args", array] = array("/e2shared/mid/4tact_4_4.mid")
             
-            #Program["out", array] = P["in", array] = array()
+            #Program["out", array] = P["fileIn", array] = array()
             
-            P["state", number] = 1
+            #P["state", number] = 1
             break
         
         case 1,
-            if (wait()) {
-                local Data = in()
+            if (P["fileIn", array]:count() > 0) {
+                local Data = P["fileIn", array]:shiftString()
                 
                 if (Data:left(4) == "MThd") {
                     Data = Data:sub(9)
@@ -55,6 +59,8 @@ function pmid() {
                     Data = Data:sub(7)
                     
                     P["data", string] = Data
+                    
+                    out("Write \"stop\" for stop playing.\n")
                     P["state", number] = 2
                 }
                 else {
@@ -98,6 +104,14 @@ function pmid() {
             break
         
         case 3,
+            if (wait()) {
+                if (in() == "stop") {
+                    soundPurge()
+                    end()
+                    break
+                }
+            }
+            
             local Data = P["data", string]
             for (J = 1, Overload) {
                 if (P["state", number] != 3) {

@@ -6,7 +6,7 @@
 
 xmenuAdd("3d", "hluoix3d")
 
-P2F["hluoix3d", string] = "hluoix3d"
+PEnabled["hluoix3d", number] = 1
 
 function hluoix3d() {
     switch (P["state", number]) {

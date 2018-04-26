@@ -4,7 +4,7 @@
 
 @name sh
 
-P2F["sh", string] = "sh"
+PEnabled["sh", number] = 1
 
 function sh() {
     switch (P["state", number]) {
@@ -57,15 +57,6 @@ function sh() {
                         end()
                         break
                     
-                    case "stress",
-                        local P1 = exec("ls") P1["args", array] = array("rdir")
-                        local P2 = exec("ls") P2["args", array] = array("e2shared")
-                        local P3 = exec("ls") P3["args", array] = array("rdir/test")
-                        
-                        P1["out", array] = P2["out", array] = P3["out", array] = P["out", array]
-                        P["state", number] = 1
-                        break
-                    
                     case "tulpacode",
                         out("TuC-0.2.2 S1 EX11-02-13 Tel %C9I10 Sp3 Img.Hum&@.f-22y-M Rls3% W2+ Dr1 XS.i4 RL3@\n")
                         P["state", number] = 1
@@ -78,16 +69,23 @@ function sh() {
                         for (I = 1, Commands:count()) {
                             local CommandExplode = Commands[I, string]:trim():explodeRE(" +")
                             
+                            local ProgramName = CommandExplode:shiftString()
                             if (I == 1) {
-                                Program = exec(CommandExplode:shiftString())
+                                Program = exec(ProgramName)
                                 Program["in", array] = P["in", array]
                             }
                             else {
                                 local PrevProgramOut = array()
                                 Program["out", array] = PrevProgramOut
                                 
-                                Program = exec(CommandExplode:shiftString())
+                                Program = exec(ProgramName)
                                 Program["in", array] = PrevProgramOut
+                            }
+                            
+                            if (Program == NULL) {
+                                out("Program \"" + ProgramName + "\" is not exist.\n")
+                                P["state", number] = 1
+                                break
                             }
                             
                             if (CommandExplode:count() > 0) {

@@ -5,7 +5,7 @@
 @name wget
 
 #ifdef httpRequest(string)
-P2F["wget", string] = "wget"
+PEnabled["wget", number] = 1
 
 function wget() {
     switch (P["state", number]) {

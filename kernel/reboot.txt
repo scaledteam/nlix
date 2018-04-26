@@ -4,7 +4,7 @@
 
 @name reboot
 
-P2F["reboot", string] = "reboot"
+PEnabled["reboot", number] = 1
 
 function reboot() {
     while (Ps:count() > 0) {

@@ -5,7 +5,7 @@
 @name surl
 
 #ifdef soundURLload(string, string, number, number, entity)
-P2F["surl", string] = "surl"
+PEnabled["surl", number] = 1
 
 function surl() {
     local Arg = arg(1)

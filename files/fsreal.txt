@@ -5,7 +5,7 @@
 @name fsreal
 
 #ifdef fileRead()
-P2F["fsreal", string] = "fsreal"
+PEnabled["fsreal", number] = 1
 
 function fsreal() {
     switch (P["state", number]) {

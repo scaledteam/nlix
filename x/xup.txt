@@ -4,7 +4,7 @@
 
 @name xup
 
-P2F["xup", string] = "xup"
+PEnabled["xup", number] = 1
 
 function xup() {
     for (I = 1, Overload) {

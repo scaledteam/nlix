@@ -4,7 +4,7 @@
 
 @name xremove
 
-P2F["xremove", string] = "xremove"
+PEnabled["xremove", number] = 1
 
 function xremove() {
     for (I = 1, Overload) {

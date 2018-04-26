@@ -6,7 +6,7 @@
 
 xmenuAdd("tests", "xids")
 
-P2F["xids", string] = "xids"
+PEnabled["xids", number] = 1
 
 function xids() {
     switch (P["state", number]) {

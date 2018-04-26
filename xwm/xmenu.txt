@@ -7,25 +7,29 @@
 if (!S:exists("xmenu")) {
     S["xmenu", table] = table(
         "exit" = table(
-            "poweroff" = 1,
-            "reboot" = 1,
-            "sh" = 1,
-            "exit" = 1
+            "poweroff" = "poweroff",
+            "reboot" = "reboot",
+            "sh" = "sh",
+            "exit" = "exit"
         )
     )
 }
 
-function xmenuAdd(Category:string, ProgramName:string) {
+function xmenuAdd(Category:string, ProgramName:string, FunctionName:string) {
     if (S["xmenu", table]:exists(Category)) {
-        S["xmenu", table][Category, table][ProgramName, number] = 1
+        S["xmenu", table][Category, table][ProgramName, string] = FunctionName
     }
     else {
         S["xmenu", table][Category, table] = table()
-        S["xmenu", table][Category, table][ProgramName, number] = 1
+        S["xmenu", table][Category, table][ProgramName, string] = FunctionName
     }
 }
 
-P2F["xmenu", string] = "xmenu"
+function xmenuAdd(Category:string, ProgramName:string) {
+    xmenuAdd(Category, ProgramName, ProgramName)
+}
+
+PEnabled["xmenu", number] = 1
 
 function xmenu() {
     switch (P["state", number]) {
@@ -69,7 +73,8 @@ function xmenu() {
                 if (inrange(Cursor - P["pos", vector2], vec2(), P["menu", table]["size", vector2]) & PosN != P["posNOld", number]) {
                     P["posNOld", number] = PosN
                     
-                    local List = S["xmenu", table][P["categories", array][PosN, string], table]:keys()
+                    P["programTable", table] = S["xmenu", table][P["categories", array][PosN, string], table]
+                    local List = P["programTable", table]:keys()
                     P["programList", array] = List
                     
                     local MenuWidth = 0
@@ -93,7 +98,7 @@ function xmenu() {
                     elseif (inrange(Cursor - P["submenu", table]["pos", vector2], vec2(), P["submenu", table]["size", vector2])) {
                         local PosN = int((Cursor[2] - P["submenu", table]["pos", vector2][2]) / 20) + 1
                         
-                        out(P["programList", array][PosN, string])
+                        out(P["programTable", table][P["programList", array][PosN, string], string])
                         end()
                     }
                     else {

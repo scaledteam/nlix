@@ -2,9 +2,9 @@
 # Created by scaled
 #
 
-@name perf
+@name setperf
 
-P2F["perf", string] = "setperf"
+PEnabled["setperf", number] = 1
 
 function setperf() {
     if (args() < 1) {

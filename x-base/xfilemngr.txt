@@ -6,7 +6,7 @@
 
 xmenuAdd("base", "xfilemngr")
 
-P2F["xfilemngr", string] = "xfilemngr"
+PEnabled["xfilemngr", number] = 1
 
 function xfilemngr() {
     switch (P["state", number]) {

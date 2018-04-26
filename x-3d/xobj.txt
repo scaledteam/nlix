@@ -6,7 +6,7 @@
 
 xmenuAdd("3d", "xobj")
 
-P2F["xobj", string] = "xobj"
+PEnabled["xobj", number] = 1
 
 function xobj() {
     switch (P["state", number]) {

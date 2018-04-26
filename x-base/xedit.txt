@@ -6,7 +6,7 @@
 
 xmenuAdd("base", "xedit")
 
-P2F["xedit", string] = "xedit"
+PEnabled["xedit", number] = 1
 
 function xedit() {
     switch (P["state", number]) {

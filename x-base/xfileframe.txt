@@ -4,7 +4,7 @@
 
 @name xfileframe
 
-P2F["xfileframe", string] = "xfileframe"
+PEnabled["xfileframe", number] = 1
 
 function xfileframe() {
     switch (P["state", number]) {

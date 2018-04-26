@@ -4,7 +4,7 @@
 
 @name xcreate
 
-P2F["xcreate", string] = "xcreate"
+PEnabled["xcreate", number] = 1
 
 function xcreate() {
     for (I = 1, Overload) {

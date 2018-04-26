@@ -3,19 +3,23 @@
 #
 
 @name libkernel
-
-NULL = table()
+@persist NULL:table
 
 function table exec(Name:string) {
-    if (P) {
-        Program = table("name" = Name, "parent" = P)
+    if (PEnabled[Name, number]) {
+        if (P) {
+            Program = table("name" = Name, "parent" = P)
+        }
+        else {
+            Program = table("name" = Name)
+        }
+        Ps:pushTable(Program)
+        
+        return Program
     }
     else {
-        Program = table("name" = Name)
+        return NULL
     }
-    Ps:pushTable(Program)
-    
-    return Program
 }
 
 function end() {
@@ -39,10 +43,8 @@ function programUp() {
 }
 
 function table:execNow() {
-    if (P2F:exists(P["name", string])) {
-        local Super = P
-        P = Program
-        P2F[P["name", string], string]()
-        P = Super
-    }
+    local Super = P
+    P = Program
+    P["name", string]()
+    P = Super
 }

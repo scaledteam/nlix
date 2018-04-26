@@ -4,9 +4,9 @@
 
 @name xwm-cmd
 
-xmenuAdd("xwm", "xwm-cmd")
+xmenuAdd("xwm", "xwmcmd")
 
-P2F["xwm-cmd", string] = "xwmcmd"
+PEnabled["xwmcmd", number] = 1
 
 function xwmcmd() {
     switch (P["state", number]) {
@@ -37,7 +37,6 @@ function xwmcmd() {
                     P["text", table]:xtext(P["text", table]["text", string]:sub(1, -2))
                 }
                 elseif (In == "\n") {
-                    #P["text", table]:xtext("> ")
                     end()
                 }
                 elseif (In == TERM_ERASE) {

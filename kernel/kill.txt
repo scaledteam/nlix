@@ -4,7 +4,7 @@
 
 @name kill
 
-P2F["kill", string] = "kill"
+PEnabled["kill", number] = 1
 
 function kill() {
     if (args() < 1) {

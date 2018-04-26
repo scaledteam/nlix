@@ -304,12 +304,14 @@ function table xxdaemon(Name:string) {
 function table table:xexec(ProgramName:string) {
     local Program = exec(ProgramName)
     
-    Program["xparam", table] = P["xparam", table]
-    Program["xdevice", wirelink] = P["xdevice", wirelink]
-    Program["xobjectsAll", table] = P["xobjectsAll", table]
-    
-    Program["xframe", table] = This
-    Program["xobjects", table] = table()
+    if (Program != NULL) {
+        Program["xparam", table] = P["xparam", table]
+        Program["xdevice", wirelink] = P["xdevice", wirelink]
+        Program["xobjectsAll", table] = P["xobjectsAll", table]
+        
+        Program["xframe", table] = This
+        Program["xobjects", table] = table()
+    }
     
     return Program
 }

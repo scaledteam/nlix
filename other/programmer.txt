@@ -5,7 +5,7 @@
 @name programmer
 
 #ifdef entity:remoteSetCode(string)
-P2F["programmer", string] = "programmer"
+PEnabled["programmer", number] = 1
 
 function programmer() {
     switch (P["state", number]) {

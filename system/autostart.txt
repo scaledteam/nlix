@@ -7,5 +7,5 @@
 if (!Ps) {
     exec("hotplugd")
     exec("autoperf")
-    exec("auto-ws")
+    exec("autows")
 }

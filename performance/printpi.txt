@@ -2,9 +2,9 @@
 # Created by scaled
 #
 
-@name print-pi
+@name printpi
 
-P2F["print-pi", string] = "printpi"
+PEnabled["printpi", number] = 1
 
 function printpi() { 
     switch (P["state", number]) {

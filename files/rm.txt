@@ -4,7 +4,7 @@
 
 @name rm
 
-P2F["rm", string] = "rm"
+PEnabled["rm", number] = 1
 
 function rm() {
     switch (P["state", number]) {

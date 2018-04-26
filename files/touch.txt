@@ -4,7 +4,7 @@
 
 @name touch
 
-P2F["touch", string] = "touch"
+PEnabled["touch", number] = 1
 
 function touch() {
     switch (P["state", number]) {

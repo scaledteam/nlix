@@ -4,22 +4,33 @@
 
 @name ssh
 
-P2F["ssh", string] = "ssh"
+PEnabled["ssh", number] = 1
 
 function ssh() {
     switch (P["state", number]) {
         case 0,
             if (deviceGet("nlix")) {
-                local Program = table("name" = "sh")
-                P["program", table] = Program
-                Program["parent", table] = P
+                local ProgramName = "sh"
+                if (args() >= 1) {
+                    ProgramName = arg(1)
+                }
                 
-                Program["in", array] = P["in", array]
-                Program["out", array] = P["out", array]
-                
-                P["device", wirelink]["S", table]["Ps", table]:pushTable(Program)
-                
-                P["state", number] = 1
+                if (P["device", wirelink]["S", table]["PEnabled", table][ProgramName, number] | arg(2) == "force") {
+                    local Program = table("name" = ProgramName)
+                    P["program", table] = Program
+                    Program["parent", table] = P
+                    
+                    Program["in", array] = P["in", array]
+                    Program["out", array] = P["out", array]
+                    
+                    P["device", wirelink]["S", table]["Ps", table]:pushTable(Program)
+                    
+                    P["state", number] = 1
+                }
+                else {
+                    out("Program \"" + P["name", string] + "\" is not exist on remove chip\n")
+                    end()
+                }
             }
             else {
                 out("Error: nlix chip is not connected.\n")

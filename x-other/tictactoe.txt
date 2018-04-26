@@ -2,11 +2,11 @@
 # Created by scaled
 #
 
-@name tic-tac-toe
+@name tic tac toe
 
-xmenuAdd("games", "tic-tac-toe")
+xmenuAdd("games", "tic tac toe", "tictactoe")
 
-P2F["tic-tac-toe", string] = "tictactoe"
+PEnabled["tictactoe", number] = 1
 
 function tictactoe() {
     switch (P["state", number]) {

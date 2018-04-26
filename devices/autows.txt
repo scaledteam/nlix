@@ -4,10 +4,10 @@
 
 @name auto-ws
 
-P2F["auto-ws", string] = "autows"
+PEnabled["autows", number] = 1
 
 function autows() {
-    if (P2F:exists("xwm")) {
+    if (PEnabled["xwm", number]) {
         if (S["devices", table]:exists("gmod_wire_egp")) {
             local Program = exec("xwm")
             Program:remove("parent")
@@ -16,7 +16,7 @@ function autows() {
         }
     }
     
-    if (P2F:exists("sh")) {
+    if (PEnabled["sh", number]) {
         if (
             (
                 S["devices", table]:exists("gmod_wire_textscreen")

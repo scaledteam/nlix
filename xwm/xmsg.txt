@@ -4,7 +4,7 @@
 
 @name xmsg
 
-P2F["xmsg", string] = "xmsg"
+PEnabled["xmsg", number] = 1
 
 function xmsg() {
     switch (P["state", number]) {

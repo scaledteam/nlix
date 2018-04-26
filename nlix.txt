@@ -3,7 +3,7 @@
 #
 
 @name nlix
-@persist [P2F Ps P]:table KPerf KState PName:string
+@persist [PEnabled Ps P]:table KPerf KState
 @trigger none
 
 if (!tickClk()) {
@@ -19,14 +19,10 @@ if (!tickClk()) {
                 case 3, #include "nlix/system/liboverload" break
                 case 4, #include "nlix/system/system-memory" break
                 
-                # Init
-                #case 5, SYSTEM_NAME = "system0" #include "nlix/system/sync" break
-                case 6, #include "nlix/system/autostart" break
-                
                 # Devices
                 case 10, #include "nlix/devices/libdevices" break
                 case 11, #include "nlix/devices/hotplugd" break
-                case 12, #include "nlix/devices/auto-ws" break
+                case 12, #include "nlix/devices/autows" break
                 case 13, #include "nlix/devices/dlist" break
                 case 14, #include "nlix/devices/devcmd" break
                 case 15, #include "nlix/devices/dremove" break
@@ -49,10 +45,10 @@ if (!tickClk()) {
                 
                 # Performance
                 case 40, #include "nlix/performance/autoperf" break
-                case 41, #include "nlix/performance/perf" break
+                case 41, #include "nlix/performance/setperf" break
                 case 42, #include "nlix/performance/overload" break
                 case 43, #include "nlix/performance/uptime" break
-                case 44, #include "nlix/performance/print-pi" break
+                case 44, #include "nlix/performance/printpi" break
                 
                 # Files
                 case 50, #include "nlix/files/libfs" break
@@ -89,7 +85,7 @@ if (!tickClk()) {
                 case 81, #include "nlix/xwm/xwm" break
                 case 82, #include "nlix/xwm/xpanel" break
                 case 83, #include "nlix/xwm/xmsg" break
-                case 84, #include "nlix/xwm/xwm-cmd" break
+                case 84, #include "nlix/xwm/xwmcmd" break
                 
                 # x base
                 case 85, #include "nlix/x-base/xfilemngr" break
@@ -113,15 +109,19 @@ if (!tickClk()) {
                 case 100, #include "nlix/x-other/speedometer" break
                 case 101, #include "nlix/x-other/radar" break
                 case 102, #include "nlix/x-other/clicker" break
-                case 103, #include "nlix/x-other/spirit-level" break
+                case 103, #include "nlix/x-other/spiritlevel" break
                 case 104, #include "nlix/x-other/xvnc" break
-                case 105, #include "nlix/x-other/tic-tac-toe" break
+                case 105, #include "nlix/x-other/tictactoe" break
                 
                 # Place for your first programs
                 #case 110, #include "nlix/other/myprogram" break
                 
+                # Init
+                #case 120, SYSTEM_NAME = "system0" #include "nlix/system/sync" break
+                case 121, #include "nlix/system/autostart" break
+                
                 # Move to execute state
-                case 120, KState = 1 runOnTick(1) exit() break
+                case 122, KState = 1 runOnTick(1) exit() break
                 default,
             }
         }
@@ -135,52 +135,39 @@ if (!tickClk()) {
     }
 }  
 else {
+    NULL:clear()
+    
     while (perf(KPerf)) {
         # Counter
-        if (KState >= Ps:count()) {
-            KState = 1
-        }
-        else {
-            KState++
-        }
+        KState = KState % Ps:count() + 1
         
         # Program memory
         P = Ps[KState, table]
         
-        # Clear if parent killed
-        if (!P["parent", table] & P:exists("parent")) {
-            P:clear()
-            Ps:remove(KState)
-            KState--
-            continue
-        }
-        
-        # Program name
-        PName = P["name", string]
-        
-        # If exist binary (function)
-        if (P2F:exists(PName)) {
-            P2F[PName, string]()
-        }
-        # If program is not valid
-        elseif (!P) {
-            # If all programs is not valid
-            if (!Ps) {
-                runOnTick(0)
-                break
+        # Program is alive
+        if (P) {
+            # Clear if parent killed
+            if (!P["parent", table] & P:exists("parent")) {
+                P:clear()
+                Ps:remove(KState)
+                KState--
+                continue
             }
+            
+            P["name", string]()
+        }
+        # If program is dead
+        else {
             # If one program is not valid
-            else {
+            if (Ps) {
                 Ps:remove(KState)
                 KState--
             }
-        }
-        # If wrong name
-        else {
-            out("Program \"" + PName + "\" is not exist.\n")
-            P:clear()
-            Ps:remove(KState)
-            KState--
+            # If all programs is not valid
+            else {
+                runOnTick(0)
+                break
+            }
         }
     }
 }

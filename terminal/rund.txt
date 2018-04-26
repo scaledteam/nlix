@@ -4,7 +4,7 @@
 
 @name rund
 
-P2F["rund", string] = "rund"
+PEnabled["rund", number] = 1
 
 function rund() { 
     if (args() < 1) {

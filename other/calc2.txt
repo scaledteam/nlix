@@ -4,7 +4,7 @@
 
 @name calc2
 
-P2F["calc2", string] = "calc2"
+PEnabled["calc2", number] = 1
 
 function calc2() { 
     switch (P["state", number]) {

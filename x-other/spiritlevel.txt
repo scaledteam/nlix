@@ -2,11 +2,11 @@
 # Created by scaled
 #
 
-@name spirit-level
+@name spirit level
 
-xmenuAdd("real", "spirit-level")
+xmenuAdd("real", "spirit level", "spiritlevel")
 
-P2F["spirit-level", string] = "spiritlevel"
+PEnabled["spiritlevel", number] = 1
 
 function spiritlevel() {
     switch (P["state", number]) {

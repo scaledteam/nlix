@@ -6,7 +6,7 @@
 
 xmenuAdd("xwm", "xwm")
 
-P2F["xwm", string] = "xwm"
+PEnabled["xwm", number] = 1
 
 function xwm() {
     switch (P["state", number]) {
@@ -330,9 +330,14 @@ function xwm() {
                 P["programs", table]:unshiftTable(Program)
                 P["frames", table]:unshiftTable(Frame)
                 
-                Program["args", array] = P:removeArray("commandExp")
-                Program["out", array] = P["xmsg", array]
-                Program["kbd", array] = array()
+                if (Program != NULL) {
+                    Program["args", array] = P:removeArray("commandExp")
+                    Program["out", array] = P["xmsg", array]
+                    Program["kbd", array] = array()
+                }
+                else {
+                    P["xmsg", array]:pushString("Error: Program \"" + P["tempProgramName", string] + "\" is not exist.")
+                }
                 
                 P["focus", number] = P["programs", table]:count()
                 

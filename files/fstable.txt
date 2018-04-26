@@ -4,7 +4,7 @@
 
 @name fstable
 
-P2F["fstable", string] = "fstable"
+PEnabled["fstable", number] = 1
 
 function fstable() {
     if (P["fs", table]:exists("table")) {

@@ -4,7 +4,7 @@
 
 @name cp
 
-P2F["cp", string] = "cp"
+PEnabled["cp", number] = 1
 
 function cp() { 
     switch (P["state", number]) {

@@ -4,7 +4,7 @@
 
 @name cat
 
-P2F["cat", string] = "cat"
+PEnabled["cat", number] = 1
 
 function cat() { 
     switch (P["state", number]) {

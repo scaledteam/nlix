@@ -4,11 +4,11 @@
 
 @name xres
 
-xmenuAdd("tests", "xres")
+xmenuAdd("tests", "xres", "xrestest")
 
-P2F["xres", string] = "xresTest"
+PEnabled["xrestest", number] = 1
 
-function xresTest() {
+function xrestest() {
     switch (P["state", number]) {
         case 0,
             if (xcanCreate(3)) {

@@ -6,7 +6,7 @@
 
 xmenuAdd("tests", "xeyes")
 
-P2F["xeyes", string] = "xeyes"
+PEnabled["xeyes", number] = 1
 
 function xeyes() {
     switch (P["state", number]) {

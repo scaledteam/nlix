@@ -6,7 +6,7 @@
 
 xmenuAdd("real", "speedometer")
 
-P2F["speedometer", string] = "speedometer"
+PEnabled["speedometer", number] = 1
 
 function speedometer() {
     switch (P["state", number]) {

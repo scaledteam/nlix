@@ -4,7 +4,7 @@
 
 @name kbd
 
-P2F["kbd", string] = "kbd"
+PEnabled["kbd", number] = 1
 
 function kbd() {
     switch (P["state", number]) {

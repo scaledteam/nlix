@@ -6,7 +6,7 @@
 
 S["startTime", number] = systime()
 
-P2F["uptime", string] = "uptime"
+PEnabled["uptime", number] = 1
 
 function uptime() {
     local Uptime = systime() - S["startTime", number]

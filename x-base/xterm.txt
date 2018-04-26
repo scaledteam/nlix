@@ -6,7 +6,7 @@
 
 xmenuAdd("base", "xterm")
 
-P2F["xterm", string] = "xterm"
+PEnabled["xterm", number] = 1
 
 function xterm() {
     switch (P["state", number]) {

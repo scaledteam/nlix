@@ -9,7 +9,7 @@
 @persist [HotplugdPortsOld]:array HotplugdCounter
 PORTS_COUNT = 4
 
-P2F["hotplugd", string] = "hotplugd"
+PEnabled["hotplugd", number] = 1
 
 function hotplugd() {
     # hot plug

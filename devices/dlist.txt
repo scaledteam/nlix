@@ -4,7 +4,7 @@
 
 @name dlist
 
-P2F["dlist", string] = "dlist"
+PEnabled["dlist", number] = 1
 
 function dlist() {
     local List = ""

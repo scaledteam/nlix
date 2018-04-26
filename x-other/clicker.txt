@@ -8,7 +8,7 @@
 
 xmenuAdd("games", "clicker")
 
-P2F["clicker", string] = "clicker"
+PEnabled["clicker", number] = 1
 
 function clicker() {
     switch (P["state", number]) {

@@ -4,7 +4,7 @@
 
 @name devcmd
 
-P2F["devcmd", string] = "devcmd"
+PEnabled["devcmd", number] = 1
 
 function devcmd() {
     switch (P["state", number]) {

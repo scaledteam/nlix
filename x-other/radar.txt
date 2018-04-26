@@ -7,7 +7,7 @@
 #ifdef findInSphere(vector, number)
 xmenuAdd("real", "radar")
 
-P2F["radar", string] = "radar"
+PEnabled["radar", number] = 1
 
 function radar() {
     switch (P["state", number]) {
