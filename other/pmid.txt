@@ -6,11 +6,6 @@
 
 P2F["pmid", string] = "pmid"
 
-function soundFreq(Id, Duration, Frequensy) {
-    soundPlay(Id, Duration, "synth/square_1760.wav")
-    soundPitch(Id, Frequensy / 1760 * 128)
-}
-
 function pmid() {
     switch (P["state", number]) {
         case 0,
@@ -25,6 +20,18 @@ function pmid() {
                 
                 P["state", number] = 1
             }
+            
+            #local Program = exec("cat")
+            
+            #Program["args", array] = array("/e2shared/mid/bach-bourree.mid")
+            #Program["args", array] = array("/e2shared/mid/castle-complete.mid")
+            #Program["args", array] = array("/e2shared/mid/game-over.mid")
+            #Program["args", array] = array("/e2shared/mid/your-reality.mid")
+            #Program["args", array] = array("/e2shared/mid/4tact_4_4.mid")
+            
+            #Program["out", array] = P["in", array] = array()
+            
+            P["state", number] = 1
             break
         
         case 1,
@@ -101,6 +108,7 @@ function pmid() {
                     case 0,
                         local Time = 0
                         
+                        local SuccesTime = 0
                         for (I = 1, 4) {
                             local Input = toByte(Data[I])
                             
@@ -108,8 +116,13 @@ function pmid() {
                             
                             if ((Input >> 7) == 0) {
                                 Data = Data:sub(1 + I)
+                                SuccesTime = 1
                                 break
                             }
+                        }
+                        
+                        if (!SuccesTime) {
+                            out("Error: Time fail.\n")
                         }
                         
                         if (Time < 500) {
@@ -126,15 +139,16 @@ function pmid() {
                             local Event = Command >> 4
                             local Channel = Command && 0xF
                             
+                            local Skip = 0
+                            
                             switch (Event) {
                                 # 1-level event 
                                 ## Up note
                                 case 0x8,
                                     local Note = toByte(Data[1])
-                                    local Dynamic = toByte(Data[2])
-                                    #soundFreq((Channel << 8) + (Note << 16), 100, ((Note - 30) * 0.3) ^ 2 * 1.2)
-                                    soundFreq((Channel << 8) + (Note << 16), 100, 8.175 * 2 ^ (Note / 12))
-                                    #out(((Channel << 8) + (Note << 16)) + "\n")
+                                    local Velocity = toByte(Data[2])
+                                    
+                                    soundStop((Channel << 8) + (Note << 16))
                                     
                                     Data = Data:sub(3)
                                     break
@@ -142,9 +156,15 @@ function pmid() {
                                 ## Down note
                                 case 0x9,
                                     local Note = toByte(Data[1])
-                                    local Dynamic = toByte(Data[2])
+                                    local Velocity = toByte(Data[2])
                                     
-                                    soundStop((Channel << 8) + (Note << 16))
+                                    local Id = (Channel << 8) + (Note << 16)
+                                    soundPlay(Id, 100, "synth/square_1760.wav")
+                                    #soundPlay(Id, 100, "synth/sine_1760.wav")
+                                    #soundPlay(Id, 100, "synth/triangle_1760.wav")
+                                    
+                                    soundPitch(Id, (8.175 * 2 ^ (Note / 12)) * 100 / 1760)
+                                    soundVolume(Id, Velocity / 128)
                                     
                                     Data = Data:sub(3)
                                     break
@@ -152,7 +172,7 @@ function pmid() {
                                 # Change
                                 case 0xA,
                                     local Note = toByte(Data[1])
-                                    local Dynamic = toByte(Data[2])
+                                    local Velocity = toByte(Data[2])
                                     Data = Data:sub(3)
                                     # Ignore
                                     break
@@ -172,7 +192,7 @@ function pmid() {
                                 # Change canal force
                                 case 0xD,
                                     local Force = toByte(Data[1])
-                                    print(Force)
+                                    out("Force: " + Force + "\n")
                                     #soundVolume((Channel << 8) + (Note << 16), Force)
                                     
                                     Data = Data:sub(2)
@@ -185,52 +205,54 @@ function pmid() {
                                     # Ignore
                                     break
                                 
-                                # Meta
-                                case 0xF,
-                                    if (Channel == 0xF) {
+                                default,
+                                    # Meta
+                                    if (Command == 0xFF) {
                                         local Mode = toByte(Data[1])
                                         
-                                        if (inrange(Mode, 0x00, 0x07)) {
-                                            Data = Data:sub(3 + toByte(Data[2]))
+                                        switch (Mode) {
+                                            case 0x00,
+                                                break
+                                            
+                                            case 0x01, case 0x02, case 0x03, case 0x04, case 0x05, case 0x06, case 0x07,
+                                                out(Data:sub(3, 2 + toByte(Data[2])) + "\n")
+                                                break
+                                            
+                                            case 0x20, case 0x21,
+                                                break
+                                            
+                                            case 0x2F,
+                                                out("End of block.\n")
+                                                
+                                                soundPurge()
+                                                P["state", number] = 2
+                                                break
+                                            
+                                            case 0x51, case 0x54, case 0x58, case 0x59, case 0x7F,
+                                                break
+                                            
+                                            default,
+                                                out("Unknown mode " + Mode:toString(16) + "\n")
                                         }
-                                        else {
-                                            switch (Mode) {
-                                                case 0x20, case 0x21,
-                                                    Data = Data:sub(4)
-                                                    break
-                                                
-                                                case 0x51, case 0x59,
-                                                    Data = Data:sub(5)
-                                                    break
-                                                
-                                                case 0x54,
-                                                    Data = Data:sub(8)
-                                                    break
-                                                
-                                                case 0x58,
-                                                    Data = Data:sub(7)
-                                                    break
-                                                
-                                                case 0x2F,
-                                                    Data = Data:sub(3)
-                                                    out("End of block.\n")
-                                                    
-                                                    soundPurge()
-                                                    P["state", number] = 2
-                                                    break
-                                                
-                                                default,
-                                                    out("Unknown command " + Command:toString(16) + "\n")
-                                            }
-                                        }
+                                        Data = Data:sub(3 + toByte(Data[2]))
                                     }
-                                    break
-                                
-                                default,
-                                    out("Unknown command " + Command:toString(16) + "\n")
+                                    
+                                    # SysEx
+                                    elseif (Command == 0xF0 | Command == 0xF7) {
+                                        out("SysEx\n")
+                                        Data = Data:sub(2 + toByte(Data[1]))
+                                    }
+                                    
+                                    # unknown
+                                    else {
+                                        out("Unknown command " + Command:toString(16) + "\n")
+                                        Skip = 1
+                                    }
                             }
                             
-                            P["substate", number] = 0
+                            if (!Skip) {
+                                P["substate", number] = 0
+                            }
                         }
                         break
                 }

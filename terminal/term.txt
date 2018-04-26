@@ -52,7 +52,8 @@ function term() {
                 Device:egpTextLayout(1, P["text", string], vec2(), vec2(512))
                 Device:egpFont(1, "Courier New")
                 
-                P["resolution", vector2] = vec2(56, 28)
+                #P["resolution", vector2] = vec2(56, 28)
+                P["resolution", vector2] = vec2(52, 28)
                 P["deviceType", string] = "gmod_wire_egp"
                 
                 P["state", number] = 2
