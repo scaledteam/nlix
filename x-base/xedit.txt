@@ -26,9 +26,15 @@ function xedit() {
                 
                 P["text", table] = xcreate("textLayout"):xsize(Res - vec2(0, 10)):xpos(vec2(0, 10)):xsize(10):xcolor(vec())
                 
-                P["in", array] = array()
-                
-                P["state", number] = 1
+                if (args() >= 1) {
+                    P["path", string] = arg(1)
+                    P["in", array] = array(P["path", string])
+                    P["state", number] = 3
+                }
+                else {
+                    P["in", array] = array()
+                    P["state", number] = 1
+                }
             }
             break
         
@@ -45,7 +51,6 @@ function xedit() {
                         P["state", number] = 2
                     }
                     elseif (P["button-save", table]:xinrange()) {
-                        P["parent", table]["in", array]:pushString("xfilechooser")
                         P["state", number] = 5
                     }
                 }
@@ -97,6 +102,7 @@ function xedit() {
             }
             break
         
+        
         # load
         case 2,
             if (P["parent", table]["programs", table][1, table]["name", string] == "xfilechooser") {
@@ -109,9 +115,8 @@ function xedit() {
         
         case 3,
             if (wait()) {
-                local Cat = exec("cat")
-                Cat["args", array] = array(in())
-                Cat["out", array] = P["in", array]
+                P["path", string] = in()
+                fread(P["path", string])
                 P["state", number] = 4
             }
             elseif (!P["xfilechooser", table]) {
@@ -120,41 +125,30 @@ function xedit() {
             break
         
         case 4,
-            if (wait()) {
-                P["text", table]:xtext(in())
-                in()
+            if (fwait()) {
+                P["text", table]:xtext(fin())
                 P["state", number] = 1
             }
             break
         
+        
         # save
         case 5,
-            if (P["parent", table]["programs", table][1, table]["name", string] == "xfilechooser") {
-                P["xfilechooser", table] = P["parent", table]["programs", table][1, table]
-                P["xfilechooser", table]["out", array] = P["in", array]
+            if (P["path", string] != "") {
+                fwrite(P["path", string], P["text", table]["text", string])
                 
                 P["state", number] = 6
+            }
+            else {
+                out("File is not opened.")
+                
+                P["state", number] = 1
             }
             break
         
         case 6,
-            if (wait()) {
-                local Touch = exec("touch")
-                Touch["args", array] = array(in())
-                in()
-                Touch["in", array] = array(P["text", table]["text", string])
-                Touch["out", array] = P["in", array]
-                
-                P["state", number] = 7
-            }
-            elseif (!P["xfilechooser", table]) {
-                P["state", number] = 1
-            }
-            break
-        
-        case 7,
-            if (wait()) {
-                local In = in()
+            if (fwait()) {
+                local In = fin()
                 if (In != "") {
                     out(In)
                 }

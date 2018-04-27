@@ -4,14 +4,25 @@
 
 @name libfs
 
-function number fsCall(Mode:string, Path:string) {
-    # Add first slash if not added
-    if (Path[1] != "/") {
-        Path = "/" + Path
+function string string:toAbsoletePath(Context:string) {
+    if (This[1] != "/") {
+        if (Context != "") {
+            return Context + This
+        }
+        else {
+            return "/" + This
+        }
     }
+    else {
+        return This
+    }
+}
+
+function number fsCall(Mode:string, Path:string) {
+    Path = Path:toAbsoletePath(P["parent", table]["pwd", string])
     
     # Remove last slash if it has
-    if (Path[Path:length()] == "/") {
+    if (Path:right(1) == "/") {
         Path = Path:sub(1, -2)
     }
     
@@ -42,4 +53,36 @@ function number fsCall(Mode:string, Path:string) {
     }
     
     return 0
+}
+
+
+function fread(Path:string) {
+    local Cat = exec("cat")
+    Cat["args", array] = array(Path)
+    
+    Cat["out", array] = P["fin", array] = array()
+}
+
+function flist(Path:string) {
+    local Ls = exec("ls")
+    Ls["args", array] = array(Path)
+    
+    Ls["out", array] = P["fin", array] = array()
+}
+
+function string fwrite(Path:string, Data:string) {
+    local Touch = exec("touch")
+    Touch["args", array] = array(Path)
+    Touch["in", array] = array(Data)
+    
+    Touch["out", array] = P["fin", array] = array()
+}
+
+
+function number fwait() {
+    return P["fin", array]:count() > 0
+}
+
+function string fin() {
+    return P["fin", array]:shiftString()
 }

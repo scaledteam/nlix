@@ -11,17 +11,20 @@ PEnabled["xfilemngr", number] = 1
 function xfilemngr() {
     switch (P["state", number]) {
         case 0,
-            if (xcanCreate(4)) {
+            if (xcanCreate(6)) {
                 local Res = xres()
-                
-                xcreate("box"):xsize(Res):xcolor(vec(90, 90, 180))
-                xcreate("text"):xpos(vec2(0, Res[2] - 20)):xtext("place for buttons")
                 
                 local Size = Res * vec2(0.5, 1) - vec2(0, 20)
                 P[0, table] = xexec("xfileframe", vec2(), Size)
                 
                 local Pos = vec2(Res[1] / 2, 0)
                 P[1, table] = xexec("xfileframe", Pos, Size)
+                
+                local PosY = Res[2] - 20
+                P["buttons", table] = xcreate("box"):xpos(vec2(0, PosY)):xsize(vec2(Res[1], 20)):xcolor(vec(90, 90, 180))
+                xcreate("text"):xpos(vec2(Res[1] * 0 / 3, PosY)):xtext("cp ->")
+                xcreate("text"):xpos(vec2(Res[1] * 1 / 3, PosY)):xtext("cp <-")
+                xcreate("text"):xpos(vec2(Res[1] * 2 / 3, PosY)):xtext("open")
                 
                 P["in", array] = array()
                 
@@ -31,8 +34,46 @@ function xfilemngr() {
         
         case 1,
             if (xcanDraw()) {
+                local Res = xres()
+                
                 local Cursor = xcursor()
                 local Use = xkeyUse()
+                
+                if (Use != P["useOld", number]) {
+                    P["useOld", number] = Use
+                    
+                    if (Use) {
+                        if (P["buttons", table]:xinrange()) {
+                            local Path0 = P[0, table]["path", string]
+                            if (P[0, table]:exists("pathOk")) {
+                                Path0 = P[0, table]["pathOk", string]
+                            }
+                            
+                            local Path1 = P[1, table]["path", string]
+                            if (P[1, table]:exists("pathOk")) {
+                                Path1 = P[1, table]["pathOk", string]
+                            }
+                            
+                            # cp ->
+                            if (inrange(Cursor[1], Res[1] * 0 / 3, Res[1] * 1 / 3)) {
+                                local Program = exec("cp")
+                                Program["args", array] = array(Path0, Path1)
+                            }
+                            # cp <-
+                            elseif (inrange(Cursor[1], Res[1] * 1 / 3, Res[1] * 2 / 3)) {
+                                local Program = exec("cp")
+                                Program["args", array] = array(Path1, Path0)
+                            }
+                            # open
+                            else {
+                                P["parent", table]["in", array]:pushString("xedit " + select(P["focus", number], Path0, Path1))
+                            }
+                        }
+                        else {
+                            P["focus", number] = Cursor[1] > Res[1] / 2
+                        }
+                    }
+                }
             }
             break
     }

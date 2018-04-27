@@ -37,16 +37,13 @@ function xfileframe() {
                 P["chooseBox", table]:xalpha(0)
             }
             
-            local Ls = exec("ls")
-            Ls["args", array] = array(P["path", string])
-            Ls["out", array] = P["in", array]
+            flist(P["path", string])
             P["state", number] = 2
             break
         
         case 2,
-            if (wait()) {
-                local ListString = P["path", string] == "/" ? in() : "..\n" + in()
-                in()
+            if (fwait()) {
+                local ListString = P["path", string] == "/" ? fin() : "..\n" + fin()
                 
                 P["listArray", array] = ListString:explode("\n")
                 P["list", table]:xtext(ListString)

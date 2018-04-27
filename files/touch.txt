@@ -19,7 +19,7 @@ function touch() {
             break
         
         case 1,
-            if (fsCall("write", P["parent", table]["pwd", string] + arg(1))) {
+            if (fsCall("write", arg(1))) {
                 P["fs", table]["in", array] = array(in())
                 P["in", array] = P["fs", table]["out", array] = array()
                 

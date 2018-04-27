@@ -19,7 +19,7 @@ function cat() {
             break
         
         case 1,
-            if (fsCall("read", P["parent", table]["pwd", string] + arg(1))) {
+            if (fsCall("read", arg(1))) {
                 P["in", array] = P["fs", table]["out", array] = array()
                 P["state", number] = 2
             }

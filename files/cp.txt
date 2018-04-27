@@ -14,29 +14,21 @@ function cp() {
                 end()
             }
             else {
-                P["pathFrom", string] = arg(1)
+                P["pathFrom", string] = arg(1):toAbsoletePath(P["parent", table]["pwd", string])
+                P["pathTo", string] = arg(2):toAbsoletePath(P["parent", table]["pwd", string])
                 
                 if (P["pathFrom", string]:right(1) != "/") {
-                    P["pathTo", string] = arg(2)
-                    
                     if (P["pathTo", string]:right(1) == "/") {
                         P["pathTo", string] = P["pathTo", string] + P["pathFrom", string]:explode("/"):popString()
                     }
                     
-                    local Program = exec("cat")
-                    Program["args", array] = array(P["pathFrom", string])
-                    P["in", array] = Program["out", array] = array()
+                    fread(P["pathFrom", string])
                     P["state", number] = 1
                 }
                 else {
-                    P["pathTo", string] = arg(2)
-                    
                     if (P["pathTo", string]:right(1) == "/") {
-                        local Program = exec("ls")
-                        Program["args", array] = array(P["pathFrom", string])
-                        P["in", array] = Program["out", array] = array()
+                        flist(P["pathFrom", string])
                         
-                        P["childrens", table] = table()
                         P["state", number] = 3
                     }
                     else {
@@ -48,28 +40,23 @@ function cp() {
         
         # one object
         case 1,
-            if (wait()) {
-                local Program = exec("touch")
-                Program["args", array] = array(P["pathTo", string])
-                Program["in", array] = array(in())
-                
-                P["in", array] = Program["out", array] = array()
+            if (fwait()) {
+                fwrite(P["pathTo", string], fin())
                 P["state", number] = 2
             }
             break
         
         case 2,
-            if (wait()) {
-                out(in())
+            if (fwait()) {
+                out(fin())
                 end()
             }
             break
         
         # recursive
         case 3,
-            if (wait()) {
-                P["list", array] = in():explode("\n")
-                P["list", array]:pop()
+            if (fwait()) {
+                P["list", array] = fin():explode("\n")
                 
                 P["state", number] = 4
             }

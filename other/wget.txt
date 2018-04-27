@@ -39,16 +39,12 @@ function wget() {
                     end()
                 }
                 else {
-                    local Program = exec("touch")
-                    
                     local Filename = arg(2)
                     if (Filename == "") {
                         Filename = "webpage"
                     }
-                    Program["args", array] = array(Filename)
-                    Program["in", array] = array(Data)
                     
-                    P["in", array] = Program["out", array] = array()
+                    fwrite(Filename, Data)
                     
                     P["state", number] = 3
                 }
@@ -56,8 +52,8 @@ function wget() {
             break
         
         case 3,
-            if (wait()) {
-                out(in())
+            if (fwait()) {
+                out(fin())
                 end()
             }
             break
