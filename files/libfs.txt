@@ -17,7 +17,7 @@ function number fsCall(Mode:string, Path:string) {
     
     local PathExp = Path:explode("/")
     
-    local Fstab = S["fstab", table]
+    local Fstab = S["etc", table]["fstab", table]
     
     local I = PathExp:count()
     while (I > 0) {

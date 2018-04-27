@@ -1,0 +1,33 @@
+#
+# Created by scaled
+#
+
+@name cd
+
+PEnabled["cd", number] = 1
+
+function cd() {
+    if (args() < 1) {
+        P["parent", table]["pwd", string] = "/"
+    }
+    else {
+        local Arg = arg(1)
+        
+        if (Arg == "..") {
+            local PathExplode = P["parent", table]["pwd", string]:explode("/")
+            PathExplode:pop()
+            PathExplode:pop()
+            
+            Arg = PathExplode:concat("/") + "/"
+        }
+        elseif (Arg[1] != "/") {
+            Arg = P["parent", table]["pwd", string] + Arg
+        }
+        if (Arg:right(1) != "/") {
+            Arg += "/"
+        }
+        
+        P["parent", table]["pwd", string] = Arg
+    }
+    end()
+}

@@ -121,7 +121,8 @@ function xedit() {
         
         case 4,
             if (wait()) {
-                P["text", table]:xtext(in():sub(1, -2))
+                P["text", table]:xtext(in())
+                in()
                 P["state", number] = 1
             }
             break
@@ -140,6 +141,7 @@ function xedit() {
             if (wait()) {
                 local Touch = exec("touch")
                 Touch["args", array] = array(in())
+                in()
                 Touch["in", array] = array(P["text", table]["text", string])
                 Touch["out", array] = P["in", array]
                 
@@ -153,7 +155,7 @@ function xedit() {
         case 7,
             if (wait()) {
                 local In = in()
-                if (In != "ok\n") {
+                if (In != "") {
                     out(In)
                 }
                 P["state", number] = 1

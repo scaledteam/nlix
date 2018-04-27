@@ -17,7 +17,7 @@ if (!tickClk()) {
                 # System
                 case 2, #include "nlix/system/libio" break
                 case 3, #include "nlix/system/liboverload" break
-                case 4, #include "nlix/system/system-memory" break
+                case 4, #include "nlix/system/system-root" break
                 
                 # Devices
                 case 10, #include "nlix/devices/libdevices" break
@@ -61,6 +61,7 @@ if (!tickClk()) {
                 case 56, #include "nlix/files/touch" break
                 case 57, #include "nlix/files/rm" break
                 case 58, #include "nlix/files/cp" break
+                case 59, #include "nlix/files/cd" break
                 
                 # Other
                 case 60, #include "nlix/other/calc" break
@@ -135,7 +136,9 @@ if (!tickClk()) {
     }
 }  
 else {
-    NULL:clear()
+    if (NULL) {
+        NULL:clear()
+    }
     
     while (perf(KPerf)) {
         # Counter

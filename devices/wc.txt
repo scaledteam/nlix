@@ -17,11 +17,6 @@ function wc() {
                 Radius = 1000
             }
             
-            #[findIncludeClass("gmod_wire_*")
-                findInSphere(entity():pos(), Radius)
-                findSortByDistance(entity():pos())
-            findClearWhiteClassList()]#
-            
             findByClass("gmod_wire_*")
             findSortByDistance(entity():pos())
             
@@ -46,17 +41,10 @@ function wc() {
             else {
                 local Id = arg(2):toNumber()
                 
-                if (!S["devices", table]["byId", table][Id, wirelink]) {
+                if (!S["dev", table]["byId", table][Id, wirelink]) {
                     local Device = entity(Id):wirelink()
                     
                     if (Device) {
-                        #[local Type = Device:type()
-                        if (S["devices", table]:exists(Type)) {
-                            S["devices", table][Type, array]:pushWirelink(Device)
-                        }
-                        else {
-                            S["devices", table][Type, array] = array(Device)
-                        }]#
                         deviceNew(Device)
                     }
                     else {

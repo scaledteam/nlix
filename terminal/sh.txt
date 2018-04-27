@@ -35,13 +35,15 @@ function sh() {
             
             # Welcome message
             out("Welcome to the Nlix operating system!\n")
+            P["pwd", string] = "/"
             
             # move to next state
             P["state", number] = 1
             break
         
         case 1,
-            out("sh $ ")
+            #out("sh $ ")
+            out(owner():name() + "@" + S["etc", table]["hostname", string] + ":" + P["pwd", string] + " $ ")
             P["state", number] = 2
             break
         

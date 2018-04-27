@@ -4,12 +4,12 @@
 
 @name uptime
 
-S["startTime", number] = systime()
+S["tmp", table]["startTime", number] = systime()
 
 PEnabled["uptime", number] = 1
 
 function uptime() {
-    local Uptime = systime() - S["startTime", number]
+    local Uptime = systime() - S["tmp", table]["startTime", number]
     if (arg(1) == "server") {
         Uptime = systime()
     }

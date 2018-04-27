@@ -51,7 +51,7 @@ function cp() {
             if (wait()) {
                 local Program = exec("touch")
                 Program["args", array] = array(P["pathTo", string])
-                Program["in", array] = array(in():sub(1, -2))
+                Program["in", array] = array(in())
                 
                 P["in", array] = Program["out", array] = array()
                 P["state", number] = 2
@@ -86,7 +86,7 @@ function cp() {
                 P["childrens", table]:pushTable(Program)
             }
             else {
-                P["state", number] = 4
+                P["state", number] = 5
             }
             break
         

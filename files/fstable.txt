@@ -60,7 +60,8 @@ function fstable() {
                             Out += Keys[I, string] + "\n"
                         }
                     }
-                    out(Out)
+                    out(Out:sub(1, -2))
+                    out("\n")
                     end()
                 }
                 break
@@ -84,11 +85,13 @@ function fstable() {
                                         break
                                     
                                     case "s",
-                                        out(Dir[NextDir, string] + "\n")
+                                        out(Dir[NextDir, string])
+                                        out("\n")
                                         break
                                     
                                     case "n",
-                                        out(Dir[NextDir, number] + "\n")
+                                        out(Dir[NextDir, number]:toString())
+                                        out("\n")
                                         break
                                     
                                     default,
@@ -109,11 +112,13 @@ function fstable() {
                                         break
                                     
                                     case "s",
-                                        out(Dir[NextDir:toNumber(), string] + "\n")
+                                        out(Dir[NextDir:toNumber(), string])
+                                        out("\n")
                                         break
                                     
                                     case "n",
-                                        out(Dir[NextDir:toNumber(), number] + "\n")
+                                        out(Dir[NextDir:toNumber(), number]:toString())
+                                        out("\n")
                                         break
                                     
                                     default,
@@ -151,7 +156,6 @@ function fstable() {
                                 }
                             }
                             else {
-                                #Dir[NextDir, string] = in()
                                 local In = in()
                                 if (In:trim() == "0" | In:toNumber() != 0) {
                                     Dir[NextDir, number] = In:toNumber()
@@ -165,7 +169,7 @@ function fstable() {
                     }
                     
                     if (P) {
-                        out("ok\n")
+                        out("")
                         end()
                     }
                 }
@@ -198,7 +202,7 @@ function fstable() {
                 }
                 
                 if (P) {
-                    out("ok\n")
+                    out("")
                     end()
                 }
                 break

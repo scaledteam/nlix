@@ -26,27 +26,14 @@ function hotplugd() {
     if (PortEntity:id() != HotplugdPortsOld[HotplugdCounter, number]) {
         HotplugdPortsOld[HotplugdCounter, number] = PortEntity:id()
         
-        #[if (PortEntity) {
-            # Check if device exists
-            local Type = Port:type()
-            local EntityId = PortEntity:id()
-            
-            local Devices = S["devices", table]
-            if (!Devices:exists(Type)) {
-                Devices[Type, array] = array(Port)
-                Devices["byId", table][EntityId, wirelink] = Port
-            }
-            elseif (Devices["byId", table][EntityId, wirelink] != Port) {
-                Devices[Type, array]:pushWirelink(Port)
-                Devices["byId", table][EntityId, wirelink] = Port
-            }
-        }]#
-        deviceNew(Port)
+        if (!S["dev", table]["byId", table][Port:entity():id(), wirelink]) {
+            deviceNew(Port)
+        }
     }
     
     # return device from dead app
-    local Devices = S["devices", table]
-    local Programs = Devices["P", table]
+    local Devices = S["dev", table]
+    local Programs = Devices["Ps", table]
 
     if (Programs) {
         local Counter = Devices["counter", number] + 1
@@ -57,7 +44,7 @@ function hotplugd() {
         
         if (!Programs[Counter, table]) {
             Programs:remove(Counter)
-            local Device = Devices["D", table]:removeWirelink(Counter)
+            local Device = Devices["Ds", table]:removeWirelink(Counter)
             
             if (Device) {
                 local DeviceType = Device:type()

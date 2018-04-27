@@ -4,10 +4,11 @@
 
 @name libdevices
 
-S["devices", table] = table(
+S["dev", table] = table(
     "byId" = table(),
-    "P" = table(),
-    "D" = table()
+    "Ps" = table(),
+    "Ds" = table(),
+    "null" = NULL
 )
 
 function string wirelink:type() {
@@ -22,25 +23,25 @@ function string wirelink:type() {
 }
 
 function number deviceGet(Type:string) {
-    if (S["devices", table]:exists(Type) & !P["device", wirelink]) {
-        local Devices = S["devices", table][Type, array]
+    if (S["dev", table]:exists(Type) & !P["device", wirelink]) {
+        local Devices = S["dev", table][Type, array]
         
         if (Devices:count() > 0) {
             local Device = Devices:shiftWirelink()
             if (Device) {
                 P["device", wirelink] = Device
-                S["devices", table]["P", table]:pushTable(P)
-                S["devices", table]["D", table]:pushWirelink(Device)
+                S["dev", table]["Ps", table]:pushTable(P)
+                S["dev", table]["Ds", table]:pushWirelink(Device)
                 
                 if (Devices:count() == 0) {
-                    S["devices", table]:remove(Type)
+                    S["dev", table]:remove(Type)
                 }
                 return 1
             }
         }
         
         if (Devices:count() == 0) {
-            S["devices", table]:remove(Type)
+            S["dev", table]:remove(Type)
         }
     }
     return 0
@@ -52,10 +53,10 @@ function deviceReturn() {
         local DeviceType = Device:type()
         
         if (P:exists(DeviceType)) {
-            S["devices", table][DeviceType, array]:unshiftWirelink(Device)
+            S["dev", table][DeviceType, array]:unshiftWirelink(Device)
         }
         else {
-            S["devices", table][DeviceType, array] = array(Device)
+            S["dev", table][DeviceType, array] = array(Device)
         }
     }
 }
@@ -68,7 +69,7 @@ function number deviceNew(Port:wirelink) {
         local Type = Port:type()
         local Id = PortEntity:id()
         
-        local Devices = S["devices", table]
+        local Devices = S["dev", table]
         if (!Devices:exists(Type)) {
             Devices[Type, array] = array(Port)
             Devices["byId", table][Id, wirelink] = Port

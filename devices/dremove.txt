@@ -14,14 +14,14 @@ function dremove() {
             local Entity = entity(Id)
             
             local Removed = 0
-            foreach (DeviceType, DeviceList:array = S["devices", table]) {
+            foreach (DeviceType, DeviceList:array = S["dev", table]) {
                 foreach (I, Device:wirelink = DeviceList) {
                     if (Device:entity() == Entity) {
                         DeviceList:remove(I)
-                        S["devices", table]["byId", table][Id, wirelink] = nowirelink()
+                        S["dev", table]["byId", table][Id, wirelink] = nowirelink()
                         
                         if (DeviceList:count() == 0) {
-                            S["devices", table]:remove(DeviceType)
+                            S["dev", table]:remove(DeviceType)
                         }
                         
                         Removed = 1
@@ -35,12 +35,12 @@ function dremove() {
         }
         else {
             local Type = arg(1)
-            if (S["devices", table]:exists(Type)) {
-                local Devices = S["devices", table]:removeArray(Type)
+            if (S["dev", table]:exists(Type)) {
+                local Devices = S["dev", table]:removeArray(Type)
                 while (Devices:count() > 0) {
-                    S["devices", table]["byId", table][Devices:popWirelink():entity():id(), wirelink] = nowirelink()
+                    S["dev", table]["byId", table][Devices:popWirelink():entity():id(), wirelink] = nowirelink()
                 }
-                #S["devices", table]:removeArray(Type):clear()
+                #S["dev", table]:removeArray(Type):clear()
             }
             else {
                 out("Error: Devices with type " + Type + " is not exists.\n")

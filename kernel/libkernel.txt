@@ -23,7 +23,7 @@ function table exec(Name:string) {
 }
 
 function end() {
-    if(Ps[KState, table] == P){
+    if(Ps[KState, table] == P) {
         Ps:removeTable(KState):clear()
         KState--
     }
@@ -35,7 +35,7 @@ function end() {
 }
 
 function programUp() {
-    if(Ps[KState, table] == P){
+    if(Ps[KState, table] == P) {
         Ps:remove(KState)
         Ps:pushTable(P)
         KState = Ps:count()
@@ -43,8 +43,10 @@ function programUp() {
 }
 
 function table:execNow() {
-    local Super = P
-    P = Program
-    P["name", string]()
-    P = Super
+    if (P != NULL) {
+        local Super = P
+        P = Program
+        P["name", string]()
+        P = Super
+    }
 }

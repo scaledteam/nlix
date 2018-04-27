@@ -56,51 +56,6 @@ function calc2() {
         case 2,
             P["input", array] = P["inputString", string]:replaceRE("[%+%-%*/^()]", " %1 "):trim():explodeRE(" +")
             P["state", number] = 3
-            #[local InputString = P["inputString", string]
-            
-            local Counter = P["counter", number]
-            
-            for (I = 1, Overload) {
-                if (Counter < P["inputLength", number]) {
-                    Counter++
-                    
-                    local Char = InputString[Counter]
-                    
-                    switch (Char) {
-                        case "+", case "-", case "*", case "/", case "^", case "(", case ")",
-                            local String = InputString:sub(P["lastDivider", number] + 1, Counter - 1)
-                            if (String != "") {
-                                P["input", array]:pushString(String)
-                            }
-                            P["input", array]:pushString(Char)
-                            P["lastDivider", number] = Counter
-                            break
-                        
-                        default, break
-                    }
-                }
-                else {
-                    local String = InputString:sub(P["lastDivider", number] + 1)
-                    if (String != "") {
-                        P["input", array]:pushString(String)
-                    }
-                    
-                    P:remove("lastDivider")
-                    P:remove("inputString")
-                    P:remove("inputLength")
-                    
-                    P["stack0", array]:clear()
-                    P["stack1", array]:clear()
-                    
-                    printTable(P["input", array])
-                    
-                    P["state", number] = 3
-                    return
-                }
-            }
-            
-            P["counter", number] = Counter
-            break]#
         
         case 3,
             local Input = P["input", array]

@@ -17,7 +17,9 @@ function xvnc() {
                     ProgramName = arg(1)
                 }
                 
-                if (P["device", wirelink]["S", table]["PEnabled", table][ProgramName, number] | arg(2) == "force") {
+                local RemoteS = P["device", wirelink]["S", table]
+                
+                if (RemoteS["bin", table][ProgramName, number]) {
                     local Program = table("name" = ProgramName)
                     P["program", table] = Program
                     Program["parent", table] = P
@@ -29,7 +31,7 @@ function xvnc() {
                     Program["xobjectsAll", table] = P["xobjectsAll", table]
                     Program["kbd", array] = P["kbd", array]
                     
-                    P["device", wirelink]["S", table]["Ps", table]:pushTable(Program)
+                    RemoteS["run", table]:pushTable(Program)
                     
                     P["state", number] = 1
                 }

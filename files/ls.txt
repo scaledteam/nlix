@@ -9,7 +9,7 @@ PEnabled["ls", number] = 1
 function ls() {
     switch (P["state", number]) {
         case 0,
-            if (fsCall("list", arg(1))) {
+            if (fsCall("list", P["parent", table]["pwd", string] + arg(1))) {
                 P["in", array] = P["fs", table]["out", array] = array()
                 P["state", number] = 1
             }
@@ -22,6 +22,7 @@ function ls() {
         case 1,
             if (wait()) {
                 out(in())
+                out("\n")
                 end()
             }
             break

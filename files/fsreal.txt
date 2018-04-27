@@ -45,7 +45,8 @@ function fsreal() {
         
         case 2,
             if (fileLoadedList()) {
-                out((fileReadList():concat("\n") + "\n"):replace(".txt\n", "\n"))
+                out((fileReadList():concat("\n") + "\n"):replace(".txt\n", "\n"):sub(1, -2))
+                out("\n")
                 end()
             }
             break
@@ -62,7 +63,8 @@ function fsreal() {
         
         case 4,
             if (fileLoaded()) {
-                out(fileRead() + "\n")
+                out(fileRead())
+                out("\n")
                 end()
             }
             elseif (systime() > P["timeout", number]) {
@@ -75,7 +77,7 @@ function fsreal() {
         case 5,
             if (fileCanWrite() & wait()) {
                 fileWrite(P["fs", table]["path", string] + P["path", string] + ".txt", in())
-                out("ok\n")
+                out("")
                 end()
             }
             break

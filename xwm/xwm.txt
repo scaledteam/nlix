@@ -225,13 +225,32 @@ function xwm() {
                     local Frame = P["frames", table][Counter, table]
                     
                     if (Frame["window", table] & inrange(Cursor - Frame["pos", vector2], vec2(0, -20), Frame["size", vector2])) {
-                        # Up window
-                        Frame:xup()
-                        
-                        P["frames", table]:unshiftTable(P["frames", table]:removeTable(Counter))
-                        P["programs", table]:unshiftTable(P["programs", table]:removeTable(Counter))
-                        
-                        P["state", number] = 2
+                        if (inrange(Cursor - Frame["pos", vector2], vec2(0, -20), Frame["size", vector2]:setY(0))) {
+                            if (Cursor[1] > Frame["pos", vector2][1] + Frame["size", vector2][1] - 20) {
+                                P["programs", table]:removeTable(Counter):clear()
+                                P["frames", table]:removeTable(Counter):xremove()
+                                
+                                P["state", number] = 2
+                            }
+                            else {
+                                Frame["moveOffset", vector2] = Frame["pos", vector2] - Cursor
+                                
+                                P["frames", table]:unshiftTable(P["frames", table]:removeTable(Counter))
+                                P["programs", table]:unshiftTable(P["programs", table]:removeTable(Counter))
+                                
+                                Frame:xup()
+                                
+                                P["state", number] = 4
+                            }
+                        }
+                        else {
+                            P["frames", table]:unshiftTable(P["frames", table]:removeTable(Counter))
+                            P["programs", table]:unshiftTable(P["programs", table]:removeTable(Counter))
+                            
+                            Frame:xup()
+                            
+                            P["state", number] = 2
+                        }
                         return
                     }
                     else {
@@ -248,7 +267,7 @@ function xwm() {
             break
         
         case 4,
-            if (xcanDraw()) {
+            #if (xcanDraw()) {
                 local Cursor = xcursor()
                 
                 if (xkeyUse()) {
@@ -260,7 +279,7 @@ function xwm() {
                 }
                 
                 P["xframe", table]["keyUse", number] = -1
-            }
+            #}
             break
         
         case 5,

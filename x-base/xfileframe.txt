@@ -45,7 +45,8 @@ function xfileframe() {
         
         case 2,
             if (wait()) {
-                local ListString = (P["path", string] == "/" ? in() : "..\n" + in()):sub(1, -2)
+                local ListString = P["path", string] == "/" ? in() : "..\n" + in()
+                in()
                 
                 P["listArray", array] = ListString:explode("\n")
                 P["list", table]:xtext(ListString)
