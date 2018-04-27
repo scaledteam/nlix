@@ -4,7 +4,7 @@
 
 @name kill
 
-PEnabled["kill", number] = 1
+KList["kill", number] = 1
 
 function kill() {
     if (args() < 1) {
@@ -17,7 +17,7 @@ function kill() {
             out("Entered value is incorrect.\n")
         }
         else {
-            Ps:removeTable(Id):clear()
+            KTasks:removeTable(Id):clear()
         }
     }
     end()

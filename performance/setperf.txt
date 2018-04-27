@@ -4,7 +4,7 @@
 
 @name setperf
 
-PEnabled["setperf", number] = 1
+KList["setperf", number] = 1
 
 function setperf() {
     if (args() < 1) {

@@ -4,11 +4,11 @@
 
 @name poweroff
 
-PEnabled["poweroff", number] = 1
+KList["poweroff", number] = 1
 
 function poweroff() {
-    while (Ps:count() > 0) {
-        Ps:popTable():clear()
+    while (KTasks:count() > 0) {
+        KTasks:popTable():clear()
     }
     
     S:clear()

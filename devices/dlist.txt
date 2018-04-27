@@ -4,7 +4,7 @@
 
 @name dlist
 
-PEnabled["dlist", number] = 1
+KList["dlist", number] = 1
 
 function dlist() {
     local List = ""

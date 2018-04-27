@@ -4,7 +4,7 @@
 
 @name xup
 
-PEnabled["xup", number] = 1
+KList["xup", number] = 1
 
 function xup() {
     for (I = 1, Overload) {

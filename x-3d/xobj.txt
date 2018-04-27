@@ -6,7 +6,7 @@
 
 xmenuAdd("3d", "xobj")
 
-PEnabled["xobj", number] = 1
+KList["xobj", number] = 1
 
 function xobj() {
     switch (P["state", number]) {

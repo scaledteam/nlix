@@ -5,7 +5,7 @@
 @name digi-scan
 
 #ifdef ranger(number)
-PEnabled["digiscan", number] = 1
+KList["digiscan", number] = 1
 
 function digiscan() { 
     switch (P["state", number]) {

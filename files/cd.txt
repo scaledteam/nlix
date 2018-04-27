@@ -4,7 +4,7 @@
 
 @name cd
 
-PEnabled["cd", number] = 1
+KList["cd", number] = 1
 
 function cd() {
     if (args() < 1) {

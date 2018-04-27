@@ -6,7 +6,7 @@
 
 xmenuAdd("tests", "xids")
 
-PEnabled["xids", number] = 1
+KList["xids", number] = 1
 
 function xids() {
     switch (P["state", number]) {

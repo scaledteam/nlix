@@ -4,7 +4,7 @@
 
 @name printpi
 
-PEnabled["printpi", number] = 1
+KList["printpi", number] = 1
 
 function printpi() { 
     switch (P["state", number]) {

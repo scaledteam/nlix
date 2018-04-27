@@ -4,7 +4,7 @@
 
 @name xfilechooser
 
-PEnabled["xfilechooser", number] = 1
+KList["xfilechooser", number] = 1
 
 function xfilechooser() {
     switch (P["state", number]) {

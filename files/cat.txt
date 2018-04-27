@@ -4,7 +4,7 @@
 
 @name cat
 
-PEnabled["cat", number] = 1
+KList["cat", number] = 1
 
 function cat() { 
     switch (P["state", number]) {
@@ -14,24 +14,14 @@ function cat() {
                 end()
             }
             else {
+                fread(fabsPath(arg(1), P["parent", table]["pwd", string]))
                 P["state", number] = 1
             }
             break
         
         case 1,
-            if (fsCall("read", arg(1))) {
-                P["in", array] = P["fs", table]["out", array] = array()
-                P["state", number] = 2
-            }
-            else {
-                out("Error: filesystem don't exist in fstab.\n")
-                end()
-            }
-            break
-        
-        case 2,
-            if (wait()) {
-                out(in())
+            if (fwait()) {
+                out(fin())
                 out("\n")
                 end()
             }

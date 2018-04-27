@@ -4,24 +4,18 @@
 
 @name ls
 
-PEnabled["ls", number] = 1
+KList["ls", number] = 1
 
 function ls() {
     switch (P["state", number]) {
         case 0,
-            if (fsCall("list", arg(1))) {
-                P["in", array] = P["fs", table]["out", array] = array()
-                P["state", number] = 1
-            }
-            else {
-                out("Error: filesystem don't exist in fstab.\n")
-                end()
-            }
+            flist(fabsPath(arg(1), P["parent", table]["pwd", string]))
+            P["state", number] = 1
             break
         
         case 1,
-            if (wait()) {
-                out(in())
+            if (fwait()) {
+                out(fin())
                 out("\n")
                 end()
             }

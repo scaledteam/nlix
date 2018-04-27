@@ -6,14 +6,14 @@
 @persist NULL:table
 
 function table exec(Name:string) {
-    if (PEnabled[Name, number]) {
+    if (KList[Name, number]) {
         if (P) {
             Program = table("name" = Name, "parent" = P)
         }
         else {
             Program = table("name" = Name)
         }
-        Ps:pushTable(Program)
+        KTasks:pushTable(Program)
         
         return Program
     }
@@ -23,8 +23,8 @@ function table exec(Name:string) {
 }
 
 function end() {
-    if(Ps[KState, table] == P) {
-        Ps:removeTable(KState):clear()
+    if(KTasks[KState, table] == P) {
+        KTasks:removeTable(KState):clear()
         KState--
     }
     else {
@@ -35,10 +35,10 @@ function end() {
 }
 
 function programUp() {
-    if(Ps[KState, table] == P) {
-        Ps:remove(KState)
-        Ps:pushTable(P)
-        KState = Ps:count()
+    if(KTasks[KState, table] == P) {
+        KTasks:remove(KState)
+        KTasks:pushTable(P)
+        KState = KTasks:count()
     }
 }
 

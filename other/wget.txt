@@ -5,7 +5,7 @@
 @name wget
 
 #ifdef httpRequest(string)
-PEnabled["wget", number] = 1
+KList["wget", number] = 1
 
 function wget() {
     switch (P["state", number]) {

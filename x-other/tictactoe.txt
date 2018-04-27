@@ -6,7 +6,7 @@
 
 xmenuAdd("games", "tic tac toe", "tictactoe")
 
-PEnabled["tictactoe", number] = 1
+KList["tictactoe", number] = 1
 
 function tictactoe() {
     switch (P["state", number]) {

@@ -6,7 +6,7 @@
 
 xmenuAdd("real", "spirit level", "spiritlevel")
 
-PEnabled["spiritlevel", number] = 1
+KList["spiritlevel", number] = 1
 
 function spiritlevel() {
     switch (P["state", number]) {

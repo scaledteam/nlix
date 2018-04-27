@@ -4,7 +4,7 @@
 
 @name xpanel
 
-PEnabled["xpanel", number] = 1
+KList["xpanel", number] = 1
 
 function xpanel() {
     switch (P["state", number]) {

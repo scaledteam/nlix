@@ -6,7 +6,7 @@
 
 S["tmp", table]["startTime", number] = systime()
 
-PEnabled["uptime", number] = 1
+KList["uptime", number] = 1
 
 function uptime() {
     local Uptime = systime() - S["tmp", table]["startTime", number]

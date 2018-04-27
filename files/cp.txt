@@ -4,7 +4,7 @@
 
 @name cp
 
-PEnabled["cp", number] = 1
+KList["cp", number] = 1
 
 function cp() { 
     switch (P["state", number]) {
@@ -14,8 +14,8 @@ function cp() {
                 end()
             }
             else {
-                P["pathFrom", string] = arg(1):toAbsoletePath(P["parent", table]["pwd", string])
-                P["pathTo", string] = arg(2):toAbsoletePath(P["parent", table]["pwd", string])
+                P["pathFrom", string] = fabsPath(arg(1), P["parent", table]["pwd", string])
+                P["pathTo", string] = fabsPath(arg(2), P["parent", table]["pwd", string])
                 
                 if (P["pathFrom", string]:right(1) != "/") {
                     if (P["pathTo", string]:right(1) == "/") {

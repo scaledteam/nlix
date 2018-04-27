@@ -5,7 +5,7 @@
 @name fsreal
 
 #ifdef fileRead()
-PEnabled["fsreal", number] = 1
+KList["fsreal", number] = 1
 
 function fsreal() {
     switch (P["state", number]) {
@@ -46,7 +46,6 @@ function fsreal() {
         case 2,
             if (fileLoadedList()) {
                 out((fileReadList():concat("\n") + "\n"):replace(".txt\n", "\n"):sub(1, -2))
-                out("\n")
                 end()
             }
             break
@@ -64,7 +63,6 @@ function fsreal() {
         case 4,
             if (fileLoaded()) {
                 out(fileRead())
-                out("\n")
                 end()
             }
             elseif (systime() > P["timeout", number]) {

@@ -3,8 +3,11 @@
 #
 
 @name overload
+@persist Overload
 
-PEnabled["overload", number] = 1
+Overload = 20
+
+KList["overload", number] = 1
 
 function overload() {
     if (args() < 1) {

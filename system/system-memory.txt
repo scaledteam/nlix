@@ -2,20 +2,19 @@
 # Created by scaled
 #
 
-@name system-root
+@name system-memory
 
-# Loal
+# Local
 #@persist S:table
 
 # Shared
 @outputs S:table
 
 S = table(
-    "bin" = PEnabled,
+    "bin" = KList,
     "etc" = table(
         "hostname" = "nlix" + entity():id()
     ),
-    "run" = Ps,
-    "mnt" = table(),
+    "run" = KTasks,
     "tmp" = table()
 )

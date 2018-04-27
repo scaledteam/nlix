@@ -3,7 +3,7 @@
 #
 
 @name nlix
-@persist [PEnabled Ps P]:table KPerf KState
+@persist [KList KTasks]:table KPerf KState P:table
 @trigger none
 
 if (!tickClk()) {
@@ -16,8 +16,7 @@ if (!tickClk()) {
                 
                 # System
                 case 2, #include "nlix/system/libio" break
-                case 3, #include "nlix/system/liboverload" break
-                case 4, #include "nlix/system/system-root" break
+                case 3, #include "nlix/system/system-memory" break
                 
                 # Devices
                 case 10, #include "nlix/devices/libdevices" break
@@ -37,21 +36,21 @@ if (!tickClk()) {
                 case 24, #include "nlix/terminal/help" break
                 case 25, #include "nlix/terminal/rund" break
                 
-                # Kernel tools
-                case 30, #include "nlix/kernel/plist" break
-                case 31, #include "nlix/kernel/kill" break
-                case 32, #include "nlix/kernel/reboot" break
-                case 33, #include "nlix/kernel/poweroff" break
-                
                 # Performance
-                case 40, #include "nlix/performance/autoperf" break
-                case 41, #include "nlix/performance/setperf" break
-                case 42, #include "nlix/performance/overload" break
-                case 43, #include "nlix/performance/uptime" break
-                case 44, #include "nlix/performance/printpi" break
+                case 30, #include "nlix/performance/autoperf" break
+                case 31, #include "nlix/performance/setperf" break
+                case 32, #include "nlix/performance/overload" break
+                case 33, #include "nlix/performance/uptime" break
+                case 34, #include "nlix/performance/printpi" break
+                
+                # Kernel tools
+                case 40, #include "nlix/kernel/plist" break
+                case 41, #include "nlix/kernel/kill" break
+                case 42, #include "nlix/kernel/reboot" break
+                case 43, #include "nlix/kernel/poweroff" break
                 
                 # Files
-                case 50, #include "nlix/files/libfs" break
+                case 50, #include "nlix/files/libfiles" break
                 case 51, #include "nlix/files/fstab" break
                 case 52, #include "nlix/files/fstable" break
                 case 53, #include "nlix/files/fsreal" break
@@ -142,17 +141,17 @@ else {
     
     while (perf(KPerf)) {
         # Counter
-        KState = KState % Ps:count() + 1
+        KState = KState % KTasks:count() + 1
         
         # Program memory
-        P = Ps[KState, table]
+        P = KTasks[KState, table]
         
         # Program is alive
         if (P) {
             # Clear if parent killed
             if (!P["parent", table] & P:exists("parent")) {
                 P:clear()
-                Ps:remove(KState)
+                KTasks:remove(KState)
                 KState--
                 continue
             }
@@ -162,8 +161,8 @@ else {
         # If program is dead
         else {
             # If one program is not valid
-            if (Ps) {
-                Ps:remove(KState)
+            if (KTasks) {
+                KTasks:remove(KState)
                 KState--
             }
             # If all programs is not valid

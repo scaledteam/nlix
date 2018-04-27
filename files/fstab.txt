@@ -15,7 +15,11 @@ if (!S:exists("fstab")) {
     )
     
     #ifdef fileRead()
-    S["mnt", table]["e2files", table] = table()
-    S["mnt", table]["e2shared", table] = table()
+    S["mnt", table] = table(
+        "e2files" = table(),
+        "e2shared" = table()
+    )
+    #else
+    S["mnt", table] = table()
     #endif
 }

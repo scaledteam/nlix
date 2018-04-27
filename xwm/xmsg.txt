@@ -4,7 +4,7 @@
 
 @name xmsg
 
-PEnabled["xmsg", number] = 1
+KList["xmsg", number] = 1
 
 function xmsg() {
     switch (P["state", number]) {

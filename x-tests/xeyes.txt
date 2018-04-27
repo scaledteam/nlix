@@ -6,7 +6,7 @@
 
 xmenuAdd("tests", "xeyes")
 
-PEnabled["xeyes", number] = 1
+KList["xeyes", number] = 1
 
 function xeyes() {
     switch (P["state", number]) {

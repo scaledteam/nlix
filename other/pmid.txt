@@ -4,7 +4,7 @@
 
 @name pmid
 
-PEnabled["pmid", number] = 1
+KList["pmid", number] = 1
 
 #ifdef soundPlay(number, number, string)
 function pmid() {
@@ -19,29 +19,15 @@ function pmid() {
                 end()
             }
             else {
-                local Program = exec("cat")
-                Program["args", array] = array(arg(1))
-                Program["out", array] = P["fileIn", array] = array()
+                fread(fabsPath(arg(1), P["parent", table]["pwd", string]))
                 
                 P["state", number] = 1
             }
-            
-            #local Program = exec("cat")
-            
-            #Program["args", array] = array("/e2shared/mid/bach-bourree.mid")
-            #Program["args", array] = array("/e2shared/mid/castle-complete.mid")
-            #Program["args", array] = array("/e2shared/mid/game-over.mid")
-            #Program["args", array] = array("/e2shared/mid/your-reality.mid")
-            #Program["args", array] = array("/e2shared/mid/4tact_4_4.mid")
-            
-            #Program["out", array] = P["fileIn", array] = array()
-            
-            #P["state", number] = 1
             break
         
         case 1,
-            if (P["fileIn", array]:count() > 0) {
-                local Data = P["fileIn", array]:shiftString()
+            if (fwait()) {
+                local Data = fin()
                 
                 if (Data:left(4) == "MThd") {
                     Data = Data:sub(9)

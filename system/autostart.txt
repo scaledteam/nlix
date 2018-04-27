@@ -4,7 +4,7 @@
 
 @name autostart
 
-if (!Ps) {
+if (!KTasks) {
     exec("hotplugd")
     exec("autoperf")
     exec("autows")

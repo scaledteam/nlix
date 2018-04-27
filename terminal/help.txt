@@ -4,12 +4,12 @@
 
 @name help
 
-PEnabled["help", number] = 1
+KList["help", number] = 1
 
 function help() {
     switch (P["state", number]) {
         case 0,
-            P["programList", array] = PEnabled:keys()
+            P["programList", array] = KList:keys()
             
             out(
                 "This system created by scaled.\n"

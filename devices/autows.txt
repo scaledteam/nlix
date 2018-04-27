@@ -4,10 +4,10 @@
 
 @name auto-ws
 
-PEnabled["autows", number] = 1
+KList["autows", number] = 1
 
 function autows() {
-    if (PEnabled["xwm", number]) {
+    if (KList["xwm", number]) {
         if (S["dev", table]:exists("gmod_wire_egp")) {
             local Program = exec("xwm")
             Program:remove("parent")
@@ -16,7 +16,7 @@ function autows() {
         }
     }
     
-    if (PEnabled["sh", number]) {
+    if (KList["sh", number]) {
         if (
             (
                 S["dev", table]:exists("gmod_wire_textscreen")

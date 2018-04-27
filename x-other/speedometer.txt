@@ -6,7 +6,7 @@
 
 xmenuAdd("real", "speedometer")
 
-PEnabled["speedometer", number] = 1
+KList["speedometer", number] = 1
 
 function speedometer() {
     switch (P["state", number]) {

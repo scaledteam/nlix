@@ -4,7 +4,7 @@
 
 @name sh
 
-PEnabled["sh", number] = 1
+KList["sh", number] = 1
 
 function sh() {
     switch (P["state", number]) {
@@ -43,7 +43,7 @@ function sh() {
         
         case 1,
             #out("sh $ ")
-            out(owner():name() + "@" + S["etc", table]["hostname", string] + ":" + P["pwd", string] + " $ ")
+            out(owner():name():left(8) + "@" + S["etc", table]["hostname", string] + ":" + P["pwd", string] + " $ ")
             P["state", number] = 2
             break
         

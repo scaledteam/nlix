@@ -4,7 +4,7 @@
 
 @name xremove
 
-PEnabled["xremove", number] = 1
+KList["xremove", number] = 1
 
 function xremove() {
     for (I = 1, Overload) {

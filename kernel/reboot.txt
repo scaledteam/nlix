@@ -4,11 +4,11 @@
 
 @name reboot
 
-PEnabled["reboot", number] = 1
+KList["reboot", number] = 1
 
 function reboot() {
-    while (Ps:count() > 0) {
-        Ps:popTable():clear()
+    while (KTasks:count() > 0) {
+        KTasks:popTable():clear()
     }
     
     S:clear()

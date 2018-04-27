@@ -4,7 +4,7 @@
 
 @name xcreate
 
-PEnabled["xcreate", number] = 1
+KList["xcreate", number] = 1
 
 function xcreate() {
     for (I = 1, Overload) {

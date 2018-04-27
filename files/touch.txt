@@ -4,7 +4,7 @@
 
 @name touch
 
-PEnabled["touch", number] = 1
+KList["touch", number] = 1
 
 function touch() {
     switch (P["state", number]) {
@@ -14,26 +14,14 @@ function touch() {
                 end()
             }
             else {
+                fwrite(fabsPath(arg(1), P["parent", table]["pwd", string]), in())
                 P["state", number] = 1
             }
             break
         
         case 1,
-            if (fsCall("write", arg(1))) {
-                P["fs", table]["in", array] = array(in())
-                P["in", array] = P["fs", table]["out", array] = array()
-                
-                P["state", number] = 2
-            }
-            else {
-                out("Error: filesystem don't exist in fstab.\n")
-                end()
-            }
-            break
-        
-        case 2,
-            if (wait()) {
-                out(in())
+            if (fwait()) {
+                out(fin())
                 end()
             }
             break

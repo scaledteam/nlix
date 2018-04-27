@@ -5,7 +5,7 @@
 @name wc
 
 #ifdef entity:wirelink()
-PEnabled["wc", number] = 1
+KList["wc", number] = 1
 
 function wc() {
     local Arg = arg(1)

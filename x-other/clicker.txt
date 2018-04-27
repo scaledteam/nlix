@@ -8,7 +8,7 @@
 
 xmenuAdd("games", "clicker")
 
-PEnabled["clicker", number] = 1
+KList["clicker", number] = 1
 
 function clicker() {
     switch (P["state", number]) {

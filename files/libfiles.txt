@@ -2,24 +2,21 @@
 # Created by scaled
 #
 
-@name libfs
+@name libfiles
 
-function string string:toAbsoletePath(Context:string) {
-    if (This[1] != "/") {
-        if (Context != "") {
-            return Context + This
-        }
-        else {
-            return "/" + This
-        }
+function string fabsPath(Path:string, Context:string) {
+    if (Path[1] != "/") {
+        return Context + Path
     }
     else {
-        return This
+        return Path
     }
 }
 
-function number fsCall(Mode:string, Path:string) {
-    Path = Path:toAbsoletePath(P["parent", table]["pwd", string])
+function table fsCall(Mode:string, Path:string) {
+    if (Path[1] != "/") {
+        Path = "/" + Path
+    }
     
     # Remove last slash if it has
     if (Path:right(1) == "/") {
@@ -45,37 +42,34 @@ function number fsCall(Mode:string, Path:string) {
             Program["fs", table] = Fs
             Program["path", string] = PathExp:concat("/", I + 1) # After fs path
             
-            P["fs", table] = Program
+            P["fin", array] = Program["out", array] = array()
             
-            return 1
+            return Program
         }
         I--
     }
     
-    return 0
+    P["fin", array] = array("Error: filesystem don't exist in fstab.\n")
+    
+    return NULL
 }
 
 
 function fread(Path:string) {
-    local Cat = exec("cat")
-    Cat["args", array] = array(Path)
-    
-    Cat["out", array] = P["fin", array] = array()
+    fsCall("read", Path)
 }
 
 function flist(Path:string) {
-    local Ls = exec("ls")
-    Ls["args", array] = array(Path)
-    
-    Ls["out", array] = P["fin", array] = array()
+    fsCall("list", Path)
 }
 
-function string fwrite(Path:string, Data:string) {
-    local Touch = exec("touch")
-    Touch["args", array] = array(Path)
-    Touch["in", array] = array(Data)
-    
-    Touch["out", array] = P["fin", array] = array()
+function fwrite(Path:string, Data:string) {
+    local FS = fsCall("write", Path)
+    FS["in", array] = array(Data)
+}
+
+function fremove(Path:string) {
+    fsCall("remove", Path)
 }
 
 

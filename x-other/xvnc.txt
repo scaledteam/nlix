@@ -6,7 +6,7 @@
 
 xmenuAdd("remote", "xvnc")
 
-PEnabled["xvnc", number] = 1
+KList["xvnc", number] = 1
 
 function xvnc() {
     switch (P["state", number]) {

@@ -4,7 +4,7 @@
 
 @name plist
 
-PEnabled["plist", number] = 1
+KList["plist", number] = 1
 
 function plist() {
     local Counter = P["counter", number]
@@ -13,11 +13,11 @@ function plist() {
     for (I = 1, Overload) {
         Counter++
         
-        if (args() == 0 | Ps[Counter, table]["name", string] == arg(1)) {
-            Out += Counter + ": " + Ps[Counter, table]["name", string] + "\n"
+        if (args() == 0 | KTasks[Counter, table]["name", string] == arg(1)) {
+            Out += Counter + ": " + KTasks[Counter, table]["name", string] + "\n"
         }
         
-        if (Counter >= (Ps:count() - 1)) {
+        if (Counter >= (KTasks:count() - 1)) {
             out(Out)
             end()
             return

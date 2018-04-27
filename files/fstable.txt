@@ -4,7 +4,7 @@
 
 @name fstable
 
-PEnabled["fstable", number] = 1
+KList["fstable", number] = 1
 
 function fstable() {
     if (P["fs", table]:exists("table")) {
@@ -21,7 +21,7 @@ function fstable() {
                             else {
                                 out("Error: This not a directory.\n")
                                 end()
-                                break
+                                return
                             }
                         }
                         elseif (Dir:exists(NextDir:toNumber())) {
@@ -31,39 +31,34 @@ function fstable() {
                             else {
                                 out("Error: This not a directory.\n")
                                 end()
-                                break
+                                return
                             }
                         }
                         else {
                             out("Error: Wrong path.\n")
                             end()
-                            break
+                            return
                         }
                     }
                 }
                 
-                if (P) {
-                    #out(Dir:keys():concat("\n") + "\n")
-                    
-                    local Out = ""
-                    
-                    local Types = Dir:typeids()
-                    local Keys = Dir:keys()
-                    for (I = 1, Dir:count()) {
-                        if (Types[Keys[I, string], string] == "t") {
-                            Out += Keys[I, string] + "/\n"
-                        }
-                        elseif (Types[Keys[I, number], string] == "t") {
-                            Out += Keys[I, number] + "/\n"
-                        }
-                        else {
-                            Out += Keys[I, string] + "\n"
-                        }
+                local Out = ""
+                
+                local Types = Dir:typeids()
+                local Keys = Dir:keys()
+                for (I = 1, Dir:count()) {
+                    if (Types[Keys[I, string], string] == "t") {
+                        Out += Keys[I, string] + "/\n"
                     }
-                    out(Out:sub(1, -2))
-                    out("\n")
-                    end()
+                    elseif (Types[Keys[I, number], string] == "t") {
+                        Out += Keys[I, number] + "/\n"
+                    }
+                    else {
+                        Out += Keys[I, string] + "\n"
+                    }
                 }
+                out(Out:sub(1, -2))
+                end()
                 break
             
             case "read",
@@ -91,7 +86,6 @@ function fstable() {
                                     
                                     case "n",
                                         out(Dir[NextDir, number]:toString())
-                                        out("\n")
                                         break
                                     
                                     default,
@@ -152,7 +146,7 @@ function fstable() {
                                 else {
                                     out("Error: Wrong path.\n")
                                     end()
-                                    break
+                                    return
                                 }
                             }
                             else {
@@ -168,10 +162,8 @@ function fstable() {
                         }
                     }
                     
-                    if (P) {
-                        out("")
-                        end()
-                    }
+                    out("")
+                    end()
                 }
                 break
             
@@ -191,7 +183,7 @@ function fstable() {
                             else {
                                 out("Error: Wrong path.\n")
                                 end()
-                                break
+                                return
                             }
                         }
                         else {
@@ -201,10 +193,8 @@ function fstable() {
                     }
                 }
                 
-                if (P) {
-                    out("")
-                    end()
-                }
+                out("")
+                end()
                 break
             
             default,

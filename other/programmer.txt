@@ -5,7 +5,7 @@
 @name programmer
 
 #ifdef entity:remoteSetCode(string)
-PEnabled["programmer", number] = 1
+KList["programmer", number] = 1
 
 function programmer() {
     switch (P["state", number]) {
