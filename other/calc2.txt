@@ -4,7 +4,7 @@
 
 @name calc2
 
-KList["calc2", number] = 1
+PList["calc2", number] = 1
 
 function calc2() { 
     switch (P["state", number]) {
@@ -13,21 +13,18 @@ function calc2() {
             
             P["input", array] = array()
             
-            P["vars", array] = array()
-            P["order", array] = array()
-            
             P["expression", table] = table()
             P["stack", table] = table()
             
-            P["priority", table] = table(
+            P["priorityStack", array] = array()
+            
+            P["priorityTable", table] = table(
                 "+" = 0,
                 "-" = 0,
                 "*" = 1,
                 "/" = 1,
                 "^" = 2
             )
-            
-            P["lastPriorities", array] = array()
             
             P["state", number] = 1
             break
@@ -60,69 +57,135 @@ function calc2() {
             local Input = P["input", array]
             
             for (I = 1, Overload) {
-                if (Input:count() > 0) {
+                if (P["state", number] != 2) {
+                    break
+                }
+                elseif (Input:count() > 0) {
                     local In1 = Input:shiftString()
-                    print(In1)
                     
-                    if (
-                        In1 == "+"
-                        | In1 == "-"
-                        | In1 == "*"
-                        | In1 == "/"
-                        | In1 == "^"
-                    ) {
-                        out("Error: +-*/^ in wrong place.\n")
-                        printTable(Input)
-                        P["state", number] = 1
-                        return
-                    }
-                    elseif (In1 == "(") {
-                        P["stack", table]:pushTable(This)
-                        This = This["table" + This["count", number], table] = table()
-                    }
-                    elseif (In1 == ")") {
-                        This = P["stack", table]:popTable()
-                    }
-                    else {
-                        local In2 = Input:shiftString()
-                        print(In2)
-                        
-                        if (
-                            In1 == "+"
-                            | In1 == "-"
-                            | In1 == "*"
-                            | In1 == "/"
-                            | In1 == "^"
-                        ) {
-                            local Priority = 0
-                            while (Priority < P["priority", table][In1, number]) {
-                                Priority++
+                    switch (In1) {
+                        case "+", case "-", case "*", case "/", case "^", 
+                            if (This:exists("table" + This["count", number])) {
+                                while (P["priority", number] < P["priorityTable", table][In1, number]) {
+                                    P["priority", number] = P["priority", number] + 1
+                                    
+                                    local Child = This["table" + This["count", number], table]
+                                    
+                                    P["stack", table]:pushTable(This)
+                                    This = This["table" + This["count", number], table] = table()
+                                    
+                                    This["table1", table] = Child
+                                    This["count", number] = 1
+                                    This["action", number] = P["priority", number]
+                                }
                                 
-                                P["stack", table]:pushTable(This)
-                                This = This["table" + This["count", number], table] = table()
+                                while (P["priority", number] > P["priorityTable", table][In1, number]) {
+                                    P["priority", number] = P["priority", number] - 1
+                                    
+                                    This = P["stack", table]:popTable()
+                                }
+                                
+                                This["action", number] = P["priority", number]
                             }
+                            else {
+                                out("Error: +-*/^ in wrong place.\n")
+                                P["state", number] = 4
+                            }
+                            break
+                        
+                        case "(",
+                            P["priorityStack", array]:pushNumber(P["priority", number])
+                            P["priority", number] = 0
                             
                             This["count", number] = This["count", number] + 1
-                            This["number" + This["count", number], number] = In2:toNumber()
-                        }
-                        elseif (In2 == "") {
-                            out("Ok.\n")
-                            printTable(P["expression", table])
                             
-                            P["state", number] = 1
-                        }
-                        else {
-                            out("Internal error.\n")
-                            P["state", number] = 1
-                            return
-                        }
+                            P["stack", table]:pushTable(This)
+                            This = This["table" + This["count", number], table] = table()
+                            break
+                        
+                        case ")",
+                            if (P["stack", table]) {
+                                while (P["priority", number] > 0) {
+                                    P["priority", number] = P["priority", number] - 1
+                                    This = P["stack", table]:popTable()
+                                }
+                                
+                                P["priority", number] = P["priorityStack", array]:popNumber()
+                                
+                                This = P["stack", table]:popTable()
+                            }
+                            else {
+                                out("Error: \")\" in wrong place.\n")
+                                P["state", number] = 4
+                            }
+                            break
+                        
+                        default,
+                            local In2 = Input:shiftString()
+                            
+                            switch (In2) {
+                                case "+", case "-", case "*", case "/", case "^",
+                                    while (P["priority", number] < P["priorityTable", table][In2, number]) {
+                                        P["priority", number] = P["priority", number] + 1
+                                        
+                                        This["count", number] = This["count", number] + 1
+                                        P["stack", table]:pushTable(This)
+                                        This = This["table" + This["count", number], table] = table()
+                                    }
+                                    
+                                    This["count", number] = This["count", number] + 1
+                                    This["number" + This["count", number], number] = In1:toNumber()
+                                    This["action", number] = P["priority", number]
+                                    
+                                    while (P["priority", number] > P["priorityTable", table][In2, number]) {
+                                        P["priority", number] = P["priority", number] - 1
+                                        
+                                        This = P["stack", table]:popTable()
+                                    }
+                                    break
+                                
+                                case ")",
+                                    This["count", number] = This["count", number] + 1
+                                    This["number" + This["count", number], number] = In1:toNumber()
+                                    
+                                    Input:unshiftString(In2)
+                                    
+                                    #[while (P["priority", number] > 0) {
+                                        P["priority", number] = P["priority", number] - 1
+                                        
+                                        This = P["stack", table]:popTable()
+                                    }
+                                    P["priority", number] = P["priorityStack", array]:popNumber()
+                                    
+                                    This = P["stack", table]:popTable()]#
+                                    break
+                                    
+                                case "(",
+                                    out("Error: expressions like " + In1 + In2 + " not supported.\n")
+                                    
+                                    P["state", number] = 4
+                                    break
+                                
+                                case "",
+                                    This["count", number] = This["count", number] + 1
+                                    This["number" + This["count", number], number] = In1:toNumber()
+                                    
+                                    out(P["expression", table]:toString())
+                                    
+                                    P["state", number] = 3
+                                    break
+                                
+                                default,
+                                    out("Internal error.\n")
+                                    P["state", number] = 4
+                            }
                     }
                 }
                 else {
-                    out("Expression ended.\n")
-                    printTable(P["expression", table])
+                    out(P["expression", table]:toString())
                     
-                    P["state", number] = 1
+                    P["state", number] = 3
+                    break
                 }
             }
             
@@ -142,5 +205,13 @@ function calc2() {
                 }
             }
             break]#
+        
+        case 4,
+            P["stack", table]:clear()
+            P["expression", table]:clear()
+            P["priorityStack", array]:clear()
+            P["priority", number] = 0
+            P["state", number] = 1
+            break
     }
 }

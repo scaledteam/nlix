@@ -4,7 +4,7 @@
 
 @name xfileframe
 
-KList["xfileframe", number] = 1
+PList["xfileframe", number] = 1
 
 function xfileframe() {
     switch (P["state", number]) {

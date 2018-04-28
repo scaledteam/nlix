@@ -4,7 +4,7 @@
 
 @name dremove
 
-KList["dremove", number] = 1
+PList["dremove", number] = 1
 
 function dremove() {
     if (args() > 0) {

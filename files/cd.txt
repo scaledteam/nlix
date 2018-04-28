@@ -4,7 +4,7 @@
 
 @name cd
 
-KList["cd", number] = 1
+PList["cd", number] = 1
 
 function cd() {
     if (args() < 1) {

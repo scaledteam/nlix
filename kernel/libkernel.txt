@@ -6,7 +6,7 @@
 @persist NULL:table
 
 function table exec(Name:string) {
-    if (KList[Name, number]) {
+    if (PList[Name, number]) {
         if (P) {
             Program = table("name" = Name, "parent" = P)
         }

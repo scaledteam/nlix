@@ -8,7 +8,7 @@
 
 xmenuAdd("games", "clicker")
 
-KList["clicker", number] = 1
+PList["clicker", number] = 1
 
 function clicker() {
     switch (P["state", number]) {

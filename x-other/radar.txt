@@ -7,7 +7,7 @@
 #ifdef findInSphere(vector, number)
 xmenuAdd("real", "radar")
 
-KList["radar", number] = 1
+PList["radar", number] = 1
 
 function radar() {
     switch (P["state", number]) {

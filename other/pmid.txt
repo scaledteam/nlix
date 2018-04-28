@@ -4,7 +4,7 @@
 
 @name pmid
 
-KList["pmid", number] = 1
+PList["pmid", number] = 1
 
 #ifdef soundPlay(number, number, string)
 function pmid() {

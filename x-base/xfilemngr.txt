@@ -6,7 +6,7 @@
 
 xmenuAdd("base", "xfilemngr")
 
-KList["xfilemngr", number] = 1
+PList["xfilemngr", number] = 1
 
 function xfilemngr() {
     switch (P["state", number]) {

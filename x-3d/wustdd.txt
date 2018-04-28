@@ -6,7 +6,7 @@
 
 xmenuAdd("3d", "wustdd")
 
-KList["wustdd", number] = 1
+PList["wustdd", number] = 1
 
 function wustdd() {
     switch (P["state", number]) {

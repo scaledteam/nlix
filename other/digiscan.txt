@@ -2,10 +2,10 @@
 # Created by scaled
 #
 
-@name digi-scan
+@name digiscan
 
 #ifdef ranger(number)
-KList["digiscan", number] = 1
+PList["digiscan", number] = 1
 
 function digiscan() { 
     switch (P["state", number]) {
@@ -28,7 +28,7 @@ function digiscan() {
                         break
                 }       
                 
-                local Resolution = P["resolution", vector2]
+                local Resolution = round(P["resolution", vector2])
                 P["offset", vector] = vec(shift(Resolution) / 2, 0)
                 
                 # Textures list
@@ -91,7 +91,6 @@ function digiscan() {
                     
                     local Direction = Device:entity():toWorldAxis(vec(Y, X, -ResolutionY) - Offset)
                     local RangerMain = rangerOffset(20000, Device:entity():toWorld(vec(0, 0, -10)), Direction)
-                    local Brightness = 0
                     if (RangerMain:hit()) {
                         Device[Counter] = rgb2digi(Textures[RangerMain:matType(), vector] * (abs(Direction:normalized():dot(RangerMain:hitNormal())) * 0.5 + 0.5), 3)
                     }

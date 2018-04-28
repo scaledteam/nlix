@@ -5,7 +5,7 @@
 @name wget
 
 #ifdef httpRequest(string)
-KList["wget", number] = 1
+PList["wget", number] = 1
 
 function wget() {
     switch (P["state", number]) {
@@ -44,7 +44,7 @@ function wget() {
                         Filename = "webpage"
                     }
                     
-                    fwrite(Filename, Data)
+                    fwrite(fabsPath(Filename, P["parent", table]["pwd", string]), Data)
                     
                     P["state", number] = 3
                 }

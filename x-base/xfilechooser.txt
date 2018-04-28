@@ -4,7 +4,7 @@
 
 @name xfilechooser
 
-KList["xfilechooser", number] = 1
+PList["xfilechooser", number] = 1
 
 function xfilechooser() {
     switch (P["state", number]) {

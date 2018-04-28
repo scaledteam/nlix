@@ -4,7 +4,7 @@
 
 @name sh
 
-KList["sh", number] = 1
+PList["sh", number] = 1
 
 function sh() {
     switch (P["state", number]) {

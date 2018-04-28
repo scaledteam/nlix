@@ -4,7 +4,7 @@
 
 @name rund
 
-KList["rund", number] = 1
+PList["rund", number] = 1
 
 function rund() { 
     if (args() < 1) {

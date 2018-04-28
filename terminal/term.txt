@@ -8,7 +8,7 @@
 TERM_ERASE  = toChar(15) + "erase"
 TERM_ERASE1 = toChar(15) + "erase1"
 
-KList["term", number] = 1
+PList["term", number] = 1
 
 function term() {
     switch (P["state", number]) {

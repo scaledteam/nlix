@@ -4,7 +4,7 @@
 
 @name xremove
 
-KList["xremove", number] = 1
+PList["xremove", number] = 1
 
 function xremove() {
     for (I = 1, Overload) {

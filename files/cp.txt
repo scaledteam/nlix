@@ -4,7 +4,7 @@
 
 @name cp
 
-KList["cp", number] = 1
+PList["cp", number] = 1
 
 function cp() { 
     switch (P["state", number]) {

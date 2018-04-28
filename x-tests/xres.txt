@@ -6,7 +6,7 @@
 
 xmenuAdd("tests", "xres", "xrestest")
 
-KList["xrestest", number] = 1
+PList["xrestest", number] = 1
 
 function xrestest() {
     switch (P["state", number]) {

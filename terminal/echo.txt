@@ -4,7 +4,7 @@
 
 @name echo
 
-KList["echo", number] = 1
+PList["echo", number] = 1
 
 function echo() {
     out(P["args", array]:concat(" ") + "\n")

@@ -4,7 +4,7 @@
 
 @name kill
 
-KList["kill", number] = 1
+PList["kill", number] = 1
 
 function kill() {
     if (args() < 1) {

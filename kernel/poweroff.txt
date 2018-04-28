@@ -4,7 +4,7 @@
 
 @name poweroff
 
-KList["poweroff", number] = 1
+PList["poweroff", number] = 1
 
 function poweroff() {
     while (KTasks:count() > 0) {

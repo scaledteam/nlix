@@ -6,7 +6,7 @@
 
 xmenuAdd("tests", "xids")
 
-KList["xids", number] = 1
+PList["xids", number] = 1
 
 function xids() {
     switch (P["state", number]) {

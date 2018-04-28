@@ -3,7 +3,7 @@
 #
 
 @name nlix
-@persist [KList KTasks]:table KPerf KState P:table
+@persist [KTasks PList P]:table KPerf KState
 @trigger none
 
 if (!tickClk()) {
@@ -65,7 +65,7 @@ if (!tickClk()) {
                 # Other
                 case 60, #include "nlix/other/calc" break
                 case 61, #include "nlix/other/surl" break
-                case 62, #include "nlix/other/digi-scan" break
+                case 62, #include "nlix/other/digiscan" break
                 case 63, #include "nlix/other/wget" break
                 case 64, #include "nlix/other/calc2" break
                 case 65, #include "nlix/other/ssh" break

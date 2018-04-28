@@ -4,7 +4,7 @@
 
 @name cat
 
-KList["cat", number] = 1
+PList["cat", number] = 1
 
 function cat() { 
     switch (P["state", number]) {

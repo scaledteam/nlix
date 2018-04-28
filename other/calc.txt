@@ -4,7 +4,7 @@
 
 @name calc
 
-KList["calc", number] = 1
+PList["calc", number] = 1
 
 function calc() { 
     switch (P["state", number]) {

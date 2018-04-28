@@ -4,7 +4,7 @@
 
 @name rm
 
-KList["rm", number] = 1
+PList["rm", number] = 1
 
 function rm() {
     switch (P["state", number]) {

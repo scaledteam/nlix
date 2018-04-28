@@ -5,7 +5,7 @@
 @name fsreal
 
 #ifdef fileRead()
-KList["fsreal", number] = 1
+PList["fsreal", number] = 1
 
 function fsreal() {
     switch (P["state", number]) {
