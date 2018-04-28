@@ -76,151 +76,128 @@ function term() {
             
             if (Device | P:exists("out")) {
                 if (wait()) {
-                    local In = in()
-                    
                     local Text = P["text", string]
                     local TextR = P["textR", array]
                     
                     local Update = 0
                     
-                    switch (In) {
-                        case TERM_ERASE1,
-                            local EraseCount = 1
+                    for (I = 1, Overload) {
+                        if (wait()) {
+                            local In = in()
                             
-                            Update = 1
-                            
-                            local String = TextR:popString()
-                            local StringCount = String:length()
-                            
-                            if (StringCount > 1) {
-                                TextR:pushString(String:sub(1, -2))
-                                P["text", string] = Text = Text:sub(1, -2)
-                            }
-                            else {
-                                P["text", string] = Text = Text:sub(1, -3)
-                            }
-                            break
-                        
-                        case TERM_ERASE,
-                            local EraseCount = P["in", array]:shiftNumber()
-                            
-                            Update = 1
-                            
-                            while (EraseCount > 0) {
-                                local String = TextR:popString()
-                                local StringCount = String:length()
-                                
-                                if (StringCount == 0) {
-                                    break
-                                }
-                                elseif (EraseCount < StringCount) {
-                                    TextR:pushString(String:sub(1, -1 - EraseCount))
-                                    P["text", string] = Text = Text:sub(1, -1 - EraseCount)
-                                    break
-                                }
-                                elseif (EraseCount == StringCount) {
-                                    P["text", string] = Text = Text:sub(1, -2 - EraseCount)
-                                    break
-                                }
-                                else {
-                                    EraseCount -= StringCount
-                                    P["text", string] = Text = Text:sub(1, -2 - StringCount)
-                                }
-                            }
-                            
-                            #Text = TextR:concat("")
-                            Text = TextR:concat("\n"):replace("\n\n", "\n")
-                            break
-                        
-                        #[case EXIT,
-                            deviceReturn()
-                            local DeviceType = P["deviceType", string]
-                            switch (DeviceType) {
-                                case "gmod_wire_egp",
-                                    Device:egpClear()
+                            switch (In) {
+                                case TERM_ERASE1,
+                                    local EraseCount = 1
+                                    
+                                    Update = 1
+                                    
+                                    local String = TextR:popString()
+                                    local StringCount = String:length()
+                                    
+                                    if (StringCount > 1) {
+                                        TextR:pushString(String:sub(1, -2))
+                                        P["text", string] = Text = Text:sub(1, -2)
+                                    }
+                                    else {
+                                        P["text", string] = Text = Text:sub(1, -3)
+                                    }
                                     break
                                 
-                                case "gmod_wire_consolescreen",
-                                    Device[2041] = 1
-                                    break
+                                case TERM_ERASE,
+                                    local EraseCount = P["in", array]:shiftNumber()
+                                    
+                                    Update = 1
+                                    
+                                    while (EraseCount > 0) {
+                                        local String = TextR:popString()
+                                        local StringCount = String:length()
                                         
-                                case "gmod_wire_textscreen",
-                                    Device["String", string] = ""
-                                    break
-                                
-                                case "out",
-                                    P["out", array]:pushString(EXIT)
+                                        if (StringCount == 0) {
+                                            break
+                                        }
+                                        elseif (EraseCount < StringCount) {
+                                            TextR:pushString(String:sub(1, -1 - EraseCount))
+                                            P["text", string] = Text = Text:sub(1, -1 - EraseCount)
+                                            break
+                                        }
+                                        elseif (EraseCount == StringCount) {
+                                            P["text", string] = Text = Text:sub(1, -2 - EraseCount)
+                                            break
+                                        }
+                                        else {
+                                            EraseCount -= StringCount
+                                            P["text", string] = Text = Text:sub(1, -2 - StringCount)
+                                        }
+                                    }
+                                    
+                                    #Text = TextR:concat("")
+                                    Text = TextR:concat("\n"):replace("\n\n", "\n")
                                     break
                                 
                                 default,
-                            }
-                            
-                            P["deviceType", string] = ""
-                            end()
-                            break]#
-                        
-                        default,
-                            local Width = P["resolution", vector2][1]
-                            
-                            local NewText = TextR:popString() + In:replace("\t", " ")
-                            local NewTextExp = NewText:explode("\n")
-                            
-                            local NewTextExpCount = NewTextExp:count()
-                            if (NewTextExpCount == 1) {
-                                local NewText2 = NewTextExp:shiftString()
-                                
-                                if (NewText2:length() >= Width) {
-                                    for (I = 0, NewText2:length() / Width) {
-                                        TextR:pushString(NewText2:sub(I * Width, (I + 1) * Width - 1))
+                                    local Width = P["resolution", vector2][1]
+                                    
+                                    local NewText = TextR:popString() + In:replace("\t", " ")
+                                    local NewTextExp = NewText:explode("\n")
+                                    
+                                    local NewTextExpCount = NewTextExp:count()
+                                    if (NewTextExpCount == 1) {
+                                        local NewText2 = NewTextExp:shiftString()
+                                        
+                                        if (NewText2:length() >= Width) {
+                                            for (I = 0, NewText2:length() / Width) {
+                                                TextR:pushString(NewText2:sub(I * Width, (I + 1) * Width - 1))
+                                            }
+                                            
+                                            Update = 1
+                                            while (TextR:count() > P["resolution", vector2][2]) {
+                                                TextR:shift()
+                                            }
+                                            #Text = TextR:concat("")
+                                            Text = TextR:concat("\n"):replace("\n\n", "\n")
+                                        }
+                                        else {
+                                            Text += In
+                                            TextR:pushString(NewText)
+                                        }
+                                    }
+                                    elseif (NewTextExpCount > P["resolution", vector2][2]) {
+                                        TextR:clear()
+                                        NewTextExp = NewTextExp:concat("\n\t", NewTextExpCount - P["resolution", vector2][2] + 1):explode("\t")
+                                        
+                                        foreach (I, NewText2:string = NewTextExp) {
+                                            for (I = 0, NewText2:length() / Width) {
+                                                TextR:pushString(NewText2:sub(I * Width, (I + 1) * Width - 1))
+                                            }
+                                        }
+                                        
+                                        Update = 1
+                                        while (TextR:count() > P["resolution", vector2][2]) {
+                                            TextR:shift()
+                                        }
+                                        #Text = TextR:concat("")
+                                        Text = TextR:concat("\n"):replace("\n\n", "\n")
+                                    }
+                                    else {
+                                        NewTextExp = NewTextExp:concat("\n\t"):explode("\t")
+                                        
+                                        foreach (I, NewText2:string = NewTextExp) {
+                                            for (I = 0, NewText2:length() / Width) {
+                                                TextR:pushString(NewText2:sub(I * Width, (I + 1) * Width - 1))
+                                            }
+                                        }
+                                        
+                                        Update = 1
+                                        while (TextR:count() > P["resolution", vector2][2]) {
+                                            TextR:shift()
+                                        }
+                                        #Text = TextR:concat("")
+                                        Text = TextR:concat("\n"):replace("\n\n", "\n")
                                     }
                                     
-                                    Update = 1
-                                    while (TextR:count() > P["resolution", vector2][2]) {
-                                        TextR:shift()
-                                    }
-                                    #Text = TextR:concat("")
-                                    Text = TextR:concat("\n"):replace("\n\n", "\n")
-                                }
-                                else {
-                                    Text += In
-                                    TextR:pushString(NewText)
-                                }
+                                    P["text", string] = Text
                             }
-                            elseif (NewTextExpCount > P["resolution", vector2][2]) {
-                                TextR:clear()
-                                NewTextExp = NewTextExp:concat("\n\t", NewTextExpCount - P["resolution", vector2][2] + 1):explode("\t")
-                                
-                                foreach (I, NewText2:string = NewTextExp) {
-                                    for (I = 0, NewText2:length() / Width) {
-                                        TextR:pushString(NewText2:sub(I * Width, (I + 1) * Width - 1))
-                                    }
-                                }
-                                
-                                Update = 1
-                                while (TextR:count() > P["resolution", vector2][2]) {
-                                    TextR:shift()
-                                }
-                                #Text = TextR:concat("")
-                                Text = TextR:concat("\n"):replace("\n\n", "\n")
-                            }
-                            else {
-                                NewTextExp = NewTextExp:concat("\n\t"):explode("\t")
-                                
-                                foreach (I, NewText2:string = NewTextExp) {
-                                    for (I = 0, NewText2:length() / Width) {
-                                        TextR:pushString(NewText2:sub(I * Width, (I + 1) * Width - 1))
-                                    }
-                                }
-                                
-                                Update = 1
-                                while (TextR:count() > P["resolution", vector2][2]) {
-                                    TextR:shift()
-                                }
-                                #Text = TextR:concat("")
-                                Text = TextR:concat("\n"):replace("\n\n", "\n")
-                            }
-                            
-                            P["text", string] = Text
+                        }
                     }
                             
                     local DeviceType = P["deviceType", string]

@@ -149,15 +149,6 @@ function calc2() {
                                     This["number" + This["count", number], number] = In1:toNumber()
                                     
                                     Input:unshiftString(In2)
-                                    
-                                    #[while (P["priority", number] > 0) {
-                                        P["priority", number] = P["priority", number] - 1
-                                        
-                                        This = P["stack", table]:popTable()
-                                    }
-                                    P["priority", number] = P["priorityStack", array]:popNumber()
-                                    
-                                    This = P["stack", table]:popTable()]#
                                     break
                                     
                                 case "(",
@@ -169,14 +160,10 @@ function calc2() {
                                 case "",
                                     This["count", number] = This["count", number] + 1
                                     This["number" + This["count", number], number] = In1:toNumber()
-                                    
-                                    out(P["expression", table]:toString())
-                                    
-                                    P["state", number] = 3
                                     break
                                 
                                 default,
-                                    out("Internal error.\n")
+                                    out("Internal error: number after number.\n")
                                     P["state", number] = 4
                             }
                     }
@@ -184,6 +171,12 @@ function calc2() {
                 else {
                     out(P["expression", table]:toString())
                     
+                    This = P["expression", table]
+                    while (This["count", number] == 1 & This:exists("table1")) {
+                        This = This["table1", table]
+                    }
+                    
+                    P["stack", table]:clear()
                     P["state", number] = 3
                     break
                 }
@@ -192,19 +185,75 @@ function calc2() {
             P["this", table] = This
             break
         
-        #[case 3,
-            local Expression = P["expression", array]
-            local Stack = P["stack", array]
+        case 3,
+            local This = P["this", table]
+            local Stack = P["stack", table]
             
             for (I = 1, Overload) {
-                if (Expression:count() > 1) {
+                local Count = This["count", number]
+                
+                if (Count == 1 & This:exists("table1")) {
+                    #out("1\n")
+                    local Table = This["table1", table]
+                    This = Stack:popTable()
+                    
+                    This["table" + This["pos", number], table] = Table
+                }
+                elseif (Count > 1) {
+                    if (This:exists("table" + Count)) {
+                        #out("2\n")
+                        This["pos", number] = Count
+                        
+                        Stack:pushTable(This)
+                        This = This["table" + This["pos", number], table]
+                    }
+                    elseif (This:exists("table" + (Count - 1))) {
+                        #out("3\n")
+                        This["pos", number] = Count - 1
+                        
+                        Stack:pushTable(This)
+                        This = This["table" + This["pos", number], table]
+                    }
+                    else {
+                        #out("4\n")
+                        local Action = This["action", number]
+                        switch (Action) {
+                            case 0,
+                                This["number" + (Count - 1), number] = This["number" + (Count - 1), number] + This["number" + Count, number]
+                                break
+                            
+                            case 1,
+                                This["number" + (Count - 1), number] = This["number" + (Count - 1), number] * This["number" + Count, number]
+                                break
+                            
+                            case 2,
+                                This["number" + (Count - 1), number] = This["number" + (Count - 1), number] ^ This["number" + Count, number]
+                                break
+                            
+                            default,
+                                out("Internal error: Unknown action.\n")
+                        }
+                        This["count", number] = Count - 1
+                    }
+                }
+                elseif (Stack) {
+                    #out("5\n")
+                    local Value = This["number1", number]
+                    This:clear()
+                    This = Stack:popTable()
+                    
+                    This:remove("table" + This["pos", number])
+                    This["number" + This["pos", number], number] = Value
                 }
                 else {
-                    P["state", number] = 1
-                    return
+                    out(This["number1", number] + "\n")
+                    P["state", number] = 4
+                    break
                 }
             }
-            break]#
+            
+            P["this", table] = This
+            break
         
         case 4,
             P["stack", table]:clear()

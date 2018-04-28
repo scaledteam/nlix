@@ -30,22 +30,22 @@ function xterm() {
             }
             
             local Skbd = exec("skbd")
-            local Sh = exec(ProgramName)
+            local Program = exec(ProgramName)
             local Term = exec("term")
             programUp()
             
-            P["sh", table] = Sh
+            P["program", table] = Program
             P["term", table] = Term
             
             Term["resolution", vector2] = P:removeVector2("termResolution")
             
             # input output
             if (P:exists("kbd")) {
-                Skbd["in", array] = Sh["kbd", array] = P["kbd", array]
+                Skbd["in", array] = Program["kbd", array] = P["kbd", array]
             }
             
-            Skbd["out", array] = Sh["in", array] = array()
-            Skbd["term", array] = Sh["out", array] = Term["in", array] = array()
+            Skbd["out", array] = Program["in", array] = array()
+            Skbd["term", array] = Program["out", array] = Term["in", array] = array()
             
             P["in", array] = Term["out", array] = array()
             
@@ -56,7 +56,7 @@ function xterm() {
             if (wait() & xcanDraw()) {
                 P["text", table]:xtext(in())
             }
-            elseif (!P["sh", table]) {
+            elseif (!P["program", table]) {
                 end()
             }
             break
