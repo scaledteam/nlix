@@ -5,7 +5,7 @@
 @name programmer
 
 #ifdef entity:remoteSetCode(string)
-PList["programmer", number] = 1
+PExist["programmer", number] = 1
 
 function programmer() {
     switch (P["state", number]) {
@@ -15,9 +15,7 @@ function programmer() {
                 end()
             }
             else {
-                local Program = exec("cat")
-                Program["args", array] = array(arg(1))
-                Program["out", array] = P["in", array]
+                fread(fabsPath(arg(1), P["parent", table]["pwd", string]))
                 
                 P["chipName", string] = args() >= 2 ? arg(1) : "generic"
                 P["state", number] = 1
@@ -25,8 +23,8 @@ function programmer() {
             break
         
         case 1,
-            if (wait()) {
-                P["data", string] = in()
+            if (fwait()) {
+                P["data", string] = fin()
                 P["state", number] = 2
             }
             break

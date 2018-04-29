@@ -7,9 +7,9 @@
 if (!S:exists("xmenu")) {
     local ExitEntry = table("exit" = "exit")
     
-    if (PList["poweroff", number]) { ExitEntry["poweroff", string] = "poweroff" }
-    if (PList["reboot", number]) { ExitEntry["reboot", string] = "reboot" }
-    if (PList["sh", number]) { ExitEntry["sh", string] = "sh" }
+    if (PExist["poweroff", number]) { ExitEntry["poweroff", string] = "poweroff" }
+    if (PExist["reboot", number]) { ExitEntry["reboot", string] = "reboot" }
+    if (PExist["sh", number]) { ExitEntry["sh", string] = "sh" }
     
     S["etc", table]["xmenu", table] = table(
         "exit" = ExitEntry
@@ -30,7 +30,7 @@ function xmenuAdd(Category:string, ProgramName:string) {
     xmenuAdd(Category, ProgramName, ProgramName)
 }
 
-PList["xmenu", number] = 1
+PExist["xmenu", number] = 1
 
 function xmenu() {
     switch (P["state", number]) {

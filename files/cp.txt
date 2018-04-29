@@ -4,7 +4,7 @@
 
 @name cp
 
-PList["cp", number] = 1
+PExist["cp", number] = 1
 
 function cp() { 
     switch (P["state", number]) {

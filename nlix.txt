@@ -3,7 +3,7 @@
 #
 
 @name nlix
-@persist [KTasks PList P]:table KPerf KState
+@persist [KTasks NULL P]:table KPerf KState
 @trigger none
 
 if (!tickClk()) {

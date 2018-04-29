@@ -6,7 +6,7 @@
 
 xmenuAdd("real", "speedometer")
 
-PList["speedometer", number] = 1
+PExist["speedometer", number] = 1
 
 function speedometer() {
     switch (P["state", number]) {

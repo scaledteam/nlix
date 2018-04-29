@@ -4,7 +4,7 @@
 
 @name xfileframe
 
-PList["xfileframe", number] = 1
+PExist["xfileframe", number] = 1
 
 function xfileframe() {
     switch (P["state", number]) {

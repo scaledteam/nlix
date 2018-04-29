@@ -4,7 +4,7 @@
 
 @name rm
 
-PList["rm", number] = 1
+PExist["rm", number] = 1
 
 function rm() {
     switch (P["state", number]) {

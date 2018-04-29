@@ -7,7 +7,7 @@
 
 Overload = 20
 
-PList["overload", number] = 1
+PExist["overload", number] = 1
 
 function overload() {
     if (args() < 1) {

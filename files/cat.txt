@@ -4,7 +4,7 @@
 
 @name cat
 
-PList["cat", number] = 1
+PExist["cat", number] = 1
 
 function cat() { 
     switch (P["state", number]) {

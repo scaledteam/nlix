@@ -6,7 +6,7 @@
 
 xmenuAdd("games", "tic tac toe", "tictactoe")
 
-PList["tictactoe", number] = 1
+PExist["tictactoe", number] = 1
 
 function tictactoe() {
     switch (P["state", number]) {

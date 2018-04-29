@@ -4,7 +4,7 @@
 
 @name reboot
 
-PList["reboot", number] = 1
+PExist["reboot", number] = 1
 
 function reboot() {
     while (KTasks:count() > 0) {

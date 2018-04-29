@@ -4,7 +4,7 @@
 
 @name autoperf
 
-PList["autoperf", number] = 1
+PExist["autoperf", number] = 1
 
 function autoperf() {
     if (P:exists("lastRun")) {

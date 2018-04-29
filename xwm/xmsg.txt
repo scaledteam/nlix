@@ -4,7 +4,7 @@
 
 @name xmsg
 
-PList["xmsg", number] = 1
+PExist["xmsg", number] = 1
 
 function xmsg() {
     switch (P["state", number]) {

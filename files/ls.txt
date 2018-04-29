@@ -4,7 +4,7 @@
 
 @name ls
 
-PList["ls", number] = 1
+PExist["ls", number] = 1
 
 function ls() {
     switch (P["state", number]) {

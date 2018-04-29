@@ -9,7 +9,7 @@
 @persist [HotplugdPortsOld]:array HotplugdCounter
 PORTS_COUNT = 4
 
-PList["hotplugd", number] = 1
+PExist["hotplugd", number] = 1
 
 function hotplugd() {
     # hot plug

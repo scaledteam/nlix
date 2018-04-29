@@ -4,7 +4,7 @@
 
 @name plist
 
-PList["plist", number] = 1
+PExist["plist", number] = 1
 
 function plist() {
     local Counter = P["counter", number]

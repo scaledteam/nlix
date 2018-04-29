@@ -6,7 +6,7 @@
 
 xmenuAdd("3d", "hluoix3d")
 
-PList["hluoix3d", number] = 1
+PExist["hluoix3d", number] = 1
 
 function hluoix3d() {
     switch (P["state", number]) {

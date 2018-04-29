@@ -4,7 +4,7 @@
 
 @name xpanel
 
-PList["xpanel", number] = 1
+PExist["xpanel", number] = 1
 
 function xpanel() {
     switch (P["state", number]) {

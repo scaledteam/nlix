@@ -4,7 +4,7 @@
 
 @name xstart
 
-PList["xstart", number] = 1
+PExist["xstart", number] = 1
 
 function xstart() {
     switch (P["state", number]) {
@@ -76,7 +76,7 @@ function xstart() {
                 
                 P["name", string] = P["args", array]:shiftString()
                 
-                if (!PList[P["name", string], number]) {
+                if (!PExist[P["name", string], number]) {
                     out("Error: Program \"" + P["name", string] + "\" is not exist.\n")
                     end()
                 }

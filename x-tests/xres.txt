@@ -6,7 +6,7 @@
 
 xmenuAdd("tests", "xres", "xrestest")
 
-PList["xrestest", number] = 1
+PExist["xrestest", number] = 1
 
 function xrestest() {
     switch (P["state", number]) {

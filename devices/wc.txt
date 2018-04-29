@@ -5,7 +5,7 @@
 @name wc
 
 #ifdef entity:wirelink()
-PList["wc", number] = 1
+PExist["wc", number] = 1
 
 function wc() {
     local Arg = arg(1)

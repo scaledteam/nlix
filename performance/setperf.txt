@@ -4,7 +4,7 @@
 
 @name setperf
 
-PList["setperf", number] = 1
+PExist["setperf", number] = 1
 
 function setperf() {
     if (args() < 1) {

@@ -4,7 +4,7 @@
 
 @name dremove
 
-PList["dremove", number] = 1
+PExist["dremove", number] = 1
 
 function dremove() {
     if (args() > 0) {

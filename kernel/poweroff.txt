@@ -4,7 +4,7 @@
 
 @name poweroff
 
-PList["poweroff", number] = 1
+PExist["poweroff", number] = 1
 
 function poweroff() {
     while (KTasks:count() > 0) {

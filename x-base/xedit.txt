@@ -6,7 +6,7 @@
 
 xmenuAdd("base", "xedit")
 
-PList["xedit", number] = 1
+PExist["xedit", number] = 1
 
 function xedit() {
     switch (P["state", number]) {

@@ -4,7 +4,7 @@
 
 @name calc2
 
-PList["calc2", number] = 1
+PExist["calc2", number] = 1
 
 function calc2() { 
     switch (P["state", number]) {
@@ -76,8 +76,9 @@ function calc2() {
                                     
                                     This["table1", table] = Child
                                     This["count", number] = 1
-                                    This["action", number] = P["priority", number]
                                 }
+                                
+                                This["action", string] = In1
                                 
                                 while (P["priority", number] > P["priorityTable", table][In1, number]) {
                                     P["priority", number] = P["priority", number] - 1
@@ -85,7 +86,9 @@ function calc2() {
                                     This = P["stack", table]:popTable()
                                 }
                                 
-                                This["action", number] = P["priority", number]
+                                if (In1 == "/" | In1 == "-") {
+                                    This["reverse" + (This["count", number] + 1), number] = 1
+                                }
                             }
                             else {
                                 out("Error: +-*/^ in wrong place.\n")
@@ -135,12 +138,17 @@ function calc2() {
                                     
                                     This["count", number] = This["count", number] + 1
                                     This["number" + This["count", number], number] = In1:toNumber()
-                                    This["action", number] = P["priority", number]
+                                    
+                                    This["action", string] = In2
                                     
                                     while (P["priority", number] > P["priorityTable", table][In2, number]) {
                                         P["priority", number] = P["priority", number] - 1
                                         
                                         This = P["stack", table]:popTable()
+                                    }
+                                    
+                                    if (In2 == "/" | In2 == "-") {
+                                        This["reverse" + (This["count", number] + 1), number] = 1
                                     }
                                     break
                                 
@@ -216,17 +224,28 @@ function calc2() {
                     }
                     else {
                         #out("4\n")
-                        local Action = This["action", number]
+                        
+                        local Action = This["action", string]
                         switch (Action) {
-                            case 0,
+                            case "+", case "-",
+                                for (I = 0, 1) {
+                                    if (This["reverse" + (Count - I), number]) {
+                                        This["number" + (Count - I), number] = -This["number" + (Count - I), number]
+                                    }
+                                }
                                 This["number" + (Count - 1), number] = This["number" + (Count - 1), number] + This["number" + Count, number]
                                 break
                             
-                            case 1,
+                            case "*", case "/",
+                                for (I = 0, 1) {
+                                    if (This["reverse" + (Count - I), number]) {
+                                        This["number" + (Count - I), number] = 1 / This["number" + (Count - I), number]
+                                    }
+                                }
                                 This["number" + (Count - 1), number] = This["number" + (Count - 1), number] * This["number" + Count, number]
                                 break
                             
-                            case 2,
+                            case "^",
                                 This["number" + (Count - 1), number] = This["number" + (Count - 1), number] ^ This["number" + Count, number]
                                 break
                             

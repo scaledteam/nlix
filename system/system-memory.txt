@@ -11,7 +11,7 @@
 @outputs S:table
 
 S = table(
-    "bin" = PList,
+    "bin" = PExist,
     "etc" = table(
         "hostname" = "nlix" + entity():id()
     ),

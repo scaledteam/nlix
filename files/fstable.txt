@@ -4,7 +4,7 @@
 
 @name fstable
 
-PList["fstable", number] = 1
+PExist["fstable", number] = 1
 
 function fstable() {
     if (P["fs", table]:exists("table")) {

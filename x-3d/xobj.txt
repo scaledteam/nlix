@@ -6,7 +6,7 @@
 
 xmenuAdd("3d", "xobj")
 
-PList["xobj", number] = 1
+PExist["xobj", number] = 1
 
 function xobj() {
     switch (P["state", number]) {

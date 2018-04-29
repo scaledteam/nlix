@@ -4,7 +4,7 @@
 
 @name cd
 
-PList["cd", number] = 1
+PExist["cd", number] = 1
 
 function cd() {
     if (args() < 1) {

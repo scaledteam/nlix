@@ -3,10 +3,10 @@
 #
 
 @name libkernel
-@persist NULL:table
+@persist PExist:table
 
 function table exec(Name:string) {
-    if (PList[Name, number]) {
+    if (PExist[Name, number]) {
         if (P) {
             Program = table("name" = Name, "parent" = P)
         }

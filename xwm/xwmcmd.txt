@@ -6,7 +6,7 @@
 
 xmenuAdd("xwm", "xwmcmd")
 
-PList["xwmcmd", number] = 1
+PExist["xwmcmd", number] = 1
 
 function xwmcmd() {
     switch (P["state", number]) {

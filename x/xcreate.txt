@@ -4,7 +4,7 @@
 
 @name xcreate
 
-PList["xcreate", number] = 1
+PExist["xcreate", number] = 1
 
 function xcreate() {
     for (I = 1, Overload) {

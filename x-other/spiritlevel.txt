@@ -6,7 +6,7 @@
 
 xmenuAdd("real", "spirit level", "spiritlevel")
 
-PList["spiritlevel", number] = 1
+PExist["spiritlevel", number] = 1
 
 function spiritlevel() {
     switch (P["state", number]) {

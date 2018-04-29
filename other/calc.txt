@@ -4,7 +4,7 @@
 
 @name calc
 
-PList["calc", number] = 1
+PExist["calc", number] = 1
 
 function calc() { 
     switch (P["state", number]) {

@@ -4,7 +4,7 @@
 
 @name xremove
 
-PList["xremove", number] = 1
+PExist["xremove", number] = 1
 
 function xremove() {
     for (I = 1, Overload) {

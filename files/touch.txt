@@ -4,7 +4,7 @@
 
 @name touch
 
-PList["touch", number] = 1
+PExist["touch", number] = 1
 
 function touch() {
     switch (P["state", number]) {

@@ -4,7 +4,7 @@
 
 @name rund
 
-PList["rund", number] = 1
+PExist["rund", number] = 1
 
 function rund() { 
     if (args() < 1) {

@@ -5,7 +5,7 @@
 @name surl
 
 #ifdef soundURLload(string, string, number, number, entity)
-PList["surl", number] = 1
+PExist["surl", number] = 1
 
 function surl() {
     local Arg = arg(1)

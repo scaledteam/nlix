@@ -4,12 +4,12 @@
 
 @name help
 
-PList["help", number] = 1
+PExist["help", number] = 1
 
 function help() {
     switch (P["state", number]) {
         case 0,
-            P["programList", array] = PList:keys()
+            P["programList", array] = PExist:keys()
             
             out(
                 "This system created by scaled.\n"

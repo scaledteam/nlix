@@ -6,7 +6,7 @@
 
 xmenuAdd("remote", "xvnc")
 
-PList["xvnc", number] = 1
+PExist["xvnc", number] = 1
 
 function xvnc() {
     switch (P["state", number]) {
