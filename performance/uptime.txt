@@ -3,13 +3,19 @@
 #
 
 @name uptime
+@persist StartTime
 
-S["tmp", table]["startTime", number] = systime()
+if (Tables:exists("StartTime")) {
+    StartTime = Tables["startTime", number]
+}
+else {
+    StartTime = Tables["startTime", number] = systime()
+}
 
 PExist["uptime", number] = 1
 
 function uptime() {
-    local Uptime = systime() - S["tmp", table]["startTime", number]
+    local Uptime = systime() - StartTime
     if (arg(1) == "server") {
         Uptime = systime()
     }

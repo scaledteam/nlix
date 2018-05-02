@@ -4,6 +4,19 @@
 
 @name xwm
 
+function xwmLaunch(ProgramName:string) {
+    P["xwmProgramName", string] = ProgramName
+    P["parent", table]["in", array]:pushString(ProgramName)
+}
+
+function number xwmWait() {
+    return P["parent", table]["programs", table][1, table]["function", string] == P["xwmProgramName", string]
+}
+
+function table xwmGetProgram() {
+    return P["parent", table]["programs", table][1, table]
+}
+
 xmenuAdd("xwm", "xwm")
 
 PExist["xwm", number] = 1
@@ -11,24 +24,24 @@ PExist["xwm", number] = 1
 function xwm() {
     switch (P["state", number]) {
         case 0,
-            if (P["parent", table]["name", string] == "sh") {
+            if (P["parent", table] & !P["parent", table]:exists("xframe")) {
                 P:removeTable("parent"):clear()
             }
             
             if (!P:exists("xframe")) {
                 if (P:exists("args")) {
-                    P["args", array]:unshiftString(P["name", string])
+                    P["args", array]:unshiftString("xwm")
                 }
                 else {
-                    P["args", array] = array(P["name", string])
+                    P["args", array] = array("xwm")
                 }
-                P["name", string] = "xstart"
+                P:changeProgram("xstart")
                 break
             }
             else {
                 if (!P:exists("kbd")) {
                     local Kbd = exec("kbd")
-                    programUp()
+                    tackUp()
                     
                     P["kbd", array] = Kbd["out", array] = array()
                 }
@@ -71,10 +84,6 @@ function xwm() {
             break
             
         case 2,
-            #[if (owner():keyPressed("b")) {
-                xprintAll()
-            }]#
-            
             if (xcanDraw()) {
                 if (P["programs", table]) {
                     # Send cursor to programs
@@ -140,18 +149,13 @@ function xwm() {
                     }
                     
                     # Infinity cycle
-                    local Counter = P["counter", number] + 1
-                    if (Counter > P["programs", table]:count()) {
-                        Counter = 1
-                    }
-                    P["counter", number] = Counter
-                    
-                    Program = P["programs", table][Counter, table]
+                    P["counter", number] = P["counter", number] % P["programs", table]:count() + 1
+                    Program = P["programs", table][P["counter", number], table]
                     
                     # Check if program is dead
                     if (!Program) {
-                        P["programs", table]:remove(Counter)
-                        P["frames", table]:removeTable(Counter):xremove()
+                        P["programs", table]:remove(P["counter", number])
+                        P["frames", table]:removeTable(P["counter", number]):xremove()
                     }
                     # check frame size
                     elseif (Program["xframe", table]["size", vector2][1] != Program["xframe", table]["window", table]["size", vector2][1]) {
@@ -267,19 +271,17 @@ function xwm() {
             break
         
         case 4,
-            #if (xcanDraw()) {
-                local Cursor = xcursor()
-                
-                if (xkeyUse()) {
-                    local Frame = P["frames", table][1, table]
-                    Frame:xpos(round(clamp(Cursor + Frame["moveOffset", vector2], vec2(0, 20), P["xframe", table]["size", vector2] - vec2(0, 20) - Frame["size", vector2])))
-                }
-                else {
-                    P["state", number] = 2
-                }
-                
-                P["xframe", table]["keyUse", number] = -1
-            #}
+            local Cursor = xcursor()
+            
+            if (xkeyUse()) {
+                local Frame = P["frames", table][1, table]
+                Frame:xpos(round(clamp(Cursor + Frame["moveOffset", vector2], vec2(0, 20), P["xframe", table]["size", vector2] - vec2(0, 20) - Frame["size", vector2])))
+            }
+            else {
+                P["state", number] = 2
+            }
+            
+            P["xframe", table]["keyUse", number] = -1
             break
         
         case 5,
@@ -362,9 +364,7 @@ function xwm() {
                 
                 P["state", number] = 2
             }
-            else {
-                break
-            }
+            break
     }
 }
 

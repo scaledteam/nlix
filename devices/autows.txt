@@ -2,15 +2,18 @@
 # Created by scaled
 #
 
-@name auto-ws
+@name autows
 
 PExist["autows", number] = 1
 
 function autows() {
     if (PExist["xwm", number]) {
-        if (S["dev", table]:exists("gmod_wire_egp")) {
-            local Program = exec("xwm")
-            Program:remove("parent")
+        if (
+            Devices:exists("gmod_wire_egp")
+            |
+            Devices:exists("gmod_wire_egp_emitter")
+        ) {
+            exec("xwm"):remove("parent")
             end()
             return
         }
@@ -19,21 +22,20 @@ function autows() {
     if (PExist["sh", number]) {
         if (
             (
-                S["dev", table]:exists("gmod_wire_textscreen")
+                Devices:exists("gmod_wire_textscreen")
                 |
-                S["dev", table]:exists("gmod_wire_egp")
+                Devices:exists("gmod_wire_egp")
                 |
-                S["dev", table]:exists("gmod_wire_consolescreen")
+                Devices:exists("gmod_wire_consolescreen")
             )
             &
             (
-                S["dev", table]:exists("gmod_wire_keyboard")
+                Devices:exists("gmod_wire_keyboard")
                 |
-                S["dev", table]:exists("gmod_wire_textentry")
+                Devices:exists("gmod_wire_textentry")
             )
         ) {
-            local Program = exec("sh")
-            Program:remove("parent")
+            exec("sh"):remove("parent")
             end()
             return
         }

@@ -8,10 +8,10 @@
 function table exec(Name:string) {
     if (PExist[Name, number]) {
         if (P) {
-            Program = table("name" = Name, "parent" = P)
+            Program = table("function" = Name, "parent" = P)
         }
         else {
-            Program = table("name" = Name)
+            Program = table("function" = Name)
         }
         KTasks:pushTable(Program)
         
@@ -23,9 +23,10 @@ function table exec(Name:string) {
 }
 
 function end() {
-    if(KTasks[KState, table] == P) {
-        KTasks:removeTable(KState):clear()
-        KState--
+    if(KTasks[KTaskId, table] == P) {
+        KTasks:remove(KTaskId)
+        P:clear()
+        KTaskId--
     }
     else {
         P:clear()
@@ -34,11 +35,11 @@ function end() {
     P = NULL
 }
 
-function programUp() {
-    if(KTasks[KState, table] == P) {
-        KTasks:remove(KState)
+function tackUp() {
+    if (KTasks[KTaskId, table] == P) {
+        KTasks:remove(KTaskId)
         KTasks:pushTable(P)
-        KState = KTasks:count()
+        KTaskId = KTasks:count()
     }
 }
 
@@ -46,7 +47,17 @@ function table:execNow() {
     if (P != NULL) {
         local Super = P
         P = Program
-        P["name", string]()
+        P["function", string]()
         P = Super
+    }
+}
+
+function number table:changeProgram(Function:string) {
+    if (PExist[Function, number]) {
+        This["function", string] = Function
+        return 1
+    }
+    else {
+        return 0
     }
 }

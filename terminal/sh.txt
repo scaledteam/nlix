@@ -12,7 +12,7 @@ function sh() {
             # init keyboard and terminal
             if (!P:exists("in")) {
                 local Skbd = exec("skbd")
-                programUp()
+                tackUp()
                 
                 P["in", array] = Skbd["out", array] = array()
                 
@@ -43,7 +43,7 @@ function sh() {
         
         case 1,
             #out("sh $ ")
-            out(owner():name():left(8) + "@" + S["etc", table]["hostname", string] + ":" + P["pwd", string] + " $ ")
+            out("sh:" + P["pwd", string] + " $ ")
             P["state", number] = 2
             break
         

@@ -11,25 +11,38 @@ PExist["xobj", number] = 1
 function xobj() {
     switch (P["state", number]) {
         case 0,
-            P["limit", number] = 30
+            P["limit", number] = 75
+            P["matrix", matrix] = matrix(ang(20))
             
-            local Program = exec("cat")
-            if (args() < 1) {
-                Program["args", array] = array("/e2shared/obj/cube.obj")
-                #Program["args", array] = array("/e2shared/obj/testfileigor.obj")
-                #Program["args", array] = array("/e2shared/obj/raritywet.obj")
+            if (args() >= 1) {
+                fread(arg(1))
+                P["state", number] = 3
             }
             else {
-                Program["args", array] = array(arg(1))
+                xwmLaunch("xfilechooser")
+                P["state", number] = 1
             }
-            
-            Program["out", array] = P["in", array] = array()
-            P["state", number] = 1
             break
         
         case 1,
+            if (xwmWait()) {
+                P["xfilechooser", table] = xwmGetProgram()
+                P["xfilechooser", table]["out", array] = P["in", array] = array()
+                
+                P["state", number] = 2
+            }
+            break
+        
+        case 2,
             if (wait()) {
-                P["file", array] = in():explode("\n")
+                fread(in())
+                P["state", number] = 3
+            }
+            break
+        
+        case 3,
+            if (fwait()) {
+                P["data", array] = fin():explode("\n")
                 
                 P["model", table] = table(
                     "v" = array(),  #Vertices
@@ -38,14 +51,20 @@ function xobj() {
                     "vp" = array(), #Parameter space vertices
                     "f" = table()   #Faces
                 )
-                P["state", number] = 2
+                P["state", number] = 4
             }
-            break
+            else {
+                break
+            }
         
-        case 2,
+        case 4,
             for (I = 1, Overload) {
-                if (P["file", array]:count() > 0) {
-                    local Stream = P["file", array]:shiftString():trimRight():explodeRE("%s+")
+                if (!perf()) {
+                    break
+                }
+                
+                if (P["data", array]:count() > 0) {
+                    local Stream = P["data", array]:shiftString():trimRight():explodeRE("%s+")
                     switch (Stream[1, string]) {
                         case "v",
                             local X = Stream[2, string]:toNumber()
@@ -54,6 +73,8 @@ function xobj() {
                             local W = (Stream[5, string] ?: "1"):toNumber()
                             
                             P["model", table]["v", array]:pushVector(vec(X, Y, Z) * W)
+                            
+                            P["scale", number] = max(P["scale", number], X, Y, Z)
                             break
                         
                         case "vt",
@@ -110,48 +131,60 @@ function xobj() {
                     }
                 }
                 else {
-                    P["state", number] = 3
+                    P["limit", number] = min(P["model", table]["f", table]:count(), P["limit", number])
+                    
+                    P["state", number] = 5
                     break
                 }
             }
             break
         
-        case 3,
-            if (xcanCreate(P["limit", number])) {
-                xcreate("box"):xsize(P["xframe", table]["size", vector2]):xcolor(vec())
+        case 5,
+            if (xcanCreate(P["limit", number] + 1)) {
+                local Res = xres()
                 
-                P["limit", number] = min(P["model", table]["f", table]:count(), P["limit", number] - 1)
-                P["state", number] = 4
+                xcreate("box"):xsize(Res):xcolor(vec())
+                
+                P["scale", number] = min(Res[1], Res[2]) / P["scale", number] / 3
+                
+                P["state", number] = 6
             }
             break
         
-        case 4,
-            local Scale = 0.4
+        case 6,
+            local Scale = P["scale", number]
             
-            local Res = P["xframe", table]["size", vector2]
-            local Matrix = matrix(ang(20))
+            local Res = xres()
+            local Matrix = P["matrix", matrix]
             local Offset = Res / 2
             
+            local V = P["model", table]["v", array]
+            
+            local Counter = P["counter", number]
+            
             for (I = 1, Overload) {
-                local Counter = P["counter", number] + 1
+                Counter++
                 
                 if (Counter > P["limit", number]) {
-                    P["state", number] = 5
-                    return
+                    P["state", number] = 7
+                    break
                 }
-                
-                xcreate("polyOutline"):xvertices(array(
-                    clamp(Scale * vec2(Matrix * P["model", table]["v", array][P["model", table]["f", table][Counter, table]["v", array][1, number], vector]) + Offset, vec2(), Res),
-                    clamp(Scale * vec2(Matrix * P["model", table]["v", array][P["model", table]["f", table][Counter, table]["v", array][2, number], vector]) + Offset, vec2(), Res),
-                    clamp(Scale * vec2(Matrix * P["model", table]["v", array][P["model", table]["f", table][Counter, table]["v", array][3, number], vector]) + Offset, vec2(), Res),
-                    clamp(Scale * vec2(Matrix * P["model", table]["v", array][P["model", table]["f", table][Counter, table]["v", array][4, number], vector]) + Offset, vec2(), Res)
-                ))
-                
-                P["counter", number] = Counter
+                else {
+                    local F = P["model", table]["f", table][Counter, table]["v", array]
+                    
+                    xcreate("polyOutline"):xvertices(array(
+                        clamp(Scale * vec2(Matrix * V[F[1, number], vector]) + Offset, vec2(), Res),
+                        clamp(Scale * vec2(Matrix * V[F[2, number], vector]) + Offset, vec2(), Res),
+                        clamp(Scale * vec2(Matrix * V[F[3, number], vector]) + Offset, vec2(), Res),
+                        clamp(Scale * vec2(Matrix * V[F[4, number], vector]) + Offset, vec2(), Res)
+                    ))
+                }
             }
+            
+            P["counter", number] = Counter
             break
         
-        case 5,
+        case 7,
             break
     }
 }

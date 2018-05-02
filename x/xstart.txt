@@ -71,13 +71,12 @@ function xstart() {
                 
                 P["xobjects", table] = table()
                 
-                P:remove("update")
-                P:remove("state")
-                
-                P["name", string] = P["args", array]:shiftString()
-                
-                if (!PExist[P["name", string], number]) {
-                    out("Error: Program \"" + P["name", string] + "\" is not exist.\n")
+                if (P:changeProgram(P["args", array]:shiftString())) {
+                    P:remove("update")
+                    P:remove("state")
+                }
+                else {
+                    out("Error: Program is not exist.\n")
                     end()
                 }
             }

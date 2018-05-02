@@ -3,6 +3,14 @@
 #
 
 @name libfiles
+@persist FSTab:table
+
+if (Tables:exists("fstab")) {
+    FSTab = Tables["fstab", table]
+}
+else {
+    Tables["fstab", table] = FSTab
+}
 
 function string fabsPath(Path:string, Context:string) {
     if (Path[1] != "/") {
@@ -25,8 +33,6 @@ function table fsCall(Mode:string, Path:string) {
     
     local PathExp = Path:explode("/")
     
-    local Fstab = S["etc", table]["fstab", table]
-    
     local I = PathExp:count()
     while (I > 0) {
         local BeforeFsPath = PathExp:concat("/", 1, I)
@@ -34,8 +40,8 @@ function table fsCall(Mode:string, Path:string) {
             BeforeFsPath = "/"
         }
         
-        if (Fstab:exists(BeforeFsPath)) {
-            local Fs = Fstab[BeforeFsPath, table]
+        if (FSTab:exists(BeforeFsPath)) {
+            local Fs = FSTab[BeforeFsPath, table]
             local Program = exec("fs" + Fs["type", string])
             
             Program["mode", string] = Mode

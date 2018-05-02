@@ -3,32 +3,41 @@
 #
 
 @name xmenu
+@persist XMenu:table
 
-if (!S:exists("xmenu")) {
+if (Tables:exists("XMenu")) {
+    XMenu = Tables["XMenu", table]
+}
+else {
     local ExitEntry = table("exit" = "exit")
     
     if (PExist["poweroff", number]) { ExitEntry["poweroff", string] = "poweroff" }
     if (PExist["reboot", number]) { ExitEntry["reboot", string] = "reboot" }
     if (PExist["sh", number]) { ExitEntry["sh", string] = "sh" }
     
-    S["etc", table]["xmenu", table] = table(
+    XMenu = Tables["XMenu", table] = table(
         "exit" = ExitEntry
     )
 }
 
 function xmenuAdd(Category:string, ProgramName:string, FunctionName:string) {
-    if (S["etc", table]["xmenu", table]:exists(Category)) {
-        S["etc", table]["xmenu", table][Category, table][ProgramName, string] = FunctionName
+    if (XMenu:exists(Category)) {
+        XMenu[Category, table][ProgramName, string] = FunctionName
     }
     else {
-        S["etc", table]["xmenu", table][Category, table] = table()
-        S["etc", table]["xmenu", table][Category, table][ProgramName, string] = FunctionName
+        XMenu[Category, table] = table()
+        XMenu[Category, table][ProgramName, string] = FunctionName
     }
 }
 
 function xmenuAdd(Category:string, ProgramName:string) {
     xmenuAdd(Category, ProgramName, ProgramName)
 }
+
+if (PExist["calc", number]) { xmenuAdd("term", "calculator", "xterm calc") }
+if (PExist["devcmd", number]) { xmenuAdd("term", "devcmd", "xterm devcmd") }
+if (PExist["sh", number]) { xmenuAdd("term", "sh", "xterm sh") }
+if (PExist["digiscan", number]) { xmenuAdd("term", "digiscan") }
 
 PExist["xmenu", number] = 1
 
@@ -39,7 +48,7 @@ function xmenu() {
                 P["out", array] = P["parent", table]["in", array]
                 
                 # Panel
-                local List = S["etc", table]["xmenu", table]:keys()
+                local List = XMenu:keys()
                 P["categories", array] = List
                 
                 local MenuWidth = 0
@@ -74,7 +83,7 @@ function xmenu() {
                 if (inrange(Cursor - P["pos", vector2], vec2(), P["menu", table]["size", vector2]) & PosN != P["posNOld", number]) {
                     P["posNOld", number] = PosN
                     
-                    P["programTable", table] = S["etc", table]["xmenu", table][P["categories", array][PosN, string], table]
+                    P["programTable", table] = XMenu[P["categories", array][PosN, string], table]
                     local List = P["programTable", table]:keys()
                     P["programList", array] = List
                     

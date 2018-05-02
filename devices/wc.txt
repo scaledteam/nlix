@@ -39,20 +39,15 @@ function wc() {
                 out("Usage: wc connect [id]\n")
             }
             else {
-                local Id = arg(2):toNumber()
+                local Device = entity(arg(2):toNumber()):wirelink()
                 
-                if (!S["dev", table]["byId", table][Id, wirelink]) {
-                    local Device = entity(Id):wirelink()
-                    
-                    if (Device) {
-                        deviceNew(Device)
-                    }
-                    else {
-                        out("Error: Incorrect id.\n")
+                if (Device) {
+                    if (!deviceNew(Device)) {
+                        out("Error: Device already exists in this system.\n")
                     }
                 }
                 else {
-                    out("Error: Device already exists in this system.\n")
+                    out("Error: Incorrect id.\n")
                 }
             }
             break

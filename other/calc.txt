@@ -9,231 +9,274 @@ PExist["calc", number] = 1
 function calc() { 
     switch (P["state", number]) {
         case 0,
-            P["parts", array] = array()
-            P["depths", array] = array()
-            P["partsPoses", array] = array()
+            out("Calculator shell.\n")
             
-            if (!wait()) {
-                out("Calculator shell.\n")
-            }
-            else {
-                P["shell", number] = 1
-            }
+            P["input", array] = array()
+            
+            P["expression", table] = table()
+            P["stack", table] = table()
+            
+            P["priorityStack", array] = array()
+            
+            P["priorityTable", table] = table(
+                "+" = 0,
+                "-" = 0,
+                "*" = 1,
+                "/" = 1,
+                "^" = 2
+            )
             
             P["state", number] = 1
             break
         
-        # Get input
         case 1,
-            if (P["shell", number] == 2) {
-                end()
-            }
-            elseif (wait()) {
-                local Input = in()
-                P["input", string] = Input
-                switch (Input) {
-                    case "",
-                        break
-                    
+            if (wait()) {
+                local In = in()
+                
+                switch (In) {
                     case "q", case "quit", case "exit",
                         end()
                         break
                     
+                    case "h", case "help",
+                        out("Just write here your formula.\nExample: \"2+2*2\"\n")
+                        break
+                    
                     default,
-                        if (P:exists("shell")) {
-                            P["shell", number] = 2
-                        }
+                        P["input", array] = In:replaceRE("[%+%-%*/^()]", " %1 "):trim():explodeRE(" +")
+                        
+                        P["this", table] = P["expression", table]
                         
                         P["state", number] = 2
-                        break
                 }
             }
             break
         
-        # Compute
         case 2,
-            P["state", number] = 3
+            local This = P["this", table]
+            local Input = P["input", array]
             
-            local Input = P["input", string]
-            
-            # Find depth and split by parts
-            local Depths = P["depths", array]
-            
-            local Parts = P["parts", array]
-            local PartPoses = P["partsPoses", array]
-            
-            local ThisDepth = 0
-            local LastPart = 0
-            
-            local Length = Input:length()
-            for (I = 1, Length) {
-                switch (Input[I]) {
-                    case "(",
-                        Depths[I, number] = ThisDepth
-                        ThisDepth++
-                        
-                        Parts:pushString(Input:sub(LastPart + 1, I - 1))
-                        PartPoses:pushVector2(vec2(LastPart + 1, I - 1))
-                        LastPart = I
-                        break
-                    
-                    case ")",
-                        ThisDepth--
-                        Depths[I, number] = ThisDepth
-                        
-                        Parts:pushString(Input:sub(LastPart + 1, I - 1))
-                        PartPoses:pushVector2(vec2(LastPart + 1, I - 1))
-                        LastPart = I
-                        break
-                    
-                    default,
-                        Depths[I, number] = ThisDepth
+            for (I = 1, Overload) {
+                if (P["state", number] != 2) {
+                    break
                 }
-            }
-            Parts:pushString(Input:sub(LastPart + 1, Length))
-            PartPoses:pushVector2(vec2(LastPart + 1, Length))
-            
-            if (ThisDepth != 0) {
-                out("Error: Something wrong with brakets.\n")
-                P["state", number] = 1
-                break
-            }
-            
-            # Compute all parts
-            local PartExplode = array()
-            local PartActions = array()
-            
-            while (Parts:count() > 0) {
-                local Target = Depths:maxIndex()
-                for (I = 1, PartPoses:count()) {
-                    if (Parts:count() == 1 | inrange(Target, PartPoses[I, vector2][1], PartPoses[I, vector2][2])) {
-                        if (Parts:count() > 1) {
-                            local PrevDepth = Depths[Target, number] - 1
-                            for (J = PartPoses[I, vector2][1], PartPoses[I, vector2][2]) {
-                                Depths[J, number] = PrevDepth
-                            }
-                        }
-                        
-                        # Compute part
-                        local Part = Parts[I, string]
-                        local LastDivider = 0
-                        
-                        # replace double minus
-                        while (Part:find("--")) {
-                            Part = Part:replace("--", "")
-                        }
-                        
-                        # Separate numbers
-                        for (J = 1, Part:length()) {
-                            local Char = Part[J]
-                            if (Char == "+" | Char == "*" | Char == "/" | Char == "^") {
-                                PartExplode:pushNumber(Part:sub(LastDivider + 1, J - 1):toNumber())
-                                LastDivider = J
-                                
-                                PartActions:pushString(Char)
-                            }
-                            elseif (Char == "-") {
-                                local PrevNumber = Part:sub(LastDivider + 1, J - 1):toNumber()
-                                if (PrevNumber != 0) {
-                                    PartExplode:pushNumber(PrevNumber)
-                                    LastDivider = J
+                
+                if (Input:count() > 0) {
+                    local In1 = Input:shiftString()
+                    
+                    switch (In1) {
+                        case "+", case "-", case "*", case "/", case "^",
+                            if (This:exists("table" + This["count", number])) {
+                                while (P["priority", number] < P["priorityTable", table][In1, number]) {
+                                    P["priority", number] = P["priority", number] + 1
                                     
-                                    PartActions:pushString(Char)
+                                    local Child = This["table" + This["count", number], table]
+                                    
+                                    P["stack", table]:pushTable(This)
+                                    This = This["table" + This["count", number], table] = table()
+                                    
+                                    This["table1", table] = Child
+                                    This["count", number] = 1
+                                }
+                                
+                                This["action", string] = In1
+                                
+                                while (P["priority", number] > P["priorityTable", table][In1, number]) {
+                                    P["priority", number] = P["priority", number] - 1
+                                    
+                                    This = P["stack", table]:popTable()
+                                }
+                                
+                                if (In1 == "/" | In1 == "-") {
+                                    This["reverse" + (This["count", number] + 1), number] = 1
                                 }
                             }
-                        }
-                        PartExplode:pushNumber(Part:sub(LastDivider + 1):toNumber())
-                        
-                        # Replace actions on numbers
-                        ## ^
-                        local J = PartActions:count()
-                        while (J > 0) {
-                            if (PartActions[J, string] == "^") {
-                                PartExplode[J, number] = PartExplode[J, number] ^ PartExplode[J + 1, number]
-                                PartActions:remove(J)
-                                PartExplode:remove(J + 1)
-                                J -= 2
-                            }
                             else {
-                                J--
+                                out("Error: +-*/^ in wrong place.\n")
+                                P["state", number] = 4
                             }
-                        }
+                            break
                         
-                        ## *, /
-                        J = 1
-                        while (J <= PartActions:count()) {
-                            if (PartActions[J, string] == "*") {
-                                PartExplode[J, number] = PartExplode[J, number] * PartExplode[J + 1, number]
-                                PartActions:remove(J)
-                                PartExplode:remove(J + 1)
-                            }
-                            elseif (PartActions[J, string] == "/") {
-                                PartExplode[J, number] = PartExplode[J, number] / PartExplode[J + 1, number]
-                                PartActions:remove(J)
-                                PartExplode:remove(J + 1)
-                            }
-                            else {
-                                J++
-                            }
-                        }
-                        
-                        ## +, -
-                        J = 1
-                        while (J <= PartActions:count()) {
-                            if (PartActions[J, string] == "+") {
-                                PartExplode[J, number] = PartExplode[J, number] + PartExplode[J + 1, number]
-                                PartActions:remove(J)
-                                PartExplode:remove(J + 1)
-                            }
-                            elseif (PartActions[J, string] == "-") {
-                                PartExplode[J, number] = PartExplode[J, number] - PartExplode[J + 1, number]
-                                PartActions:remove(J)
-                                PartExplode:remove(J + 1)
-                            }
-                            else {
-                                J++
-                            }
-                        }
-                        
-                        local ComputedPart = PartExplode[1, number]
-                        PartExplode:clear()
-                        PartActions:clear()
-                        
-                        if (Parts:count() > 1) {
-                            Parts[I - 1, string] = Parts[I - 1, string] + ComputedPart + Parts[I + 1, string]
-                            PartPoses[I - 1, vector2][2] = PartPoses[I + 1, vector2][2]
+                        case "(",
+                            P["priorityStack", array]:pushNumber(P["priority", number])
+                            P["priority", number] = 0
                             
-                            Parts:remove(I)
-                            Parts:remove(I)
-                            PartPoses:remove(I)
-                            PartPoses:remove(I)
+                            This["count", number] = This["count", number] + 1
+                            
+                            P["stack", table]:pushTable(This)
+                            This = This["table" + This["count", number], table] = table()
+                            break
+                        
+                        case ")",
+                            if (P["stack", table]) {
+                                while (P["priority", number] > 0) {
+                                    P["priority", number] = P["priority", number] - 1
+                                    This = P["stack", table]:popTable()
+                                }
+                                
+                                P["priority", number] = P["priorityStack", array]:popNumber()
+                                
+                                This = P["stack", table]:popTable()
+                            }
+                            else {
+                                out("Error: \")\" in wrong place.\n")
+                                P["state", number] = 4
+                            }
+                            break
+                        
+                        default,
+                            local In2 = Input:shiftString()
+                            
+                            switch (In2) {
+                                case "+", case "-", case "*", case "/", case "^",
+                                    while (P["priority", number] < P["priorityTable", table][In2, number]) {
+                                        P["priority", number] = P["priority", number] + 1
+                                        
+                                        This["count", number] = This["count", number] + 1
+                                        P["stack", table]:pushTable(This)
+                                        This = This["table" + This["count", number], table] = table()
+                                    }
+                                    
+                                    This["count", number] = This["count", number] + 1
+                                    This["number" + This["count", number], number] = In1:toNumber()
+                                    
+                                    This["action", string] = In2
+                                    
+                                    while (P["priority", number] > P["priorityTable", table][In2, number]) {
+                                        P["priority", number] = P["priority", number] - 1
+                                        
+                                        This = P["stack", table]:popTable()
+                                    }
+                                    
+                                    if (In2 == "/" | In2 == "-") {
+                                        This["reverse" + (This["count", number] + 1), number] = 1
+                                    }
+                                    break
+                                
+                                case ")",
+                                    This["count", number] = This["count", number] + 1
+                                    This["number" + This["count", number], number] = In1:toNumber()
+                                    
+                                    Input:unshiftString(In2)
+                                    break
+                                    
+                                case "(",
+                                    out("Error: expressions like " + In1 + In2 + " not supported.\n")
+                                    
+                                    P["state", number] = 4
+                                    break
+                                
+                                case "",
+                                    This["count", number] = This["count", number] + 1
+                                    This["number" + This["count", number], number] = In1:toNumber()
+                                    break
+                                
+                                default,
+                                    out("Internal error: number after number.\n")
+                                    P["state", number] = 4
+                            }
+                    }
+                }
+                else {
+                    This = P["expression", table]
+                    while (This["count", number] == 1 & This:exists("table1")) {
+                        This = This["table1", table]
+                    }
+                    
+                    P["stack", table]:clear()
+                    P["state", number] = 3
+                    break
+                }
+            }
+            
+            P["this", table] = This
+            break
+        
+        case 3,
+            local This = P["this", table]
+            local Stack = P["stack", table]
+            
+            for (I = 1, Overload) {
+                local Count = This["count", number]
+                
+                if (Count == 1) {
+                    if (This:exists("table1")) {
+                        local Table = This["table1", table]
+                        This = Stack:popTable()
+                        
+                        This["table" + This["pos", number], table] = Table
+                    }
+                    else {
+                        if (Stack) {
+                            local Value = This["number1", number]
+                            This:clear()
+                            This = Stack:popTable()
+                            
+                            This:remove("table" + This["pos", number])
+                            This["number" + This["pos", number], number] = Value
                         }
                         else {
-                            out(ComputedPart + "\n")
-                            
-                            P["depths", array]:clear()
-                            P["parts", array]:clear()
-                            P["partsPoses", array]:clear()
-                            
-                            P["state", number] = 1
+                            out(This["number1", number] + "\n")
+                            P["state", number] = 4
+                            break
                         }
+                    }
+                }
+                elseif (Count > 1) {
+                    if (This:exists("table" + Count)) {
+                        This["pos", number] = Count
                         
-                        break
+                        Stack:pushTable(This)
+                        This = This["table" + This["pos", number], table]
+                    }
+                    elseif (This:exists("table" + (Count - 1))) {
+                        This["pos", number] = Count - 1
+                        
+                        Stack:pushTable(This)
+                        This = This["table" + This["pos", number], table]
+                    }
+                    else {
+                        local Action = This["action", string]
+                        switch (Action) {
+                            case "+", case "-",
+                                for (I = 0, 1) {
+                                    if (This["reverse" + (Count - I), number]) {
+                                        This["number" + (Count - I), number] = -This["number" + (Count - I), number]
+                                    }
+                                }
+                                This["number" + (Count - 1), number] = This["number" + (Count - 1), number] + This["number" + Count, number]
+                                break
+                            
+                            case "*", case "/",
+                                for (I = 0, 1) {
+                                    if (This["reverse" + (Count - I), number]) {
+                                        This["number" + (Count - I), number] = 1 / This["number" + (Count - I), number]
+                                    }
+                                }
+                                This["number" + (Count - 1), number] = This["number" + (Count - 1), number] * This["number" + Count, number]
+                                break
+                            
+                            case "^",
+                                This["number" + (Count - 1), number] = This["number" + (Count - 1), number] ^ This["number" + Count, number]
+                                break
+                            
+                            default,
+                                out("Internal error: Unknown binary action.\n")
+                        }
+                        This["count", number] = Count - 1
                     }
                 }
             }
             
-            if (P["state", number] == 3) {
-                out("Error: Expression can't be computed.\n")
-                
-                P["state", number] = 1
-            }
+            P["this", table] = This
             break
         
-        case 3,
-            out("Error: Tick quota.\n")
+        case 4,
+            P["stack", table]:clear()
+            P["expression", table]:clear()
+            P["priorityStack", array]:clear()
+            P["priority", number] = 0
             P["state", number] = 1
             break
-            
     }
 }

@@ -20,7 +20,7 @@ function xwmcmd() {
                 P["text", table] = xcreate("text"):xtext("> "):xcolor(vec())
                 
                 local Skbd = exec("skbd")
-                programUp()
+                tackUp()
                 
                 Skbd["in", array] = P["kbd", array]
                 P["in", array] = Skbd["term", array] = array()

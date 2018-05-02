@@ -47,7 +47,7 @@ function xedit() {
                 
                 if (Use) {
                     if (P["button-load", table]:xinrange()) {
-                        P["parent", table]["in", array]:pushString("xfilechooser")
+                        xwmLaunch("xfilechooser")
                         P["state", number] = 2
                     }
                     elseif (P["button-save", table]:xinrange()) {
@@ -55,47 +55,48 @@ function xedit() {
                     }
                 }
             }
-            
-            # input
-            local Keys = P["kbd", array]
-            
-            if (Keys:count() > 0 | P["kbdTableOld", table]:count() > 0) {
-                local KbdTableOld = P["kbdTableOld", table]
-                KbdTableOld:clear()
-                P["kbdTableOld", table] = P["kbdTable", table]
-                P["kbdTable", table] = KbdTableOld
-            }
-            
-            foreach (I, Key:number = Keys) {
-                P["kbdTable", table][Key, number] = 1
-            }
-            
-            if (Keys:count() > 0) {
-                for (I = 1, Keys:count()) {
-                    local Key = Keys[I, number]
-                    if (P["kbdTable", table][Key, number] > P["kbdTableOld", table][Key, number]) {
-                        switch (Key) {
-                            # Enter
-                            case 10, case 13, case 142,
-                                P["text", table]:xtext(P["text", table]["text", string] + "\n")
-                                break
-                            
-                            # Backspace
-                            case 127,
-                                P["text", table]:xtext(P["text", table]["text", string]:sub(1, -2))
-                                break
-                            
-                            # Delete
-                            case 148,
-                                break
-                            
-                            # Normal key
-                            default,
-                                if (inrange(Key, 32, 127)) {
-                                    local Char = toChar(Key)
-                                    
-                                    P["text", table]:xtext(P["text", table]["text", string] + Char)
-                                }
+            else {
+                # input
+                local Keys = P["kbd", array]
+                
+                if (Keys:count() > 0 | P["kbdTableOld", table]:count() > 0) {
+                    local KbdTableOld = P["kbdTableOld", table]
+                    KbdTableOld:clear()
+                    P["kbdTableOld", table] = P["kbdTable", table]
+                    P["kbdTable", table] = KbdTableOld
+                }
+                
+                foreach (I, Key:number = Keys) {
+                    P["kbdTable", table][Key, number] = 1
+                }
+                
+                if (Keys:count() > 0) {
+                    for (I = 1, Keys:count()) {
+                        local Key = Keys[I, number]
+                        if (P["kbdTable", table][Key, number] > P["kbdTableOld", table][Key, number]) {
+                            switch (Key) {
+                                # Enter
+                                case 10, case 13, case 142,
+                                    P["text", table]:xtext(P["text", table]["text", string] + "\n")
+                                    break
+                                
+                                # Backspace
+                                case 127,
+                                    P["text", table]:xtext(P["text", table]["text", string]:sub(1, -2))
+                                    break
+                                
+                                # Delete
+                                case 148,
+                                    break
+                                
+                                # Normal key
+                                default,
+                                    if (inrange(Key, 32, 127)) {
+                                        local Char = toChar(Key)
+                                        
+                                        P["text", table]:xtext(P["text", table]["text", string] + Char)
+                                    }
+                            }
                         }
                     }
                 }
@@ -105,8 +106,8 @@ function xedit() {
         
         # load
         case 2,
-            if (P["parent", table]["programs", table][1, table]["name", string] == "xfilechooser") {
-                P["xfilechooser", table] = P["parent", table]["programs", table][1, table]
+            if (xwmWait()) {
+                P["xfilechooser", table] = xwmGetProgram()
                 P["xfilechooser", table]["out", array] = P["in", array]
                 
                 P["state", number] = 3

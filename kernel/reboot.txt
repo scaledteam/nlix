@@ -10,8 +10,6 @@ function reboot() {
     while (KTasks:count() > 0) {
         KTasks:popTable():clear()
     }
-    
-    S:clear()
 
     reset()
 }

@@ -98,8 +98,8 @@ function skbd() {
                                 }
                                 break
                             
-                            # Escape # Delete
-                            case 18, case 148,
+                            # Delete
+                            case 148,
                                 if (P["text", string]:length() > 0) {
                                     P["term", array]:pushString(TERM_ERASE)
                                     P["term", array]:pushNumber(P["text", string]:length())

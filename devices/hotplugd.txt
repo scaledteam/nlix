@@ -5,60 +5,18 @@
 @name hotplugd
 
 @inputs [Port1 Port2 Port3 Port4]:wirelink
-@persist PORTS_COUNT
-@persist [HotplugdPortsOld]:array HotplugdCounter
-PORTS_COUNT = 4
+@persist PortsOld:vector4 PortId
 
 PExist["hotplugd", number] = 1
 
 function hotplugd() {
-    # hot plug
-    if (HotplugdCounter >= PORTS_COUNT) {
-        HotplugdCounter = 1
-    }
-    else {
-        HotplugdCounter++
-    }
+    PortId = PortId % 4 + 1
     
-    local Port = select(HotplugdCounter, Port1, Port2, Port3, Port4)
-    local PortEntity = Port:entity()
+    local Device = select(PortId, Port1, Port2, Port3, Port4)
     
-    if (PortEntity:id() != HotplugdPortsOld[HotplugdCounter, number]) {
-        HotplugdPortsOld[HotplugdCounter, number] = PortEntity:id()
+    if (Device & Device:entity():id() != PortsOld[PortId]) {
+        PortsOld[PortId] = Device:entity():id()
         
-        if (!S["dev", table]["byId", table][Port:entity():id(), wirelink]) {
-            deviceNew(Port)
-        }
-    }
-    
-    # return device from dead app
-    local Devices = S["dev", table]
-    local Programs = Devices["Ps", table]
-
-    if (Programs) {
-        local Counter = Devices["counter", number] + 1
-        
-        if (Counter > Programs:count()) {
-            Counter = 1
-        }
-        
-        if (!Programs[Counter, table]) {
-            Programs:remove(Counter)
-            local Device = Devices["Ds", table]:removeWirelink(Counter)
-            
-            if (Device) {
-                local DeviceType = Device:type()
-                
-                if (Devices:exists(DeviceType)) {
-                    Devices[DeviceType, array]:unshiftWirelink(Device)
-                }
-                else {
-                    Devices[DeviceType, array] = array(Device)
-                }
-            }
-        }
-        else {
-            Devices["counter", number] = Counter
-        }
+        deviceNew(Device)
     }
 }

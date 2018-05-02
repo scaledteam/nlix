@@ -8,7 +8,7 @@ PExist["dlist", number] = 1
 
 function dlist() {
     local List = ""
-    foreach (DeviceType, DeviceList:array = S["dev", table]) {
+    foreach (DeviceType, DeviceList:array = Devices) {
         List += DeviceType + ": " + DeviceList:count() + "\n"
         foreach (I, Device:wirelink = DeviceList) {
             List += "  " + Device:entity():id() + "\n"

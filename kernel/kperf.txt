@@ -2,11 +2,11 @@
 # Created by scaled
 #
 
-@name setperf
+@name kperf
 
-PExist["setperf", number] = 1
+PExist["kperf", number] = 1
 
-function setperf() {
+function kperf() {
     if (args() < 1) {
         out(KPerf + "\n")
     }

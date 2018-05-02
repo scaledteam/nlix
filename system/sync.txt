@@ -3,17 +3,13 @@
 #
 
 @name sync
-@persist SYSTEM_NAME:string
+@persist SYNC_SYSTEM_NAME:string
 
-local Gtable = gTable("nlix")
+local Gtable = gTable("nlix-sync")
 
-if (Gtable[SYSTEM_NAME, table]["S", table]) {
-    S = Gtable[SYSTEM_NAME, table]["S", table]
-    Ps = Gtable[SYSTEM_NAME, table]["Ps", table]
+if (Gtable[SYNC_SYSTEM_NAME, table]) {
+    Tables = Gtable[SYNC_SYSTEM_NAME, table]
 }
 else {
-    Gtable[SYSTEM_NAME, table] = table(
-        "S" = S,
-        "Ps" = Ps
-    )
+    Gtable[SYNC_SYSTEM_NAME, table] = Tables
 }

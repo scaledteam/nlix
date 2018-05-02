@@ -3,14 +3,20 @@
 #
 
 @name libdevices
+@persist Devices:table
 
-S["dev", table] = table(
-    "byId" = table(),
-    "Ps" = table(),
-    "Ds" = table(),
-    "null" = NULL
-)
+if (Tables:exists("Devices")) {
+    Devices = Tables["Devices", table]
+}
+else {
+    Devices = Tables["Devices", table] = table(
+        "byId" = table(),
+        "busyPrograms" = table(),
+        "busyDevices" = table()
+    )
+}
 
+# For system
 function string wirelink:type() {
     local Name = This:entity():type()
     
@@ -22,64 +28,75 @@ function string wirelink:type() {
     }
 }
 
-function number deviceGet(Type:string) {
-    if (S["dev", table]:exists(Type) & !P["device", wirelink]) {
-        local Devices = S["dev", table][Type, array]
+function deviceAdd(Device:wirelink) {
+    if (Device) {
+        local Type = Device:type()
         
-        if (Devices:count() > 0) {
-            local Device = Devices:shiftWirelink()
-            if (Device) {
-                P["device", wirelink] = Device
-                S["dev", table]["Ps", table]:pushTable(P)
-                S["dev", table]["Ds", table]:pushWirelink(Device)
-                
-                if (Devices:count() == 0) {
-                    S["dev", table]:remove(Type)
+        if (Devices:exists(Type)) {
+            Devices[Type, array]:unshiftWirelink(Device)
+        }
+        else {
+            Devices[Type, array] = array(Device)
+        }
+    }
+}
+
+function number deviceNew(Device:wirelink) {
+    if (Device) {
+        local Entity = Device:entity()
+        local Id = Entity:id()
+        
+        if (Entity & Devices["byId", table][Id, entity] != Entity) {
+            Devices["byId", table][Id, entity] = Entity
+            
+            deviceAdd(Device)
+            return 1
+        }
+    }
+    return 0
+}
+
+# For programs
+function number deviceGet(Type:string) {
+    if (!P["device", wirelink]) {
+        if (Devices:exists(Type)) {
+            # Add new device
+            if (Devices[Type, array]:count() > 0) {
+                local Device = Devices[Type, array]:shiftWirelink()
+                if (Device) {
+                    P["device", wirelink] = Device
+                    Devices["busyPrograms", table]:pushTable(P)
+                    Devices["busyDevices", table]:pushWirelink(Device)
+                    
+                    if (Devices[Type, array]:count() == 0) {
+                        Devices:remove(Type)
+                    }
+                    return 1
                 }
-                return 1
+            }
+            else {
+                Devices:remove(Type)
             }
         }
+        else {
+            # return device from dead app
+            local Programs = Devices["busyPrograms", table]
         
-        if (Devices:count() == 0) {
-            S["dev", table]:remove(Type)
+            if (Programs) {
+                local Counter = Devices["busyCounter", number] % Programs:count() + 1
+                Devices["busyCounter", number] = Counter
+                
+                if (!Programs[Counter, table]) {
+                    Programs:remove(Counter)
+                    
+                    deviceAdd(Devices["busyDevices", table]:removeWirelink(Counter))
+                }
+            }
         }
     }
     return 0
 }
 
 function deviceReturn() {
-    local Device = P:removeWirelink("device")
-    if (Device) {
-        local DeviceType = Device:type()
-        
-        if (P:exists(DeviceType)) {
-            S["dev", table][DeviceType, array]:unshiftWirelink(Device)
-        }
-        else {
-            S["dev", table][DeviceType, array] = array(Device)
-        }
-    }
-}
-
-function number deviceNew(Port:wirelink) {
-    local PortEntity = Port:entity()
-    
-    if (PortEntity) {
-        # Check if device exists
-        local Type = Port:type()
-        local Id = PortEntity:id()
-        
-        local Devices = S["dev", table]
-        if (!Devices:exists(Type)) {
-            Devices[Type, array] = array(Port)
-            Devices["byId", table][Id, wirelink] = Port
-            return 1
-        }
-        elseif (Devices["byId", table][Id, wirelink] != Port) {
-            Devices[Type, array]:pushWirelink(Port)
-            Devices["byId", table][Id, wirelink] = Port
-            return 1
-        }
-    }
-    return 0
+    deviceAdd(P:removeWirelink("device"))
 }

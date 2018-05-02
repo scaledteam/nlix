@@ -5,8 +5,8 @@
 @name term
 @persist [TERM_ERASE TERM_ERASE1]:string
 
-TERM_ERASE  = toChar(15) + "erase"
-TERM_ERASE1 = toChar(15) + "erase1"
+TERM_ERASE  = toChar(148)
+TERM_ERASE1 = toChar(127)
 
 PExist["term", number] = 1
 

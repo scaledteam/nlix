@@ -32,7 +32,7 @@ function xterm() {
             local Skbd = exec("skbd")
             local Program = exec(ProgramName)
             local Term = exec("term")
-            programUp()
+            tackUp()
             
             P["program", table] = Program
             P["term", table] = Term

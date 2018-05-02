@@ -20,7 +20,7 @@ function xvnc() {
                 local RemoteS = P["device", wirelink]["S", table]
                 
                 if (RemoteS["bin", table][ProgramName, number]) {
-                    local Program = table("name" = ProgramName)
+                    local Program = table("function" = ProgramName)
                     P["program", table] = Program
                     Program["parent", table] = P
                     
@@ -36,7 +36,7 @@ function xvnc() {
                     P["state", number] = 1
                 }
                 else {
-                    out("Program \"" + P["name", string] + "\" is not exist on remove chip")
+                    out("Program \"" + ProgramName + "\" is not exist on remove chip")
                     end()
                 }
             }

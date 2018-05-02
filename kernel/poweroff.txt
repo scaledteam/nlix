@@ -10,8 +10,6 @@ function poweroff() {
     while (KTasks:count() > 0) {
         KTasks:popTable():clear()
     }
-    
-    S:clear()
 
     runOnTick(0)
 }

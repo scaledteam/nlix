@@ -1,0 +1,7 @@
+#
+# Created by scaled
+#
+
+@name libnetwork
+@persist [Net NetList]:table
+
