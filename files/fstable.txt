@@ -4,8 +4,8 @@
 
 @name fstable
 
-if (!FSTab:exists("/")) {
-    FSTab["/", table] = table("type" = "table", "table" = table("tables" = Tables))
+if (!Filesystems:exists("/")) {
+    Filesystems["/", table] = table("type" = "table", "table" = table("tables" = Tables))
 }
 
 PExist["fstable", number] = 1

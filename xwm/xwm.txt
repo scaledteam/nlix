@@ -10,7 +10,7 @@ function xwmLaunch(ProgramName:string) {
 }
 
 function number xwmWait() {
-    return P["parent", table]["programs", table][1, table]["function", string] == P["xwmProgramName", string]
+    return P["parent", table]["programs", table][1, table]["command", string] == P["xwmProgramName", string]
 }
 
 function table xwmGetProgram() {
@@ -180,7 +180,8 @@ function xwm() {
                 
                 # Commands
                 if (wait()) {
-                    local CommandExp = in():trim():explodeRE(" +")
+                    P["lastCommand", string] = in()
+                    local CommandExp = P["lastCommand", string]:trim():explodeRE(" +")
                     
                     switch (CommandExp[1, string]) {
                         case "exit",
@@ -355,6 +356,8 @@ function xwm() {
                     Program["args", array] = P:removeArray("commandExp")
                     Program["out", array] = P["xmsg", array]
                     Program["kbd", array] = array()
+                    
+                    Program["command", string] = P["lastCommand", string]
                 }
                 else {
                     P["xmsg", array]:pushString("Error: Program \"" + P["tempProgramName", string] + "\" is not exist.")

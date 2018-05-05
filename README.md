@@ -49,7 +49,7 @@ $steamdir/steamapps/common/GarrysMod/garrysmod/data/expression2/nlix/nlix.txt
 
 Через git:
 
-1. Зайдите в директорию
+1. Зайти в директорию
 
 ```
 $steamdir/steamapps/common/GarrysMod/garrysmod/data/expression2/
@@ -57,7 +57,7 @@ $steamdir/steamapps/common/GarrysMod/garrysmod/data/expression2/
 
 Где `$steamdir` - расположение папки Steam.
 
-2. Напишите в терминале
+2. Написать в терминале
 
 ```
 git clone https://github.com/scaledtm/nlix

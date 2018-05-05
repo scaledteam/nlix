@@ -5,12 +5,12 @@
 @name fsreal
 
 #ifdef fileRead()
-if (!FSTab:exists("/e2files")) {
-    FSTab["/", table]["table", table]["e2files", table] = table()
-    FSTab["/", table]["table", table]["e2shared", table] = table()
+if (!Filesystems:exists("/e2files")) {
+    Filesystems["/", table]["table", table]["e2files", table] = table()
+    Filesystems["/", table]["table", table]["e2shared", table] = table()
     
-    FSTab["/e2files", table]  = table("type" = "real", "path" = "/")
-    FSTab["/e2shared", table] = table("type" = "real", "path" = ">e2shared/")
+    Filesystems["/e2files", table]  = table("type" = "real", "path" = "/")
+    Filesystems["/e2shared", table] = table("type" = "real", "path" = ">e2shared/")
 }
 
 PExist["fsreal", number] = 1

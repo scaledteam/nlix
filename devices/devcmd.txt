@@ -43,7 +43,7 @@ function devcmd() {
                     P["deviceType", string] = Args[2, string]
                 }
                 else {
-                    out("Usage: start [type]\n")
+                    out("Usage: connect [type]\n")
                 }
                 break
             
