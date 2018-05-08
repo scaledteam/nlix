@@ -1,81 +1,78 @@
 # nlix
-UNIX-подобная операционная система для дополнения Wiremod.
+UNIX-like operation system for wiremod addon.
 
-## Возможности операционной системы Nlix:
-Организация нескольких терминалов, работающих на одном чипе.
+## Features
+Few workspaces on one chip.
 
-Поддержка большого списка устройств. Для организации терминала можно использовать EGP Screen, Text Screen или Console Screen в качестве устройства вывода, и Keyboard или Text Entry в качестве устройства ввода.
+Support many devices. For terminal you can use EGP Screen, Text Screen or Console screen as output device and Keyboard or Text Entry as output device.
 
-Горячее подключение устройств. При чём при отключении устройства от порта оно остаётся подключеным к системе, что позволяет подключить множество устройств к ограниченному числу портов.
+Hotplug. Also after unconnecting device from port, device stay connected to system. It allow connect unlimited count of devices to limited count of ports.
 
-Беспроводное подключение внешних устройств с помощью программы wc (требуется дополнение wiring).
+Wireless connection using "wc" (require wiring addition).
 
-Низкие системные требования. Чип может потреблять от 300 ops до бесконечности и запускаться при квотах, в 10 раз меньших, чем стандартные. Но чем меньше чип потребляет, тем медленней работает.
+Low system requires. Chip can use from 300 to infinitie ops and run with ultra low expression2 quotes. But if you set low ops limit, system will work slowly.
 
-Модульная файловая система. Доступна виртуальная файловая система fstable, позволяющся лазить по таблицам и fsreal, позволяющая лазить по реальным файлам, используя стандартные функции Expression 2.
+Modular filesystem. Nlix contain virtual filesystem "fstable", which represent tables as folders and other unit as files, and "fsreal", which allow to manipulate real files, using usual expression2 functions.
 
-Система ввода-вывода. Каждая программа имеет входной и выходной поток, которые можно перенаправлять и делать с ними множество интересных вещей.
+Input-output system. All program have their input and output, which you can redirect and make do interesting things.
 
-Графическая система X. Не имеет отношения к одноимённой графической системе для GNU/Linux и Unix. Позволяет удобно работать с EGP объектами, используя объектно-ориентированное программирование. Вам не нужно вручную задавать id каждого объекта, X сделает всё за вас.
+Graphical system "X". Make programming with egp much comfortable, represent egp objects as class. You don't have to set egp id to every object manual, system X make it for you.
 
-Удалённое управление вашими чипами nlix с помощью программ ssh и vnc (не имеют отношения к протоколам ssh и vnc для реального оборудования).
+Combine few nlix chips in one system. Compution power of every chip will increases in proportion to the number of chips (require synchronization module).
 
-Использование нескольких чипов nlix в одной системе. Вычислительная мощность чипов складывается (требуется включить модуль синхронизации).
+Change programs code without reboot require synchronization module).
 
-Изменение кода приложений без перезагрузки системы и приложений (требуется включить модуль синхронизации).
+## Install
+From site:
 
-## Установка
-Через сайт:
+1. Download nlix using button "Clone or download"
 
-1. Скачать nlix кнопкой "Clone or download"
-
-2. Распаковать архив nlix-master.zip папку:
+2. Unpack archive "nlix-master.zip" папку:
 
 ```
 $steamdir/steamapps/common/GarrysMod/garrysmod/data/expression2/
 ```
 
-Где `$steamdir` - расположение папки Steam.
+Where `$steamdir` - path to your Steam folder.
 
-3. Переименовать папку nlix-master в nlix
+3. Rename nlix-master folder to nlix
 
-4. Убедится, что файл nlix.txt находится по этому расположению:
-
+4. Verify that the file is nlix.txt is located at this location:
 ```
 $steamdir/steamapps/common/GarrysMod/garrysmod/data/expression2/nlix/nlix.txt
 ```
 
-5. Готово!
+5. Done!
 
-Через git:
+Using git git:
 
-1. Зайти в директорию
+1. Join into directory:
 
 ```
 $steamdir/steamapps/common/GarrysMod/garrysmod/data/expression2/
 ```
 
-Где `$steamdir` - расположение папки Steam.
+Where `$steamdir` - path to your Steam folder.
 
-2. Написать в терминале
+2. Write in terminal:
 
 ```
 git clone https://github.com/scaledtm/nlix
 ```
 
-3. Готово!
+3. Done!
 
-## Использование
-1. Откройте Expression2, выберите в списке файлов nlix.txt и установите чип в любое понравившееся место.
+## Using
+1. Open Expression2 and choose nlix.txt in nlix folder, and create chip.
 
-2. Подключите EGP Screen к любому порту. Также можно подключить клавиатуру если собирайтесь работать с текстовым редактором или виртуальным терминалом.
+2. Connect EGP Screen to any port. Also you can connect keyboard, if you want work with text editor or virtual terminal.
 
-Если хотите работать с терминалом, то можете подключить в качестве экрана EGP Screen, Text Screen или Console Screen, и Text Screen или Console Screen в качестве устройства ввода. Приоритет отдаётся графическому режиму, поэтому при использовании EGP Screen нужно будет выйти из графического режима (menu -> exit -> sh) или открыть виртуальный терминал (menu -> base -> xterm).
+If you want work with terminal, you can connect EGP Screen, Text Screen or Console Screen, and input device: Keyboard or Text Entry. Graphics mode have priority from terminal mode, therefore if you connect EGP Screen to your nlix chip, you must out from graphics mode (menu -> exit -> sh) or open virtual terminal (menu -> base -> xterm).
 
-## Аксессуары
+## Accessories
 https://github.com/scaledtm/nlix-accessories/
 
-Набор аксессуаров содержит ноутбук, принтер и проектор для advanced duplicator 2, а также инструменты, позволяющие их собрать вручную.
+Accessories set contains laptop, printer and projector for advanded duplicator 2, and also tool for building this things manual.
 
-## Скриншоты
+## Screenshots
 http://steamcommunity.com/id/scaled/screenshots/
