@@ -6,7 +6,46 @@
 @persist [P NULL KTasks]:table KTaskId KPerf
 @trigger none
 
-if (!tickClk()) {
+if (tickClk()) {
+    if (NULL) {
+        NULL:clear()
+    }
+    
+    while (perf(KPerf)) {
+        # Counter
+        KTaskId = KTaskId % KTasks:count() + 1
+        
+        # Program memory
+        P = KTasks[KTaskId, table]
+        
+        # Program is alive
+        if (P) {
+            # Clear if parent killed
+            if (!P["parent", table] & P:exists("parent")) {
+                P:clear()
+                KTasks:remove(KTaskId)
+                KTaskId--
+                continue
+            }
+            
+            P["function", string]()
+        }
+        # If program is dead
+        else {
+            # If one program is not valid
+            if (KTasks) {
+                KTasks:remove(KTaskId)
+                KTaskId--
+            }
+            # If all programs is not valid
+            else {
+                runOnTick(0)
+                break
+            }
+        }
+    }
+}  
+else {
     if (clk()) {
         while (perf(KPerf)) {
             KTaskId++
@@ -134,43 +173,7 @@ if (!tickClk()) {
         
         interval(0)
     }
-}  
-else {
-    if (NULL) {
-        NULL:clear()
-    }
-    
-    while (perf(KPerf)) {
-        # Counter
-        KTaskId = KTaskId % KTasks:count() + 1
-        
-        # Program memory
-        P = KTasks[KTaskId, table]
-        
-        # Program is alive
-        if (P) {
-            # Clear if parent killed
-            if (!P["parent", table] & P:exists("parent")) {
-                P:clear()
-                KTasks:remove(KTaskId)
-                KTaskId--
-                continue
-            }
-            
-            P["function", string]()
-        }
-        # If program is dead
-        else {
-            # If one program is not valid
-            if (KTasks) {
-                KTasks:remove(KTaskId)
-                KTaskId--
-            }
-            # If all programs is not valid
-            else {
-                runOnTick(0)
-                break
-            }
-        }
+    elseif (duped() | dupefinished()) {
+        reset()
     }
 }
