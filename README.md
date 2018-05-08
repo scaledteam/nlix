@@ -1,78 +1,78 @@
-# nlix
-UNIX-like operation system for wiremod addon.
+# Nlix
+UNIX-like operating system on Wiremod.
 
 ## Features
-Few workspaces on one chip.
+Multiple workspaces using just only one chip.
 
-Support many devices. For terminal you can use EGP Screen, Text Screen or Console screen as output device and Keyboard or Text Entry as output device.
+Support for many devices. To work with the terminal, you can use the EGP Screen, Text Screen or Console Screen as an output device and Keyboard or Text Entry as an input device.
 
-Hotplug. Also after unconnecting device from port, device stay connected to system. It allow connect unlimited count of devices to limited count of ports.
+Hotplug. Also, after disconnecting the device from the plug, it remains connected to the system. This behavior allows you to connect an unlimited number of devices to a limited number of plugs.
 
-Wireless connection using "wc" (require wiring addition).
+Wireless connection of external devices using **wc** program (requires the wiring extension to be enabled).
 
-Low system requires. Chip can use from 300 to infinitie ops and run with ultra low expression2 quotes. But if you set low ops limit, system will work slowly.
+Low system requirements. The chip can use 300 or more ops and can run with ultra low Expression 2 quotas. But keep in mind that if you set low ops limit, the system will run slower than normal.
 
-Modular filesystem. Nlix contain virtual filesystem "fstable", which represent tables as folders and other unit as files, and "fsreal", which allow to manipulate real files, using usual expression2 functions.
+Modular file system. Nlix has a virtual file systems **fstable**, where tables represent folders and other data represent files, and **fsreal**, which allows to manipulate real files using standard Expression 2 functions.
 
-Input-output system. All program have their input and output, which you can redirect and make do interesting things.
+I/O system. All programs have an input and output stream, which you can redirect and do a lot of interesting things.
 
-Graphical system "X". Make programming with egp much comfortable, represent egp objects as class. You don't have to set egp id to every object manual, system X make it for you.
+Graphic system X. Makes work with EGP much comfortable, as it represents EGP objects as a class. You don't have to set the EGP IDs for each object manually, system X sets them for you.
 
-Combine few nlix chips in one system. Compution power of every chip will increases in proportion to the number of chips (require synchronization module).
+Combining of multiple Nlix chips. The computing power of each chip increases the system's performance in an arithmetic progression (requires a synchronization module).
 
-Change programs code without reboot require synchronization module).
+Changing the code of the programs without rebooting (requires a synchronization module).
 
-## Install
-From site:
+## Installation
+From the site:
 
-1. Download nlix using button "Clone or download"
+1. Download Nlix using a "Clone or download" button.
 
-2. Unpack archive "nlix-master.zip" папку:
+2. Unpack the archive "nlix-master.zip" here:
 
 ```
 $steamdir/steamapps/common/GarrysMod/garrysmod/data/expression2/
 ```
 
-Where `$steamdir` - path to your Steam folder.
+Where `$steamdir` is the path to your Steam folder.
 
-3. Rename nlix-master folder to nlix
+3. Rename `nlix-master` folder to `nlix`
 
-4. Verify that the file is nlix.txt is located at this location:
+4. Make sure that the file `nlix.txt` is in this location:
 ```
 $steamdir/steamapps/common/GarrysMod/garrysmod/data/expression2/nlix/nlix.txt
 ```
 
 5. Done!
 
-Using git git:
+Using git:
 
-1. Join into directory:
+1. Move to this directory:
 
 ```
 $steamdir/steamapps/common/GarrysMod/garrysmod/data/expression2/
 ```
 
-Where `$steamdir` - path to your Steam folder.
+Where `$steamdir` is the path to your Steam folder.
 
-2. Write in terminal:
+2. Run this command:
 
 ```
-git clone https://github.com/scaledtm/nlix
+git clone https://github.com/scaledTM/nlix.git
 ```
 
 3. Done!
 
 ## Using
-1. Open Expression2 and choose nlix.txt in nlix folder, and create chip.
+1. Open the Expression 2 editor and select nlix.txt in the nlix folder, then place the chip.
 
-2. Connect EGP Screen to any port. Also you can connect keyboard, if you want work with text editor or virtual terminal.
+2. Connect an EGP Screen to any port. Also, you can connect the keyboard, if you want to work with a text editor or a virtual terminal.
 
-If you want work with terminal, you can connect EGP Screen, Text Screen or Console Screen, and input device: Keyboard or Text Entry. Graphics mode have priority from terminal mode, therefore if you connect EGP Screen to your nlix chip, you must out from graphics mode (menu -> exit -> sh) or open virtual terminal (menu -> base -> xterm).
+If you want to work with the terminal, connect the I/O devices. Priority is given to the graphical mode, so if you connect the EGP Screen to your nlix chip, you need to exit the graphical mode (menu -> exit -> sh) or open the virtual terminal (menu -> base -> xterm).
 
 ## Accessories
 https://github.com/scaledtm/nlix-accessories/
 
-Accessories set contains laptop, printer and projector for advanded duplicator 2, and also tool for building this things manual.
+The accessory kit includes the laptop, printer and projector for Advanced Duplicator 2, and also tools for building them manually.
 
 ## Screenshots
-http://steamcommunity.com/id/scaled/screenshots/
+https://steamcommunity.com/id/scaled/screenshots/?appid=4000
