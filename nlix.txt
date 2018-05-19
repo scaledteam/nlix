@@ -149,8 +149,8 @@ elseif (clk()) {
             case 105, #include "nlix/x-other/tictactoe" break
             
             # Remote control
-            #case 113, #include "nlix/remote/remote" break
-            #case 114, #include "nlix/remote/xremote" break
+            case 113, #include "nlix/remote/remote" break
+            case 114, #include "nlix/remote/xremote" break
             
             # Place for your first programs
             #case 110, #include "nlix/other/myprogram" break
