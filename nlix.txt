@@ -149,10 +149,9 @@ else {
                 case 103, #include "nlix/x-other/spiritlevel" break
                 case 105, #include "nlix/x-other/tictactoe" break
                 
-                # Network
-                #case 110, #include "nlix/network/libnetwork" break
-                #case 113, #include "nlix/network/telnet" break
-                #case 114, #include "nlix/network/xremote" break
+                # Remote control
+                #case 113, #include "nlix/remote/remote" break
+                #case 114, #include "nlix/remote/xremote" break
                 
                 # Place for your first programs
                 #case 110, #include "nlix/other/myprogram" break

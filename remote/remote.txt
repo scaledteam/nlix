@@ -2,11 +2,11 @@
 # Created by scaled
 #
 
-@name ssh
+@name remote
 
-PExist["ssh", number] = 1
+PExist["remote", number] = 1
 
-function ssh() {
+function remote() {
     switch (P["state", number]) {
         case 0,
             if (deviceGet("nlix")) {
@@ -15,9 +15,9 @@ function ssh() {
                     ProgramName = arg(1)
                 }
                 
-                local RemoteS = P["device", wirelink]["S", table]
+                local RemoteTables = P["device", wirelink]["S", table]
                 
-                if (RemoteS["bin", table][ProgramName, number]) {
+                if (RemoteTables["PExist", table][ProgramName, number]) {
                     local Program = table("function" = ProgramName)
                     P["program", table] = Program
                     Program["parent", table] = P
@@ -25,7 +25,7 @@ function ssh() {
                     Program["in", array] = P["in", array]
                     Program["out", array] = P["out", array]
                     
-                    RemoteS["run", table]:pushTable(Program)
+                    RemoteTables["KTasks", table]:pushTable(Program)
                     
                     P["state", number] = 1
                 }

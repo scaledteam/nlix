@@ -2,13 +2,13 @@
 # Created by scaled
 #
 
-@name xvnc
+@name xremote
 
-xmenuAdd("remote", "xvnc")
+xmenuAdd("remote", "xremote")
 
-PExist["xvnc", number] = 1
+PExist["xremote", number] = 1
 
-function xvnc() {
+function xremote() {
     switch (P["state", number]) {
         case 0,
             if (deviceGet("nlix")) {
@@ -17,9 +17,9 @@ function xvnc() {
                     ProgramName = arg(1)
                 }
                 
-                local RemoteS = P["device", wirelink]["S", table]
+                local RemoteTables = P["device", wirelink]["Tables", table]
                 
-                if (RemoteS["bin", table][ProgramName, number]) {
+                if (RemoteTables["PExist", table][ProgramName, number]) {
                     local Program = table("function" = ProgramName)
                     P["program", table] = Program
                     Program["parent", table] = P
@@ -31,7 +31,7 @@ function xvnc() {
                     Program["xobjectsAll", table] = P["xobjectsAll", table]
                     Program["kbd", array] = P["kbd", array]
                     
-                    RemoteS["run", table]:pushTable(Program)
+                    RemoteTables["PTasks", table]:pushTable(Program)
                     
                     P["state", number] = 1
                 }

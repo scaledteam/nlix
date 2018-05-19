@@ -5,10 +5,10 @@
 @name tables
 
 # Public
-#@outputs Tables:table
+@outputs Tables:table
 
 # Private
-@persist Tables:table
+#@persist Tables:table
 
 if (!Tables) {
     Tables["PExist", table] = PExist
