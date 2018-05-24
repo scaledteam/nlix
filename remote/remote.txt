@@ -15,7 +15,7 @@ function remote() {
                     ProgramName = arg(1)
                 }
                 
-                local RemoteTables = P["device", wirelink]["S", table]
+                local RemoteTables = P["device", wirelink]["Tables", table]
                 
                 if (RemoteTables["PExist", table][ProgramName, number]) {
                     local Program = table("function" = ProgramName)
