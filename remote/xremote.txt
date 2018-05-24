@@ -31,7 +31,7 @@ function xremote() {
                     Program["xobjectsAll", table] = P["xobjectsAll", table]
                     Program["kbd", array] = P["kbd", array]
                     
-                    RemoteTables["PTasks", table]:pushTable(Program)
+                    RemoteTables["KTasks", table]:pushTable(Program)
                     
                     P["state", number] = 1
                 }
