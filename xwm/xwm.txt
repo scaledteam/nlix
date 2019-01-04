@@ -225,7 +225,8 @@ function xwm() {
             
             local Counter = P["focusCounter", number]
             
-            for (I = 1, Overload) {
+            #for (I = 1, Overload) {
+            while (perf()) {
                 if (Counter <= P["programs", table]:count()) {
                     local Frame = P["frames", table][Counter, table]
                     

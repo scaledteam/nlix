@@ -11,7 +11,7 @@ PExist["xremote", number] = 1
 function xremote() {
     switch (P["state", number]) {
         case 0,
-            if (deviceGet("nlix")) {
+            if (deviceGet("e2_nlix")) {
                 local ProgramName = "xwm"
                 if (args() >= 1) {
                     ProgramName = arg(1)

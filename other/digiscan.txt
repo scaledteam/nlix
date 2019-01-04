@@ -85,7 +85,8 @@ function digiscan() {
                 local Count = P["count", number]
                 local Textures = P["textures", table]
                 
-                for (I = 1, Overload) {
+                #for (I = 1, Overload) {
+                while (perf()) {
                     local X = Counter % ResolutionX
                     local Y = int(Counter / ResolutionX)
                     

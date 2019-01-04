@@ -59,7 +59,7 @@ function sh() {
                         end()
                         break
                     
-                    case "tulpacode",
+                    case "easteregg",
                         out("TuC-0.2.2 S1 EX11-02-13 Tel %C9I10 Sp3 Img.Hum&@.f-22y-M Rls3% W2+ Dr1 XS.i4 RL3@\n")
                         P["state", number] = 1
                         break

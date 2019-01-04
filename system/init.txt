@@ -1,0 +1,126 @@
+#
+# Created by scaled
+#
+
+@name init
+
+PExist["init", number] = 1
+
+function init() {
+    P["i", number] = P["i", number] + 1
+    switch (P["i", number]) {
+        # Kernel lib
+        case 1, #include "nlix/kernel/libkernel" break
+        
+        # System
+        case 2, #include "nlix/system/libio" break
+        #case 3, SYNC_SYSTEM_NAME = "system0" #include "nlix/system/sync" break
+        case 4, #include "nlix/system/tables" break
+        
+        # Devices
+        case 10, #include "nlix/devices/libdevices" break
+        case 11, #include "nlix/devices/hotplugd" break
+        case 12, #include "nlix/devices/autows" break
+        case 13, #include "nlix/devices/dlist" break
+        case 14, #include "nlix/devices/devcmd" break
+        case 15, #include "nlix/devices/dremove" break
+        case 16, #include "nlix/devices/wc" break
+        
+        # Terminal
+        case 20, #include "nlix/terminal/term" break
+        case 21, #include "nlix/terminal/skbd" break
+        case 22, #include "nlix/terminal/sh" break
+        
+        case 23, #include "nlix/terminal/echo" break
+        case 24, #include "nlix/terminal/help" break
+        case 25, #include "nlix/terminal/rund" break
+        
+        # Performance
+        case 30, #include "nlix/performance/autoperf" break
+        case 32, #include "nlix/performance/overload" break
+        case 33, #include "nlix/performance/uptime" break
+        case 34, #include "nlix/performance/printpi" break
+        
+        # Kernel tools
+        case 31, #include "nlix/kernel/kperf" break
+        case 40, #include "nlix/kernel/plist" break
+        case 41, #include "nlix/kernel/kill" break
+        case 42, #include "nlix/kernel/reboot" break
+        case 43, #include "nlix/kernel/poweroff" break
+        
+        # Files
+        case 50, #include "nlix/files/libfiles" break
+        case 51, #include "nlix/files/fstable" break
+        case 52, #include "nlix/files/fsreal" break
+        
+        case 54, #include "nlix/files/ls" break
+        case 55, #include "nlix/files/cat" break
+        case 56, #include "nlix/files/touch" break
+        case 57, #include "nlix/files/rm" break
+        case 58, #include "nlix/files/cp" break
+        case 59, #include "nlix/files/cd" break
+        
+        # Other
+        case 61, #include "nlix/other/surl" break
+        case 62, #include "nlix/other/digiscan" break
+        case 63, #include "nlix/other/wget" break
+        case 64, #include "nlix/other/calc" break
+        case 66, #include "nlix/other/programmer" break
+        case 67, #include "nlix/other/pmid" break
+        
+        # X
+        case 70, #include "nlix/x/kbd" break
+        case 71, #include "nlix/x/libx" break
+        case 72, #include "nlix/x/xstart" break
+        case 73, #include "nlix/x/xremove" break
+        case 74, #include "nlix/x/xup" break
+        case 75, #include "nlix/x/xcreate" break
+        
+        # xwm
+        case 80, #include "nlix/xwm/xmenu" break
+        case 81, #include "nlix/xwm/xwm" break
+        case 82, #include "nlix/xwm/xpanel" break
+        case 83, #include "nlix/xwm/xmsg" break
+        case 84, #include "nlix/xwm/xwmcmd" break
+        
+        # x base
+        case 85, #include "nlix/x-base/xfilemngr" break
+        case 86, #include "nlix/x-base/xedit" break
+        case 87, #include "nlix/x-base/xterm" break
+        case 88, #include "nlix/x-base/xfilechooser" break
+        case 89, #include "nlix/x-base/xfileframe" break
+        
+        # x tests
+        case 90, #include "nlix/x-tests/xres" break
+        case 91, #include "nlix/x-tests/xeyes" break
+        case 92, #include "nlix/x-tests/xids" break
+        
+        # 3D
+        case 95, #include "nlix/x-3d/xobj" break
+        case 96, #include "nlix/x-3d/hluoix3d" break
+        case 97, #include "nlix/x-3d/wustdd" break
+        case 98, #include "nlix/x-3d/illusion" break
+        
+        # Other for X
+        case 100, #include "nlix/x-other/speedometer" break
+        case 101, #include "nlix/x-other/radar" break
+        case 102, #include "nlix/x-other/clicker" break
+        case 103, #include "nlix/x-other/spiritlevel" break
+        case 105, #include "nlix/x-other/tictactoe" break
+        
+        # Remote control
+        case 113, #include "nlix/remote/remote" break
+        case 114, #include "nlix/remote/xremote" break
+        
+        # Place for your first programs
+        #case 110, #include "nlix/other/myprogram" break
+        
+        # Start system
+        case 121,
+            end()
+            #include "nlix/system/autostart"
+            break
+        
+        default,
+    }
+}

@@ -56,7 +56,8 @@ function calc() {
             local This = P["this", table]
             local Input = P["input", array]
             
-            for (I = 1, Overload) {
+            #for (I = 1, Overload) {
+            while (perf()) {
                 if (P["state", number] != 2) {
                     break
                 }
@@ -196,7 +197,8 @@ function calc() {
             local This = P["this", table]
             local Stack = P["stack", table]
             
-            for (I = 1, Overload) {
+            #for (I = 1, Overload) {
+            while (perf()) {
                 local Count = This["count", number]
                 
                 if (Count == 1) {

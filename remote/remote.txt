@@ -9,7 +9,7 @@ PExist["remote", number] = 1
 function remote() {
     switch (P["state", number]) {
         case 0,
-            if (deviceGet("nlix")) {
+            if (deviceGet("e2_nlix")) {
                 local ProgramName = "sh"
                 if (args() >= 1) {
                     ProgramName = arg(1)

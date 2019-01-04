@@ -1,0 +1,60 @@
+#
+# Created by scaled
+#
+
+@name sperf
+@persist SperfRepeats SperfCounter SperfTaskId SperfTasksCount SperfPerf
+
+SperfCounter = 1
+
+function sperfFirst() {
+    # Check work it or not
+    if (SperfCounter == P["SperfCounter", number]) {
+        SperfCounter++
+        
+        SperfTasksCount = SperfTaskId
+        SperfTaskId = 0
+    }
+    else {
+        P["SperfCounter", number] = SperfCounter
+        
+        SperfTaskId++
+    }
+    
+    
+    if (perf()) {
+        SperfPerf = 
+    }
+    elseif (SperfRepeats == 0) {
+        SperfRepeats++
+        KTaskId--
+        return 0
+    }
+    else {
+        SperfRepeats = 0
+        return 0
+    }
+}
+
+function sperfLoop() {
+    return perf(SperfPerf)
+}
+
+
+
+function sperf() {
+    if (perf()) {
+        SperfRepeats++
+        return 1
+    }
+    elseif (SperfRepeats == 0) {
+        SperfRepeats++
+        KTaskId--
+        return 0
+    }
+    else {
+        SperfRepeats = 0
+        return 0
+    }
+}
+

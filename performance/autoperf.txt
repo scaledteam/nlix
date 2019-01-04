@@ -3,6 +3,7 @@
 #
 
 @name autoperf
+@persist AutoperfLastRun
 
 PExist["autoperf", number] = 1
 
@@ -19,7 +20,7 @@ PExist["autoperf", number] = 1
     P["lastRun", number] = systime()
 }]#
 
-function autoperf() {
+#[function autoperf() {
     local DeltaTime = max(tickInterval(), systime() - P["lastRun", number])
     
     if (DeltaTime < 0.0667) {
@@ -30,4 +31,17 @@ function autoperf() {
     }
     
     P["lastRun", number] = systime()
+}]#
+
+function autoperf() {
+    local DeltaTime = max(tickInterval(), systime() - AutoperfLastRun)
+    
+    if (DeltaTime < 0.0667) {
+        KPerf = max(KPerf - 1, 2)
+    }
+    elseif (DeltaTime > 0.0667) {
+        KPerf = min(KPerf + 1, 85)
+    }
+    
+    AutoperfLastRun = systime()
 }

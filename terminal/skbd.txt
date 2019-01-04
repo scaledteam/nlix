@@ -15,8 +15,8 @@ function skbd() {
                 if (!P:exists("kbdOld")) {
                     P["kbdOld", array] = array()
                     
-                    P["kbdTable", table] = table()
-                    P["kbdTableOld", table] = table()
+                    #P["kbdTable", table] = table()
+                    #P["kbdTableOld", table] = table()
                 }
                 P["state", number] = 2
             }
@@ -28,8 +28,8 @@ function skbd() {
                 if (!P:exists("kbdOld")) {
                     P["kbdOld", array] = array()
                     
-                    P["kbdTable", table] = table()
-                    P["kbdTableOld", table] = table()
+                    #P["kbdTable", table] = table()
+                    #P["kbdTableOld", table] = table()
                 }
                 
                 P["state", number] = 1
@@ -65,8 +65,74 @@ function skbd() {
         
         case 2,
             local Keys = P["kbd", array]
+            local KeysOld = P["kbdOld", array]
             
-            if (Keys:count() > 0 | P["kbdTableOld", table]:count() > 0) {
+            if (Keys:count() > 0) {
+                #[if (changed(Keys:count())) {
+                    print("---start action\n", Keys, "\n", KeysOld)
+                }]#
+                
+                for (I = 1, Keys:count()) {
+                    if (I > KeysOld:count()) {
+                        break
+                    }
+                    else {
+                        #print("I=" + I + " <= KeysOld:count()=" + KeysOld:count())
+                    }
+                    
+                    while (KeysOld:count() > 0 & KeysOld[I, number] != Keys[I, number]) {
+                        #print("removed " + I + " element from KeysOld, key " + KeysOld[I, number])
+                        KeysOld:remove(I)
+                    }
+                }
+                
+                for (I = KeysOld:count() + 1, Keys:count()) {
+                    local Key = Keys[I, number]
+                    KeysOld[I, number] = Key
+                    #print("added " + I + " element to KeysOld, key " + Key)
+                    switch (Key) {
+                        # Enter
+                        case 10, case 13, case 142,
+                            P["term", array]:pushString("\n")
+                            
+                            out(P["text", string])
+                            P["text", string] = ""
+                            break
+                        
+                        # Backspace
+                        case 127,
+                            if (P["text", string]:length() > 0) {
+                                P["term", array]:pushString(TERM_ERASE1)
+                                P["text", string] = P["text", string]:sub(1, -2)
+                            }
+                            break
+                        
+                        # Delete
+                        case 148,
+                            if (P["text", string]:length() > 0) {
+                                P["term", array]:pushString(TERM_ERASE)
+                                P["term", array]:pushNumber(P["text", string]:length())
+                                P["text", string] = ""
+                            }
+                            break
+                        
+                        # Normal key
+                        default,
+                            if (inrange(Key, 32, 127)) {
+                                local Char = toChar(Key)
+                                
+                                P["text", string] = P["text", string] + Char
+                                
+                                P["term", array]:pushString(Char)
+                            }
+                    }
+                }
+            }
+            elseif (KeysOld:count() > 0) {
+                KeysOld:clear()
+            }
+            
+            #[if (Keys:count() > 0 | P["kbdTableOld", table]:count() > 0) {
                 local KbdTableOld = P["kbdTableOld", table]
                 KbdTableOld:clear()
                 P["kbdTableOld", table] = P["kbdTable", table]
@@ -119,7 +185,7 @@ function skbd() {
                         }
                     }
                 }
-            }
+            }]#
             break
         
         case 3,

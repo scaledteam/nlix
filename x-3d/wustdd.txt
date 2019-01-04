@@ -11,7 +11,13 @@ PExist["wustdd", number] = 1
 function wustdd() {
     switch (P["state", number]) {
         case 0,
-            P["count", number] = 40
+            local Count = arg(1):toNumber()
+            if (Count > 1) {
+                P["count", number] = Count
+            }
+            else {
+                P["count", number] = 40
+            }
             
             if (xcanCreate(2 + P["count", number])) {
                 P["background", table] = xcreate("box"):xsize(xres()):xcolor(vec(50, 50, 60))
@@ -113,7 +119,8 @@ function wustdd() {
                 
                 local RENDER_SMOOTH = P["RENDER_SMOOTH", number]
                 
-                for (I = 1, Overload) {
+                #for (I = 1, Overload) {
+                while (perf()) {
                     Counter++
                     
                     #Start actions
@@ -198,18 +205,25 @@ function wustdd() {
                     }
                     
                     
+                    # Fast method
+                    local FirstId = P[Counter, table]["id", number]
                     for (I = 1, 3) {
                         local Vector = P["Render_Matrix1", matrix] * P["Render_Matrix0", matrix] * (AREA[Counter, matrix]:row(I) - Render_Pos)
                         if (Vector[3] <= 0) {
-                            P[Counter, table]:xvertices(P["EMPTY_POLY", array])
+                            # Classic method
+                            #P[Counter, table]:xvertices(P["EMPTY_POLY", array])
+                            # Fast method
+                            P["xdevice", wirelink]:egpPolyOutline(FirstId, P["EMPTY_POLY", array])
                             continue
                         }
                         Temp_Vectors[I, vector2] = clamp(Vector:dehomogenized() * RENDER_MULTIPLIER_VECTOR2 + Offset, vec2(), Res)
                     }
                     
-                    
-                    P[Counter, table]:xvertices(Temp_Vectors)
-                    
+                    # Classic method
+                    #P[Counter, table]:xvertices(Temp_Vectors)
+                    # Fast method
+                    P["xdevice", wirelink]:egpPolyOutline(FirstId, Temp_Vectors)
+                    FirstId++
                     
                     #End action
                     if (Counter >= P["count", number]) {

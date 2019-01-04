@@ -1,0 +1,36 @@
+#
+# Created by scaled
+#
+
+@name libnetwork
+@output Net:table
+@persists NetDevices:table
+
+PExist["connect", number] = 1
+
+function connect() {
+    switch (P["state", number]) {
+        case 0,
+            if (arg(1)) {
+                P["targetType", string] = arg(1)
+                P["state", number] = 1
+            }
+            else {
+                err("Usage: connect [device]\n")
+                end()
+                break
+            }
+        
+        case 1,
+            if (deviceGet(P["targetType", string])) {
+                local Device = P["device", wirelink]
+                
+                if (Device["Net", table]) {
+                    NetDevices:pushTable(Device["Net", table])
+                }
+                else {
+                    err("No network on this device\n")
+                }
+            }
+    }
+}

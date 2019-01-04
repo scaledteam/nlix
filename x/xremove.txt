@@ -7,7 +7,7 @@
 PExist["xremove", number] = 1
 
 function xremove() {
-    for (I = 1, Overload) {
+    while (perf()) {
         switch (P["state", number]) {
             case 0,
                 if (!P["xparam", table]["blocked", number]) {

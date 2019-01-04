@@ -21,7 +21,7 @@ function string wirelink:type() {
     local Name = This:entity():type()
     
     if (Name == "gmod_wire_expression2") {
-        return This:entity():getName()
+        return "e2_" + This:entity():getName()
     }
     else {
         return Name

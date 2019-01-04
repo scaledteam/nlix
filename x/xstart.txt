@@ -21,6 +21,8 @@ function xstart() {
                 Device:egpResolution(vec2(), vec2(512))
                 
                 Device:egpBox(1, vec2(), vec2())
+                Device:egpAlpha(1, 0)
+                Device:egpBox(2, vec2(), vec2())
                 
                 P["xdevice", wirelink] = Device
                 P:remove("device")
@@ -50,13 +52,13 @@ function xstart() {
                 Device:egpResolution(vec2(), Res)
                 
                 P["xframe", table] = table(
-                    "id" = 1,
+                    "id" = 2,
                     "type" = "frame",
                     "size" = Res,
                     "count" = 1
                 )
                 
-                P["xobjectsAll", table] = table(P["xframe", table])
+                P["xobjectsAll", table] = table(NULL, P["xframe", table])
                 
                 local DeviceEntity = Device:entity()
                 P["xparam", table] = table(

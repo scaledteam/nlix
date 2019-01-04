@@ -7,7 +7,7 @@
 PExist["xcreate", number] = 1
 
 function xcreate() {
-    for (I = 1, Overload) {
+    while (perf()) {
         switch (P["state", number]) {
             # For last objects
             case 0,

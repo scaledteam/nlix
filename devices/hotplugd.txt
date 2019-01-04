@@ -5,17 +5,16 @@
 @name hotplugd
 
 @inputs [Port1 Port2 Port3 Port4]:wirelink
-@persist PortsOld:vector4 PortId
+@persist PortsOld:array PortId
 
 PExist["hotplugd", number] = 1
 
 function hotplugd() {
     PortId = PortId % 4 + 1
-    
     local Device = select(PortId, Port1, Port2, Port3, Port4)
     
-    if (Device & Device:entity():id() != PortsOld[PortId]) {
-        PortsOld[PortId] = Device:entity():id()
+    if (Device & Device != PortsOld[PortId, wirelink]) {
+        PortsOld[PortId, wirelink] = Device
         
         deviceNew(Device)
     }

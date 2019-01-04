@@ -133,6 +133,37 @@ function fstable() {
                 end()
                 break
             
+            case "exists",
+                if (P["path", string] != "") {
+                    local PathExp = P["path", string]:explode("/")
+                    
+                    while (PathExp:count() > 0) {
+                        local NextDir = PathExp:shiftString()
+                        if (Dir:exists(NextDir)) {
+                            if (PathExp:count() != 0) {
+                                Dir = Dir[NextDir, table]
+                            }
+                            else {
+                                out("1")
+                            }
+                        }
+                        elseif (Dir:exists(NextDir:toNumber())) {
+                            if (PathExp:count() != 0) {
+                                Dir = Dir[NextDir:toNumber(), table]
+                            }
+                            else {
+                                out("1")
+                            }
+                        }
+                        else {
+                            out("0")
+                        }
+                    }
+                }
+                
+                end()
+                break
+            
             case "write",
                 if (wait()) {
                     if (P["path", string] != "") {
@@ -161,6 +192,38 @@ function fstable() {
                                 else {
                                     Dir[NextDir, string] = In
                                 }
+                                break
+                            }
+                        }
+                    }
+                    
+                    out("")
+                    end()
+                }
+                break
+            
+            case "mkdir",
+                if (wait()) {
+                    if (P["path", string] != "") {
+                        local PathExp = P["path", string]:explode("/")
+                        
+                        while (PathExp:count() > 0) {
+                            local NextDir = PathExp:shiftString()
+                            if (PathExp:count() != 0) {
+                                if (Dir:exists(NextDir)) {
+                                    Dir = Dir[NextDir, table]
+                                }
+                                elseif (Dir:exists(NextDir:toNumber())) {
+                                    Dir = Dir[NextDir:toNumber(), table]
+                                }
+                                else {
+                                    out("Error: Wrong path.\n")
+                                    end()
+                                    return
+                                }
+                            }
+                            else {
+                                Dir[NextDir, table] = table()
                                 break
                             }
                         }

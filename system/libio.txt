@@ -8,6 +8,10 @@ function out(Text:string) {
     P["out", array]:pushString(Text)
 }
 
+function err(Text:string) {
+    P["err", array]:pushString(Text)
+}
+
 function number wait() {
     return P["in", array]:count() > 0
 }

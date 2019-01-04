@@ -5,7 +5,7 @@
 @name libfiles
 @persist Filesystems:table
 
-if (Tables:exists("fstab")) {
+if (Tables:exists("Filesystems")) {
     Filesystems = Tables["Filesystems", table]
 }
 else {
@@ -76,6 +76,14 @@ function fwrite(Path:string, Data:string) {
 
 function fremove(Path:string) {
     fsCall("remove", Path)
+}
+
+function fmkdir(Path:string) {
+    fsCall("mkdir", Path)
+}
+
+function fexists(Path:string) {
+    fsCall("exists", Path)
 }
 
 

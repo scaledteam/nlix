@@ -100,7 +100,8 @@ function pmid() {
             }
             
             local Data = P["data", string]
-            for (J = 1, Overload) {
+            #for (J = 1, Overload) {
+            while (perf()) {
                 if (P["state", number] != 3) {
                     break
                 }

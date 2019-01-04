@@ -3,9 +3,11 @@
 #
 
 @name libkernel
-@persist PExist:table
+@persist PExist:table KFUNC_KEY:string
 
 function table exec(Name:string) {
+    local Program = NULL
+    
     if (PExist[Name, number]) {
         if (P) {
             Program = table("function" = Name, "parent" = P)
@@ -14,12 +16,9 @@ function table exec(Name:string) {
             Program = table("function" = Name)
         }
         KTasks:pushTable(Program)
-        
-        return Program
     }
-    else {
-        return NULL
-    }
+    
+    return Program
 }
 
 function end() {
@@ -44,9 +43,9 @@ function tackUp() {
 }
 
 function table:execNow() {
-    if (P != NULL) {
+    if (PExist[P["function", string], number]) {
         local Super = P
-        P = Program
+        P = This
         P["function", string]()
         P = Super
     }
