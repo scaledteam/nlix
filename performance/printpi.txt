@@ -26,7 +26,8 @@ function printpi() {
             break
         
         case 1,
-            for (I = 1, Overload) {
+            #for (I = 1, Overload) {
+            while (perf()) {
                 local N = P["counter", number] + 1
                 
                 P["result", number] = P["result", number] + 4 * ((-1) ^ (N - 1)) / (2 * N - 1)

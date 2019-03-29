@@ -28,7 +28,7 @@ function init() {
         
         # Terminal
         case 20, #include "nlix/terminal/term" break
-        case 21, #include "nlix/terminal/skbd" break
+        case 21, #include "nlix-old/terminal/skbd" break
         case 22, #include "nlix/terminal/sh" break
         
         case 23, #include "nlix/terminal/echo" break
@@ -37,16 +37,16 @@ function init() {
         
         # Performance
         case 30, #include "nlix/performance/autoperf" break
-        case 32, #include "nlix/performance/overload" break
-        case 33, #include "nlix/performance/uptime" break
-        case 34, #include "nlix/performance/printpi" break
+        #case 31, #include "nlix/performance/overload" break
+        case 32, #include "nlix/performance/uptime" break
+        case 33, #include "nlix/performance/printpi" break
         
         # Kernel tools
-        case 31, #include "nlix/kernel/kperf" break
-        case 40, #include "nlix/kernel/plist" break
-        case 41, #include "nlix/kernel/kill" break
-        case 42, #include "nlix/kernel/reboot" break
-        case 43, #include "nlix/kernel/poweroff" break
+        case 40, #include "nlix/kernel/kperf" break
+        case 41, #include "nlix/kernel/plist" break
+        case 42, #include "nlix/kernel/kill" break
+        case 43, #include "nlix/kernel/reboot" break
+        case 44, #include "nlix/kernel/poweroff" break
         
         # Files
         case 50, #include "nlix/files/libfiles" break

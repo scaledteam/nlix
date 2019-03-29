@@ -58,7 +58,8 @@ function xobj() {
             }
         
         case 4,
-            for (I = 1, Overload) {
+            #for (I = 1, Overload) {
+            while (perf()) {
                 if (!perf()) {
                     break
                 }
@@ -162,7 +163,8 @@ function xobj() {
             
             local Counter = P["counter", number]
             
-            for (I = 1, Overload) {
+            #for (I = 1, Overload) {
+            while (perf()) {
                 Counter++
                 
                 if (Counter > P["limit", number]) {

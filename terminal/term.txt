@@ -81,7 +81,8 @@ function term() {
                     
                     local Update = 0
                     
-                    for (I = 1, Overload) {
+                    #for (I = 1, Overload) {
+                    while (perf()) {
                         if (wait()) {
                             local In = in()
                             

@@ -10,7 +10,8 @@ function plist() {
     local Counter = P["counter", number]
     local Out = ""
 
-    for (I = 1, Overload) {
+    while (perf()) {
+    #for (I = 1, Overload) {
         Counter++
         
         if (args() == 0 | KTasks[Counter, table]["function", string] == arg(1)) {

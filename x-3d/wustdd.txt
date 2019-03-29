@@ -49,7 +49,8 @@ function wustdd() {
             if (xcanDraw()) {
                 local Counter = P["counter", number]
                     
-                for (I = 1, Overload) {
+                #for (I = 1, Overload) {
+                while (perf()) {
                     if (Counter <= P["count", number]) {
                         P[Counter, table] = xcreate("polyOutline"):xcolor(vec(200, 200, 240))#:xparent(P["background", table])
                         Counter++
@@ -75,7 +76,8 @@ function wustdd() {
             local Max_Iterations = int(P["count", number] / 2)
             local Angle_Step = 360 / Max_Iterations
             
-            for (I = 1, Overload) {
+            #for (I = 1, Overload) {
+            while (perf()) {
                 Counter++
                 
                 #Generate map
@@ -235,6 +237,17 @@ function wustdd() {
                 }
                 
                 P["counter", number] = Counter
+                
+                # Kernel hack
+                if (P:exists("priority")) {
+                    if (P["priority-tries", number] < P["priority", number]) {
+                        P["priority-tries", number] = P["priority-tries", number] + 1
+                        KTaskId--
+                    }
+                    else {
+                        P["priority-tries", number] = 1
+                    }
+                }
                 
                 if (systime() > P["textNextUpdate", number]) {
                     P["fps", number] = P["framesRendered", number]

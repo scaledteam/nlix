@@ -36,7 +36,8 @@ function help() {
             local TabWidth = P["tabWidth", number]
             local TabString = P["tabString", string]
         
-            for (J = 1, Overload) {
+            #for (J = 1, Overload) {
+            while (perf()) {
                 for (I = 1, 3) {
                     Counter++
                     

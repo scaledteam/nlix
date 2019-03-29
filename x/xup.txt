@@ -7,7 +7,8 @@
 PExist["xup", number] = 1
 
 function xup() {
-    for (I = 1, Overload) {
+    #for (I = 1, Overload) {
+    while (perf()) {
         switch (P["state", number]) {
             case 0,
                 if (!P["xparam", table]["blocked", number]) {
