@@ -57,7 +57,7 @@ function table fsCall(Mode:string, Path:string) {
     
     P["fin", array] = array("Error: filesystem don't exist in fstab.\n")
     
-    return NULL
+    return table()
 }
 
 

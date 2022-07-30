@@ -1,0 +1,435 @@
+#
+# Created by scaled
+#
+
+@name wine
+
+# Defined
+@persist Screen:table Keyboard Device:wirelink
+
+# Temporary
+@persist Sys_CursorPos:vector2 Sys_Mouse Sys_Mouse_Changed #Input
+@persist Screen2_Active Screen2_Extends Screen2_Pos:vector2 #Screen2
+
+# Events
+@persist App_Dialog_Changed Sys_Text_Enable_Changed Device_Connected
+
+# Not defined
+@persist [Sys_Resolution App_Resolution Sys_Resolution_Old EGP_SymbolSize]:vector2 Sys_Orientation Sys_Resolution_Acpect #Screen
+@persist Sys_Timer_Num Sys_Timer App_TimerNum App_Timer Sys_Click App_Timer_Clk #Timer
+@persist Threads Threads_Count #Threads
+@persist Threads_Count_Old Threads_Old #Detectors
+@persist [EGP_NormalL EGP_Up EGP_Right]:vector EGP_Size_Screen:vector2
+
+@persist [App App_Pos EGPID_App App_List]:table [App_Move App_Resize]:string
+@persist [App_Launch App_Event_Create App_Event_EGPID App_Close App_Call App_Dialog]:string #Events
+@persist App_This:string App_This_Table:table EGP App_This_Active App_Click App_Mouse #App varriables
+
+PExist["wine", number] = 1
+
+
+# Fake EGP Screen
+function table wineToX(ID) {
+    return P["wine egp", table][ID, table]
+}
+
+function table table:xToWine(ID) {
+    P["wine egp", table][ID, table] = This
+    return This
+}
+
+function table wineXCreate(ID, Type:string) {
+    if (P["wine egp", table]:exists(ID)) {
+        local Object = P["wine egp", table][ID, table]
+        Object["wine exists", number] = 1
+        Object["type", string] = Type
+        return P["wine egp", table][ID, table]
+    }
+    else {
+        local Object = xcreate(Type)
+        Object["wine exists", number] = 1
+        return Object:xparent(P["wine egp", table][0, table]):xToWine(ID)
+    }
+}
+
+function vector2 table:egpPos(ID) {
+    return wineToX(ID)["pos", vector2] + wineToX(ID)["size", vector2]/2 #+ wineToX(ID)["parent", table]["size", vector2]/2
+}
+
+function vector2 table:egpSize(ID) {
+    return wineToX(ID)["size", vector2]
+}
+
+function vector2 table:egpSizeScreen() {
+    return EGP_Size_Screen
+}
+
+function vector table:egpColor(ID) {
+    return wineToX(ID)["color", vector]
+}
+
+function number table:egpParent(ID) {
+    return 0
+}
+
+function number table:egpHasObject(ID) {
+    return wineToX(ID)["wine exists", number]
+}
+
+function entity table:entity() {
+    return P["xdevice", wirelink]:entity()
+}
+
+function table:egpParent(ID1, ID2) {
+    wineToX(ID1):xparent(wineToX(ID2))
+}
+
+function table:egpAlign(ID1, Align) {
+    wineToX(ID1):xalign(vec2(Align, 0))
+}
+
+function table:egpAlign(ID1, Align1, Align2) {
+    wineToX(ID1):xalign(vec2(Align1, Align2))
+}
+
+
+function table:egpCopy(ID1, ID2) {
+    local Object = wineXCreate(ID1, "box")
+    local Reference = wineToX(ID2)
+    local ID = Object["id", number]
+    
+    #Object:merge(Reference)
+    #Object["id", number] = ID
+    
+    Object["type", string] = Reference["type", string]
+    Object["pos", vector2] = Reference["pos", vector2]
+    Object["size", vector2] = Reference["size", vector2]
+    Object["sizeNum", number] = Reference["sizeNum", number]
+    Object["color", vector] = Reference["color", vector]
+    Object["alpha", number] = Reference["alpha", number]
+    Object["text", string] = Reference["text", string]
+    Object["monospaced", number] = Reference["monospaced", number]
+    Object["align", vector2] = Reference["align", vector2]
+    Object["verticles", array] = Reference["verticles", array]
+    Object["parent", table] = Reference["parent", table]
+    
+    Object:xredraw()
+}
+
+function table:egpBox(ID, Pos:vector2, Size:vector2) {
+    wineXCreate(ID, "box"):xpos(Pos - Size/2):xsize(Size)
+}
+
+function table:egpBoxOutline(ID, Pos:vector2, Size:vector2) {
+    # Add outline support
+    wineXCreate(ID, "box"):xpos(Pos - Size/2):xsize(Size)
+}
+
+function table:egpCircle(ID, Pos:vector2, Size:vector2) {
+    wineXCreate(ID, "circle"):xpos(Pos):xsize(Size)
+}
+
+function table:egpCircleOutline(ID, Pos:vector2, Size:vector2) {
+    # Add outline support
+    wineXCreate(ID, "circle"):xpos(Pos):xsize(Size)
+}
+
+function table:egpWedge(ID, Pos:vector2, Size:vector2) {
+    # Add wedge support
+    wineXCreate(ID, "circle"):xpos(Pos):xsize(Size)
+}
+
+function table:egpMaterial(ID, Material:string) {}
+
+function table:egpFidelity(ID, Fidelity) {}
+
+function table:egpSize(ID, Size:vector2) {
+    wineToX(ID):xsize(Size)
+}
+function table:egpSize(ID, Size) {
+    wineToX(ID):xsize(Size)
+}
+
+function table:egpPos(ID, Pos:vector2) {
+    
+    local Object = wineToX(ID)
+    switch (Object["type", string]) {
+        case "box", case "boxOutline",
+            Object:xpos(Pos - Object["size", vector2] / 2)
+            break
+        
+        default,
+            Object:xpos(Pos)
+    }
+}
+
+function table:egpLine(ID, Pos1:vector2, Pos2:vector2) {
+    wineXCreate(ID, "line"):xline(Pos1, Pos2)
+}
+
+function table:egpLineStrip(ID, Pos1:vector2, Pos2:vector2, Pos3:vector2) {
+    wineXCreate(ID, "lineStrip"):xvertices(array(Pos1, Pos2, Pos3))
+}
+
+function table:egpLineStrip(ID, Pos1:vector2, Pos2:vector2, Pos3:vector2, Pos4:vector2) {
+    wineXCreate(ID, "lineStrip"):xvertices(array(Pos1, Pos2, Pos3, Pos4))
+}
+
+function table:egpLineStrip(ID, Vertices:array) {
+    wineXCreate(ID, "lineStrip"):xvertices(Vertices)
+}
+
+function table:egpPoly(ID, Pos1:vector2, Pos2:vector2, Pos3:vector2) {
+    wineXCreate(ID, "poly"):xvertices(array(Pos1, Pos2, Pos3))
+}
+
+function table:egpPoly(ID, Vertices:array) {
+    wineXCreate(ID, "poly"):xvertices(Vertices)
+}
+
+function table:egpText(ID, Text:string, Pos:vector2) {
+    wineXCreate(ID, "text"):xpos(Pos):xtext(Text)
+}
+
+function table:egpTextLayout(ID, Text:string, Pos:vector2, Size:vector2) {
+    wineXCreate(ID, "textLayout"):xpos(Pos):xsize(Size):xtext(Text)
+}
+
+function table:egpSetText(ID, Text:string) {
+    wineToX(ID):xtext(Text)
+}
+
+function table:egpFont(ID, Font:string) {}
+
+function table:egpColor(ID, Color:vector) {
+    wineToX(ID):xcolor(Color)
+}
+
+function table:egpColor(ID, Color:vector4) {
+    wineToX(ID):xcolor(vec(Color))
+    wineToX(ID):xalpha(Color[4])
+}
+
+function table:egpAlpha(ID, Alpha) {
+    wineToX(ID):xalpha(Alpha)
+}
+
+function table:egpRemove(ID) {
+    local Object = P["wine egp", table][ID, table]
+    Object["type", string] = "line"
+    Object["wine exists", number] = 0
+    Object["pos", vector2] = vec2()
+    Object["size", vector2] = vec2()
+    Object:xredraw()
+}
+
+
+# Replaced functions
+function number app(Name:string) {
+    xmenuAdd("wine", Name, "wine " + Name)
+    return Name == App_This
+}
+
+function number appThread(Name:string) {
+    return Name == App_This
+}
+
+function number appEgpMemory(Count) {
+    P["wine egp memory", number] = Count
+    return 0
+}
+
+function number appCloseTry(Number) {
+    return 0
+}
+
+function number appGraphics(Size:vector2,Color:vector){
+    #local Res = P["xframe", table]["size", vector2]
+    #xcreate("box"):xcolor(Color)
+    if (!P:exists("wine appGraphics")) {
+        P["xframe", table]["size", vector2] = Size
+        P["xframe", table]["name", table]:xtext(arg(1))
+        
+        P["wine egp", table] = table()
+        xcreate("box"):xsize(Size):xcolor(Color):xToWine(0)
+        
+        P["wine appGraphics", number] = 1
+        print(1)
+        return 1
+    }
+    else {
+        return 0
+    }
+}
+
+function vector2 autoResolution() {
+    return vec2(512)
+}
+
+function appIntent(App_Name:string, Table:table){
+    if(!App[App_Name,table]){
+        App_Launch = App_Name
+        App[App_Name,table] = Table:clone()
+    }else{
+        App[App_Name,table] = App[App_Name,table]:merge(Table)
+    }
+}
+
+#include "Windows/System/First/Const"
+#include "Windows/System/First/ROM"
+
+#include "Windows/System/API/Vars"
+#include "Windows/System/API/ROM"
+#include "Windows/System/API/Core"
+#include "Windows/System/API/EGP/Core"
+#include "Windows/System/API/EGP/Phys"
+#include "Windows/System/API/EGP/Object"
+#include "Windows/System/API/EGP/TextField"
+#include "Windows/System/API/EGP/Button"
+#include "Windows/System/API/EGP/Slider"
+#include "Windows/System/API/EGP/Menu"
+#include "Windows/System/API/EGP/ArrayField"
+#include "Windows/System/API/userfunctions"
+
+
+# Most windows linked api
+function number appSize(EGPID,MinSize:vector2,StandartSize:vector2,Color:vector){
+    return 0
+}
+function number appSize(EGPID,MinSize:vector2,StandartSize:vector2){
+    return 0
+}
+
+function number appCreate() {
+    return 0
+}
+
+function appCall(Name:string) { }
+
+function number appDialog(Name:string,Type:string,Size,Text:string) {
+    if (App_Dialog == Name) {
+        out(Name + ": " + Text)
+        App_Dialog = ""
+    }
+    return 0
+}
+
+function string activityManager(VarName:string, EGPIDStart, EGPIDEnd){
+    if (!Screen:egpHasObject(egp(EGPIDStart))) {
+        appN(VarName + "Update", 1)
+        appS(VarName + "Changed", appS(VarName))
+    }
+    elseif (appS(VarName + "Changed") != "" & appS(VarName + "Changed") != appS(VarName)) {
+        for (I = egp(EGPIDStart), egp(EGPIDEnd)) {
+            Screen:egpRemove(I)
+        }
+        appN(VarName + "Update", 1)
+        appS(VarName + "Changed", appS(VarName))
+        return ""
+    }
+    
+    return appS(VarName)
+}
+function string activityManager(EGPIDStart,EGPIDEnd){return activityManager("Activity",EGPIDStart,EGPIDEnd)}
+function string activityManager(EGPIDStart){return activityManager("Activity",EGPIDStart,EGPID_App[App_This,vector2]:y())}
+
+function number activityGraphics(VarName:string){if(appN(VarName+"Update")){appN(VarName+"Update",0) return 1} return 0}
+function number activityGraphics(){return activityGraphics("Activity")}
+
+function number activityCreate(VarName:string){if(!appN(VarName+"Create"+appS(VarName))){appN(VarName+"Create"+appS(VarName),1) return 1} return 0}
+function number activityCreate(){return activityCreate("Activity")}
+
+function wineApps() {
+    #include "Windows/Apps/AppDialog"
+    #include "Windows/Apps/Settings"
+    #include "Windows/Apps/TaskM"
+    
+    #include "Windows/Apps/3Dengine"
+    #include "Windows/Apps/Hluoix3D"
+    #include "Windows/Apps/LineEdit"
+    
+    #include "Windows/Apps/Illusion"
+    #include "Windows/Apps/LoadAnim"
+    
+    #[#include "Windows/Apps/Radar"
+    #include "Windows/Apps/OscilloScp"
+    #include "Windows/Apps/ArrayM"
+    #include "Windows/Apps/E2Editor"]#
+    
+    #include "Windows/Apps/Clicker"
+    #include "Windows/Apps/TicTacToe"
+    #include "Windows/Apps/PlayerRace"
+    
+    #include "Windows/Apps/YourApp"
+    #include "Windows/Apps/HttpTest"
+    
+    #include "Windows/Apps/Diagrams"
+    #include "Windows/Apps/Calculator"
+    #include "Windows/Apps/Chat"
+    #include "Windows/Apps/Infometer"
+    
+    #include "Windows/Apps/APITest"
+    #include "Windows/Apps/PerfTest"
+    #include "Windows/Apps/TableCMD"
+}
+
+wineApps()
+
+function wine() {
+    switch (P["wine state", number]) {
+        case 0,
+            if (args() == 0) {
+                out("Usage: wine [program name].\n")
+                end()
+            }
+            else {
+                if (!P:exists("wine egp memory")) {
+                    # Create fake memory for graphics requirement sample
+                    local P_Saved = P
+                    App_This = arg(1)
+                    P = table()
+                    
+                    App = P
+                    App_This_Table = P
+                    wineApps()
+                    
+                    local Memory = P["wine egp memory", number]
+                    P:clear()
+                    P = P_Saved
+                    P["wine egp memory", number] = Memory + 10
+                }
+                P["wine state", number] = 1
+            }
+            break
+        
+        case 1,
+            if (P["wine egp memory", number] == 0) {
+                out("Program don't reported memory requirements.\n")
+                end()
+            }
+            elseif (xcanCreate(P["wine egp memory", number])) {
+                P["wine state", number] = 2
+            }
+            break
+        
+        case 2,
+            if (xcanDraw()) {
+                Sys_Resolution = P["xframe", table]["parent", table]["size", vector2]
+                App_Resolution = P["xframe", table]["size", vector2]
+                
+                App = P
+                App_This = arg(1)
+                App_This_Table = P
+                App_This_Active = 1
+                EGP_SymbolSize = vec2(P["xparam", table]["symbolWidth", number], 1)
+                Sys_CursorPos = xcursor() #+ wineToX(0)["pos", vector2] #+ App_Resolution / 2
+                App_Mouse = xkeyUse()
+                App_Click = App_Mouse & App_Mouse != P["keyUseOld", number]
+                P["keyUseOld", number] = App_Mouse
+                
+                wineApps()
+            }
+            break
+    }
+}
+

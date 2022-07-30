@@ -6,6 +6,10 @@
 
 PExist["kill", number] = 1
 
+function kill(Id) {
+    KTasks:removeTable(Id):clear()
+}
+
 function kill() {
     if (args() < 1) {
         out("Usage: kill [id]\n")
@@ -13,12 +17,46 @@ function kill() {
     else {
         local Id = arg(1):toNumber()
         
-        if (Id < 0) {
+        if (Id < 0 | Id > KTasks:count()) {
             out("Entered value is incorrect.\n")
         }
         else {
-            KTasks:removeTable(Id):clear()
+            kill(Id)
         }
     }
     end()
+}
+
+
+PExist["pkill", number] = 1
+
+function pkill(ProgramName:string) {
+    local Program = exec("pkill")
+    Program["args", array] = array(ProgramName)
+}
+
+function pkill() {
+    if (args() < 1) {
+        out("Usage: pkill [program name]\n")
+        end()
+    }
+    else {
+        local Counter = P["counter", number]
+        local ProgramName = arg(1)
+        while (perf()) {
+            Counter++
+            if (Counter > KTasks:count()) {
+                if (P["killed", number] == 0) {
+                    out("No programs was killed.\n")
+                }
+                end()
+                break
+            }
+            if (KTasks[Counter, table]["function", string] == ProgramName) {
+                kill(Counter)
+                P["killed", number] = P["killed", number] + 1
+            }
+        }
+        P["counter", number] = Counter
+    }
 }

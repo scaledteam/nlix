@@ -43,7 +43,8 @@ function table xcreate(Type:string) {
                 Object["verticles", array] = array(vec2(), vec2(), vec2())
                 Object["sizeNum", number] = 1
                 break
-            default, return NULL
+            default,
+                return table()
         }
         
         Device:egpParent(Id, Object["parent", table]["id", number])
@@ -51,7 +52,7 @@ function table xcreate(Type:string) {
         return Object
     }
     else {
-        return NULL
+        return table()
     }
 }
 
@@ -282,7 +283,7 @@ function number xxobjectsLeft() {
 function table table:xexec(ProgramName:string) {
     local Program = exec(ProgramName)
     
-    if (Program != NULL) {
+    if (Program) {
         Program["xparam", table] = P["xparam", table]
         Program["xdevice", wirelink] = P["xdevice", wirelink]
         Program["xobjectsAll", table] = P["xobjectsAll", table]
@@ -302,7 +303,7 @@ function table xexec(ProgramName:string, Pos:vector2, Size:vector2) {
         return Frame:xexec(ProgramName)
     }
     else {
-        return NULL
+        return table()
     }
 }
 

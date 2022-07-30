@@ -3,10 +3,10 @@
 #
 
 @name libkernel
-@persist PExist:table KFUNC_KEY:string
+@persist PExist:table
 
 function table exec(Name:string) {
-    local Program = NULL
+    local Program = table()
     
     if (PExist[Name, number]) {
         if (P) {
@@ -31,7 +31,7 @@ function end() {
         P:clear()
     }
     
-    P = NULL
+    P = table()
 }
 
 function tackUp() {

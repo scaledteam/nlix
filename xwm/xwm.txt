@@ -328,7 +328,7 @@ function xwm() {
                 
                 Frame["window", table] = xcreate("box"):xparent(Frame):xpos(WindowPos):xsize(WindowSize)
                 
-                xcreate("text"):xparent(Frame):xpos(WindowPos):xtext(P["tempProgramName", string]):xsize(20):xcolor(vec())
+                Frame["name", table] = xcreate("text"):xparent(Frame):xpos(WindowPos):xtext(P["tempProgramName", string]):xsize(20):xcolor(vec())
                 
                 local Offset = vec2(WindowSize[1] - 10, -10)
                 Frame["closeButton", table] = xcreate("lineStrip"):xparent(Frame):xsize(2):xvertices(array(
@@ -353,7 +353,7 @@ function xwm() {
                 P["programs", table]:unshiftTable(Program)
                 P["frames", table]:unshiftTable(Frame)
                 
-                if (Program != NULL) {
+                if (Program) {
                     Program["args", array] = P:removeArray("commandExp")
                     Program["out", array] = P["xmsg", array]
                     Program["kbd", array] = array()

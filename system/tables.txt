@@ -13,10 +13,10 @@
 if (!Tables) {
     Tables["PExist", table] = PExist
     Tables["KTasks", table] = KTasks
-    Tables["NULL", table] = NULL
+    #Tables["NULL", table] = NULL
 }
 else {
     PExist = Tables["PExist", table]
     KTasks = Tables["KTasks", table]
-    NULL = Tables["NULL", table]
+   # NULL = Tables["NULL", table]
 }

@@ -58,7 +58,8 @@ function xstart() {
                     "count" = 1
                 )
                 
-                P["xobjectsAll", table] = table(NULL, P["xframe", table])
+                #P["xobjectsAll", table] = table(NULL, P["xframe", table])
+                P["xobjectsAll", table] = table(table(), P["xframe", table])
                 
                 local DeviceEntity = Device:entity()
                 P["xparam", table] = table(

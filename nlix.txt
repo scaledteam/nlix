@@ -13,13 +13,13 @@
 # Сделать верхний frame для курсора и меню в xwm
 
 @name nlix
-@persist [P NULL KTasks]:table KTaskId KPerf
+@persist [P KTasks]:table KTaskId KPerf
 @trigger none
 
 if (tickClk()) {
-    if (NULL) {
+    #[if (NULL) {
         NULL:clear()
-    }
+    }]#
     
     while (perf(KPerf)) {
         # Counter

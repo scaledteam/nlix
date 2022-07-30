@@ -65,9 +65,9 @@ function sh() {
                         break
                     
                     default,
-                        local Commands = Command:explode(">")
+                        #[local Commands = Command:explode(">")
                         
-                        local Program = NULL
+                        local Program = table()
                         for (I = 1, Commands:count()) {
                             local CommandExplode = Commands[I, string]:trim():explodeRE(" +")
                             
@@ -84,7 +84,7 @@ function sh() {
                                 Program["in", array] = PrevProgramOut
                             }
                             
-                            if (Program == NULL) {
+                            if (!Program:exists("function")) {
                                 out("Program \"" + ProgramName + "\" is not exist.\n")
                                 P["state", number] = 1
                                 break
@@ -95,10 +95,27 @@ function sh() {
                             }
                         }
                         
-                        Program["out", array] = P["out", array]
+                        Program["out", array] = P["out", array]]#
                         
-                        P["program", table] = Program
-                        P["state", number] = 3
+                        local CommandExplode = Command:trim():explodeRE(" +")
+                        local ProgramName = CommandExplode:shiftString()
+                        local Program = exec(ProgramName)
+                        if (Program) {
+                            if (CommandExplode:count() > 0) {
+                                Program["args", array] = CommandExplode
+                            }
+                            Program["in", array] = P["in", array]
+                            Program["out", array] = P["out", array]
+                            
+                            P["program", table] = Program
+                            
+                            P["state", number] = 3
+                        }
+                        else {
+                            out("Program \"" + ProgramName + "\" is not exist.\n")
+                            
+                            P["state", number] = 1
+                        }
                     }
             }
             break

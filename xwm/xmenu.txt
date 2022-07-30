@@ -22,7 +22,9 @@ else {
 
 function xmenuAdd(Category:string, ProgramName:string, FunctionName:string) {
     if (XMenu:exists(Category)) {
-        XMenu[Category, table][ProgramName, string] = FunctionName
+        if (!XMenu[Category, table]:exists(ProgramName)) {
+            XMenu[Category, table][ProgramName, string] = FunctionName
+        }
     }
     else {
         XMenu[Category, table] = table()
