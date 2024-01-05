@@ -44,9 +44,14 @@ function table wineXCreate(ID, Type:string) {
     if (P["wine egp", table]:exists(ID)) {
         local Object = P["wine egp", table][ID, table]
         Object["wine exists", number] = 1
-        Object["wine parent", number] = 0
+        #Object["wine parent", number] = 0
+        
+        if (Type != Object["type", string]) {
+            Object["type", string] = Type
+            Object:xredraw()
+        }
         Object["type", string] = Type
-        Object:xredraw()
+        
         return P["wine egp", table][ID, table]
     }
     else {
@@ -259,15 +264,18 @@ function number appCloseTry(Number) {
 function number appGraphics(Size:vector2,Color:vector){
     #local Res = P["xframe", table]["size", vector2]
     #xcreate("box"):xcolor(Color)
+    if (P:exists("wine fake memory")) {
+        return 1
+    }
     if (!P:exists("wine appGraphics")) {
         P["xframe", table]["size", vector2] = Size
         P["xframe", table]["name", table]:xtext(arg(1))
+        P["Size", vector2] = Size
         
         P["wine egp", table] = table()
         xcreate("box"):xsize(Size):xcolor(Color):xToWine(0)
         
         P["wine appGraphics", number] = 1
-        print("appGraphics 1")
         return 1
     }
     else {
@@ -372,6 +380,13 @@ function number appSize(EGPID,MinSize:vector2,StandartSize:vector2){
 }
 
 function number appCreate() {
+    if (P:exists("wine fake memory")) {
+        return 0
+    }
+    if (!P:exists("wine appCreate")) {
+        P["wine appCreate", number] = 1
+        return 1
+    }
     return 0
 }
 
@@ -413,7 +428,7 @@ function number activityCreate(VarName:string){if(!appN(VarName+"Create"+appS(Va
 function number activityCreate(){return activityCreate("Activity")}
 
 function wineApps() {
-    #include "Windows/Apps/AppDialog"
+    ##include "Windows/Apps/AppDialog"
     #include "Windows/Apps/Settings"
     #include "Windows/Apps/TaskM"
     
@@ -434,7 +449,7 @@ function wineApps() {
     #include "Windows/Apps/PlayerRace"
     
     #include "Windows/Apps/YourApp"
-    #include "Windows/Apps/HttpTest"
+    ##include "Windows/Apps/HttpTest"
     
     #include "Windows/Apps/Diagrams"
     #include "Windows/Apps/Calculator"
@@ -448,6 +463,7 @@ function wineApps() {
 
 wineApps()
 EGPID_App["Free", array] = array()
+App = table()
 
 function wine() {
     switch (P["wine state", number]) {
@@ -463,8 +479,10 @@ function wine() {
                     App_This = arg(1)
                     P = table()
                     
-                    App = P
+                    #App = P
+                    App[App_This,table] = P
                     App_This_Table = P
+                    P["wine fake memory", number] = 1
                     wineApps()
                     
                     local Memory = P["wine egp memory", number]
@@ -492,27 +510,26 @@ function wine() {
                 Sys_Resolution = P["xframe", table]["parent", table]["size", vector2]
                 App_Resolution = P["xframe", table]["size", vector2]
                 
-                App = P
                 App_This = arg(1)
                 App_This_Table = P
                 App_This_Active = 1
+                App[App_This, table] = P
                 EGP_SymbolSize = vec2(P["xparam", table]["symbolWidth", number], 1)
                 Sys_CursorPos = xcursor() #+ wineToX(0)["pos", vector2] #+ App_Resolution / 2
                 App_Mouse = xkeyUse()
                 App_Click = App_Mouse & App_Mouse != P["keyUseOld", number]
                 P["keyUseOld", number] = App_Mouse
                 #User = P["xframe", table]["user", entity]
-                #EGP = 0
+                EGP = 0
                 EGPID_App[App_This,vector2] = vec2(0, P["wine egp memory", number]-5)
                 EGPID_App["Free", array][1, vector2] = vec2(P["wine egp memory", number]-4, P["wine egp memory", number]-1)
                 
-                wineApps()
-                
-                local String = ""
-                foreach (I, EGP_Object:table = P["wine egp", table]) {
-                    String += I + ", "
+                if (P["kbd", array][1, number] != P["wine keyboard old", number]) {
+                    Keyboard = P["kbd", array][1, number]
+                    P["wine keyboard old", number] = Keyboard
                 }
-                print(String)
+                
+                wineApps()
             }
             break
     }
