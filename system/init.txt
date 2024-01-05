@@ -67,7 +67,7 @@ function init() {
         case 63, #include "nlix/other/wget" break
         case 64, #include "nlix/other/calc" break
         case 66, #include "nlix/other/programmer" break
-        case 67, #include "nlix/other/pmid" break 
+        case 67, #include "nlix/other/pmid" break
         
         # X
         case 70, #include "nlix/x/kbd" break

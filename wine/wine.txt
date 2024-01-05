@@ -25,6 +25,8 @@
 @persist [App_Launch App_Event_Create App_Event_EGPID App_Close App_Call App_Dialog]:string #Events
 @persist App_This:string App_This_Table:table EGP App_This_Active App_Click App_Mouse #App varriables
 
+@persist Update:string
+
 PExist["wine", number] = 1
 
 
@@ -42,12 +44,15 @@ function table wineXCreate(ID, Type:string) {
     if (P["wine egp", table]:exists(ID)) {
         local Object = P["wine egp", table][ID, table]
         Object["wine exists", number] = 1
+        Object["wine parent", number] = 0
         Object["type", string] = Type
+        Object:xredraw()
         return P["wine egp", table][ID, table]
     }
     else {
         local Object = xcreate(Type)
         Object["wine exists", number] = 1
+        Object["wine parent", number] = 0
         return Object:xparent(P["wine egp", table][0, table]):xToWine(ID)
     }
 }
@@ -69,7 +74,7 @@ function vector table:egpColor(ID) {
 }
 
 function number table:egpParent(ID) {
-    return 0
+    return wineToX(ID)["wine parent", number]
 }
 
 function number table:egpHasObject(ID) {
@@ -81,7 +86,9 @@ function entity table:entity() {
 }
 
 function table:egpParent(ID1, ID2) {
-    wineToX(ID1):xparent(wineToX(ID2))
+    local Object = wineToX(ID1)
+    Object:xparent(wineToX(ID2))
+    Object["wine parent", number] = ID2
 }
 
 function table:egpAlign(ID1, Align) {
@@ -112,6 +119,7 @@ function table:egpCopy(ID1, ID2) {
     Object["align", vector2] = Reference["align", vector2]
     Object["verticles", array] = Reference["verticles", array]
     Object["parent", table] = Reference["parent", table]
+    Object["wine exists", number] = Reference["wine exists", number]
     
     Object:xredraw()
 }
@@ -175,6 +183,10 @@ function table:egpLineStrip(ID, Pos1:vector2, Pos2:vector2, Pos3:vector2, Pos4:v
     wineXCreate(ID, "lineStrip"):xvertices(array(Pos1, Pos2, Pos3, Pos4))
 }
 
+function table:egpLineStrip(ID, Pos1:vector2, Pos2:vector2, Pos3:vector2, Pos4:vector2, Pos5:vector2) {
+    wineXCreate(ID, "lineStrip"):xvertices(array(Pos1, Pos2, Pos3, Pos4, Pos5))
+}
+
 function table:egpLineStrip(ID, Vertices:array) {
     wineXCreate(ID, "lineStrip"):xvertices(Vertices)
 }
@@ -192,7 +204,7 @@ function table:egpText(ID, Text:string, Pos:vector2) {
 }
 
 function table:egpTextLayout(ID, Text:string, Pos:vector2, Size:vector2) {
-    wineXCreate(ID, "textLayout"):xpos(Pos):xsize(Size):xtext(Text)
+    wineXCreate(ID, "textLayout"):xpos(Pos):xsize(Size):xtext(Text):xalign(vec2(0, 0))
 }
 
 function table:egpSetText(ID, Text:string) {
@@ -215,7 +227,8 @@ function table:egpAlpha(ID, Alpha) {
 }
 
 function table:egpRemove(ID) {
-    local Object = P["wine egp", table][ID, table]
+    #local Object = P["wine egp", table][ID, table]
+    local Object = wineToX(ID)
     Object["type", string] = "line"
     Object["wine exists", number] = 0
     Object["pos", vector2] = vec2()
@@ -254,7 +267,7 @@ function number appGraphics(Size:vector2,Color:vector){
         xcreate("box"):xsize(Size):xcolor(Color):xToWine(0)
         
         P["wine appGraphics", number] = 1
-        print(1)
+        print("appGraphics 1")
         return 1
     }
     else {
@@ -280,8 +293,64 @@ function appIntent(App_Name:string, Table:table){
 
 #include "Windows/System/API/Vars"
 #include "Windows/System/API/ROM"
+
 #include "Windows/System/API/Core"
-#include "Windows/System/API/EGP/Core"
+
+# core replacement
+##include "Windows/System/API/EGP/Core"
+function number egp() {
+    return 0
+}
+
+function number egp(EGPID) {
+    return EGPID
+}
+
+function number egpInrange(EGPID) {
+    #local Pos = vec2(Screen:egpGlobalPos(EGPID)) - Sys_Resolution / 2
+    local Pos = Screen:egpPos(EGPID) + Screen:egpPos(Screen:egpParent(EGPID))
+    local Size = Screen:egpSize(EGPID) / 2
+    return inrange(Sys_CursorPos, Pos - Size, Pos + Size)
+}
+
+function number egpInrange(Pos1:vector2, Pos2:vector2, EGPparent) {
+    return inrange(Sys_CursorPos, Screen:egpPos(EGPparent) + Pos1, Screen:egpPos(EGPparent) + Pos2)
+}
+
+function number appEgpInrange(Pos1:vector2, Pos2:vector2) {
+    local App_Pos = Screen:egpPos(EGP) return inrange(Sys_CursorPos, App_Pos + Pos1, App_Pos + Pos2)
+}
+
+function number egpTextSizeX(Number) {
+    return int(EGP_SymbolSize:x() * int(Number / EGP_SymbolSize:y()) / 2) * 2
+}
+
+function vector2 egpChoiceHelper(Pos:vector2, Step) {
+    return floor((Sys_CursorPos - Pos) / Step)
+}
+
+function vector2 appChoiceHelper(Pos:vector2, Step) {
+    return floor((Sys_CursorPos - Pos - Screen:egpPos(EGP)) / Step)
+}
+
+function vector2 egpChoiceHelper(Pos:vector2, Step:vector2) {
+    return floor((Sys_CursorPos - Pos) / Step)
+}
+
+function vector2 appChoiceHelper(Pos:vector2, Step:vector2) {
+    return floor((Sys_CursorPos - Pos - Screen:egpPos(EGP)) / Step)
+}
+
+function vector egpUniColor(Color:vector) {
+    return vec(255) * (array(Color:x(), Color:y(), Color:z()):average() < 190)
+}
+
+function vector egpUniColor(ParentID) {
+    return egpUniColor(Screen:egpColor(ParentID))
+}
+
+
+
 #include "Windows/System/API/EGP/Phys"
 #include "Windows/System/API/EGP/Object"
 #include "Windows/System/API/EGP/TextField"
@@ -293,6 +362,8 @@ function appIntent(App_Name:string, Table:table){
 
 
 # Most windows linked api
+##include "Windows/System/API/App"
+
 function number appSize(EGPID,MinSize:vector2,StandartSize:vector2,Color:vector){
     return 0
 }
@@ -315,12 +386,14 @@ function number appDialog(Name:string,Type:string,Size,Text:string) {
 }
 
 function string activityManager(VarName:string, EGPIDStart, EGPIDEnd){
+    #print(appS(VarName), appS(VarName + "Changed"))
     if (!Screen:egpHasObject(egp(EGPIDStart))) {
         appN(VarName + "Update", 1)
         appS(VarName + "Changed", appS(VarName))
     }
     elseif (appS(VarName + "Changed") != "" & appS(VarName + "Changed") != appS(VarName)) {
         for (I = egp(EGPIDStart), egp(EGPIDEnd)) {
+        #for (I = EGPIDStart, EGPIDEnd) {
             Screen:egpRemove(I)
         }
         appN(VarName + "Update", 1)
@@ -374,6 +447,7 @@ function wineApps() {
 }
 
 wineApps()
+EGPID_App["Free", array] = array()
 
 function wine() {
     switch (P["wine state", number]) {
@@ -396,7 +470,7 @@ function wine() {
                     local Memory = P["wine egp memory", number]
                     P:clear()
                     P = P_Saved
-                    P["wine egp memory", number] = Memory + 10
+                    P["wine egp memory", number] = Memory + 15
                 }
                 P["wine state", number] = 1
             }
@@ -409,6 +483,7 @@ function wine() {
             }
             elseif (xcanCreate(P["wine egp memory", number])) {
                 P["wine state", number] = 2
+                #print("egp memory requirements: " + P["wine egp memory", number])
             }
             break
         
@@ -426,8 +501,18 @@ function wine() {
                 App_Mouse = xkeyUse()
                 App_Click = App_Mouse & App_Mouse != P["keyUseOld", number]
                 P["keyUseOld", number] = App_Mouse
+                #User = P["xframe", table]["user", entity]
+                #EGP = 0
+                EGPID_App[App_This,vector2] = vec2(0, P["wine egp memory", number]-5)
+                EGPID_App["Free", array][1, vector2] = vec2(P["wine egp memory", number]-4, P["wine egp memory", number]-1)
                 
                 wineApps()
+                
+                local String = ""
+                foreach (I, EGP_Object:table = P["wine egp", table]) {
+                    String += I + ", "
+                }
+                print(String)
             }
             break
     }

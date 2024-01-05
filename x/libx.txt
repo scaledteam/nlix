@@ -178,6 +178,7 @@ function table table:xvertices(Verticles:array) {
         case "lineStrip", P["xdevice", wirelink]:egpLineStrip(This["id", number], Verticles) break
         default,
     }
+    P["xdevice", wirelink]:egpParent(This["id", number], This["parent", table]["id", number])
     return This
 }
 
